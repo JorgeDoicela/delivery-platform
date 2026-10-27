@@ -59,3 +59,12 @@ Ante cualquier intervención en el repositorio, el agente debe consultar y ceñi
 3. **Gestión de Estados Completa:** Toda vista asíncrona debe implementar los cuatro estados: `idle`, `loading` (skeletons), `error` (mensajes contextuales y reintento) y `success`.
 4. **Límite de Tamaño de Archivo:** Ningún componente o clase de servicio debe superar las 400 líneas. Extraer a submódulos cuando se alcance dicho límite.
 5. **Tono Sobrio y Profesional:** Cero emojis y cero lenguaje publicitario o inflado en código, documentación y commits.
+
+---
+
+## 5. Control de Calidad Pre-Commit (Husky v9)
+
+El repositorio cuenta con hooks de pre-commit automatizados y selectivos en `.husky/pre-commit`:
+* **Frontend:** Si el commit incluye archivos `.ts`, `.tsx`, `.js` o `.jsx`, ejecuta automáticamente el linter de ESLint (`pnpm --filter frontend lint`).
+* **Backend:** Si el commit incluye archivos `.cs` o `.csproj`, ejecuta la compilación de la solución (`dotnet build backend/Delivery.sln`).
+* **Inmutabilidad de la Regla:** Queda prohibido eludir el pre-commit con `--no-verify` salvo autorización expresa del desarrollador. Todo commit debe entrar con 0 errores y 0 advertencias.
