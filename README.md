@@ -61,8 +61,8 @@ Verificar que los servicios esten saludables con `docker compose ps`.
 cd backend/src/Delivery.Api
 dotnet run
 ```
-*API disponible en:* `http://localhost:5000`  
-*Swagger UI:* `http://localhost:5000/swagger`
+*API disponible en:* `http://localhost:5005`  
+*Swagger UI:* `http://localhost:5005/swagger`
 
 ### Paso 3: Iniciar el Frontend (Next.js 16)
 ```powershell

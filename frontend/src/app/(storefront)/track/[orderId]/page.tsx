@@ -54,7 +54,7 @@ function OrderTrackingContent() {
 
     // SignalR Tracking Hub
     const connection = new signalR.HubConnectionBuilder()
-      .withUrl(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000'}/hubs/tracking`)
+      .withUrl(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5005'}/hubs/tracking`)
       .withAutomaticReconnect()
       .build();
 

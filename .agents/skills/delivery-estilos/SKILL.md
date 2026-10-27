@@ -1,0 +1,85 @@
+---
+name: delivery-estilos
+description: Sistema de diseño, UI/UX premium y guía de estilos para Delivery Platform (Paleta asadero carbón/ámbar, tipografía, micro-animaciones, accesibilidad WCAG y diseño táctil ergonómico).
+---
+# Sistema de Diseño y Guía de Estilos para Delivery Platform
+
+Esta habilidad define los principios visuales, tokens de diseño, criterios de experiencia de usuario (UX) y estándares de accesibilidad para la interfaz de Delivery Platform.
+
+---
+
+## 1. Identidad Visual: Asadero Artesanal Premium
+
+La identidad estética combina la elegancia contemporánea con los atributos gastronómicos de un asadero tradicional de pollos y carnes a la brasa:
+* **Sensación:** Cálida, limpia, apetitosa y de alta tecnología.
+* **Tonalidades Base:** Carbón intenso, brasa encendida, acentos tostados y contrastes definidos.
+* **Prohibición Estricta:** Prohibido el uso de colores planos genéricos sin calibrar (ej. rojo puro `#ff0000` o azul primario `#0000ff`). Todos los tonos deben derivar de la paleta calibrada.
+
+---
+
+## 2. Paleta de Colores y Design Tokens
+
+### 2.1. Modo Oscuro (Storefront Hero, Tracking y KDS)
+* **Fondo Principal:** `neutral-950` (`#0a0a0a`) - Profundo, reduce el cansancio visual en cocina y resalta los productos.
+* **Superficies y Tarjetas:** `neutral-900` (`#171717`) con bordes sutiles en `neutral-800` (`#262626`).
+* **Superficies Interactivas Elevadas:** `neutral-800/80` con desenfoque de fondo (`backdrop-blur-md`).
+* **Texto Principal:** `neutral-50` (`#fafafa`) y `neutral-200` (`#e5e5e5`).
+* **Texto Secundario / Metadatos:** `neutral-400` (`#a3a3a3`) y `neutral-500` (`#737373`).
+
+### 2.2. Acentos Gastronómicos (Fuego y Brasa)
+* **Primario (Ámbar Dorado):** `amber-500` (`#f59e0b`) y `amber-400` (`#fbbf24`). Empleado en estados de preparación, botones de acción primaria y badges de cocción.
+* **Secundario (Naranja Brasa):** `orange-600` (`#ea580c`) y `orange-500` (`#f97316`). Empleado en indicadores de oferta, pines de destino y alertas de alta demanda.
+* **Resaltado y Halos:** `amber-500/20` o `orange-500/20` para sombras volumétricas y efectos de pulso.
+
+### 2.3. Modo Claro Funcional (Formularios de Checkout y Facturación)
+* **Fondo:** `white` (`#ffffff`) y `slate-50` (`#f8fafc`).
+* **Bordes y Divisores:** `slate-200` (`#e2e8f0`).
+* **Texto Primario:** `slate-900` (`#0f172a`).
+
+### 2.4. Colores Semánticos de Operación
+* **Éxito (Entregado / Pagado):** `emerald-600` (`#16a34a`) con fondo `emerald-950/40`.
+* **Atención / En Horno:** `amber-500` (`#f59e0b`) con fondo `amber-950/40`.
+* **Cancelado / Error:** `red-600` (`#dc2626`) con fondo `red-950/40`.
+* **En Camino (Despachado):** `blue-500` (`#3b82f6`) con halo dinámico.
+
+---
+
+## 3. Tipografía y Jerarquía
+
+* **Fuente Principal:** Tipografías sans-serif de alta legibilidad en pantallas (`Inter`, `Outfit` o variables del sistema).
+* **Números y Precios:** Emplear fuentes con cifras tabulares o monoespaciadas (`font-mono`) para que los importes, vuelto y coordenadas se alineen verticalmente sin oscilaciones visuales.
+* **Escala Tipográfica:**
+  - Encabezados principales: `text-xl` a `text-2xl font-bold tracking-tight`.
+  - Títulos de tarjeta / Comandas: `text-sm font-semibold uppercase tracking-wider`.
+  - Texto de lectura: `text-sm font-normal leading-relaxed`.
+  - Etiquetas compactas y metadatos: `text-xs` y `text-[11px] font-medium`.
+
+---
+
+## 4. Ergonomía Táctil y Mobile-First
+
+* **Zonas de Pulsación (Touch Targets):**
+  - Cualquier botón interactivo, selector o casilla en móvil debe tener una dimensión mínima de `44px` (ideal `48px`) para evitar pulsaciones erróneas de repartidores con guantes o clientes en smartphones.
+* **Micro-Interacciones:**
+  - Retroalimentación háptica visual en botones mediante escalado sutil: `active:scale-95`.
+  - Transiciones suaves y consistentes: `transition-all duration-200 ease-out`.
+  - Pulso continuo para indicadores de seguimiento GPS activo: `animate-pulse` o `animate-ping`.
+
+---
+
+## 5. Accesibilidad (WCAG 2.1 AA)
+
+* **Contraste de Color:**
+  - Relación de contraste mínima de 4.5:1 para texto estándar y 3:1 para texto de gran tamaño o controles de interfaz.
+* **Estados de Foco:**
+  - Todo elemento interactivo debe disponer de anillo de foco visible (`focus-visible:ring-2 focus-visible:ring-amber-500/50 focus:outline-none`).
+* **Semántica:**
+  - Empleo de elementos semánticos de HTML5 (`<main>`, `<nav>`, `<section>`, `<header>`, `<button>`). Prohibido sustituir enlaces o botones por `<div>` sin atributos ARIA ni soporte de teclado.
+
+---
+
+## 6. Prohibiciones Técnicas de Estilos
+
+* **Prohibido `!important`:** Todo conflicto de especificidad debe resolverse ajustando el orden o utilizando capas de Tailwind / CSS estructurado.
+* **Prohibido Estilos Inline Aleatorios:** Estilos visuales como colores de fondo, márgenes y tipografías deben definirse con clases de utilidad predecibles.
+* **Prohibido Desbordamientos Horizontales:** El diseño debe ser 100% responsivo y fluido desde una anchura mínima de 360px hasta monitores ultrapanorámicos.
