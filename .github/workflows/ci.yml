@@ -1,0 +1,128 @@
+name: CI Pipeline (Pruebas y Verificacion)
+
+on:
+  push:
+    branches:
+      - main
+      - develop
+  pull_request:
+    branches:
+      - main
+      - develop
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  detect-changes:
+    name: Deteccion de Cambios
+    runs-on: ubuntu-latest
+    outputs:
+      backend: ${{ steps.filter.outputs.backend }}
+      frontend: ${{ steps.filter.outputs.frontend }}
+      infra: ${{ steps.filter.outputs.infra }}
+    steps:
+      - name: Checkout del codigo
+        uses: actions/checkout@v4
+
+      - name: Filtro de rutas modificadas
+        uses: dorny/paths-filter@v3
+        id: filter
+        with:
+          filters: |
+            backend:
+              - 'backend/**'
+              - '.husky/**'
+              - 'Directory.Build.props'
+            frontend:
+              - 'frontend/**'
+              - 'package.json'
+              - 'pnpm-lock.yaml'
+              - 'pnpm-workspace.yaml'
+            infra:
+              - 'docker/**'
+              - 'docker-compose*.yml'
+              - 'deploy/**'
+              - '.github/workflows/**'
+
+  backend-ci:
+    name: Backend CI (.NET 8)
+    needs: detect-changes
+    if: needs.detect-changes.outputs.backend == 'true' || github.event_name == 'pull_request'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout del codigo
+        uses: actions/checkout@v4
+
+      - name: Configurar .NET 8 SDK
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '8.0.x'
+
+      - name: Restaurar dependencias NuGet
+        run: dotnet restore backend/Delivery.sln
+
+      - name: Compilar solucion
+        run: dotnet build backend/Delivery.sln --no-restore --configuration Release
+
+      - name: Ejecutar pruebas unitarias xUnit
+        run: dotnet test backend/Delivery.sln --no-build --configuration Release --verbosity normal --nologo
+
+  frontend-ci:
+    name: Frontend CI (Next.js & Vitest)
+    needs: detect-changes
+    if: needs.detect-changes.outputs.frontend == 'true' || github.event_name == 'pull_request'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout del codigo
+        uses: actions/checkout@v4
+
+      - name: Instalar pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 11.24.0
+
+      - name: Configurar Node.js 22
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: 'pnpm'
+
+      - name: Instalar dependencias
+        run: pnpm install --frozen-lockfile
+
+      - name: Ejecutar ESLint
+        run: pnpm --filter frontend lint
+
+      - name: Ejecutar pruebas unitarias Vitest
+        run: pnpm --filter frontend test
+
+      - name: Validar build de produccion
+        run: pnpm --filter frontend build
+        env:
+          NEXT_PUBLIC_API_URL: http://localhost:5005
+          NEXT_PUBLIC_WS_URL: http://localhost:5005
+
+  docker-lint:
+    name: Validacion de Dockerfiles
+    needs: detect-changes
+    if: needs.detect-changes.outputs.infra == 'true' || github.event_name == 'pull_request'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout del codigo
+        uses: actions/checkout@v4
+
+      - name: Hadolint (Linter de Dockerfiles)
+        uses: hadolint/hadolint-action@v3.1.0
+        with:
+          dockerfile: backend/Dockerfile
+          failure-threshold: error
+        continue-on-error: true
+
+      - name: Validar sintaxis Dockerfile Frontend
+        uses: hadolint/hadolint-action@v3.1.0
+        with:
+          dockerfile: frontend/Dockerfile
+          failure-threshold: error
+        continue-on-error: true

@@ -1,0 +1,107 @@
+name: CD Pipeline (Despliegue Automatico y Rollback)
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+    inputs:
+      target:
+        description: 'Servicio especifico a desplegar'
+        required: true
+        default: 'auto'
+        type: choice
+        options:
+          - 'auto'
+          - 'all'
+          - 'backend'
+          - 'frontend'
+
+concurrency:
+  group: production-deploy
+  cancel-in-progress: false
+
+jobs:
+  pre-deploy-validation:
+    name: Validacion Pre-Despliegue
+    runs-on: ubuntu-latest
+    outputs:
+      deploy_target: ${{ steps.calc_target.outputs.deploy_target }}
+    steps:
+      - name: Checkout del codigo
+        uses: actions/checkout@v4
+
+      - name: Filtro de rutas modificadas
+        uses: dorny/paths-filter@v3
+        id: filter
+        with:
+          filters: |
+            backend:
+              - 'backend/**'
+            frontend:
+              - 'frontend/**'
+            infra:
+              - 'docker/**'
+              - 'docker-compose*.yml'
+              - 'deploy/**'
+              - '.github/workflows/**'
+
+      - name: Determinar target de despliegue
+        id: calc_target
+        run: |
+          MANUAL_TARGET="${{ github.event.inputs.target }}"
+          if [ -n "$MANUAL_TARGET" ] && [ "$MANUAL_TARGET" != "auto" ]; then
+            echo "deploy_target=$MANUAL_TARGET" >> "$GITHUB_OUTPUT"
+            echo "Target seleccionado manualmente: $MANUAL_TARGET"
+            exit 0
+          fi
+
+          BACKEND="${{ steps.filter.outputs.backend }}"
+          FRONTEND="${{ steps.filter.outputs.frontend }}"
+          INFRA="${{ steps.filter.outputs.infra }}"
+
+          if [ "$INFRA" = "true" ] || ( [ "$BACKEND" = "true" ] && [ "$FRONTEND" = "true" ] ); then
+            TARGET="all"
+          elif [ "$BACKEND" = "true" ]; then
+            TARGET="backend"
+          elif [ "$FRONTEND" = "true" ]; then
+            TARGET="frontend"
+          else
+            TARGET="all"
+          fi
+
+          echo "deploy_target=$TARGET" >> "$GITHUB_OUTPUT"
+          echo "Target automatico calculado: $TARGET"
+
+  deploy-to-server:
+    name: Despliegue en Servidor de Produccion
+    needs: pre-deploy-validation
+    runs-on: ubuntu-latest
+    steps:
+      - name: Ejecutar despliegue remoto via SSH
+        uses: appleboy/ssh-action@v1.2.0
+        with:
+          host: ${{ secrets.SSH_HOST }}
+          username: ${{ secrets.SSH_USER }}
+          key: ${{ secrets.SSH_KEY }}
+          port: ${{ secrets.SSH_PORT || 22 }}
+          script_stop: true
+          envs: TARGET
+          script: |
+            set -euo pipefail
+            DEPLOY_DIR="${{ secrets.DEPLOY_PATH }}"
+            TARGET="${{ needs.pre-deploy-validation.outputs.deploy_target }}"
+
+            echo "[CI/CD] Accediendo al directorio de despliegue: ${DEPLOY_DIR}"
+            cd "${DEPLOY_DIR}"
+
+            echo "[CI/CD] Actualizando codigo desde origin/main..."
+            git fetch origin main
+            git checkout -f main
+            git reset --hard origin/main
+
+            echo "[CI/CD] Otorgando permisos de ejecucion a scripts de despliegue..."
+            chmod +x deploy/scripts/*.sh
+
+            echo "[CI/CD] Ejecutando script de despliegue con target: ${TARGET}..."
+            ./deploy/scripts/deploy.sh "${TARGET}"

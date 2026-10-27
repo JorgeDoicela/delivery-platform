@@ -1,0 +1,56 @@
+name: Manual Rollback Pipeline
+
+on:
+  workflow_dispatch:
+    inputs:
+      target:
+        description: 'Servicio a restaurar a la version previa'
+        required: true
+        default: 'all'
+        type: choice
+        options:
+          - 'all'
+          - 'backend'
+          - 'frontend'
+      reason:
+        description: 'Motivo del rollback (auditoria tecnica)'
+        required: true
+        default: 'Incidente o fallo de estabilidad en produccion'
+
+concurrency:
+  group: production-rollback
+  cancel-in-progress: false
+
+jobs:
+  execute-rollback:
+    name: Ejecucion de Rollback en Produccion
+    runs-on: ubuntu-latest
+    steps:
+      - name: Registrar auditoria de inicio de rollback
+        run: |
+          echo "=========================================="
+          echo "INICIANDO ROLLBACK MANUAL EN PRODUCCION"
+          echo "Servicio objetivo: ${{ github.event.inputs.target }}"
+          echo "Operador: ${{ github.actor }}"
+          echo "Motivo: ${{ github.event.inputs.reason }}"
+          echo "=========================================="
+
+      - name: Ejecutar script de rollback en servidor via SSH
+        uses: appleboy/ssh-action@v1.2.0
+        with:
+          host: ${{ secrets.SSH_HOST }}
+          username: ${{ secrets.SSH_USER }}
+          key: ${{ secrets.SSH_KEY }}
+          port: ${{ secrets.SSH_PORT || 22 }}
+          script_stop: true
+          script: |
+            set -euo pipefail
+            DEPLOY_DIR="${{ secrets.DEPLOY_PATH }}"
+            TARGET="${{ github.event.inputs.target }}"
+
+            echo "[ROLLBACK] Accediendo a ${DEPLOY_DIR}..."
+            cd "${DEPLOY_DIR}"
+
+            chmod +x deploy/scripts/rollback.sh
+            echo "[ROLLBACK] Ejecutando rollback para: ${TARGET}..."
+            ./deploy/scripts/rollback.sh "${TARGET}"
