@@ -1,0 +1,29 @@
+#!/usr/bin/env sh
+
+echo "[pre-commit] Verificando calidad del codigo en staging..."
+
+# 1. Comprobacion de Frontend (Next.js / TypeScript / ESLint)
+STAGED_FRONTEND=$(git diff --cached --name-only --diff-filter=ACM | grep -E '^frontend/.*\.(ts|tsx|js|jsx)$' || true)
+if [ -n "$STAGED_FRONTEND" ]; then
+  echo "[pre-commit] Archivos de frontend detectados. Ejecutando linter..."
+  pnpm --filter frontend lint || {
+    echo ""
+    echo "[pre-commit] ERROR: Se detectaron fallos de linting en el frontend."
+    echo "[pre-commit] Corrige los errores antes de confirmar el commit."
+    exit 1
+  }
+fi
+
+# 2. Comprobacion de Backend (.NET 8 / C#)
+STAGED_BACKEND=$(git diff --cached --name-only --diff-filter=ACM | grep -E '^backend/.*\.(cs|csproj)$' || true)
+if [ -n "$STAGED_BACKEND" ]; then
+  echo "[pre-commit] Archivos de backend detectados. Verificando compilacion .NET..."
+  dotnet build backend/Delivery.sln -v q -nologo || {
+    echo ""
+    echo "[pre-commit] ERROR: La solucion de backend no compila correctamente."
+    echo "[pre-commit] Corrige los errores de compilacion antes de confirmar el commit."
+    exit 1
+  }
+fi
+
+echo "[pre-commit] Todas las validaciones pasaron exitosamente."

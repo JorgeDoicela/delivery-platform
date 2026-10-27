@@ -1,0 +1,16 @@
+{
+  "name": "delivery-platform-root",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "prepare": "husky",
+    "lint:frontend": "pnpm --filter frontend lint",
+    "build:frontend": "pnpm --filter frontend build",
+    "build:backend": "dotnet build backend/Delivery.sln",
+    "test:all": "pnpm lint:frontend && pnpm build:backend"
+  },
+  "devDependencies": {
+    "husky": "^9.1.7"
+  },
+  "packageManager": "pnpm@11.24.0"
+}
