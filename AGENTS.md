@@ -65,6 +65,6 @@ Ante cualquier intervención en el repositorio, el agente debe consultar y ceñi
 ## 5. Control de Calidad Pre-Commit (Husky v9)
 
 El repositorio cuenta con hooks de pre-commit automatizados y selectivos en `.husky/pre-commit`:
-* **Frontend:** Si el commit incluye archivos `.ts`, `.tsx`, `.js` o `.jsx`, ejecuta automáticamente el linter de ESLint (`pnpm --filter frontend lint`).
-* **Backend:** Si el commit incluye archivos `.cs` o `.csproj`, ejecuta la compilación de la solución (`dotnet build backend/Delivery.sln`).
+* **Frontend:** Si el commit incluye archivos `.ts`, `.tsx`, `.js` o `.jsx`, ejecuta automáticamente el linter de ESLint (`pnpm --filter frontend lint`) y la suite de pruebas unitarias (`pnpm --filter frontend test`).
+* **Backend:** Si el commit incluye archivos `.cs` o `.csproj`, ejecuta la compilación y pruebas completas de la solución (`dotnet test backend/Delivery.sln -v q -nologo`).
 * **Inmutabilidad de la Regla:** Queda prohibido eludir el pre-commit con `--no-verify` salvo autorización expresa del desarrollador. Todo commit debe entrar con 0 errores y 0 advertencias.

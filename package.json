@@ -7,7 +7,10 @@
     "lint:frontend": "pnpm --filter frontend lint",
     "build:frontend": "pnpm --filter frontend build",
     "build:backend": "dotnet build backend/Delivery.sln",
-    "test:all": "pnpm lint:frontend && pnpm build:backend"
+    "test:backend": "dotnet test backend/Delivery.sln --nologo",
+    "test:frontend": "pnpm --filter frontend test",
+    "test": "pnpm test:backend && pnpm test:frontend",
+    "test:all": "pnpm lint:frontend && pnpm build:backend && pnpm test"
   },
   "devDependencies": {
     "husky": "^9.1.7"
