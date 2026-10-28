@@ -6,11 +6,11 @@
      Centralización de Identidad Visual, Superficies y Estados
      ========================================================================== */
 
-  /* Identidad de Marca (Paleta Asadero: Brasa encendida y Ámbar dorado) */
-  --brand-primary: #ea580c;
-  --brand-primary-hover: #c2410c;
-  --brand-primary-light: #ffedd5;
-  --brand-primary-muted: rgba(234, 88, 12, 0.12);
+  /* Identidad de Marca (Paleta Fast-Food Asadero: Rojo Vivo estilo KFC y Acento Dorado) */
+  --brand-primary: #e4002b;
+  --brand-primary-hover: #c40024;
+  --brand-primary-light: #fee2e2;
+  --brand-primary-muted: rgba(228, 0, 43, 0.12);
 
   --brand-accent: #f59e0b;
   --brand-accent-hover: #d97706;
@@ -18,11 +18,11 @@
   --brand-accent-muted: rgba(245, 158, 11, 0.12);
 
   /* Superficies en Modo Claro (Storefront / Checkout / Clientes) */
-  --surface-canvas: #f8fafc;
+  --surface-canvas: #f9fafb;
   --surface-card: #ffffff;
-  --surface-card-hover: #f1f5f9;
-  --surface-border: #e2e8f0;
-  --surface-border-subtle: #f1f5f9;
+  --surface-card-hover: #f3f4f6;
+  --surface-border: #e5e7eb;
+  --surface-border-subtle: #f3f4f6;
 
   /* Superficies en Modo Oscuro (KDS Cocina / Headers / Terminales Operativos) */
   --surface-dark: #09090b;

@@ -1,7 +1,7 @@
 "use client";
 
 import React from "react";
-import { Bike, Store, Sparkles, Clock, ShieldCheck } from "lucide-react";
+import { Bike, Store, Clock, ShieldCheck } from "lucide-react";
 import { useCartStore } from "@/features/cart";
 
 export function OrderModeSelector() {
@@ -18,38 +18,38 @@ export function OrderModeSelector() {
 
   return (
     <section className="space-y-6 w-full text-center pt-2">
-      <h2 className="text-2xl sm:text-4xl font-black uppercase tracking-wide text-text-strong">
+      <h2 className="text-2xl sm:text-3xl font-black uppercase tracking-wide text-neutral-900">
         ¿Cómo te gustaría ordenar hoy?
       </h2>
 
-      {/* Grid de 2 Tarjetas Principales estilo KFC (Ancho Completo) */}
+      {/* Grid de 2 Tarjetas Principales estilo KFC (Rojo Fast Food) */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6 w-full">
         {/* Opción A Domicilio */}
         <button
           type="button"
           onClick={() => handleSelectMode("delivery")}
-          className={`group relative overflow-hidden p-6 rounded-2xl flex flex-col sm:flex-row items-center justify-center gap-4 text-left transition-all active:scale-98 shadow-md ${
+          className={`group relative overflow-hidden p-6 sm:p-8 rounded-2xl flex flex-col sm:flex-row items-center justify-center gap-5 text-left transition-all active:scale-98 shadow-md bg-brand-primary hover:bg-brand-primary-hover text-white ${
             deliveryType === "delivery"
-              ? "bg-brand-primary text-text-inverse-strong ring-4 ring-brand-primary/20 shadow-lg shadow-brand-primary/30"
-              : "bg-brand-primary/95 hover:bg-brand-primary text-text-inverse-strong"
+              ? "ring-4 ring-brand-primary/30 shadow-xl"
+              : ""
           }`}
         >
-          <div className="w-14 h-14 rounded-2xl bg-surface-card/15 flex items-center justify-center shrink-0 border border-surface-card/20">
-            <Bike className="w-8 h-8 text-text-inverse-strong group-hover:scale-110 transition-transform" />
+          <div className="w-16 h-16 rounded-2xl bg-white/20 flex items-center justify-center shrink-0 border border-white/25">
+            <Bike className="w-9 h-9 text-white group-hover:scale-110 transition-transform" />
           </div>
           <div className="text-center sm:text-left">
-            <span className="text-[11px] font-bold tracking-widest uppercase text-brand-primary-light block">
+            <span className="text-[11px] font-bold tracking-widest uppercase text-white/80 block">
               Directo a tu puerta
             </span>
-            <span className="text-2xl sm:text-3xl font-black uppercase tracking-tight block leading-tight">
+            <span className="text-2xl sm:text-3xl font-black uppercase tracking-tight block leading-tight text-white">
               A Domicilio
             </span>
-            <span className="text-xs text-text-inverse-muted block mt-0.5">
+            <span className="text-xs text-white/80 block mt-0.5">
               Tarifa estándar: $1.50 • Despacho en 20-35 min
             </span>
           </div>
           {deliveryType === "delivery" && (
-            <span className="absolute top-2 right-2 text-[10px] font-bold uppercase bg-surface-card text-brand-primary px-2 py-0.5 rounded-full shadow-sm">
+            <span className="absolute top-3 right-3 text-[10px] font-bold uppercase bg-white text-brand-primary px-2.5 py-0.5 rounded-full shadow-sm">
               Seleccionado
             </span>
           )}
@@ -59,52 +59,53 @@ export function OrderModeSelector() {
         <button
           type="button"
           onClick={() => handleSelectMode("takeout")}
-          className={`group relative overflow-hidden p-6 rounded-2xl flex flex-col sm:flex-row items-center justify-center gap-4 text-left transition-all active:scale-98 shadow-md ${
+          className={`group relative overflow-hidden p-6 sm:p-8 rounded-2xl flex flex-col sm:flex-row items-center justify-center gap-5 text-left transition-all active:scale-98 shadow-md bg-brand-primary hover:bg-brand-primary-hover text-white ${
             deliveryType === "takeout"
-              ? "bg-brand-primary text-text-inverse-strong ring-4 ring-brand-primary/20 shadow-lg shadow-brand-primary/30"
-              : "bg-brand-primary/95 hover:bg-brand-primary text-text-inverse-strong"
+              ? "ring-4 ring-brand-primary/30 shadow-xl"
+              : ""
           }`}
         >
-          <div className="w-14 h-14 rounded-2xl bg-surface-card/15 flex items-center justify-center shrink-0 border border-surface-card/20">
-            <Store className="w-8 h-8 text-text-inverse-strong group-hover:scale-110 transition-transform" />
+          <div className="w-16 h-16 rounded-2xl bg-white/20 flex items-center justify-center shrink-0 border border-white/25">
+            <Store className="w-9 h-9 text-white group-hover:scale-110 transition-transform" />
           </div>
           <div className="text-center sm:text-left">
-            <span className="text-[11px] font-bold tracking-widest uppercase text-brand-primary-light block">
+            <span className="text-[11px] font-bold tracking-widest uppercase text-white/80 block">
               Sin costo de envío
             </span>
-            <span className="text-2xl sm:text-3xl font-black uppercase tracking-tight block leading-tight">
+            <span className="text-2xl sm:text-3xl font-black uppercase tracking-tight block leading-tight text-white">
               Recoge en Local
             </span>
-            <span className="text-xs text-text-inverse-muted block mt-0.5">
-              Retiro en Sucursal Norte o Sur
+            <span className="text-xs text-white/80 block mt-0.5">
+              Retiro en Sucursal Norte o Sur • Listo en 20 min
             </span>
           </div>
           {deliveryType === "takeout" && (
-            <span className="absolute top-2 right-2 text-[10px] font-bold uppercase bg-surface-card text-brand-primary px-2 py-0.5 rounded-full shadow-sm">
+            <span className="absolute top-3 right-3 text-[10px] font-bold uppercase bg-white text-brand-primary px-2.5 py-0.5 rounded-full shadow-sm">
               Seleccionado
             </span>
           )}
         </button>
       </div>
 
-      {/* Barra Píldora de Utilidad estilo KFC Cupones / Horno */}
-      <div className="inline-flex flex-wrap items-center justify-center gap-3 bg-surface-card border border-surface-border py-2 px-5 rounded-full shadow-sm text-xs text-text-base">
+      {/* Píldora de Utilidad y Cupones estilo KFC */}
+      <div className="inline-flex flex-wrap items-center justify-center gap-3 bg-white border border-neutral-300 py-2.5 px-6 rounded-full shadow-sm text-xs text-neutral-800">
         <div className="flex items-center gap-1.5 font-bold text-brand-primary">
-          <Clock className="w-3.5 h-3.5" />
-          <span>Horno en Marcha: 20 min por tanda</span>
+          <span className="w-4 h-4 rounded-full bg-brand-primary text-white flex items-center justify-center text-[10px] font-black">
+            %
+          </span>
+          <span className="uppercase tracking-wider">Cupones y Descuentos</span>
         </div>
-        <span className="text-surface-border hidden sm:inline">•</span>
-        <div className="flex items-center gap-1.5 text-text-muted">
+        <span className="text-neutral-300 hidden sm:inline">•</span>
+        <div className="flex items-center gap-1.5 text-neutral-600">
+          <Clock className="w-3.5 h-3.5 text-brand-primary" />
+          <span>Horno en marcha: 20 min por tanda</span>
+        </div>
+        <span className="text-neutral-300 hidden sm:inline">•</span>
+        <div className="flex items-center gap-1.5 text-neutral-600">
           <ShieldCheck className="w-3.5 h-3.5 text-status-success" />
-          <span>Facturación SRI Electrónica</span>
-        </div>
-        <span className="text-surface-border hidden sm:inline">•</span>
-        <div className="flex items-center gap-1.5 text-text-muted">
-          <Sparkles className="w-3.5 h-3.5 text-brand-accent" />
-          <span>Carbón 100% Vegetal y Leña</span>
+          <span>Envío estándar $1.50 • Facturación SRI</span>
         </div>
       </div>
     </section>
   );
 }
-

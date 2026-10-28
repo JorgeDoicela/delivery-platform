@@ -22,20 +22,20 @@ export function CartButtonBadge() {
   return (
     <Link
       href="/checkout"
-      className="relative inline-flex items-center gap-2 bg-surface-dark hover:bg-surface-dark-hover text-text-inverse-strong text-xs font-semibold px-4 py-2.5 rounded-xl shadow-sm transition-all active:scale-95 border border-surface-dark-border"
+      className="relative inline-flex items-center gap-2 bg-neutral-100 hover:bg-neutral-200/80 text-neutral-800 text-xs font-semibold px-4 py-2 rounded-full shadow-sm transition-all active:scale-95 border border-neutral-200/80"
     >
       <div className="relative">
-        <ShoppingBag className="w-4 h-4 text-brand-accent" />
+        <ShoppingBag className="w-4 h-4 text-brand-primary" />
         {isClient && count > 0 && (
-          <span className="absolute -top-2 -right-2 w-4 h-4 bg-brand-primary text-text-inverse-strong font-black text-[10px] rounded-full flex items-center justify-center animate-bounce">
+          <span className="absolute -top-2 -right-2 w-4 h-4 bg-brand-primary text-white font-black text-[10px] rounded-full flex items-center justify-center animate-bounce">
             {count}
           </span>
         )}
       </div>
 
-      <div className="flex flex-col items-start leading-tight">
-        <span className="text-[10px] text-text-inverse-muted">Ver Carrito</span>
-        <span className="font-bold text-brand-accent">
+      <div className="flex items-baseline gap-1.5 leading-tight">
+        <span className="text-[11px] text-neutral-500 hidden sm:inline font-medium">Carrito</span>
+        <span className="font-black text-brand-primary tabular-nums">
           ${isClient ? total.toFixed(2) : "0.00"}
         </span>
       </div>

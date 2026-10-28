@@ -9,125 +9,122 @@ export default function StorefrontLayout({
 }) {
   return (
     <div className="flex flex-col min-h-screen bg-surface-canvas">
-      {/* Top Bar Operativa (Ancho Completo) */}
-      <div className="bg-surface-dark text-text-inverse-muted text-xs py-1.5 px-4 sm:px-8 border-b border-surface-dark-border">
-        <div className="w-full flex justify-between items-center">
-          <div className="flex items-center gap-2">
-            <span className="w-2 h-2 rounded-full bg-status-success animate-pulse"></span>
-            <span>Horno encendido: Tomando pedidos para almuerzo y cena</span>
-          </div>
-          <div className="flex items-center gap-4 hidden sm:flex">
-            <span>Envío estándar: $1.50</span>
-            <Link href="/track" className="hover:text-text-inverse-strong transition-colors">
-              Rastrear Pedido
-            </Link>
-          </div>
-        </div>
-      </div>
-
-      {/* Header Comercial (Ancho Completo) */}
-      <header className="sticky top-0 z-40 bg-surface-card/90 backdrop-blur-md border-b border-surface-border">
+      {/* Header Comercial Blanco Limpio estilo KFC */}
+      <header className="sticky top-0 z-40 bg-white/95 backdrop-blur-md border-b border-neutral-200">
         <div className="w-full px-4 sm:px-8 h-16 flex items-center justify-between gap-4">
-          {/* Logo */}
-          <Link href="/" className="flex items-center gap-2 group">
-            <div className="w-10 h-10 rounded-xl bg-brand-primary flex items-center justify-center text-text-inverse-strong font-bold text-xl shadow-md shadow-brand-primary/20 group-hover:bg-brand-primary-hover transition-colors">
+          {/* Logo en Rojo KFC */}
+          <Link href="/" className="flex items-center gap-2.5 group">
+            <div className="w-9 h-9 rounded-xl bg-brand-primary flex items-center justify-center text-white font-black text-xl shadow-sm group-hover:bg-brand-primary-hover transition-colors">
               D
             </div>
             <div>
               <span
                 data-display-brand
-                className="font-extrabold text-2xl tracking-tight text-text-strong block leading-none uppercase"
+                className="font-black text-2xl tracking-tight text-brand-primary block leading-none uppercase"
               >
                 DELIVERY
               </span>
-              <span className="text-[10px] tracking-widest text-text-muted font-semibold uppercase block mt-0.5">
+              <span className="text-[10px] tracking-widest text-text-muted font-bold uppercase block mt-0.5">
                 Canal Directo
               </span>
             </div>
           </Link>
 
           {/* Enlaces de Navegación estilo KFC */}
-          <nav className="hidden lg:flex items-center gap-6 text-xs font-bold uppercase tracking-wider text-text-base">
+          <nav className="hidden lg:flex items-center gap-6 text-xs font-bold uppercase tracking-wider text-neutral-800">
             <Link href="/#catalogo" className="hover:text-brand-primary transition-colors">
               Ordenar
             </Link>
             <Link href="/track" className="hover:text-brand-primary transition-colors">
               Rastrear Pedido
             </Link>
-            <Link href="/kitchen" className="hover:text-brand-primary transition-colors text-text-muted">
-              Cocina KDS
+            <Link href="/#sucursales" className="hover:text-brand-primary transition-colors text-neutral-600">
+              Sucursales
             </Link>
           </nav>
 
           {/* Selector Rápido de Cobertura / Buscador Píldora */}
           <div className="flex-1 max-w-sm hidden md:flex items-center">
             <Link
-              href="/checkout"
-              className="w-full flex items-center gap-2 px-4 py-2 text-xs text-text-base bg-surface-card-hover hover:bg-surface-border/50 rounded-full transition-colors border border-surface-border"
+              href="/#catalogo"
+              className="w-full flex items-center gap-2.5 px-4 py-2 text-xs text-neutral-500 bg-neutral-100 hover:bg-neutral-200/70 rounded-full transition-colors border border-neutral-200/60"
             >
-              <Search className="w-3.5 h-3.5 text-text-muted" />
+              <Search className="w-3.5 h-3.5 text-neutral-400" />
               <span className="truncate">Buscar productos o combos...</span>
               <MapPin className="w-3.5 h-3.5 text-brand-primary ml-auto shrink-0" />
             </Link>
           </div>
 
-          {/* Acciones */}
+          {/* Acciones: Carrito */}
           <div className="flex items-center gap-3">
-            <Link
-              href="/kitchen"
-              className="hidden sm:inline-flex items-center text-xs font-bold uppercase tracking-wider bg-surface-dark text-text-inverse-strong px-4 py-2 rounded-full hover:bg-surface-dark-card transition-colors shadow-sm"
-            >
-              Terminal KDS
-            </Link>
             <CartButtonBadge />
           </div>
         </div>
       </header>
 
-      {/* Contenido Principal (Ancho Completo) */}
-      <main className="flex-1 w-full px-4 sm:px-8 lg:px-12 py-6">
+      {/* Contenido Principal a Ancho Completo */}
+      <main className="flex-1 w-full">
         {children}
       </main>
 
-      {/* Footer (Ancho Completo) */}
-      <footer className="bg-surface-dark text-text-inverse-muted text-xs border-t border-surface-dark-border mt-12 py-10">
-        <div className="w-full px-4 sm:px-8 lg:px-12 grid grid-cols-1 md:grid-cols-3 gap-8">
+      {/* Footer Estilo KFC Limpio con Accesos Operativos */}
+      <footer id="sucursales" className="bg-neutral-100 text-neutral-600 text-xs border-t border-neutral-200 mt-16 py-12">
+        <div className="w-full max-w-7xl mx-auto px-4 sm:px-8 lg:px-12 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
           <div>
             <div className="flex items-center gap-2 mb-3">
-              <div className="w-7 h-7 rounded-lg bg-brand-primary flex items-center justify-center text-text-inverse-strong font-bold text-sm">
+              <div className="w-7 h-7 rounded-lg bg-brand-primary flex items-center justify-center text-white font-bold text-sm">
                 D
               </div>
-              <span className="font-bold text-text-inverse-strong text-base">DELIVERY</span>
+              <span className="font-black text-brand-primary text-base uppercase tracking-tight">DELIVERY</span>
             </div>
-            <p className="text-text-inverse-muted leading-relaxed">
-              Plataforma directa de pedidos y despacho logístico sin comisiones abusivas de intermediarios.
+            <p className="text-neutral-500 leading-relaxed">
+              Pollo asado artesanalmente al carbón vegetal y leña seleccionada. Pedidos directos sin intermediarios.
             </p>
           </div>
 
           <div>
-            <h4 className="font-semibold text-text-inverse-strong uppercase tracking-wider text-[11px] mb-3">
+            <h4 className="font-bold text-neutral-900 uppercase tracking-wider text-[11px] mb-3">
               Sucursales Operativas
             </h4>
             <ul className="space-y-2">
               <li className="flex items-start gap-1.5">
-                <MapPin className="w-3.5 h-3.5 text-brand-accent mt-0.5 shrink-0" />
-                <span>Sucursal Norte: Av. Amazonas y República</span>
+                <MapPin className="w-3.5 h-3.5 text-brand-primary mt-0.5 shrink-0" />
+                <span>Norte: Av. Amazonas y República</span>
               </li>
               <li className="flex items-start gap-1.5">
-                <MapPin className="w-3.5 h-3.5 text-brand-accent mt-0.5 shrink-0" />
-                <span>Sucursal Sur: Av. Rodrigo de Chávez y Maldonado</span>
+                <MapPin className="w-3.5 h-3.5 text-brand-primary mt-0.5 shrink-0" />
+                <span>Sur: Av. Rodrigo de Chávez y Maldonado</span>
               </li>
             </ul>
           </div>
 
           <div>
-            <h4 className="font-semibold text-text-inverse-strong uppercase tracking-wider text-[11px] mb-3">
+            <h4 className="font-bold text-neutral-900 uppercase tracking-wider text-[11px] mb-3">
               Garantía y Facturación
             </h4>
-            <p className="text-text-inverse-muted leading-relaxed mb-2">
-              Comprobantes electrónicos autorizados emitidos directamente al SRI. Pagos seguros contra entrega y transferencias verificadas.
+            <p className="text-neutral-500 leading-relaxed mb-2">
+              Facturación electrónica autorizada SRI. Despacho y entrega monitoreados en tiempo real.
             </p>
-            <span className="text-[11px] text-text-inverse-subtle">© 2026 Delivery Platform</span>
+            <span className="text-[11px] text-neutral-400">© 2026 Delivery Platform. Todos los derechos reservados.</span>
+          </div>
+
+          {/* Accesos Operativos Reubicados (Horno y KDS) */}
+          <div>
+            <h4 className="font-bold text-neutral-900 uppercase tracking-wider text-[11px] mb-3">
+              Accesos Operativos
+            </h4>
+            <div className="space-y-3">
+              <div className="flex items-center gap-2 text-neutral-700 bg-white p-2.5 rounded-xl border border-neutral-200">
+                <span className="w-2 h-2 rounded-full bg-status-success animate-pulse shrink-0"></span>
+                <span className="text-[11px] font-medium leading-tight">Horno encendido: Tomando pedidos</span>
+              </div>
+              <Link
+                href="/kitchen"
+                className="inline-flex items-center justify-center w-full text-xs font-bold uppercase tracking-wider bg-neutral-900 hover:bg-neutral-800 text-white px-4 py-2.5 rounded-full transition-colors shadow-sm"
+              >
+                Terminal KDS (Cocina)
+              </Link>
+            </div>
           </div>
         </div>
       </footer>
