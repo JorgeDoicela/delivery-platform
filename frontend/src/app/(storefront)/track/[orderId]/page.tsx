@@ -7,7 +7,7 @@ interface OrderTrackingPageProps {
 }
 
 export const metadata = {
-  title: 'Seguimiento de Pedido | Delivery Platform',
+  title: 'Seguimiento de Pedido | La Granjita',
   description: 'Rastreo satelital en tiempo real de tu pedido con mapa vectorial.',
 };
 

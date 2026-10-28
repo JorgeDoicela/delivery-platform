@@ -9,23 +9,23 @@ export default function StorefrontLayout({
 }) {
   return (
     <div className="flex flex-col min-h-screen bg-surface-canvas">
-      {/* Header Comercial Blanco Limpio estilo KFC */}
+      {/* Header Comercial Blanco Limpio estilo KFC con Identidad La Granjita */}
       <header className="sticky top-0 z-40 bg-white/95 backdrop-blur-md border-b border-neutral-200">
         <div className="w-full px-4 sm:px-8 h-16 flex items-center justify-between gap-4">
-          {/* Logo en Rojo KFC */}
+          {/* Logo La Granjita en Rojo */}
           <Link href="/" className="flex items-center gap-2.5 group">
-            <div className="w-9 h-9 rounded-xl bg-brand-primary flex items-center justify-center text-white font-black text-xl shadow-sm group-hover:bg-brand-primary-hover transition-colors">
-              D
+            <div className="w-9 h-9 rounded-xl bg-brand-primary flex items-center justify-center text-white font-black text-sm shadow-sm group-hover:bg-brand-primary-hover transition-colors">
+              LG
             </div>
             <div>
               <span
                 data-display-brand
                 className="font-black text-2xl tracking-tight text-brand-primary block leading-none uppercase"
               >
-                DELIVERY
+                LA GRANJITA
               </span>
               <span className="text-[10px] tracking-widest text-text-muted font-bold uppercase block mt-0.5">
-                Canal Directo
+                Pollo a la Brasa
               </span>
             </div>
           </Link>
@@ -72,13 +72,13 @@ export default function StorefrontLayout({
         <div className="w-full max-w-7xl mx-auto px-4 sm:px-8 lg:px-12 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
           <div>
             <div className="flex items-center gap-2 mb-3">
-              <div className="w-7 h-7 rounded-lg bg-brand-primary flex items-center justify-center text-white font-bold text-sm">
-                D
+              <div className="w-7 h-7 rounded-lg bg-brand-primary flex items-center justify-center text-white font-bold text-xs">
+                LG
               </div>
-              <span className="font-black text-brand-primary text-base uppercase tracking-tight">DELIVERY</span>
+              <span className="font-black text-brand-primary text-base uppercase tracking-tight">LA GRANJITA</span>
             </div>
             <p className="text-neutral-500 leading-relaxed">
-              Pollo asado artesanalmente al carbón vegetal y leña seleccionada. Pedidos directos sin intermediarios.
+              Pollo asado artesanalmente al carbón vegetal y leña seleccionada en La Granjita. Pedidos directos sin intermediarios.
             </p>
           </div>
 
@@ -89,11 +89,11 @@ export default function StorefrontLayout({
             <ul className="space-y-2">
               <li className="flex items-start gap-1.5">
                 <MapPin className="w-3.5 h-3.5 text-brand-primary mt-0.5 shrink-0" />
-                <span>Norte: Av. Amazonas y República</span>
+                <span>La Granjita Norte: Av. Amazonas y República</span>
               </li>
               <li className="flex items-start gap-1.5">
                 <MapPin className="w-3.5 h-3.5 text-brand-primary mt-0.5 shrink-0" />
-                <span>Sur: Av. Rodrigo de Chávez y Maldonado</span>
+                <span>La Granjita Sur: Av. Rodrigo de Chávez y Maldonado</span>
               </li>
             </ul>
           </div>
@@ -105,7 +105,7 @@ export default function StorefrontLayout({
             <p className="text-neutral-500 leading-relaxed mb-2">
               Facturación electrónica autorizada SRI. Despacho y entrega monitoreados en tiempo real.
             </p>
-            <span className="text-[11px] text-neutral-400">© 2026 Delivery Platform. Todos los derechos reservados.</span>
+            <span className="text-[11px] text-neutral-400">© 2026 La Granjita. Todos los derechos reservados.</span>
           </div>
 
           {/* Accesos Operativos Reubicados (Horno y KDS) */}
@@ -122,7 +122,7 @@ export default function StorefrontLayout({
                 href="/kitchen"
                 className="inline-flex items-center justify-center w-full text-xs font-bold uppercase tracking-wider bg-neutral-900 hover:bg-neutral-800 text-white px-4 py-2.5 rounded-full transition-colors shadow-sm"
               >
-                Terminal KDS (Cocina)
+                Terminal KDS - La Granjita
               </Link>
             </div>
           </div>

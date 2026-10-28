@@ -3,7 +3,7 @@ import { RefreshCw } from 'lucide-react';
 import { DriverDeliveryView } from '@/features/tracking';
 
 export const metadata = {
-  title: 'Repartidor - Hoja de Ruta | Delivery Platform',
+  title: 'Repartidor - Hoja de Ruta | La Granjita',
   description: 'Terminal móvil de telemetría y liquidación para repartidores.',
 };
 

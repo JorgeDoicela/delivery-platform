@@ -1,7 +1,7 @@
 import { OrderSearchView } from "@/features/tracking";
 
 export const metadata = {
-  title: "Rastrear Pedido | Delivery Platform",
+  title: "Rastrear Pedido | La Granjita",
   description: "Ingresa el código identificador de tu pedido para consultar la ubicación del repartidor en vivo.",
 };
 

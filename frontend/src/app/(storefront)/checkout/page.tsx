@@ -1,7 +1,7 @@
 import { CheckoutForm } from "@/features/checkout";
 
 export const metadata = {
-  title: "Finalizar Pedido | Delivery Platform",
+  title: "Finalizar Pedido | La Granjita",
   description: "Ingresa tus datos de entrega y método de pago sin intermediarios.",
 };
 

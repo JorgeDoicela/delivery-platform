@@ -76,7 +76,7 @@ export function OrderModeSelector() {
               Recoge en Local
             </span>
             <span className="text-xs text-white/80 block mt-0.5">
-              Retiro en Sucursal Norte o Sur • Listo en 20 min
+              Retiro en La Granjita Norte o Sur • Listo en 20 min
             </span>
           </div>
           {deliveryType === "takeout" && (

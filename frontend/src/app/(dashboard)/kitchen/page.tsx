@@ -1,7 +1,7 @@
 import { KitchenView } from '@/features/kitchen';
 
 export const metadata = {
-  title: 'KDS Cocina | Delivery Platform',
+  title: 'KDS Cocina | La Granjita',
   description: 'Pantalla operativa de comandas para cocina en tiempo real.',
 };
 

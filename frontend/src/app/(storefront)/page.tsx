@@ -6,8 +6,8 @@ import {
 } from "@/features/catalog";
 
 export const metadata = {
-  title: "Delivery Platform | Pedidos Directos y Reparto",
-  description: "Pollo asado al carbón y combos familiares directos a tu domicilio.",
+  title: "La Granjita | Pollo a la Brasa y Pedidos Directos",
+  description: "Pollo asado al carbón y combos familiares directos a tu domicilio desde La Granjita.",
 };
 
 export default function StorefrontHomePage() {

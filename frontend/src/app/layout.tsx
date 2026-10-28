@@ -28,8 +28,8 @@ export const viewport: Viewport = {
 };
 
 export const metadata: Metadata = {
-  title: "Delivery | Pedidos Directos y Reparto a Domicilio",
-  description: "Plataforma de delivery directa y despacho logístico para nuestras sucursales.",
+  title: "La Granjita | Pollo a la Brasa y Pedidos Directos",
+  description: "Plataforma de delivery directa de La Granjita. Pollo a la brasa al carbón y leña.",
   manifest: "/manifest.json",
 };
 

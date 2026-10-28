@@ -129,7 +129,7 @@ export function PaymentMethodSection({
         <div className="p-4 bg-status-info/10 border border-status-info/30 rounded-xl space-y-2 text-xs text-status-info animate-in fade-in">
           <p className="font-bold">Datos Bancarios para Transferencia:</p>
           <p className="text-[11px] leading-relaxed">
-            Banco Pichincha | Cta. Corriente: 2100456789 | Titular: Delivery Platform S.A. | RUC: 1792345678001
+            Banco Pichincha | Cta. Corriente: 2100456789 | Titular: La Granjita S.A. | RUC: 1792345678001
           </p>
           <p className="text-[10px] text-status-info/90">
             * El cajero verificará la acreditación bancaria antes de enviar la orden al horno.
