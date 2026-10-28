@@ -69,10 +69,10 @@ export function CatalogSection() {
             <button
               key={category}
               onClick={() => setSelectedCategory(category)}
-              className={`px-4 py-2 rounded-xl text-xs font-bold transition-all whitespace-nowrap ${
+              className={`px-5 py-2.5 rounded-full text-xs font-bold uppercase tracking-wider transition-all whitespace-nowrap shadow-sm ${
                 isSelected
-                  ? "bg-brand-primary text-text-inverse-strong shadow-md shadow-brand-primary/20"
-                  : "bg-surface-card text-text-base hover:bg-surface-card-hover border border-surface-border"
+                  ? "bg-brand-primary text-text-inverse-strong shadow-brand-primary/30 scale-105"
+                  : "bg-surface-card text-text-base hover:bg-surface-card-hover border border-surface-border hover:border-brand-primary/40"
               }`}
             >
               {category}

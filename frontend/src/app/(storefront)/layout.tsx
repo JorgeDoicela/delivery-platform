@@ -46,20 +46,39 @@ export default function StorefrontLayout({
             </div>
           </Link>
 
-          {/* Selector Rápido de Cobertura */}
-          <div className="flex-1 max-w-md hidden md:flex items-center">
+          {/* Enlaces de Navegación estilo KFC */}
+          <nav className="hidden lg:flex items-center gap-6 text-xs font-bold uppercase tracking-wider text-text-base">
+            <Link href="/#catalogo" className="hover:text-brand-primary transition-colors">
+              Ordenar
+            </Link>
+            <Link href="/track" className="hover:text-brand-primary transition-colors">
+              Rastrear Pedido
+            </Link>
+            <Link href="/kitchen" className="hover:text-brand-primary transition-colors text-text-muted">
+              Cocina KDS
+            </Link>
+          </nav>
+
+          {/* Selector Rápido de Cobertura / Buscador Píldora */}
+          <div className="flex-1 max-w-sm hidden md:flex items-center">
             <Link
               href="/checkout"
-              className="w-full flex items-center gap-2 px-3.5 py-2 text-xs text-text-base bg-surface-card-hover hover:bg-surface-border/50 rounded-full transition-colors border border-surface-border"
+              className="w-full flex items-center gap-2 px-4 py-2 text-xs text-text-base bg-surface-card-hover hover:bg-surface-border/50 rounded-full transition-colors border border-surface-border"
             >
-              <MapPin className="w-4 h-4 text-brand-primary shrink-0" />
-              <span className="truncate">¿Dónde entregamos? Selecciona tu ubicación</span>
-              <Search className="w-3.5 h-3.5 text-text-muted ml-auto" />
+              <Search className="w-3.5 h-3.5 text-text-muted" />
+              <span className="truncate">Buscar productos o combos...</span>
+              <MapPin className="w-3.5 h-3.5 text-brand-primary ml-auto shrink-0" />
             </Link>
           </div>
 
           {/* Acciones */}
           <div className="flex items-center gap-3">
+            <Link
+              href="/kitchen"
+              className="hidden sm:inline-flex items-center text-xs font-bold uppercase tracking-wider bg-surface-dark text-text-inverse-strong px-4 py-2 rounded-full hover:bg-surface-dark-card transition-colors shadow-sm"
+            >
+              Terminal KDS
+            </Link>
             <CartButtonBadge />
           </div>
         </div>

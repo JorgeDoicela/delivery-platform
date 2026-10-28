@@ -50,7 +50,7 @@ export function ProductCard({ product }: ProductCardProps) {
           <button
             type="button"
             onClick={() => setIsModalOpen(true)}
-            className="inline-flex items-center gap-1.5 bg-surface-dark hover:bg-brand-primary text-text-inverse-strong text-xs font-bold py-2.5 px-4 rounded-xl shadow-sm transition-all active:scale-95"
+            className="inline-flex items-center gap-1.5 bg-brand-primary hover:bg-brand-primary-hover text-text-inverse-strong text-xs font-bold uppercase tracking-wider py-2.5 px-5 rounded-full shadow-md shadow-brand-primary/20 transition-all hover:scale-105 active:scale-95"
           >
             <Plus className="w-3.5 h-3.5" />
             <span>Pedir</span>

@@ -3,5 +3,7 @@ export { CatalogSection } from "./components/CatalogSection";
 export { ProductCard } from "./components/ProductCard";
 export { ModifierModal } from "./components/ModifierModal";
 export { InventoryManagerView } from "./components/InventoryManagerView";
+export { OrderModeSelector } from "./components/OrderModeSelector";
+export { PromotionalBanners } from "./components/PromotionalBanners";
 export { useMenuQuery } from "./hooks/useMenuQuery";
 

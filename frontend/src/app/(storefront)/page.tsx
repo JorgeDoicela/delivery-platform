@@ -1,4 +1,9 @@
-import { CatalogHero, CatalogSection } from "@/features/catalog";
+import {
+  CatalogHero,
+  OrderModeSelector,
+  PromotionalBanners,
+  CatalogSection,
+} from "@/features/catalog";
 
 export const metadata = {
   title: "Delivery Platform | Pedidos Directos y Reparto",
@@ -7,19 +12,25 @@ export const metadata = {
 
 export default function StorefrontHomePage() {
   return (
-    <div className="space-y-12">
-      {/* Hero Comercial Operativo */}
+    <div className="space-y-12 pb-8">
+      {/* 1. Gran Banner Panorámico Promocional (Estilo Hero KFC) */}
       <CatalogHero />
 
-      {/* Sección del Menú Interactivo en Vivo */}
-      <section id="catalogo" className="space-y-6 pt-4">
-        <div className="flex items-center justify-between pb-2 border-b border-surface-border">
+      {/* 2. Selector Principal: ¿Cómo te gustaría ordenar hoy? (Estilo Bloques Rojos KFC) */}
+      <OrderModeSelector />
+
+      {/* 3. Tarjetas Promocionales de Especialidad y Receta (Estilo Tarjetas Inferiores KFC) */}
+      <PromotionalBanners />
+
+      {/* 4. Menú y Combos Interactivo en Vivo */}
+      <section id="catalogo" className="space-y-6 pt-6">
+        <div className="flex items-center justify-between pb-3 border-b border-surface-border">
           <div>
-            <h2 className="text-3xl font-black text-text-strong uppercase tracking-wide">
+            <h2 className="text-3xl sm:text-4xl font-black text-text-strong uppercase tracking-wide">
               Menú y Combos
             </h2>
-            <p className="text-xs text-text-muted">
-              Personaliza tu orden con guarniciones y salsas artesanales
+            <p className="text-xs sm:text-sm text-text-muted mt-0.5">
+              Personaliza tu orden con guarniciones calientes, ensalada fresca y ají artesanal
             </p>
           </div>
         </div>
