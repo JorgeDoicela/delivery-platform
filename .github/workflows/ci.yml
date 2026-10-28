@@ -34,7 +34,6 @@ jobs:
             backend:
               - 'backend/**'
               - '.husky/**'
-              - 'Directory.Build.props'
             frontend:
               - 'frontend/**'
               - 'package.json'
@@ -42,6 +41,7 @@ jobs:
               - 'pnpm-workspace.yaml'
             infra:
               - 'docker-compose*.yml'
+              - '.dockerignore'
               - 'scripts/**'
               - '.github/workflows/**'
 
@@ -101,7 +101,7 @@ jobs:
         run: pnpm --filter frontend build
         env:
           NEXT_PUBLIC_API_URL: http://localhost:5005
-          NEXT_PUBLIC_WS_URL: http://localhost:5005
+          NEXT_PUBLIC_WS_URL: http://localhost:5005/hubs
 
   docker-lint:
     name: Validacion de Dockerfiles
