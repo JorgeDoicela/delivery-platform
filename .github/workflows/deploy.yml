@@ -43,7 +43,7 @@ jobs:
             infra:
               - 'docker/**'
               - 'docker-compose*.yml'
-              - 'deploy/**'
+              - 'scripts/**'
               - '.github/workflows/**'
 
       - name: Determinar target de despliegue
@@ -101,7 +101,7 @@ jobs:
             git reset --hard origin/main
 
             echo "[CI/CD] Otorgando permisos de ejecucion a scripts de despliegue..."
-            chmod +x deploy/scripts/*.sh
+            chmod +x scripts/deploy/*.sh
 
             echo "[CI/CD] Ejecutando script de despliegue con target: ${TARGET}..."
-            ./deploy/scripts/deploy.sh "${TARGET}"
+            ./scripts/deploy/deploy.sh "${TARGET}"

@@ -30,7 +30,7 @@ El sistema opera bajo un pipeline continuo y desacoplado mediante GitHub Actions
        │
        ├─► [Exitoso] ──► Registra commit en .last_successful_commit
        │
-       └─► [Fallo]   ──► Dispara automáticamente ./deploy/scripts/rollback.sh
+       └─► [Fallo]   ──► Dispara automáticamente ./scripts/deploy/rollback.sh
                          Restaura imágenes :previous y notifica fallo en CI/CD.
 ```
 

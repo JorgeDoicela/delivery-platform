@@ -51,6 +51,6 @@ jobs:
             echo "[ROLLBACK] Accediendo a ${DEPLOY_DIR}..."
             cd "${DEPLOY_DIR}"
 
-            chmod +x deploy/scripts/rollback.sh
+            chmod +x scripts/deploy/rollback.sh
             echo "[ROLLBACK] Ejecutando rollback para: ${TARGET}..."
-            ./deploy/scripts/rollback.sh "${TARGET}"
+            ./scripts/deploy/rollback.sh "${TARGET}"
