@@ -17,7 +17,7 @@ export function CatalogSection() {
             <div key={i} className="h-8 w-24 bg-surface-border animate-pulse rounded-lg" />
           ))}
         </div>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
           {[1, 2, 3].map((i) => (
             <div key={i} className="h-48 bg-surface-card border border-surface-border rounded-2xl p-5 animate-pulse space-y-4">
               <div className="h-4 w-16 bg-surface-card-hover rounded" />
@@ -81,8 +81,8 @@ export function CatalogSection() {
         })}
       </div>
 
-      {/* Grid de Productos */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+      {/* Grid de Productos Adaptado a Ancho Completo */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
         {filteredProducts.map((product) => (
           <ProductCard key={product.id} product={product} />
         ))}

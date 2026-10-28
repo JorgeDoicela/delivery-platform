@@ -7,7 +7,7 @@ export const metadata = {
 
 export default function CheckoutPage() {
   return (
-    <div className="max-w-6xl mx-auto space-y-6">
+    <div className="w-full space-y-6">
       <div className="border-b border-surface-border pb-4">
         <h1 className="text-2xl font-black text-text-strong tracking-tight">
           Finalizar Pedido

@@ -65,7 +65,7 @@ export function CatalogHero() {
         <ChevronRight className="w-5 h-5" />
       </button>
 
-      <div className="relative z-10 max-w-2xl space-y-6">
+      <div className="relative z-10 max-w-4xl space-y-6">
         {/* Badge Superior */}
         <div className="inline-flex items-center gap-2 bg-surface-dark/60 text-brand-accent px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider backdrop-blur-md border border-brand-accent/30">
           <span>{slide.badge}</span>

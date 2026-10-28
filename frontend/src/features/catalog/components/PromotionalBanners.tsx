@@ -9,7 +9,7 @@ export function PromotionalBanners() {
     <section className="grid grid-cols-1 md:grid-cols-2 gap-6 pt-4">
       {/* Tarjeta Promocional 1: Artesanal y Brasa */}
       <div className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-surface-dark via-surface-dark-card to-surface-dark border border-surface-dark-border p-8 flex flex-col justify-between text-text-inverse-strong shadow-lg min-h-[260px] group">
-        <div className="space-y-3 relative z-10 max-w-md">
+        <div className="space-y-3 relative z-10 max-w-xl">
           <div className="inline-flex items-center gap-1.5 bg-brand-primary-muted text-brand-accent px-2.5 py-1 rounded-full text-[11px] font-bold uppercase tracking-wider border border-brand-accent/20">
             <Flame className="w-3.5 h-3.5 text-brand-accent" />
             Asado Artesanal
@@ -35,7 +35,7 @@ export function PromotionalBanners() {
 
       {/* Tarjeta Promocional 2: Combos Familiares Completos */}
       <div className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-brand-primary/90 via-brand-primary to-brand-primary-hover border border-brand-primary/40 p-8 flex flex-col justify-between text-text-inverse-strong shadow-lg min-h-[260px] group">
-        <div className="space-y-3 relative z-10 max-w-md">
+        <div className="space-y-3 relative z-10 max-w-xl">
           <div className="inline-flex items-center gap-1.5 bg-surface-card/20 text-text-inverse-strong px-2.5 py-1 rounded-full text-[11px] font-bold uppercase tracking-wider border border-surface-card/30">
             <Utensils className="w-3.5 h-3.5" />
             Combos con Todo
@@ -61,3 +61,4 @@ export function PromotionalBanners() {
     </section>
   );
 }
+

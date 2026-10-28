@@ -17,13 +17,13 @@ export function OrderModeSelector() {
   };
 
   return (
-    <section className="space-y-4 max-w-4xl mx-auto text-center pt-2">
-      <h2 className="text-2xl sm:text-3xl font-black uppercase tracking-wide text-text-strong">
+    <section className="space-y-6 w-full text-center pt-2">
+      <h2 className="text-2xl sm:text-4xl font-black uppercase tracking-wide text-text-strong">
         ¿Cómo te gustaría ordenar hoy?
       </h2>
 
-      {/* Grid de 2 Tarjetas Principales estilo KFC */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+      {/* Grid de 2 Tarjetas Principales estilo KFC (Ancho Completo) */}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6 w-full">
         {/* Opción A Domicilio */}
         <button
           type="button"
@@ -107,3 +107,4 @@ export function OrderModeSelector() {
     </section>
   );
 }
+
