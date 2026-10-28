@@ -106,7 +106,7 @@ export function OrderMap({ destination, driverLocation, className = '' }: OrderM
     if (!destinationMarkerRef.current) {
       const el = createDestinationDomMarker();
       const popup = new Popup({ offset: 25 }).setHTML(
-        '<div style="font-family: sans-serif; font-size: 12px; font-weight: bold; padding: 4px; color: #111;">Destino de Entrega</div>'
+        '<div style="font-family: sans-serif; font-size: 12px; font-weight: bold; padding: 4px; color: var(--text-strong, #0f172a);">Destino de Entrega</div>'
       );
 
       const marker = new Marker({ element: el, anchor: 'bottom' })
