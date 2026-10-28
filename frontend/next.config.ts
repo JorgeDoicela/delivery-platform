@@ -13,6 +13,8 @@ const nextConfig: NextConfig = {
       },
     },
   },
+  // Desactivar generacion automatica de AGENTS.md en la subcarpeta frontend
+  agentRules: false,
 };
 
 export default nextConfig;
