@@ -146,19 +146,19 @@ export function OrderSummary() {
       <div className="pt-3 border-t border-surface-border-subtle space-y-1.5 text-xs">
         <div className="flex justify-between text-text-base">
           <span>Subtotal de productos:</span>
-          <span className="font-semibold text-text-strong">{formatCurrency(subtotal)}</span>
+          <span className="font-semibold text-text-strong tabular-nums">{formatCurrency(subtotal)}</span>
         </div>
 
         <div className="flex justify-between text-text-base">
           <span>Tarifa de entrega:</span>
-          <span className="font-semibold text-text-strong">
+          <span className="font-semibold text-text-strong tabular-nums">
             {deliveryFee > 0 ? formatCurrency(deliveryFee) : "Gratis (Retiro)"}
           </span>
         </div>
 
         <div className="pt-2 border-t border-surface-border flex justify-between items-center text-sm font-black text-text-strong">
           <span>Total a Pagar:</span>
-          <span className="text-lg text-brand-primary">{formatCurrency(total)}</span>
+          <span className="text-lg text-brand-primary tabular-nums">{formatCurrency(total)}</span>
         </div>
       </div>
     </div>

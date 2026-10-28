@@ -1,7 +1,6 @@
 import Link from "next/link";
 import { MapPin, Search } from "lucide-react";
 import { CartButtonBadge } from "@/features/cart";
-import { StorefrontThemeScope } from "@/shared/components/StorefrontThemeScope";
 
 export default function StorefrontLayout({
   children,
@@ -9,7 +8,7 @@ export default function StorefrontLayout({
   children: React.ReactNode;
 }) {
   return (
-    <StorefrontThemeScope>
+    <div className="flex flex-col min-h-screen bg-surface-canvas">
       {/* Top Bar Operativa */}
       <div className="bg-surface-dark text-text-inverse-muted text-xs py-1.5 px-4 border-b border-surface-dark-border">
         <div className="max-w-6xl mx-auto flex justify-between items-center">
@@ -27,7 +26,7 @@ export default function StorefrontLayout({
       </div>
 
       {/* Header Comercial */}
-      <header className="sticky top-9 z-40 bg-surface-card/90 backdrop-blur-md border-b border-surface-border">
+      <header className="sticky top-0 z-40 bg-surface-card/90 backdrop-blur-md border-b border-surface-border">
         <div className="max-w-6xl mx-auto px-4 h-16 flex items-center justify-between gap-4">
           {/* Logo */}
           <Link href="/" className="flex items-center gap-2 group">
@@ -113,6 +112,6 @@ export default function StorefrontLayout({
           </div>
         </div>
       </footer>
-    </StorefrontThemeScope>
+    </div>
   );
 }

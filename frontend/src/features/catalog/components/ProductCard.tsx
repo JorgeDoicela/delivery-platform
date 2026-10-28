@@ -42,7 +42,7 @@ export function ProductCard({ product }: ProductCardProps) {
             <span className="text-[10px] text-text-muted block uppercase font-medium">
               Precio Base
             </span>
-            <span className="text-lg font-black text-text-strong tracking-tight">
+            <span className="text-lg font-black text-text-strong tracking-tight tabular-nums">
               {formatCurrency(product.basePrice)}
             </span>
           </div>

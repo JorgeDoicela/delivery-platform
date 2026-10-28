@@ -1,12 +1,5 @@
 import type { Metadata, Viewport } from "next";
-import {
-  Barlow_Condensed,
-  Inter,
-  Outfit,
-  Antonio,
-  Nunito,
-  Geist_Mono,
-} from "next/font/google";
+import { Barlow_Condensed, Inter } from "next/font/google";
 import { Providers } from "./providers";
 import "./globals.css";
 
@@ -14,32 +7,13 @@ const barlowCondensed = Barlow_Condensed({
   weight: ["600", "700", "800", "900"],
   subsets: ["latin"],
   variable: "--font-barlow-condensed",
-});
-
-const outfit = Outfit({
-  subsets: ["latin"],
-  variable: "--font-outfit",
-});
-
-const antonio = Antonio({
-  weight: ["600", "700"],
-  subsets: ["latin"],
-  variable: "--font-antonio",
+  display: "swap",
 });
 
 const inter = Inter({
   subsets: ["latin"],
   variable: "--font-inter",
-});
-
-const nunito = Nunito({
-  subsets: ["latin"],
-  variable: "--font-nunito",
-});
-
-const geistMono = Geist_Mono({
-  subsets: ["latin"],
-  variable: "--font-geist-mono",
+  display: "swap",
 });
 
 export const viewport: Viewport = {
@@ -67,7 +41,7 @@ export default function RootLayout({
   return (
     <html
       lang="es"
-      className={`${barlowCondensed.variable} ${outfit.variable} ${antonio.variable} ${inter.variable} ${nunito.variable} ${geistMono.variable} h-full antialiased`}
+      className={`${barlowCondensed.variable} ${inter.variable} h-full antialiased`}
     >
       <body className="min-h-full flex flex-col bg-surface-canvas text-text-strong font-sans">
         <Providers>{children}</Providers>

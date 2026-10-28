@@ -235,7 +235,7 @@ export function ModifierModal({ product, onClose }: ModifierModalProps) {
             className="flex-1 flex items-center justify-between bg-brand-primary hover:bg-brand-primary-hover disabled:bg-surface-border disabled:text-text-muted text-text-inverse-strong text-xs font-bold py-3.5 px-5 rounded-xl shadow-md shadow-brand-primary/20 transition-all active:scale-95 disabled:active:scale-100"
           >
             <span>{isValid ? "Agregar al Pedido" : "Selecciona las opciones obligatorias"}</span>
-            <span className="text-sm font-black tracking-tight">
+            <span className="text-sm font-black tracking-tight tabular-nums">
               {formatCurrency(lineTotal)}
             </span>
           </button>

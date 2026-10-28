@@ -62,15 +62,19 @@
   --background: var(--surface-canvas);
   --foreground: var(--text-strong);
 
-  /* Pila tipográfica dinámica */
-  --font-display-current: var(--font-barlow-condensed, sans-serif);
-  --font-sans-current: var(--font-inter, sans-serif);
+  /* ==========================================================================
+     Sistema Tipográfico Oficial (2 Familias Calibradas - Inspirado en Asadero/El Pollo Loco)
+     1. Display/Titulares/Marca: Barlow Condensed (Gothic condensada pesada)
+     2. Cuerpo/UI/Formularios/Precios: Inter (Sans-serif limpia con cifras tabulares)
+     ========================================================================== */
+  --font-display: var(--font-barlow-condensed), sans-serif;
+  --font-sans: var(--font-inter), -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
 }
 
 @theme inline {
-  --font-sans: var(--font-sans-current);
-  --font-display: var(--font-display-current);
-  --font-mono: var(--font-geist-mono);
+  --font-sans: var(--font-sans);
+  --font-display: var(--font-display);
+  --font-mono: var(--font-sans); /* Cifras tabulares con Inter sin tercera fuente */
   --color-brand-primary: var(--brand-primary);
   --color-brand-primary-hover: var(--brand-primary-hover);
   --color-brand-primary-light: var(--brand-primary-light);
@@ -126,79 +130,40 @@ body {
   background: var(--background);
   color: var(--foreground);
   font-family: var(--font-sans);
+  font-feature-settings: "cv02", "cv03", "cv04", "cv11";
 }
 
 /* ==========================================================================
-   Aislamiento Tipográfico Estricto por Ruta (Comparativa sin Mezclas)
+   Jerarquía Tipográfica Unificada (Barlow Condensed + Inter)
    ========================================================================== */
 
-/* Opción 1: Home (Barlow Condensed + Inter + Geist Mono) */
-.theme-typography-opt1 {
-  --font-display-current: var(--font-barlow-condensed);
-  --font-sans-current: var(--font-inter);
-  font-family: var(--font-inter), sans-serif;
-}
-.theme-typography-opt1 h1,
-.theme-typography-opt1 h2,
-.theme-typography-opt1 h3,
-.theme-typography-opt1 h4,
-.theme-typography-opt1 h5,
-.theme-typography-opt1 h6,
-.theme-typography-opt1 .font-display,
-.theme-typography-opt1 [data-display-brand] {
-  font-family: var(--font-barlow-condensed), sans-serif;
-}
-.theme-typography-opt1 input,
-.theme-typography-opt1 button,
-.theme-typography-opt1 select,
-.theme-typography-opt1 textarea {
-  font-family: var(--font-inter), sans-serif;
+/* Titulares, Display y Marca: Barlow Condensed en mayúsculas calibradas */
+h1,
+h2,
+h3,
+h4,
+h5,
+h6,
+.font-display,
+[data-display-brand] {
+  font-family: var(--font-display);
+  letter-spacing: 0.025em;
 }
 
-/* Opción 2: Checkout (Outfit + Inter + Geist Mono) */
-.theme-typography-opt2 {
-  --font-display-current: var(--font-outfit);
-  --font-sans-current: var(--font-inter);
-  font-family: var(--font-inter), sans-serif;
-}
-.theme-typography-opt2 h1,
-.theme-typography-opt2 h2,
-.theme-typography-opt2 h3,
-.theme-typography-opt2 h4,
-.theme-typography-opt2 h5,
-.theme-typography-opt2 h6,
-.theme-typography-opt2 .font-display,
-.theme-typography-opt2 [data-display-brand] {
-  font-family: var(--font-outfit), sans-serif;
-}
-.theme-typography-opt2 input,
-.theme-typography-opt2 button,
-.theme-typography-opt2 select,
-.theme-typography-opt2 textarea {
-  font-family: var(--font-inter), sans-serif;
+/* Cifras tabulares monoespaciadas para precios e importes sin tercera fuente */
+.tabular-nums,
+.font-mono {
+  font-family: var(--font-sans);
+  font-variant-numeric: tabular-nums;
+  font-feature-settings: "tnum" 1;
 }
 
-/* Opción 3: Track (Antonio + Nunito + Geist Mono) */
-.theme-typography-opt3 {
-  --font-display-current: var(--font-antonio);
-  --font-sans-current: var(--font-nunito);
-  font-family: var(--font-nunito), sans-serif;
-}
-.theme-typography-opt3 h1,
-.theme-typography-opt3 h2,
-.theme-typography-opt3 h3,
-.theme-typography-opt3 h4,
-.theme-typography-opt3 h5,
-.theme-typography-opt3 h6,
-.theme-typography-opt3 .font-display,
-.theme-typography-opt3 [data-display-brand] {
-  font-family: var(--font-antonio), sans-serif;
-}
-.theme-typography-opt3 input,
-.theme-typography-opt3 button,
-.theme-typography-opt3 select,
-.theme-typography-opt3 textarea {
-  font-family: var(--font-nunito), sans-serif;
+/* Formularios y controles interactivos */
+input,
+button,
+select,
+textarea {
+  font-family: inherit;
 }
 
 /* Selección de texto con identidad de marca */

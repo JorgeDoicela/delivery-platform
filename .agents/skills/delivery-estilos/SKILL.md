@@ -44,15 +44,19 @@ La identidad estética combina la elegancia contemporánea con los atributos gas
 
 ---
 
-## 3. Tipografía y Jerarquía
+## 3. Tipografía y Jerarquía (Sistema Estricto de 2 Fuentes)
 
-* **Fuente Principal:** Tipografías sans-serif de alta legibilidad en pantallas (`Inter`, `Outfit` o variables del sistema).
-* **Números y Precios:** Emplear fuentes con cifras tabulares o monoespaciadas (`font-mono`) para que los importes, vuelto y coordenadas se alineen verticalmente sin oscilaciones visuales.
+La plataforma utiliza estrictamente dos familias tipográficas calibradas, sin añadir una tercera fuente externa:
+* **1. Titulares, Display y Botones de Acción Primaria (`--font-display`):** `Barlow Condensed` (pesos `700 Bold`, `800 ExtraBold` y `900 Black`).
+  - Empleada en mayúsculas (`uppercase tracking-wide` o `tracking-wider`) para encabezados de sección, nombres de combos, logotipo y badges de marca (estética artesanal de fuego inspirada en El Pollo Loco).
+* **2. Cuerpo, Controles, Modales y Precios (`--font-sans`):** `Inter` (pesos `400 Regular`, `500 Medium` y `600 SemiBold`).
+  - Cero tercera fuente para cifras o precios: Se activan las cifras tabulares de la propia fuente `Inter` (`font-mono tabular-nums` con `font-feature-settings: "tnum" 1`) para alinear importes sin oscilaciones visuales.
 * **Escala Tipográfica:**
-  - Encabezados principales: `text-xl` a `text-2xl font-bold tracking-tight`.
-  - Títulos de tarjeta / Comandas: `text-sm font-semibold uppercase tracking-wider`.
-  - Texto de lectura: `text-sm font-normal leading-relaxed`.
-  - Etiquetas compactas y metadatos: `text-xs` y `text-[11px] font-medium`.
+  - Encabezados principales: `text-2xl` a `text-4xl font-black uppercase tracking-wide`.
+  - Títulos de tarjeta / Combos: `text-base` a `text-lg font-bold text-text-strong`.
+  - Texto de lectura y descripciones: `text-xs` a `text-sm font-normal leading-relaxed text-text-muted`.
+  - Importes y precios: `text-sm` a `text-lg font-black font-mono tabular-nums`.
+  - Etiquetas compactas y metadatos: `text-[10px]` y `text-[11px] font-bold uppercase tracking-wider`.
 
 ---
 
