@@ -1,5 +1,7 @@
 using System.Globalization;
 using Delivery.Core.Common;
+using Delivery.Features.Common.Handlers;
+using FluentValidation;
 using StackExchange.Redis;
 
 namespace Delivery.Features.Tracking.GetDriverLocation;
@@ -14,6 +16,16 @@ public sealed record DriverLocationResponse(
     DateTime Timestamp
 );
 
+public sealed class GetDriverLocationValidator : AbstractValidator<GetDriverLocationQuery>
+{
+    public GetDriverLocationValidator()
+    {
+        RuleFor(x => x.OrderId)
+            .NotEmpty()
+            .WithMessage("El identificador de la orden no puede ser un GUID vacío.");
+    }
+}
+
 public static class GetDriverLocationErrors
 {
     public static readonly Error NoDriverAssigned = new(
@@ -27,17 +39,26 @@ public static class GetDriverLocationErrors
     );
 }
 
-public sealed class GetDriverLocationHandler
+public sealed class GetDriverLocationHandler : IHandler<GetDriverLocationQuery, Result<DriverLocationResponse>>
 {
     private readonly IConnectionMultiplexer _redis;
+    private readonly IValidator<GetDriverLocationQuery> _validator;
 
-    public GetDriverLocationHandler(IConnectionMultiplexer redis)
+    public GetDriverLocationHandler(IConnectionMultiplexer redis, IValidator<GetDriverLocationQuery> validator)
     {
         _redis = redis;
+        _validator = validator;
     }
 
     public async Task<Result<DriverLocationResponse>> Handle(GetDriverLocationQuery query, CancellationToken cancellationToken = default)
     {
+        var validation = await _validator.ValidateAsync(query, cancellationToken);
+        if (!validation.IsValid)
+        {
+            var first = validation.Errors[0];
+            return Result.Failure<DriverLocationResponse>(new Error(first.ErrorCode, first.ErrorMessage));
+        }
+
         var db = _redis.GetDatabase();
 
         // Obtener ID del repartidor asignado a la orden

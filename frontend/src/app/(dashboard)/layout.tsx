@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { Utensils, Volume2, ShieldCheck } from "lucide-react";
+import { Utensils, Volume2, ShieldCheck, Package, Building2 } from "lucide-react";
 
 export default function DashboardLayout({
   children,
@@ -10,32 +10,60 @@ export default function DashboardLayout({
     <div className="flex flex-col min-h-screen bg-slate-950 text-slate-100">
       {/* Barra de Estado KDS y Operaciones */}
       <header className="h-14 bg-slate-900 border-b border-slate-800 px-4 flex items-center justify-between shrink-0">
-        <div className="flex items-center gap-4">
-          <Link href="/kitchen" className="flex items-center gap-2 font-bold text-lg text-white">
+        <div className="flex items-center gap-6">
+          <Link href="/kitchen" className="flex items-center gap-2 font-bold text-base text-white">
             <div className="w-8 h-8 rounded-lg bg-orange-600 flex items-center justify-center">
               <Utensils className="w-4 h-4 text-white" />
             </div>
-            <span>KDS Cocina</span>
+            <span>Delivery Ops</span>
           </Link>
-          <span className="text-xs bg-slate-800 text-slate-300 px-2.5 py-1 rounded-md font-mono border border-slate-700">
-            Sucursal #1 (Norte)
-          </span>
+
+          {/* Navegación Modular de Operaciones */}
+          <nav className="hidden md:flex items-center gap-1 text-xs">
+            <Link
+              href="/kitchen"
+              className="px-3 py-1.5 rounded-lg text-slate-300 hover:text-white hover:bg-slate-800 transition-colors font-medium flex items-center gap-1.5"
+            >
+              <Utensils className="w-3.5 h-3.5 text-orange-400" />
+              <span>Cocina KDS</span>
+            </Link>
+
+            <Link
+              href="/admin/inventory"
+              className="px-3 py-1.5 rounded-lg text-slate-300 hover:text-white hover:bg-slate-800 transition-colors font-medium flex items-center gap-1.5"
+            >
+              <Package className="w-3.5 h-3.5 text-amber-400" />
+              <span>Inventario</span>
+            </Link>
+
+            <Link
+              href="/admin/branches"
+              className="px-3 py-1.5 rounded-lg text-slate-300 hover:text-white hover:bg-slate-800 transition-colors font-medium flex items-center gap-1.5"
+            >
+              <Building2 className="w-3.5 h-3.5 text-blue-400" />
+              <span>Sucursales</span>
+            </Link>
+          </nav>
         </div>
 
-        <div className="flex items-center gap-4 text-xs">
-          <div className="flex items-center gap-2 bg-slate-800/80 px-3 py-1.5 rounded-lg border border-slate-700">
+        <div className="flex items-center gap-3 text-xs">
+          <span className="hidden lg:inline-block text-[11px] bg-slate-800 text-slate-300 px-2.5 py-1 rounded-md font-mono border border-slate-700">
+            Sucursal #1 (Norte)
+          </span>
+
+          <div className="flex items-center gap-2 bg-slate-800/80 px-2.5 py-1 rounded-lg border border-slate-700">
             <span className="w-2 h-2 rounded-full bg-emerald-400 animate-ping"></span>
-            <span className="text-emerald-400 font-medium">SignalR Conectado</span>
+            <span className="text-emerald-400 font-medium hidden sm:inline">SignalR Activo</span>
           </div>
 
-          <div className="flex items-center gap-1.5 text-slate-400 bg-slate-800 px-2.5 py-1.5 rounded-lg border border-slate-700">
+          <div className="flex items-center gap-1.5 text-slate-400 bg-slate-800 px-2.5 py-1 rounded-lg border border-slate-700">
             <Volume2 className="w-3.5 h-3.5 text-orange-400" />
-            <span className="hidden sm:inline">Alarma Activa</span>
+            <span className="hidden sm:inline">Alarma</span>
           </div>
 
           <Link
             href="/"
-            className="text-xs text-slate-400 hover:text-white flex items-center gap-1 transition-colors"
+            className="text-xs text-slate-400 hover:text-white flex items-center gap-1 transition-colors px-2 py-1 rounded-lg hover:bg-slate-800"
           >
             <ShieldCheck className="w-3.5 h-3.5" />
             <span className="hidden md:inline">Ver Tienda</span>
@@ -43,7 +71,7 @@ export default function DashboardLayout({
         </div>
       </header>
 
-      {/* Contenedor del Tablero Kanban */}
+      {/* Contenedor Operativo */}
       <main className="flex-1 p-4 overflow-hidden flex flex-col">
         {children}
       </main>

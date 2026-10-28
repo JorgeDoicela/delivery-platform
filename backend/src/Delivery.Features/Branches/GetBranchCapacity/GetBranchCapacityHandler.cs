@@ -1,11 +1,23 @@
 using Delivery.Core.Common;
 using Delivery.Core.Infrastructure.Persistence;
+using Delivery.Features.Common.Handlers;
+using FluentValidation;
 using Microsoft.EntityFrameworkCore;
 using StackExchange.Redis;
 
-namespace Delivery.Features.Orders.GetBranchCapacity;
+namespace Delivery.Features.Branches.GetBranchCapacity;
 
 public sealed record GetBranchCapacityQuery(int BranchId);
+
+public sealed class GetBranchCapacityValidator : AbstractValidator<GetBranchCapacityQuery>
+{
+    public GetBranchCapacityValidator()
+    {
+        RuleFor(x => x.BranchId)
+            .GreaterThan(0)
+            .WithMessage("El identificador de la sucursal debe ser mayor a 0.");
+    }
+}
 
 public sealed record BranchCapacityResponse(
     int BranchId,
@@ -17,22 +29,34 @@ public sealed record BranchCapacityResponse(
     string? DemandNotice
 );
 
-public sealed class GetBranchCapacityHandler
+public sealed class GetBranchCapacityHandler : IHandler<GetBranchCapacityQuery, Result<BranchCapacityResponse>>
 {
     private readonly AppDbContext _context;
     private readonly IConnectionMultiplexer _redis;
+    private readonly IValidator<GetBranchCapacityQuery> _validator;
 
-    public GetBranchCapacityHandler(AppDbContext context, IConnectionMultiplexer redis)
+    public GetBranchCapacityHandler(
+        AppDbContext context,
+        IConnectionMultiplexer redis,
+        IValidator<GetBranchCapacityQuery> validator)
     {
         _context = context;
         _redis = redis;
+        _validator = validator;
     }
 
-    public async Task<Result<BranchCapacityResponse>> Handle(GetBranchCapacityQuery query, CancellationToken ct = default)
+    public async Task<Result<BranchCapacityResponse>> Handle(GetBranchCapacityQuery query, CancellationToken cancellationToken = default)
     {
+        var validation = await _validator.ValidateAsync(query, cancellationToken);
+        if (!validation.IsValid)
+        {
+            var first = validation.Errors[0];
+            return Result.Failure<BranchCapacityResponse>(new Error(first.ErrorCode, first.ErrorMessage));
+        }
+
         var branch = await _context.Branches
             .AsNoTracking()
-            .FirstOrDefaultAsync(b => b.Id == query.BranchId && b.IsActive, ct);
+            .FirstOrDefaultAsync(b => b.Id == query.BranchId && b.IsActive, cancellationToken);
 
         if (branch is null)
         {
@@ -67,3 +91,4 @@ public sealed class GetBranchCapacityHandler
         ));
     }
 }
+

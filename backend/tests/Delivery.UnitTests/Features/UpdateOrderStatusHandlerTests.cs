@@ -1,9 +1,11 @@
+using Delivery.Core.Contracts.Realtime;
 using Delivery.Core.Domain.Entities;
 using Delivery.Core.Domain.Enums;
 using Delivery.Core.Infrastructure.Persistence;
 using Delivery.Features.Orders.UpdateOrderStatus;
 using FluentAssertions;
 using Microsoft.EntityFrameworkCore;
+using Moq;
 using Xunit;
 
 namespace Delivery.UnitTests.Features;
@@ -19,12 +21,24 @@ public class UpdateOrderStatusHandlerTests
         return new AppDbContext(options);
     }
 
+    private static UpdateOrderStatusHandler CreateHandler(AppDbContext context)
+    {
+        var mockTrackingNotifier = new Mock<ITrackingNotifier>();
+        var mockKitchenNotifier = new Mock<IKitchenNotifier>();
+        return new UpdateOrderStatusHandler(
+            context,
+            new UpdateOrderStatusValidator(),
+            mockTrackingNotifier.Object,
+            mockKitchenNotifier.Object
+        );
+    }
+
     [Fact]
     public async Task Handle_WhenOrderDoesNotExist_ShouldReturnOrderNotFoundError()
     {
         // Arrange
         using var context = CreateInMemoryDbContext();
-        var handler = new UpdateOrderStatusHandler(context);
+        var handler = CreateHandler(context);
         var command = new UpdateOrderStatusCommand(Guid.NewGuid(), OrderStatus.Confirmed);
 
         // Act
@@ -56,7 +70,7 @@ public class UpdateOrderStatusHandlerTests
         context.Orders.Add(order);
         await context.SaveChangesAsync();
 
-        var handler = new UpdateOrderStatusHandler(context);
+        var handler = CreateHandler(context);
         var command = new UpdateOrderStatusCommand(order.Id, targetStatus);
 
         // Act
@@ -90,7 +104,7 @@ public class UpdateOrderStatusHandlerTests
         context.Orders.Add(order);
         await context.SaveChangesAsync();
 
-        var handler = new UpdateOrderStatusHandler(context);
+        var handler = CreateHandler(context);
         var command = new UpdateOrderStatusCommand(order.Id, targetStatus);
 
         // Act

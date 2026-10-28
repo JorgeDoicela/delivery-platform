@@ -1,13 +1,6 @@
-using Delivery.Features.Catalog.GetActiveMenu;
-using Delivery.Features.Catalog.ToggleProductStatus;
-using Delivery.Features.Geofencing.ResolveBranchByPoint;
-using Delivery.Features.Kitchen.GetActiveKitchenOrders;
-using Delivery.Features.Orders.ApproveTransferOrder;
-using Delivery.Features.Orders.CreateOrder;
-using Delivery.Features.Orders.GetOrderById;
-using Delivery.Features.Orders.UpdateOrderStatus;
-using Delivery.Features.Tracking.GetDriverLocation;
-using Delivery.Features.Tracking.IngestDriverLocation;
+using System.Reflection;
+using Delivery.Features.Common.Endpoints;
+using Delivery.Features.Common.Handlers;
 using FluentValidation;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -17,21 +10,31 @@ public static class DependencyInjection
 {
     public static IServiceCollection AddDeliveryFeatures(this IServiceCollection services)
     {
-        // Registro de Validadores FluentValidation
-        services.AddValidatorsFromAssembly(typeof(DependencyInjection).Assembly);
+        var assembly = typeof(DependencyInjection).Assembly;
 
-        // Registro de Handlers de Casos de Uso (Vertical Slices)
-        services.AddScoped<ResolveBranchHandler>();
-        services.AddScoped<GetActiveMenuHandler>();
-        services.AddScoped<ToggleProductStatusHandler>();
-        services.AddScoped<CreateOrderHandler>();
-        services.AddScoped<UpdateOrderStatusHandler>();
-        services.AddScoped<GetOrderByIdHandler>();
-        services.AddScoped<ApproveTransferOrderHandler>();
-        services.AddScoped<GetActiveKitchenOrdersHandler>();
-        services.AddScoped<IngestDriverLocationHandler>();
-        services.AddScoped<GetDriverLocationHandler>();
-        services.AddScoped<Delivery.Features.Orders.GetBranchCapacity.GetBranchCapacityHandler>();
+        // 1. Registro automático de Validadores FluentValidation
+        services.AddValidatorsFromAssembly(assembly);
+
+        // 2. Registro dinámico y automático de Handlers de Casos de Uso (Vertical Slices)
+        var handlerTypes = assembly.GetTypes()
+            .Where(t => !t.IsAbstract && !t.IsInterface && t.Name.EndsWith("Handler", StringComparison.Ordinal));
+
+        foreach (var handlerType in handlerTypes)
+        {
+            services.AddScoped(handlerType);
+
+            // Registro de contratos IHandler<TRequest, TResponse> para despacho desacoplado
+            var handlerInterfaces = handlerType.GetInterfaces()
+                .Where(i => i.IsGenericType && i.GetGenericTypeDefinition() == typeof(IHandler<,>));
+
+            foreach (var handlerInterface in handlerInterfaces)
+            {
+                services.AddScoped(handlerInterface, handlerType);
+            }
+        }
+
+        // 3. Auto-registro de Endpoints de cada Vertical Slice
+        services.AddEndpoints(assembly);
 
         return services;
     }

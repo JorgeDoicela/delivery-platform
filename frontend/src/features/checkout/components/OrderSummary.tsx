@@ -1,6 +1,6 @@
 "use client";
 
-import { useCartStore } from "@/features/cart/store/useCartStore";
+import { useCartStore } from "@/features/cart";
 import { formatCurrency } from "@/shared/lib/utils";
 import { Trash2, Plus, Minus, ShoppingBag, Truck, Store } from "lucide-react";
 import Link from "next/link";

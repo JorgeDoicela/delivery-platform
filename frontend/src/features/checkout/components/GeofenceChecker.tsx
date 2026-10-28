@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { apiClient } from "@/shared/lib/api-client";
-import { useCartStore } from "@/features/cart/store/useCartStore";
+import { useCartStore } from "@/features/cart";
 import type { BranchCoverageDto, BranchCapacityResponse } from "@/shared/types/api";
 import { MapPin, Navigation, CheckCircle2, AlertTriangle, Loader2 } from "lucide-react";
 import { AddressSelector } from "./AddressSelector";

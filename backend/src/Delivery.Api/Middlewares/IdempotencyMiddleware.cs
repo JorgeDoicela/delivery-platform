@@ -1,4 +1,5 @@
-using System.Text;
+using System.Text.Json;
+using Microsoft.AspNetCore.Mvc;
 using StackExchange.Redis;
 
 namespace Delivery.Api.Middlewares;
@@ -32,7 +33,7 @@ public class IdempotencyMiddleware
         string idempotencyKey = $"idempotency:{keyValues.ToString().Trim()}";
         var db = _redis.GetDatabase();
 
-        // Intentar registrar la clave en estado PROCESSING con TTL de 120 segundos
+        // Intentar registrar la clave en estado PROCESSING con TTL transitorio de 120 segundos
         bool acquired = await db.StringSetAsync(idempotencyKey, "PROCESSING", TimeSpan.FromSeconds(120), When.NotExists);
 
         if (!acquired)
@@ -40,10 +41,20 @@ public class IdempotencyMiddleware
             var existingValue = await db.StringGetAsync(idempotencyKey);
             if (existingValue == "PROCESSING")
             {
-                // Otra solicitud concurrente con la misma clave está en proceso
+                // Otra solicitud concurrente con la misma clave está en proceso (RFC 7807)
                 context.Response.StatusCode = StatusCodes.Status409Conflict;
-                context.Response.ContentType = "application/json";
-                await context.Response.WriteAsync("{\"error\":\"La solicitud ya se encuentra en procesamiento.\"}");
+                context.Response.ContentType = "application/problem+json";
+
+                var problem = new ProblemDetails
+                {
+                    Status = StatusCodes.Status409Conflict,
+                    Title = "Conflict",
+                    Detail = "La solicitud con esta clave de idempotencia ya se encuentra en procesamiento.",
+                    Instance = context.Request.Path
+                };
+                problem.Extensions["code"] = "Orders.IdempotencyConflict";
+
+                await context.Response.WriteAsync(JsonSerializer.Serialize(problem));
                 return;
             }
 
@@ -72,8 +83,8 @@ public class IdempotencyMiddleware
 
             if (context.Response.StatusCode is >= 200 and < 300)
             {
-                // Guardar respuesta exitosa en Redis con TTL de 120 segundos
-                await db.StringSetAsync(idempotencyKey, responseBody, TimeSpan.FromSeconds(120));
+                // Almacenar en Redis con TTL de 24 horas según arquitectura (Sección 3.3)
+                await db.StringSetAsync(idempotencyKey, responseBody, TimeSpan.FromHours(24));
             }
             else
             {

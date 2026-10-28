@@ -1,11 +1,23 @@
 using Delivery.Core.Common;
 using Delivery.Core.Domain.Enums;
 using Delivery.Core.Infrastructure.Persistence;
+using Delivery.Features.Common.Handlers;
+using FluentValidation;
 using Microsoft.EntityFrameworkCore;
 
 namespace Delivery.Features.Orders.GetOrderById;
 
 public sealed record GetOrderByIdQuery(Guid OrderId);
+
+public sealed class GetOrderByIdValidator : AbstractValidator<GetOrderByIdQuery>
+{
+    public GetOrderByIdValidator()
+    {
+        RuleFor(x => x.OrderId)
+            .NotEmpty()
+            .WithMessage("El identificador de la orden no puede ser un GUID vacío.");
+    }
+}
 
 public sealed record OrderDetailModifierDto(
     Guid Id,
@@ -58,17 +70,26 @@ public static class GetOrderByIdErrors
     );
 }
 
-public sealed class GetOrderByIdHandler
+public sealed class GetOrderByIdHandler : IHandler<GetOrderByIdQuery, Result<OrderDetailResponse>>
 {
     private readonly AppDbContext _context;
+    private readonly IValidator<GetOrderByIdQuery> _validator;
 
-    public GetOrderByIdHandler(AppDbContext context)
+    public GetOrderByIdHandler(AppDbContext context, IValidator<GetOrderByIdQuery> validator)
     {
         _context = context;
+        _validator = validator;
     }
 
     public async Task<Result<OrderDetailResponse>> Handle(GetOrderByIdQuery query, CancellationToken cancellationToken = default)
     {
+        var validation = await _validator.ValidateAsync(query, cancellationToken);
+        if (!validation.IsValid)
+        {
+            var first = validation.Errors[0];
+            return Result.Failure<OrderDetailResponse>(new Error(first.ErrorCode, first.ErrorMessage));
+        }
+
         var order = await _context.Orders
             .AsNoTracking()
             .Include(o => o.Branch)

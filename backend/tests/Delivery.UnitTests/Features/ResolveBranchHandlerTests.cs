@@ -1,6 +1,6 @@
 using Delivery.Core.Domain.Entities;
 using Delivery.Core.Infrastructure.Persistence;
-using Delivery.Features.Geofencing.ResolveBranchByPoint;
+using Delivery.Features.Branches.ResolveBranch;
 using FluentAssertions;
 using Microsoft.EntityFrameworkCore;
 using NetTopologySuite.Geometries;
@@ -30,7 +30,7 @@ public class ResolveBranchHandlerTests
     {
         // Arrange
         using var context = CreateInMemoryDbContext();
-        var handler = new ResolveBranchHandler(context);
+        var handler = new ResolveBranchHandler(context, new ResolveBranchValidator());
 
         // Act
         var result = await handler.Handle(new ResolveBranchQuery(latitude, longitude));
@@ -45,7 +45,7 @@ public class ResolveBranchHandlerTests
     {
         // Arrange
         using var context = CreateInMemoryDbContext();
-        var handler = new ResolveBranchHandler(context);
+        var handler = new ResolveBranchHandler(context, new ResolveBranchValidator());
 
         // Act
         var result = await handler.Handle(new ResolveBranchQuery(-0.1800, -78.4800));

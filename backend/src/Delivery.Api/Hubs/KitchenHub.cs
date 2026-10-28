@@ -1,10 +1,11 @@
+using Delivery.Core.Contracts;
 using Microsoft.AspNetCore.SignalR;
 
 namespace Delivery.Api.Hubs;
 
 public interface IKitchenClient
 {
-    Task ReceiveNewOrder(object payload);
+    Task ReceiveNewOrder(KitchenOrderTicketDto ticket);
     Task StockUpdated(int productId, bool isAvailable);
     Task OrderStatusChanged(string orderId, string status);
 }

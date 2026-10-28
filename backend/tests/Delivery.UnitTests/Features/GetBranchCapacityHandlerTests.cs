@@ -1,6 +1,6 @@
 using Delivery.Core.Domain.Entities;
 using Delivery.Core.Infrastructure.Persistence;
-using Delivery.Features.Orders.GetBranchCapacity;
+using Delivery.Features.Branches.GetBranchCapacity;
 using FluentAssertions;
 using Microsoft.EntityFrameworkCore;
 using Moq;
@@ -53,7 +53,7 @@ public class GetBranchCapacityHandlerTests
         // Arrange
         using var context = CreateInMemoryDbContext();
         var mockRedis = new Mock<IConnectionMultiplexer>();
-        var handler = new GetBranchCapacityHandler(context, mockRedis.Object);
+        var handler = new GetBranchCapacityHandler(context, mockRedis.Object, new GetBranchCapacityValidator());
 
         // Act
         var result = await handler.Handle(new GetBranchCapacityQuery(BranchId: 999));
@@ -80,7 +80,7 @@ public class GetBranchCapacityHandlerTests
         mockRedis.Setup(r => r.GetDatabase(It.IsAny<int>(), It.IsAny<object>()))
             .Returns(mockDatabase.Object);
 
-        var handler = new GetBranchCapacityHandler(context, mockRedis.Object);
+        var handler = new GetBranchCapacityHandler(context, mockRedis.Object, new GetBranchCapacityValidator());
 
         // Act
         var result = await handler.Handle(new GetBranchCapacityQuery(branch.Id));
@@ -111,7 +111,7 @@ public class GetBranchCapacityHandlerTests
         mockRedis.Setup(r => r.GetDatabase(It.IsAny<int>(), It.IsAny<object>()))
             .Returns(mockDatabase.Object);
 
-        var handler = new GetBranchCapacityHandler(context, mockRedis.Object);
+        var handler = new GetBranchCapacityHandler(context, mockRedis.Object, new GetBranchCapacityValidator());
 
         // Act
         var result = await handler.Handle(new GetBranchCapacityQuery(branch.Id));
@@ -142,7 +142,7 @@ public class GetBranchCapacityHandlerTests
         mockRedis.Setup(r => r.GetDatabase(It.IsAny<int>(), It.IsAny<object>()))
             .Returns(mockDatabase.Object);
 
-        var handler = new GetBranchCapacityHandler(context, mockRedis.Object);
+        var handler = new GetBranchCapacityHandler(context, mockRedis.Object, new GetBranchCapacityValidator());
 
         // Act
         var result = await handler.Handle(new GetBranchCapacityQuery(branch.Id));

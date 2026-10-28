@@ -1,8 +1,8 @@
 "use client";
 
 import { useState } from "react";
-import { useMenuQuery } from "@/features/catalog/hooks/useMenuQuery";
-import { ProductCard } from "@/features/catalog/components/ProductCard";
+import { useMenuQuery } from "../hooks/useMenuQuery";
+import { ProductCard } from "./ProductCard";
 import { AlertTriangle, RefreshCw } from "lucide-react";
 
 export function CatalogSection() {

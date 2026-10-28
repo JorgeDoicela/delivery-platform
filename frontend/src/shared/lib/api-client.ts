@@ -13,7 +13,7 @@ import type {
 const API_BASE_URL =
   process.env.NEXT_PUBLIC_API_URL || "http://localhost:5005";
 
-class ApiClientError extends Error {
+export class ApiClientError extends Error {
   code: string;
   status: number;
 
@@ -27,20 +27,31 @@ class ApiClientError extends Error {
 
 async function handleResponse<T>(response: Response): Promise<T> {
   if (!response.ok) {
-    let errorData: ApiError = {
+    const errorData: ApiError = {
       code: `HTTP_${response.status}`,
       message: "Ha ocurrido un error inesperado en el servidor.",
     };
 
     try {
       const json = await response.json();
-      if (json.code && json.message) {
-        errorData = json;
+      // Soporte estricto para RFC 7807 ProblemDetails del backend .NET 8
+      if (json.detail) {
+        errorData.message = json.detail;
+      } else if (json.message) {
+        errorData.message = json.message;
       } else if (json.error) {
         errorData.message = json.error;
+      } else if (json.title) {
+        errorData.message = json.title;
+      }
+
+      if (json.code) {
+        errorData.code = json.code;
+      } else if (json.status) {
+        errorData.code = `HTTP_${json.status}`;
       }
     } catch {
-      // Usar mensaje predeterminado si no es JSON
+      // Usar mensaje predeterminado si no es un payload JSON válido
     }
 
     throw new ApiClientError(errorData.message, errorData.code, response.status);
@@ -158,5 +169,18 @@ export const apiClient = {
       body: JSON.stringify({ driverId, orderId, latitude, longitude, heading }),
     });
     return handleResponse<void>(res);
+  },
+
+  // 9. Catálogo: Conmutar disponibilidad de producto (Stock en tiempo real)
+  async toggleProductStatus(
+    productId: number,
+    isActive: boolean
+  ): Promise<{ productId: number; isActive: boolean; productName: string }> {
+    const res = await fetch(`${API_BASE_URL}/api/catalog/products/${productId}/status`, {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ productId, isActive }),
+    });
+    return handleResponse<{ productId: number; isActive: boolean; productName: string }>(res);
   },
 };

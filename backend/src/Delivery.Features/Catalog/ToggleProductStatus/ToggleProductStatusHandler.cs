@@ -1,5 +1,7 @@
 using Delivery.Core.Common;
+using Delivery.Core.Contracts.Realtime;
 using Delivery.Core.Infrastructure.Persistence;
+using Delivery.Features.Common.Handlers;
 using FluentValidation;
 using Microsoft.EntityFrameworkCore;
 
@@ -27,15 +29,20 @@ public static class ToggleProductStatusErrors
     );
 }
 
-public sealed class ToggleProductStatusHandler
+public sealed class ToggleProductStatusHandler : IHandler<ToggleProductStatusCommand, Result<ToggleProductStatusResponse>>
 {
     private readonly AppDbContext _context;
     private readonly IValidator<ToggleProductStatusCommand> _validator;
+    private readonly IKitchenNotifier _kitchenNotifier;
 
-    public ToggleProductStatusHandler(AppDbContext context, IValidator<ToggleProductStatusCommand> validator)
+    public ToggleProductStatusHandler(
+        AppDbContext context,
+        IValidator<ToggleProductStatusCommand> validator,
+        IKitchenNotifier kitchenNotifier)
     {
         _context = context;
         _validator = validator;
+        _kitchenNotifier = kitchenNotifier;
     }
 
     public async Task<Result<ToggleProductStatusResponse>> Handle(ToggleProductStatusCommand command, CancellationToken cancellationToken = default)
@@ -55,6 +62,9 @@ public sealed class ToggleProductStatusHandler
 
         product.IsActive = command.IsActive;
         await _context.SaveChangesAsync(cancellationToken);
+
+        // Notificación en tiempo real al ecosistema operativo
+        await _kitchenNotifier.NotifyStockUpdatedAsync(product.Id, product.IsActive, cancellationToken);
 
         return Result.Success(new ToggleProductStatusResponse(product.Id, product.IsActive, product.Name));
     }

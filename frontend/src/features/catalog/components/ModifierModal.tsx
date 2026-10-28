@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import type { MenuProductDto, MenuModifierGroupDto } from "@/shared/types/api";
-import { useCartStore, type SelectedModifier } from "@/features/cart/store/useCartStore";
+import { useCartStore, type SelectedModifier } from "@/features/cart";
 import { formatCurrency } from "@/shared/lib/utils";
 import { X, Plus, Minus, Check } from "lucide-react";
 

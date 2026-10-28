@@ -1,9 +1,11 @@
 using Delivery.Core.Common;
 using Delivery.Core.Infrastructure.Persistence;
+using Delivery.Features.Common.Handlers;
+using FluentValidation;
 using Microsoft.EntityFrameworkCore;
 using NetTopologySuite.Geometries;
 
-namespace Delivery.Features.Geofencing.ResolveBranchByPoint;
+namespace Delivery.Features.Branches.ResolveBranch;
 
 public sealed record ResolveBranchQuery(double Latitude, double Longitude);
 
@@ -29,30 +31,52 @@ public static class ResolveBranchErrors
     );
 }
 
-public sealed class ResolveBranchHandler
+public sealed class ResolveBranchValidator : AbstractValidator<ResolveBranchQuery>
+{
+    public ResolveBranchValidator()
+    {
+        RuleFor(x => x.Latitude)
+            .InclusiveBetween(-90.0, 90.0)
+            .WithErrorCode(ResolveBranchErrors.InvalidCoordinates.Code)
+            .WithMessage(ResolveBranchErrors.InvalidCoordinates.Message);
+
+        RuleFor(x => x.Longitude)
+            .InclusiveBetween(-180.0, 180.0)
+            .WithErrorCode(ResolveBranchErrors.InvalidCoordinates.Code)
+            .WithMessage(ResolveBranchErrors.InvalidCoordinates.Message);
+    }
+}
+
+public sealed class ResolveBranchHandler : IHandler<ResolveBranchQuery, Result<BranchCoverageDto>>
 {
     private static readonly GeometryFactory GeometryFactory = new(new PrecisionModel(), 4326);
     private readonly AppDbContext _context;
+    private readonly IValidator<ResolveBranchQuery> _validator;
 
-    public ResolveBranchHandler(AppDbContext context)
+    public ResolveBranchHandler(AppDbContext context, IValidator<ResolveBranchQuery> validator)
     {
         _context = context;
+        _validator = validator;
     }
 
     public async Task<Result<BranchCoverageDto>> Handle(ResolveBranchQuery query, CancellationToken cancellationToken = default)
     {
-        if (query.Latitude is < -90 or > 90 || query.Longitude is < -180 or > 180)
+        var validation = await _validator.ValidateAsync(query, cancellationToken);
+        if (!validation.IsValid)
         {
-            return Result.Failure<BranchCoverageDto>(ResolveBranchErrors.InvalidCoordinates);
+            var first = validation.Errors[0];
+            return Result.Failure<BranchCoverageDto>(new Error(first.ErrorCode, first.ErrorMessage));
         }
 
         // En NetTopologySuite y GeoJSON las coordenadas son (Longitud, Latitud) -> (X, Y)
         var clientPoint = GeometryFactory.CreatePoint(new Coordinate(query.Longitude, query.Latitude));
 
         // Consulta espacial evaluada con el índice GiST idx_branches_coverage_polygon en PostgreSQL
+        // y ordenamiento por distancia euclidiana para priorizar la sucursal más cercana en zonas limítrofes
         var branch = await _context.Branches
             .AsNoTracking()
             .Where(b => b.IsActive && b.CoveragePolygon.Contains(clientPoint))
+            .OrderBy(b => b.LocationPoint.Distance(clientPoint))
             .Select(b => new BranchCoverageDto(
                 b.Id,
                 b.Name,
@@ -71,3 +95,4 @@ public sealed class ResolveBranchHandler
         return Result.Success(branch);
     }
 }
+

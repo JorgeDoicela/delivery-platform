@@ -1,8 +1,10 @@
 using Delivery.Core.Common;
+using Delivery.Core.Contracts;
+using Delivery.Core.Contracts.Realtime;
 using Delivery.Core.Domain.Entities;
 using Delivery.Core.Domain.Enums;
 using Delivery.Core.Infrastructure.Persistence;
-using Delivery.Features.Kitchen.GetActiveKitchenOrders;
+using Delivery.Features.Common.Handlers;
 using FluentValidation;
 using Microsoft.EntityFrameworkCore;
 using NetTopologySuite.Geometries;
@@ -99,18 +101,24 @@ public sealed class CreateOrderValidator : AbstractValidator<CreateOrderCommand>
     }
 }
 
-public sealed class CreateOrderHandler
+public sealed class CreateOrderHandler : IHandler<CreateOrderCommand, Result<CreateOrderResponse>>
 {
     private static readonly GeometryFactory GeometryFactory = new(new PrecisionModel(), 4326);
     private readonly AppDbContext _context;
     private readonly IValidator<CreateOrderCommand> _validator;
     private readonly IConnectionMultiplexer _redis;
+    private readonly IKitchenNotifier _kitchenNotifier;
 
-    public CreateOrderHandler(AppDbContext context, IValidator<CreateOrderCommand> validator, IConnectionMultiplexer redis)
+    public CreateOrderHandler(
+        AppDbContext context,
+        IValidator<CreateOrderCommand> validator,
+        IConnectionMultiplexer redis,
+        IKitchenNotifier kitchenNotifier)
     {
         _context = context;
         _validator = validator;
         _redis = redis;
+        _kitchenNotifier = kitchenNotifier;
     }
 
     public async Task<Result<CreateOrderResponse>> Handle(CreateOrderCommand command, CancellationToken cancellationToken = default)
@@ -129,35 +137,6 @@ public sealed class CreateOrderHandler
         if (branch is null)
         {
             return Result.Failure<CreateOrderResponse>(CreateOrderErrors.BranchNotFound);
-        }
-
-        // Control de Capacidad Operativa y Throttling en Redis por franjas de 20 minutos (Sección 9.4)
-        var db = _redis.GetDatabase();
-        long currentSlot = (DateTimeOffset.UtcNow.ToUnixTimeSeconds() / 1200) * 1200;
-        string slotKey = $"branch:{branch.Id}:slot:{currentSlot}";
-
-        long currentSlotOrders = await db.StringIncrementAsync(slotKey);
-        if (currentSlotOrders == 1)
-        {
-            await db.KeyExpireAsync(slotKey, TimeSpan.FromHours(2), ExpireWhen.HasNoExpiry);
-        }
-
-        int maxOrders = branch.MaxOrdersPerSlot > 0 ? branch.MaxOrdersPerSlot : 15;
-        int hardCap = (int)(maxOrders * 1.5);
-
-        if (currentSlotOrders > hardCap)
-        {
-            await db.StringDecrementAsync(slotKey);
-            return Result.Failure<CreateOrderResponse>(CreateOrderErrors.SlotCapacityExceeded);
-        }
-
-        string estimatedTime = "35-45 min";
-        string? demandNotice = null;
-
-        if (currentSlotOrders > maxOrders)
-        {
-            estimatedTime = "60-75 min";
-            demandNotice = "Tiempo estimado de entrega extendido a 60-75 min por alta demanda en horno.";
         }
 
         // Consultar productos solicitados desde la base de datos (seguridad: blindaje del subtotal)
@@ -278,8 +257,45 @@ public sealed class CreateOrderHandler
             order.Status = OrderStatus.Confirmed;
         }
 
-        await _context.Orders.AddAsync(order, cancellationToken);
-        await _context.SaveChangesAsync(cancellationToken);
+        // Control de Capacidad Operativa y Throttling en Redis por franjas de 20 minutos (Sección 9.4)
+        var db = _redis.GetDatabase();
+        long currentSlot = (DateTimeOffset.UtcNow.ToUnixTimeSeconds() / 1200) * 1200;
+        string slotKey = $"branch:{branch.Id}:slot:{currentSlot}";
+
+        long currentSlotOrders = await db.StringIncrementAsync(slotKey);
+        if (currentSlotOrders == 1)
+        {
+            await db.KeyExpireAsync(slotKey, TimeSpan.FromHours(2), ExpireWhen.HasNoExpiry);
+        }
+
+        int maxOrders = branch.MaxOrdersPerSlot > 0 ? branch.MaxOrdersPerSlot : 15;
+        int hardCap = (int)(maxOrders * 1.5);
+
+        if (currentSlotOrders > hardCap)
+        {
+            await db.StringDecrementAsync(slotKey);
+            return Result.Failure<CreateOrderResponse>(CreateOrderErrors.SlotCapacityExceeded);
+        }
+
+        string estimatedTime = "35-45 min";
+        string? demandNotice = null;
+
+        if (currentSlotOrders > maxOrders)
+        {
+            estimatedTime = "60-75 min";
+            demandNotice = "Tiempo estimado de entrega extendido a 60-75 min por alta demanda en horno.";
+        }
+
+        try
+        {
+            await _context.Orders.AddAsync(order, cancellationToken);
+            await _context.SaveChangesAsync(cancellationToken);
+        }
+        catch
+        {
+            await db.StringDecrementAsync(slotKey);
+            throw;
+        }
 
         var ticket = new KitchenOrderTicketDto(
             order.Id,
@@ -295,6 +311,9 @@ public sealed class CreateOrderHandler
                 i.Modifiers.Select(m => new KitchenTicketModifierDto(m.ModifierNameSnapshot)).ToList()
             )).ToList()
         );
+
+        // Notificación en tiempo real al Kitchen Display System (KDS) de la sucursal
+        await _kitchenNotifier.NotifyNewOrderAsync(branch.Id, ticket, cancellationToken);
 
         return Result.Success(new CreateOrderResponse(
             order.Id,

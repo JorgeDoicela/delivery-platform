@@ -1,5 +1,6 @@
 using Delivery.Core.Common;
 using Delivery.Core.Infrastructure.Persistence;
+using Delivery.Features.Common.Handlers;
 using Microsoft.EntityFrameworkCore;
 
 namespace Delivery.Features.Catalog.GetActiveMenu;
@@ -43,7 +44,7 @@ public sealed record ActiveMenuResponse(
     int TotalProducts
 );
 
-public sealed class GetActiveMenuHandler
+public sealed class GetActiveMenuHandler : IHandler<GetActiveMenuQuery, Result<ActiveMenuResponse>>
 {
     private readonly AppDbContext _context;
 

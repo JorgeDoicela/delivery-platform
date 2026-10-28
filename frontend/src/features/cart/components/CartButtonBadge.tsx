@@ -1,6 +1,6 @@
 "use client";
 
-import { useCartStore } from "@/features/cart/store/useCartStore";
+import { useCartStore } from "../store/useCartStore";
 import { ShoppingBag } from "lucide-react";
 import Link from "next/link";
 import { useSyncExternalStore } from "react";

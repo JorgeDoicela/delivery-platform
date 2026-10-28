@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { MapPin, Search } from "lucide-react";
-import { CartButtonBadge } from "@/features/cart/components/CartButtonBadge";
+import { CartButtonBadge } from "@/features/cart";
 
 export default function StorefrontLayout({
   children,
