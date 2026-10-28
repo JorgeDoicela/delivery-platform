@@ -14,13 +14,15 @@
 **/bin
 **/obj
 **/publish
+**/TestResults
+**/*.user
+**/*.suo
+**/*.DotSettings.user
 **/.env*.local
 **/coverage
-**/*.DotSettings.user
 **/.vs
 **/.idea
 **/.vscode
 **/*.log
 **/.DS_Store
 Thumbs.db
-
