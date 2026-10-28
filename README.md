@@ -25,6 +25,8 @@ La documentacion tecnica detallada del sistema se encuentra organizada bajo taxo
   - [`01-infraestructura-docker.md`](file:///c:/Users/DESARROLLADOR/Desktop/Proyectos/delivery-platform/docs/05-despliegue-y-operaciones/01-infraestructura-docker.md): Especificacion de contenedores PostgreSQL + PostGIS y Redis 7 con healthchecks.
   - [`02-empaquetado-capacitor.md`](file:///c:/Users/DESARROLLADOR/Desktop/Proyectos/delivery-platform/docs/05-despliegue-y-operaciones/02-empaquetado-capacitor.md): Configuracion de Capacitor para generacion de la aplicacion movil Android / iOS.
   - [`DEVOPS_DEPLOY_GUIDE.md`](file:///c:/Users/DESARROLLADOR/Desktop/Proyectos/delivery-platform/docs/DEVOPS_DEPLOY_GUIDE.md): Guia de CI/CD, secretos en GitHub Actions, despliegue continuo con Docker Compose, scripts en `scripts/deploy/` y rollback automatico.
+* **Historico y Archivo:**
+  - [`especificacion-inicial.md`](file:///c:/Users/DESARROLLADOR/Desktop/Proyectos/delivery-platform/docs/archive/especificacion-inicial.md): Documento original de maquetado y especificaciones preliminares del proyecto.
 
 ---
 
