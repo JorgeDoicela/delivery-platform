@@ -1,6 +1,22 @@
 @Delivery.Api_HostAddress = http://localhost:5005
 
-GET {{Delivery.Api_HostAddress}}/weatherforecast/
+### 1. Comprobación de Salud del Sistema
+GET {{Delivery.Api_HostAddress}}/health
 Accept: application/json
 
-###
+### 2. Catálogo Comercial: Menú Activo y Modificadores
+GET {{Delivery.Api_HostAddress}}/api/catalog/menu
+Accept: application/json
+
+### 3. Cobertura: Resolver Sucursal por Coordenadas (Quito Norte)
+POST {{Delivery.Api_HostAddress}}/api/branches/resolve
+Content-Type: application/json
+
+{
+  "latitude": -0.1782,
+  "longitude": -78.4845
+}
+
+### 4. Capacidad Operativa: Estado de Saturación de Horno (Sucursal 1)
+GET {{Delivery.Api_HostAddress}}/api/branches/capacity/1
+Accept: application/json
