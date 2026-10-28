@@ -41,7 +41,6 @@ jobs:
               - 'pnpm-lock.yaml'
               - 'pnpm-workspace.yaml'
             infra:
-              - 'docker/**'
               - 'docker-compose*.yml'
               - 'scripts/**'
               - '.github/workflows/**'

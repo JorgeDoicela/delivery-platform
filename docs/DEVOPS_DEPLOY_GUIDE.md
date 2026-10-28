@@ -152,3 +152,4 @@ El repositorio centraliza sus herramientas de línea de comandos en la carpeta r
   - Sintaxis: `./scripts/deploy/deploy.sh [all|backend|frontend]`
 * `scripts/deploy/rollback.sh`: Reversión de emergencia a los estados etiquetados como `:previous`.
   - Sintaxis: `./scripts/deploy/rollback.sh [all|backend|frontend]`
+* `scripts/db/init-postgis.sql`: Inicialización automática de PostgreSQL con extensiones `postgis` y `uuid-ossp` montada en `/docker-entrypoint-initdb.d/`.

@@ -13,6 +13,7 @@ La persistencia y el motor de cache local estan orquestados mediante Docker Comp
   - `POSTGRES_USER=postgres`
   - `POSTGRES_PASSWORD=postgres_dev_password`
 * **Volumen Persistente:** `postgres_data:/var/lib/postgresql/data`
+* **Script de Inicializacion:** `scripts/db/init-postgis.sql` montado en `/docker-entrypoint-initdb.d/01-init-postgis.sql:ro` (extensiones PostGIS y uuid-ossp).
 * **Mecanismo de Healthcheck:**
   ```yaml
   test: ["CMD-SHELL", "pg_isready -U postgres -d delivery"]

@@ -41,7 +41,6 @@ jobs:
             frontend:
               - 'frontend/**'
             infra:
-              - 'docker/**'
               - 'docker-compose*.yml'
               - 'scripts/**'
               - '.github/workflows/**'
