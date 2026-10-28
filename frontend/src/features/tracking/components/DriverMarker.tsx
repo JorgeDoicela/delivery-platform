@@ -43,7 +43,7 @@ export function createDriverDomMarker(heading = 0): HTMLDivElement {
   container.innerHTML = `
     <div style="position: relative; display: flex; align-items: center; justify-content: center; width: 44px; height: 44px;">
       <div style="position: absolute; width: 40px; height: 40px; border-radius: 9999px; background: var(--brand-accent-muted, rgba(245, 158, 11, 0.25)); animation: ping 1.5s cubic-bezier(0, 0, 0.2, 1) infinite;"></div>
-      <div style="position: relative; z-index: 10; display: flex; align-items: center; justify-content: center; width: 36px; height: 36px; border-radius: 9999px; background: var(--surface-dark-card, #18181b); border: 2.5px solid var(--brand-accent, #f59e0b); box-shadow: 0 4px 12px rgba(0,0,0,0.5); transform: rotate(${heading}deg); transition: transform 0.3s ease-out;">
+      <div style="position: relative; z-index: 10; display: flex; align-items: center; justify-content: center; width: 36px; height: 36px; border-radius: 9999px; background: var(--surface-dark-card, #18181b); border: 2.5px solid var(--brand-accent, #f59e0b); box-shadow: 0 4px 12px var(--surface-dark, rgba(0,0,0,0.5)); transform: rotate(${heading}deg); transition: transform 0.3s ease-out;">
         <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" style="color: var(--brand-accent, #f59e0b);" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
           <polygon points="12 2 19 21 12 17 5 21 12 2"></polygon>
         </svg>
@@ -61,7 +61,7 @@ export function createDestinationDomMarker(): HTMLDivElement {
   container.className = 'destination-maplibre-marker';
   container.innerHTML = `
     <div style="position: relative; display: flex; flex-direction: column; align-items: center;">
-      <div style="background: var(--status-danger, #dc2626); color: white; border-radius: 9999px; width: 34px; height: 34px; display: flex; align-items: center; justify-content: center; border: 2px solid white; box-shadow: 0 3px 10px rgba(0,0,0,0.4);">
+      <div style="background: var(--status-danger, #dc2626); color: var(--text-inverse-strong, #fafafa); border-radius: 9999px; width: 34px; height: 34px; display: flex; align-items: center; justify-content: center; border: 2px solid var(--surface-card, #ffffff); box-shadow: 0 3px 10px var(--surface-dark, rgba(0,0,0,0.4));">
         <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
           <path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"></path>
           <circle cx="12" cy="10" r="3"></circle>

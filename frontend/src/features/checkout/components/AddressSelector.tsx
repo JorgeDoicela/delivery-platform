@@ -42,14 +42,14 @@ function createPinDomElement(): HTMLDivElement {
   container.style.cursor = 'grab';
   container.innerHTML = `
     <div style="position: relative; display: flex; flex-direction: column; align-items: center; transform: translateY(-16px);">
-      <div style="background: var(--brand-primary, #ea580c); color: white; border-radius: 9999px; width: 38px; height: 38px; display: flex; align-items: center; justify-content: center; border: 2.5px solid white; box-shadow: 0 4px 14px var(--brand-primary-muted, rgba(234, 88, 12, 0.45));">
+      <div style="background: var(--brand-primary, #ea580c); color: var(--text-inverse-strong, #fafafa); border-radius: 9999px; width: 38px; height: 38px; display: flex; align-items: center; justify-content: center; border: 2.5px solid var(--surface-card, #ffffff); box-shadow: 0 4px 14px var(--brand-primary-muted, rgba(234, 88, 12, 0.45));">
         <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
           <path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"></path>
           <circle cx="12" cy="10" r="3"></circle>
         </svg>
       </div>
       <div style="width: 3px; height: 10px; background: var(--brand-primary, #ea580c);"></div>
-      <div style="width: 8px; height: 3px; border-radius: 9999px; background: rgba(0,0,0,0.25);"></div>
+      <div style="width: 8px; height: 3px; border-radius: 9999px; background: var(--surface-dark-border-subtle, rgba(0,0,0,0.25));"></div>
     </div>
   `;
   return container;
