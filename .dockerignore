@@ -1,0 +1,26 @@
+# ==========================================
+# Docker Ignore Global para Delivery Platform
+# ==========================================
+**/.git
+**/.github
+**/.husky
+**/.agents
+**/node_modules
+**/.next
+**/out
+**/dist
+**/build
+**/.turbo
+**/bin
+**/obj
+**/publish
+**/.env*.local
+**/coverage
+**/*.DotSettings.user
+**/.vs
+**/.idea
+**/.vscode
+**/*.log
+**/.DS_Store
+Thumbs.db
+

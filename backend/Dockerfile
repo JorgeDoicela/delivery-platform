@@ -6,7 +6,8 @@
 FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
 WORKDIR /src
 
-# Copiar archivos de proyecto para cachear la restauración de paquetes NuGet
+# Copiar archivos de proyecto y configuración global para cachear la restauración de paquetes NuGet
+COPY ["backend/Directory.Build.props", "backend/"]
 COPY ["backend/src/Delivery.Core/Delivery.Core.csproj", "backend/src/Delivery.Core/"]
 COPY ["backend/src/Delivery.Features/Delivery.Features.csproj", "backend/src/Delivery.Features/"]
 COPY ["backend/src/Delivery.Api/Delivery.Api.csproj", "backend/src/Delivery.Api/"]

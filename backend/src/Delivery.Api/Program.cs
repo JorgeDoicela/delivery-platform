@@ -47,18 +47,17 @@ builder.Services.AddHangfireServer(options =>
 });
 
 // 6. Configuración de CORS para cliente Next.js
+var allowedOrigins = builder.Configuration.GetSection("Cors:AllowedOrigins").Get<string[]>()
+    ?? ["http://localhost:3005", "http://127.0.0.1:3005", "https://pedidos.delivery.com"];
+
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowFrontend", policy =>
     {
-        policy.WithOrigins(
-            "http://localhost:3005",
-            "http://127.0.0.1:3005",
-            "https://pedidos.delivery.com"
-        )
-        .AllowAnyHeader()
-        .AllowAnyMethod()
-        .AllowCredentials();
+        policy.WithOrigins(allowedOrigins)
+            .AllowAnyHeader()
+            .AllowAnyMethod()
+            .AllowCredentials();
     });
 });
 
@@ -86,11 +85,14 @@ app.UseMiddleware<ExceptionHandlingMiddleware>();
 app.UseCors("AllowFrontend");
 app.UseMiddleware<IdempotencyMiddleware>();
 
-// Dashboard de Hangfire para auditoría de tareas en segundo plano
-app.UseHangfireDashboard("/hangfire", new DashboardOptions
+// Dashboard de Hangfire para auditoría de tareas en segundo plano (restringido a Development por seguridad)
+if (app.Environment.IsDevelopment())
 {
-    DashboardTitle = "Delivery - Background Jobs Monitor"
-});
+    app.UseHangfireDashboard("/hangfire", new DashboardOptions
+    {
+        DashboardTitle = "Delivery - Background Jobs Monitor (Dev)"
+    });
+}
 
 // Health Check
 app.MapGet("/health", () => Results.Ok(new
