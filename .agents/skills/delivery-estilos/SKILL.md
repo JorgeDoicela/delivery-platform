@@ -1,6 +1,6 @@
 ---
 name: delivery-estilos
-description: Sistema de diseño, UI/UX premium y guía de estilos para Delivery Platform (Paleta asadero carbón/ámbar, tipografía, micro-animaciones, accesibilidad WCAG y diseño táctil ergonómico).
+description: Sistema de diseño, UI/UX premium y guía de estilos para Delivery Platform (Paleta asadero carbón/ámbar, cero emojis, cero KPIs enormes, mínimo uso de iconos SVG, accesibilidad WCAG y diseño ergonómico).
 ---
 # Sistema de Diseño y Guía de Estilos para Delivery Platform
 
@@ -78,8 +78,11 @@ La identidad estética combina la elegancia contemporánea con los atributos gas
 
 ---
 
-## 6. Prohibiciones Técnicas de Estilos
+## 6. Prohibiciones Técnicas y Restricciones Estéticas Estrictas
 
+* **Cero Emojis:** Prohibido el uso de emojis en cualquier componente, botón, título, badge, alerta o texto de la interfaz. La comunicación visual debe ser 100% profesional, sobria y fáctica.
+* **Cero KPIs Enormes:** Prohibido el uso de tipografía desproporcionada o métricas gigantescas (ej. `text-5xl`, `text-6xl` o bloques masivos de KPIs decorativos). Las cifras clave y totales deben mantener proporciones compactas y equilibradas (`text-xl` a `text-2xl font-bold font-mono`).
+* **Mínimos Iconos SVG (Uso Exclusivamente Esencial):** Prohibido saturar la interfaz con iconos en cada botón, título, enlace o tarjeta. Los iconos SVG quedan reservados únicamente a casos donde la funcionalidad no puede comunicarse solo con texto (ej. botón de cierre `X`, feedback de carga activa, o marcadores de ubicación en mapas). Si un botón o texto se comprende de forma autónoma, no debe incluir SVG.
 * **Prohibido `!important`:** Todo conflicto de especificidad debe resolverse ajustando el orden o utilizando capas de Tailwind / CSS estructurado.
-* **Prohibido Estilos Inline Aleatorios:** Estilos visuales como colores de fondo, márgenes y tipografías deben definirse con clases de utilidad predecibles.
+* **Prohibido Estilos Inline Aleatorios:** Estilos visuales como colores de fondo, márgenes y tipografías deben definirse con los tokens globales de CSS y utilidades predecibles.
 * **Prohibido Desbordamientos Horizontales:** El diseño debe ser 100% responsivo y fluido desde una anchura mínima de 360px hasta monitores ultrapanorámicos.
