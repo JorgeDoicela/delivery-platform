@@ -47,3 +47,10 @@ stateDiagram-v2
 
 > [!IMPORTANT]
 > Queda estrictamente bloqueada cualquier transicion que intente retroceder estados (por ejemplo, pasar de `ReadyForDelivery` a `InKitchen`) o saltar de `Created` directamente a `Delivered`. Toda transicion invalida responde `400 Bad Request` con el codigo de error `Orders.InvalidStatusTransition`.
+
+---
+
+## Navegacion de Documentacion
+* **Anterior:** [01. Vision General de la Arquitectura](./01-vision-general.md)
+* **Siguiente:** [01. Vertical Slices y APIs Backend](../02-backend-servicios/01-vertical-slices-api.md)
+* **Indice General:** [README Principal](../../README.md)

@@ -43,3 +43,10 @@ export default config;
    ```powershell
    npx cap open android
    ```
+
+---
+
+## Navegacion de Documentacion
+* **Anterior:** [01. Infraestructura Local con Docker Compose](./01-infraestructura-docker.md)
+* **Siguiente:** [03. Guia Tecnica de CI/CD, Despliegue Automatizado y Rollback](./03-guia-despliegue-devops.md)
+* **Indice General:** [README Principal](../../README.md)

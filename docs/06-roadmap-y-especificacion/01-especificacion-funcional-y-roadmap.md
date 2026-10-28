@@ -1,8 +1,8 @@
-# Sistema Integrado de Pedidos y Reparto a Domicilio
+# 01. Especificacion Funcional y Roadmap de Implementacion
 
-Documento de Especificación Técnica y Arquitectura Definitiva  
-Proyecto: Plataforma de Delivery Propia para 2 Sucursales  
-Estado: Aprobado / Fase de Construcción  
+Documento de Especificacion Tecnica, Alcance Operativo y Roadmap del Negocio  
+Proyecto: Plataforma de Delivery Directo para 2 Sucursales  
+Estado: Aprobado / En Operacion y Mantenimiento  
 
 ---
 
@@ -567,3 +567,9 @@ La interfaz del repartidor cuenta con dos disparadores que abren directamente la
 * **Base de Datos:** AWS RDS PostgreSQL con extensión PostGIS habilitada y respaldos automatizados.
 * **Caché y Colas:** AWS ElastiCache for Redis o contenedor Redis dedicado con volumen persistente AOF.
 * **Almacenamiento:** AWS S3 o Cloudflare R2 para comprobantes de pago e imágenes del menú.
+
+---
+
+## Navegacion de Documentacion
+* **Anterior:** [03. Guia Tecnica de CI/CD, Despliegue Automatizado y Rollback](../05-despliegue-y-operaciones/03-guia-despliegue-devops.md)
+* **Indice General:** [README Principal](../../README.md)

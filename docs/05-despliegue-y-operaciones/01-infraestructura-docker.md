@@ -61,4 +61,11 @@ Para la gestion del ciclo de vida en servidores remotos y contingencias de produ
 * `scripts/deploy/deploy.sh`: Automatizacion de despliegue con verificacion activa de health checks y fallback.
 * `scripts/deploy/rollback.sh`: Reversion inmediata a imagenes Docker con etiqueta `:previous`.
 
-Consulte la guia detallada en [DEVOPS_DEPLOY_GUIDE.md](../DEVOPS_DEPLOY_GUIDE.md).
+Consulte la guia detallada de CI/CD y despliegue continuo en [03-guia-despliegue-devops.md](./03-guia-despliegue-devops.md).
+
+---
+
+## Navegacion de Documentacion
+* **Anterior:** [03. Herramienta Movil del Repartidor y Telemetria GPS](../04-frontend-web/03-pantalla-repartidor-gps.md)
+* **Siguiente:** [02. Empaquetado Movil con Capacitor](./02-empaquetado-capacitor.md)
+* **Indice General:** [README Principal](../../README.md)

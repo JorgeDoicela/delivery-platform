@@ -61,3 +61,10 @@ interface CartItem {
 
 > [!NOTE]
 > La clave deterministica `id` permite que si el cliente anade dos veces el mismo combo con exactamente los mismos modificadores, se incremente la cantidad en lugar de duplicar lineas en la comanda.
+
+---
+
+## Navegacion de Documentacion
+* **Anterior:** [02. Especificacion de Redis: GEO, Cache e Idempotencia](../03-base-de-datos/02-redis-geo-cache.md)
+* **Siguiente:** [02. Pantalla de Cocina y Kitchen Display System (KDS)](./02-pantalla-cocina-kds.md)
+* **Indice General:** [README Principal](../../README.md)

@@ -159,3 +159,10 @@ El backend de la plataforma esta construido en .NET 8 utilizando C# 12 y Minimal
 
 * **Ruta:** `GET /api/tracking/orders/{orderId}/driver-location`
 * **Descripcion:** Consulta en Redis GEO las coordenadas mas recientes del repartidor para dicha orden.
+
+---
+
+## Navegacion de Documentacion
+* **Anterior:** [02. Maquina de Estados del Pedido](../01-arquitectura/02-maquina-estados.md)
+* **Siguiente:** [02. Especificacion de SignalR Hubs en Tiempo Real](./02-signalr-hubs.md)
+* **Indice General:** [README Principal](../../README.md)

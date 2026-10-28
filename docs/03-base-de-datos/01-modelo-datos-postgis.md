@@ -125,3 +125,10 @@ Almacena el registro inmutable del pedido. Los precios finales, subtotales y cos
 
 ### 3.3. Tablas `OrderItems` y `OrderItemModifiers` (Snapshots Inmutables)
 Cada linea de pedido almacena `ProductNameSnapshot` y `OptionNameSnapshot` junto a sus `UnitPriceSnapshot`. Esto garantiza que los historiales de venta y facturacion permanezcan 100% fieles al momento exacto de la compra.
+
+---
+
+## Navegacion de Documentacion
+* **Anterior:** [02. Especificacion de SignalR Hubs en Tiempo Real](../02-backend-servicios/02-signalr-hubs.md)
+* **Siguiente:** [02. Especificacion de Redis: GEO, Cache e Idempotencia](./02-redis-geo-cache.md)
+* **Indice General:** [README Principal](../../README.md)

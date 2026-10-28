@@ -67,3 +67,10 @@ sequenceDiagram
     API->>THub: Clients.Group("order_{id}").SendAsync("DriverLocationUpdated")
     THub-->>Cliente: Evento DriverLocationUpdated (Mueve marcador en tiempo real)
 ```
+
+---
+
+## Navegacion de Documentacion
+* **Anterior:** [01. Vertical Slices y APIs Backend](./01-vertical-slices-api.md)
+* **Siguiente:** [01. Modelo de Datos Relacional y Extension Espacial PostGIS](../03-base-de-datos/01-modelo-datos-postgis.md)
+* **Indice General:** [README Principal](../../README.md)

@@ -59,3 +59,9 @@ El frontend Next.js 16 con App Router organiza los componentes y la logica por d
 ### 3.3. Manejo de Concurrencia e Idempotencia
 * **Idempotency-Key en Cabecera HTTP:** Todo checkout genera un UUIDv4 enviado en la cabecera `Idempotency-Key`. El middleware en backend almacena el resultado en Redis con TTL de 24 horas (`idempotency:{key}`), bloqueando transacciones duplicadas por doble clic o interrupciones de red.
 * **Control de Capacidad en Horno (Throttling):** Restriccion configurable `max_orders_per_slot` por intervalo de 20 minutos para prevenir saturacion de cocina.
+
+---
+
+## Navegacion de Documentacion
+* **Siguiente:** [02. Maquina de Estados del Pedido](./02-maquina-estados.md)
+* **Indice General:** [README Principal](../../README.md)

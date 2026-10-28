@@ -28,3 +28,10 @@ En pedidos con modalidad de pago en efectivo (`Cash`), la pantalla muestra de fo
 * Denominacion del billete con el que cancelara el cliente (`cashAmountPaid`).
 * Vuelto exacto a entregar (`changeDue`).
 * Boton de confirmacion que finaliza la orden en el servidor (`Delivered`) y detiene la transmision GPS.
+
+---
+
+## Navegacion de Documentacion
+* **Anterior:** [02. Pantalla de Cocina y Kitchen Display System (KDS)](./02-pantalla-cocina-kds.md)
+* **Siguiente:** [01. Infraestructura Local con Docker Compose](../05-despliegue-y-operaciones/01-infraestructura-docker.md)
+* **Indice General:** [README Principal](../../README.md)

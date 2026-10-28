@@ -1,6 +1,12 @@
-# Guía Técnica de CI/CD, Despliegue Automatizado y Rollback
+# 03. Guia Tecnica de CI/CD, Despliegue Automatizado y Rollback
 
-Este documento define la arquitectura de automatización de despliegue, la configuración de secretos en GitHub Actions y las operaciones de mantenimiento para el servidor de producción de **Delivery Platform**.
+Este documento define la arquitectura de automatizacion de despliegue, la configuracion de secretos en GitHub Actions y las operaciones de mantenimiento para el servidor de produccion de **Delivery Platform**.
+
+---
+
+## Modulos Relacionados en Operaciones
+* [01. Infraestructura Local con Docker Compose](./01-infraestructura-docker.md)
+* [02. Empaquetado Movil con Capacitor](./02-empaquetado-capacitor.md)
 
 ---
 
@@ -153,3 +159,10 @@ El repositorio centraliza sus herramientas de línea de comandos en la carpeta r
 * `scripts/deploy/rollback.sh`: Reversión de emergencia a los estados etiquetados como `:previous`.
   - Sintaxis: `./scripts/deploy/rollback.sh [all|backend|frontend]`
 * `scripts/db/init-postgis.sql`: Inicialización automática de PostgreSQL con extensiones `postgis` y `uuid-ossp` montada en `/docker-entrypoint-initdb.d/`.
+
+---
+
+## Navegacion de Documentacion
+* **Anterior:** [02. Empaquetado Movil con Capacitor](./02-empaquetado-capacitor.md)
+* **Siguiente:** [01. Especificacion Funcional y Roadmap de Implementacion](../06-roadmap-y-especificacion/01-especificacion-funcional-y-roadmap.md)
+* **Indice General:** [README Principal](../../README.md)

@@ -44,3 +44,10 @@ sequenceDiagram
 1. Si la cabecera `Idempotency-Key` no esta presente, la peticion pasa normalmente.
 2. Si la clave ya existe en Redis, el middleware interrumpe el pipeline y retorna de inmediato la respuesta previamente almacenada con la cabecera `X-Cache-Lookup: HIT`.
 3. Si la clave no existe, el middleware procesa la orden, captura el stream de respuesta y lo persiste en Redis de manera atomica.
+
+---
+
+## Navegacion de Documentacion
+* **Anterior:** [01. Modelo de Datos Relacional y Extension Espacial PostGIS](./01-modelo-datos-postgis.md)
+* **Siguiente:** [01. Estructura de Rutas y Route Groups en Frontend](../04-frontend-web/01-estructura-route-groups.md)
+* **Indice General:** [README Principal](../../README.md)

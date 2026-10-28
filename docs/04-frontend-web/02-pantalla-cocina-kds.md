@@ -37,3 +37,10 @@ Para evitar archivos `.mp3` pesados o dependencias bloqueadas por politicas de n
 * Oscilador 1: Onda senoidal a 587.33 Hz (Re5).
 * Oscilador 2: Onda triangular con modulacion hacia 1174.66 Hz (Re6).
 * Duracion total: 450 milisegundos con decaimiento exponencial suave.
+
+---
+
+## Navegacion de Documentacion
+* **Anterior:** [01. Estructura de Rutas y Route Groups en Frontend](./01-estructura-route-groups.md)
+* **Siguiente:** [03. Herramienta Movil del Repartidor y Telemetria GPS](./03-pantalla-repartidor-gps.md)
+* **Indice General:** [README Principal](../../README.md)
