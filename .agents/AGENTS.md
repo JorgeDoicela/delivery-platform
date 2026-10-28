@@ -59,6 +59,7 @@ Ante cualquier intervención en el repositorio, el agente debe consultar y ceñi
 3. **Gestión de Estados Completa:** Toda vista asíncrona debe implementar los cuatro estados: `idle`, `loading` (skeletons), `error` (mensajes contextuales y reintento) y `success`.
 4. **Límite de Tamaño de Archivo:** Ningún componente o clase de servicio debe superar las 400 líneas. Extraer a submódulos cuando se alcance dicho límite.
 5. **Tono Sobrio y Profesional:** Cero emojis y cero lenguaje publicitario o inflado en código, documentación y commits.
+6. **Estructura de Scripts Operativos (`scripts/`):** Todo script de automatización, despliegue o mantenimiento debe ubicarse en la raíz `scripts/` clasificado por su dominio (ej. `scripts/deploy/` para CI/CD y rollback, `scripts/db/` para semillas o respaldos). Prohibido crear scripts sueltos en la raíz o carpetas sin categorizar.
 
 ---
 

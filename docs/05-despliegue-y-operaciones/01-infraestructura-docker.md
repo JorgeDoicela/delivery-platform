@@ -52,3 +52,12 @@ docker compose ps
 ```powershell
 docker compose down
 ```
+
+---
+
+## 4. Scripts de Operacion y Despliegue en Produccion
+Para la gestion del ciclo de vida en servidores remotos y contingencias de produccion, los scripts operativos residen en `scripts/deploy/`:
+* `scripts/deploy/deploy.sh`: Automatizacion de despliegue con verificacion activa de health checks y fallback.
+* `scripts/deploy/rollback.sh`: Reversion inmediata a imagenes Docker con etiqueta `:previous`.
+
+Consulte la guia detallada en [DEVOPS_DEPLOY_GUIDE.md](../DEVOPS_DEPLOY_GUIDE.md).

@@ -130,7 +130,7 @@ Cada servicio en producción dispone de un endpoint HTTP dedicado para monitoreo
 ## 5. Procedimientos de Rollback
 
 ### 5.1. Rollback Automático (Ante Fallo de Healthcheck)
-Si un nuevo despliegue no supera las comprobaciones de salud en 90 segundos (18 intentos de 5s), el script `deploy.sh` invoca inmediatamente `rollback.sh`:
+Si un nuevo despliegue no supera las comprobaciones de salud en 90 segundos (18 intentos de 5s), el script `scripts/deploy/deploy.sh` invoca inmediatamente `scripts/deploy/rollback.sh`:
 1. Re-etiqueta las imágenes de respaldo `delivery-backend:previous` y `delivery-frontend:previous` a `:latest`.
 2. Recrea los contenedores con la versión anterior estable.
 3. El pipeline de GitHub Actions se marca como fallido para auditoría técnica.
@@ -141,3 +141,14 @@ En caso de detectar un comportamiento no deseado en producción posterior al des
 2. Seleccione el workflow **Manual Rollback Pipeline**.
 3. Haga clic en **Run workflow**, seleccione el target (`all`, `backend` o `frontend`) e ingrese el motivo del rollback.
 4. El script se conectará por SSH y restaurará la versión estable previa en menos de 30 segundos.
+
+---
+
+## 6. Estructura de Scripts Operativos (`scripts/`)
+
+El repositorio centraliza sus herramientas de línea de comandos en la carpeta raíz `scripts/` estructurada por ámbito de responsabilidad:
+
+* `scripts/deploy/deploy.sh`: Ejecución de despliegue local o remoto con comprobación activa de health checks y preservación de snapshots.
+  - Sintaxis: `./scripts/deploy/deploy.sh [all|backend|frontend]`
+* `scripts/deploy/rollback.sh`: Reversión de emergencia a los estados etiquetados como `:previous`.
+  - Sintaxis: `./scripts/deploy/rollback.sh [all|backend|frontend]`
