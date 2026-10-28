@@ -1,22 +1,120 @@
 @import "tailwindcss";
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  /* ==========================================================================
+     Design Tokens Globales - Delivery Platform
+     Centralización de Identidad Visual, Superficies y Estados
+     ========================================================================== */
+
+  /* Identidad de Marca (Paleta Asadero: Brasa encendida y Ámbar dorado) */
+  --brand-primary: #ea580c;
+  --brand-primary-hover: #c2410c;
+  --brand-primary-light: #ffedd5;
+  --brand-primary-muted: rgba(234, 88, 12, 0.12);
+
+  --brand-accent: #f59e0b;
+  --brand-accent-hover: #d97706;
+  --brand-accent-light: #fef3c7;
+  --brand-accent-muted: rgba(245, 158, 11, 0.12);
+
+  /* Superficies en Modo Claro (Storefront / Checkout / Clientes) */
+  --surface-canvas: #f8fafc;
+  --surface-card: #ffffff;
+  --surface-card-hover: #f1f5f9;
+  --surface-border: #e2e8f0;
+  --surface-border-subtle: #f1f5f9;
+
+  /* Superficies en Modo Oscuro (KDS Cocina / Headers / Terminales Operativos) */
+  --surface-dark: #09090b;
+  --surface-dark-card: #18181b;
+  --surface-dark-hover: #27272a;
+  --surface-dark-border: #27272a;
+  --surface-dark-border-subtle: #3f3f46;
+
+  /* Jerarquía Tipográfica y Contraste */
+  --text-strong: #0f172a;
+  --text-base: #334155;
+  --text-muted: #64748b;
+  --text-subtle: #94a3b8;
+  --text-inverse-strong: #fafafa;
+  --text-inverse-base: #d4d4d8;
+  --text-inverse-muted: #a1a1aa;
+  --text-inverse-subtle: #71717a;
+
+  /* Estados Semánticos de Operación */
+  --status-success: #16a34a;
+  --status-success-bg: rgba(22, 163, 74, 0.12);
+  --status-success-border: rgba(22, 163, 74, 0.28);
+
+  --status-warning: #f59e0b;
+  --status-warning-bg: rgba(245, 158, 11, 0.12);
+  --status-warning-border: rgba(245, 158, 11, 0.28);
+
+  --status-danger: #dc2626;
+  --status-danger-bg: rgba(220, 38, 38, 0.12);
+  --status-danger-border: rgba(220, 38, 38, 0.28);
+
+  --status-info: #0284c7;
+  --status-info-bg: rgba(2, 132, 199, 0.12);
+  --status-info-border: rgba(2, 132, 199, 0.28);
+
+  /* Variables base requeridas */
+  --background: var(--surface-canvas);
+  --foreground: var(--text-strong);
 }
 
 @theme inline {
+  --color-brand-primary: var(--brand-primary);
+  --color-brand-primary-hover: var(--brand-primary-hover);
+  --color-brand-primary-light: var(--brand-primary-light);
+  --color-brand-primary-muted: var(--brand-primary-muted);
+
+  --color-brand-accent: var(--brand-accent);
+  --color-brand-accent-hover: var(--brand-accent-hover);
+  --color-brand-accent-light: var(--brand-accent-light);
+  --color-brand-accent-muted: var(--brand-accent-muted);
+
+  --color-surface-canvas: var(--surface-canvas);
+  --color-surface-card: var(--surface-card);
+  --color-surface-card-hover: var(--surface-card-hover);
+  --color-surface-border: var(--surface-border);
+  --color-surface-border-subtle: var(--surface-border-subtle);
+
+  --color-surface-dark: var(--surface-dark);
+  --color-surface-dark-card: var(--surface-dark-card);
+  --color-surface-dark-hover: var(--surface-dark-hover);
+  --color-surface-dark-border: var(--surface-dark-border);
+  --color-surface-dark-border-subtle: var(--surface-dark-border-subtle);
+
+  --color-text-strong: var(--text-strong);
+  --color-text-base: var(--text-base);
+  --color-text-muted: var(--text-muted);
+  --color-text-subtle: var(--text-subtle);
+  --color-text-inverse-strong: var(--text-inverse-strong);
+  --color-text-inverse-base: var(--text-inverse-base);
+  --color-text-inverse-muted: var(--text-inverse-muted);
+  --color-text-inverse-subtle: var(--text-inverse-subtle);
+
+  --color-status-success: var(--status-success);
+  --color-status-success-bg: var(--status-success-bg);
+  --color-status-success-border: var(--status-success-border);
+
+  --color-status-warning: var(--status-warning);
+  --color-status-warning-bg: var(--status-warning-bg);
+  --color-status-warning-border: var(--status-warning-border);
+
+  --color-status-danger: var(--status-danger);
+  --color-status-danger-bg: var(--status-danger-bg);
+  --color-status-danger-border: var(--status-danger-border);
+
+  --color-status-info: var(--status-info);
+  --color-status-info-bg: var(--status-info-bg);
+  --color-status-info-border: var(--status-info-border);
+
   --color-background: var(--background);
   --color-foreground: var(--foreground);
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
 }
 
 body {

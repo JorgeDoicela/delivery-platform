@@ -187,19 +187,19 @@ export function OrderMap({ destination, driverLocation, className = '' }: OrderM
   };
 
   return (
-    <div className={`relative w-full h-80 sm:h-96 rounded-2xl overflow-hidden border border-neutral-800 shadow-2xl bg-neutral-950 ${className}`}>
+    <div className={`relative w-full h-80 sm:h-96 rounded-2xl overflow-hidden border border-surface-dark-border shadow-2xl bg-surface-dark ${className}`}>
       {/* Contenedor del lienzo MapLibre WebGL */}
       <div ref={mapContainerRef} className="w-full h-full" />
 
       {/* Barra de control flotante */}
       <div className="absolute top-3 left-3 z-10 flex items-center gap-2">
-        <span className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-neutral-900/90 backdrop-blur-md border border-neutral-800 text-[11px] font-semibold text-neutral-200 shadow-md">
-          <Layers className="h-3.5 w-3.5 text-amber-500" />
+        <span className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-surface-dark-card/90 backdrop-blur-md border border-surface-dark-border text-[11px] font-semibold text-text-inverse-base shadow-md">
+          <Layers className="h-3.5 w-3.5 text-brand-accent" />
           Rastreo Vectorial MapLibre
         </span>
         {driverLocation && (
-          <span className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-amber-500/10 backdrop-blur-md border border-amber-500/30 text-[11px] font-bold text-amber-400 animate-pulse shadow-md">
-            <span className="h-2 w-2 rounded-full bg-amber-400" />
+          <span className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-brand-accent/10 backdrop-blur-md border border-brand-accent/30 text-[11px] font-bold text-brand-accent animate-pulse shadow-md">
+            <span className="h-2 w-2 rounded-full bg-brand-accent" />
             GPS Activo
           </span>
         )}
@@ -210,15 +210,15 @@ export function OrderMap({ destination, driverLocation, className = '' }: OrderM
         type="button"
         onClick={handleRecenter}
         title="Centrar mapa en posición activa"
-        className="absolute top-3 right-3 z-10 p-2.5 rounded-xl bg-neutral-900/90 hover:bg-neutral-800 backdrop-blur-md border border-neutral-800 text-neutral-300 hover:text-white shadow-lg transition-all active:scale-95"
+        className="absolute top-3 right-3 z-10 p-2.5 rounded-xl bg-surface-dark-card/90 hover:bg-surface-dark-hover backdrop-blur-md border border-surface-dark-border text-text-inverse-base hover:text-text-inverse-strong shadow-lg transition-all active:scale-95"
       >
         <Navigation className="h-4 w-4" />
       </button>
 
       {/* Mensaje informativo si aún no hay repartidor transmitiendo */}
       {!driverLocation && (
-        <div className="absolute bottom-3 left-3 right-14 z-10 p-2.5 rounded-xl bg-neutral-900/85 backdrop-blur-md border border-neutral-800 text-[11px] text-neutral-400 flex items-center gap-2">
-          <Compass className="h-4 w-4 text-neutral-500 shrink-0" />
+        <div className="absolute bottom-3 left-3 right-14 z-10 p-2.5 rounded-xl bg-surface-dark-card/85 backdrop-blur-md border border-surface-dark-border text-[11px] text-text-inverse-muted flex items-center gap-2">
+          <Compass className="h-4 w-4 text-text-inverse-subtle shrink-0" />
           <span>El mapa mostrará el movimiento en vivo en cuanto el repartidor retire la orden.</span>
         </div>
       )}

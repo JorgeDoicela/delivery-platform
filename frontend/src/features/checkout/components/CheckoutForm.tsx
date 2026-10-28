@@ -143,7 +143,7 @@ export function CheckoutForm() {
           <OrderSummary />
 
           {submitError && (
-            <div className="p-3.5 rounded-xl bg-red-50 border border-red-200 text-xs text-red-700 font-medium leading-relaxed">
+            <div className="p-3.5 rounded-xl bg-status-danger-bg border border-status-danger-border text-xs text-status-danger font-medium leading-relaxed">
               {submitError}
             </div>
           )}
@@ -151,7 +151,7 @@ export function CheckoutForm() {
           <button
             type="submit"
             disabled={isSubmitting || items.length === 0}
-            className="w-full flex items-center justify-center gap-2 bg-orange-600 hover:bg-orange-500 disabled:bg-slate-300 text-white font-extrabold text-sm py-4 px-6 rounded-2xl shadow-xl shadow-orange-600/30 transition-all active:scale-95 disabled:active:scale-100"
+            className="w-full flex items-center justify-center gap-2 bg-brand-primary hover:bg-brand-primary-hover disabled:bg-surface-border disabled:text-text-muted text-white font-extrabold text-sm py-4 px-6 rounded-2xl shadow-xl shadow-brand-primary/30 transition-all active:scale-95 disabled:active:scale-100"
           >
             {isSubmitting ? (
               <>

@@ -10,10 +10,10 @@ export function DriverMarkerElement({ heading = 0 }: DriverMarkerProps) {
   return (
     <div className="relative flex items-center justify-center">
       {/* Halo de pulso */}
-      <span className="absolute h-10 w-10 rounded-full bg-amber-500/30 animate-ping" />
+      <span className="absolute h-10 w-10 rounded-full bg-brand-accent/30 animate-ping" />
       {/* Contenedor con rotación de rumbo (heading) */}
       <div
-        className="relative z-10 flex items-center justify-center h-10 w-10 rounded-full bg-neutral-900 border-2 border-amber-500 shadow-xl text-amber-400 transition-transform duration-300 ease-out"
+        className="relative z-10 flex items-center justify-center h-10 w-10 rounded-full bg-surface-dark-card border-2 border-brand-accent shadow-xl text-brand-accent transition-transform duration-300 ease-out"
         style={{ transform: `rotate(${heading}deg)` }}
       >
         <svg
@@ -24,7 +24,7 @@ export function DriverMarkerElement({ heading = 0 }: DriverMarkerProps) {
           strokeWidth="2.5"
           strokeLinecap="round"
           strokeLinejoin="round"
-          className="w-5 h-5 text-amber-400"
+          className="w-5 h-5 text-brand-accent"
         >
           <polygon points="12 2 19 21 12 17 5 21 12 2" />
         </svg>
@@ -42,9 +42,9 @@ export function createDriverDomMarker(heading = 0): HTMLDivElement {
   container.style.cursor = 'pointer';
   container.innerHTML = `
     <div style="position: relative; display: flex; align-items: center; justify-content: center; width: 44px; height: 44px;">
-      <div style="position: absolute; width: 40px; height: 40px; border-radius: 9999px; background: rgba(245, 158, 11, 0.35); animation: ping 1.5s cubic-bezier(0, 0, 0.2, 1) infinite;"></div>
-      <div style="position: relative; z-index: 10; display: flex; align-items: center; justify-content: center; width: 36px; height: 36px; border-radius: 9999px; background: #0a0a0a; border: 2.5px solid #f59e0b; box-shadow: 0 4px 12px rgba(0,0,0,0.5); transform: rotate(${heading}deg); transition: transform 0.3s ease-out;">
-        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#f59e0b" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+      <div style="position: absolute; width: 40px; height: 40px; border-radius: 9999px; background: rgba(235, 154, 43, 0.35); animation: ping 1.5s cubic-bezier(0, 0, 0.2, 1) infinite;"></div>
+      <div style="position: relative; z-index: 10; display: flex; align-items: center; justify-content: center; width: 36px; height: 36px; border-radius: 9999px; background: #0d0f12; border: 2.5px solid #eb9a2b; box-shadow: 0 4px 12px rgba(0,0,0,0.5); transform: rotate(${heading}deg); transition: transform 0.3s ease-out;">
+        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#eb9a2b" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
           <polygon points="12 2 19 21 12 17 5 21 12 2"></polygon>
         </svg>
       </div>

@@ -100,24 +100,24 @@ export function ModifierModal({ product, onClose }: ModifierModalProps) {
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center p-0 sm:p-4 bg-slate-950/70 backdrop-blur-sm animate-in fade-in duration-200">
-      <div className="relative w-full max-w-lg bg-white rounded-t-3xl sm:rounded-2xl shadow-2xl flex flex-col max-h-[90vh] overflow-hidden">
+    <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center p-0 sm:p-4 bg-surface-dark/75 backdrop-blur-sm animate-in fade-in duration-200">
+      <div className="relative w-full max-w-lg bg-surface-card rounded-t-3xl sm:rounded-2xl shadow-2xl flex flex-col max-h-[90vh] overflow-hidden">
         {/* Header Modal */}
-        <div className="p-4 sm:p-6 border-b border-slate-100 flex items-start justify-between">
+        <div className="p-4 sm:p-6 border-b border-surface-border-subtle flex items-start justify-between">
           <div>
-            <span className="text-[10px] font-bold uppercase tracking-wider text-orange-600 bg-orange-50 px-2 py-0.5 rounded">
+            <span className="text-[10px] font-bold uppercase tracking-wider text-brand-primary bg-brand-primary-light/50 px-2 py-0.5 rounded">
               {product.category}
             </span>
-            <h3 className="text-xl font-black text-slate-900 mt-1">
+            <h3 className="text-xl font-black text-text-strong mt-1">
               {product.name}
             </h3>
-            <p className="text-xs text-slate-500 mt-0.5 line-clamp-2">
+            <p className="text-xs text-text-muted mt-0.5 line-clamp-2">
               {product.description}
             </p>
           </div>
           <button
             onClick={onClose}
-            className="p-1.5 rounded-full hover:bg-slate-100 text-slate-400 hover:text-slate-700 transition-colors"
+            className="p-1.5 rounded-full hover:bg-surface-card-hover text-text-muted hover:text-text-strong transition-colors"
           >
             <X className="w-5 h-5" />
           </button>
@@ -131,12 +131,12 @@ export function ModifierModal({ product, onClose }: ModifierModalProps) {
 
             return (
               <div key={group.id} className="space-y-3">
-                <div className="flex items-center justify-between pb-1.5 border-b border-slate-100">
+                <div className="flex items-center justify-between pb-1.5 border-b border-surface-border-subtle">
                   <div>
-                    <h4 className="text-sm font-bold text-slate-900">
+                    <h4 className="text-sm font-bold text-text-strong">
                       {group.name}
                     </h4>
-                    <p className="text-[11px] text-slate-500">
+                    <p className="text-[11px] text-text-muted">
                       {group.maxSelectable === 1
                         ? "Selecciona 1 opción"
                         : `Elige hasta ${group.maxSelectable} opciones`}
@@ -146,9 +146,9 @@ export function ModifierModal({ product, onClose }: ModifierModalProps) {
                     className={`text-[10px] font-bold px-2 py-0.5 rounded ${
                       group.isRequired
                         ? isGroupValid
-                          ? "bg-emerald-50 text-emerald-700"
-                          : "bg-orange-50 text-orange-700"
-                        : "bg-slate-100 text-slate-600"
+                          ? "bg-status-success-bg text-status-success"
+                          : "bg-status-warning-bg text-status-warning"
+                        : "bg-surface-card-hover text-text-muted"
                     }`}
                   >
                     {group.isRequired ? (isGroupValid ? "Completado" : "Obligatorio") : "Opcional"}
@@ -166,30 +166,30 @@ export function ModifierModal({ product, onClose }: ModifierModalProps) {
                         onClick={() => handleToggleOption(group, option.id)}
                         className={`w-full flex items-center justify-between p-3 rounded-xl border text-left text-xs transition-all ${
                           isSelected
-                            ? "border-orange-500 bg-orange-50/50 shadow-sm"
-                            : "border-slate-200 hover:border-slate-300 bg-white"
+                            ? "border-brand-primary bg-brand-primary-light/30 shadow-sm"
+                            : "border-surface-border hover:border-surface-border-subtle bg-surface-card"
                         }`}
                       >
                         <div className="flex items-center gap-3">
                           <div
                             className={`w-4 h-4 rounded-full border flex items-center justify-center transition-colors ${
                               isSelected
-                                ? "border-orange-600 bg-orange-600 text-white"
-                                : "border-slate-300 bg-white"
+                                ? "border-brand-primary bg-brand-primary text-white"
+                                : "border-surface-border bg-surface-card"
                             }`}
                           >
                             {isSelected && <Check className="w-2.5 h-2.5 stroke-[3]" />}
                           </div>
                           <span
                             className={`font-medium ${
-                              isSelected ? "text-slate-900 font-bold" : "text-slate-700"
+                              isSelected ? "text-text-strong font-bold" : "text-text-base"
                             }`}
                           >
                             {option.name}
                           </span>
                         </div>
 
-                        <span className="font-semibold text-slate-600">
+                        <span className="font-semibold text-text-muted">
                           {option.additionalPrice > 0
                             ? `+ ${formatCurrency(option.additionalPrice)}`
                             : "Incluido"}
@@ -204,24 +204,24 @@ export function ModifierModal({ product, onClose }: ModifierModalProps) {
         </div>
 
         {/* Footer Modal: Cantidad y Botón de Acción */}
-        <div className="p-4 sm:p-6 bg-slate-50 border-t border-slate-100 flex items-center justify-between gap-4">
+        <div className="p-4 sm:p-6 bg-surface-canvas border-t border-surface-border-subtle flex items-center justify-between gap-4">
           {/* Stepper Cantidad */}
-          <div className="flex items-center gap-2 bg-white border border-slate-200 rounded-xl p-1 shadow-sm">
+          <div className="flex items-center gap-2 bg-surface-card border border-surface-border rounded-xl p-1 shadow-sm">
             <button
               type="button"
               onClick={() => setQuantity((q) => Math.max(1, q - 1))}
               disabled={quantity <= 1}
-              className="w-8 h-8 rounded-lg flex items-center justify-center text-slate-600 hover:bg-slate-100 disabled:opacity-30 disabled:hover:bg-transparent"
+              className="w-8 h-8 rounded-lg flex items-center justify-center text-text-base hover:bg-surface-card-hover disabled:opacity-30 disabled:hover:bg-transparent"
             >
               <Minus className="w-4 h-4" />
             </button>
-            <span className="w-6 text-center text-sm font-bold text-slate-900">
+            <span className="w-6 text-center text-sm font-bold text-text-strong">
               {quantity}
             </span>
             <button
               type="button"
               onClick={() => setQuantity((q) => Math.min(20, q + 1))}
-              className="w-8 h-8 rounded-lg flex items-center justify-center text-slate-600 hover:bg-slate-100"
+              className="w-8 h-8 rounded-lg flex items-center justify-center text-text-base hover:bg-surface-card-hover"
             >
               <Plus className="w-4 h-4" />
             </button>
@@ -232,7 +232,7 @@ export function ModifierModal({ product, onClose }: ModifierModalProps) {
             type="button"
             onClick={handleAddToCart}
             disabled={!isValid}
-            className="flex-1 flex items-center justify-between bg-orange-600 hover:bg-orange-500 disabled:bg-slate-300 text-white text-xs font-bold py-3.5 px-5 rounded-xl shadow-md transition-all active:scale-95 disabled:active:scale-100"
+            className="flex-1 flex items-center justify-between bg-brand-primary hover:bg-brand-primary-hover disabled:bg-surface-border disabled:text-text-muted text-white text-xs font-bold py-3.5 px-5 rounded-xl shadow-md shadow-brand-primary/20 transition-all active:scale-95 disabled:active:scale-100"
           >
             <span>{isValid ? "Agregar al Pedido" : "Selecciona las opciones obligatorias"}</span>
             <span className="text-sm font-black tracking-tight">

@@ -13,12 +13,12 @@ export default function StorefrontHomePage() {
 
       {/* Sección del Menú Interactivo en Vivo */}
       <section id="catalogo" className="space-y-6 pt-4">
-        <div className="flex items-center justify-between pb-2 border-b border-slate-200">
+        <div className="flex items-center justify-between pb-2 border-b border-surface-border">
           <div>
-            <h2 className="text-2xl font-black text-slate-900 tracking-tight">
+            <h2 className="text-2xl font-black text-text-strong tracking-tight">
               Menú y Combos
             </h2>
-            <p className="text-xs text-slate-500">
+            <p className="text-xs text-text-muted">
               Personaliza tu orden con guarniciones y salsas artesanales
             </p>
           </div>

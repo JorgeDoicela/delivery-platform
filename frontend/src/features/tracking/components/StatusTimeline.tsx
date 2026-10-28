@@ -29,7 +29,7 @@ const steps = [
 export function StatusTimeline({ status }: StatusTimelineProps) {
   if (status === OrderStatus.Cancelled) {
     return (
-      <div className="p-4 bg-red-950/40 border border-red-800 rounded-xl text-center text-xs text-red-400 font-semibold">
+      <div className="p-4 bg-status-danger/20 border border-status-danger/40 rounded-xl text-center text-xs text-status-danger font-semibold">
         Esta orden ha sido cancelada.
       </div>
     );
@@ -49,17 +49,17 @@ export function StatusTimeline({ status }: StatusTimelineProps) {
               <div
                 className={`h-8 w-8 rounded-full flex items-center justify-center font-bold text-xs mb-2 transition-all ${
                   isCompleted
-                    ? 'bg-emerald-600 text-white'
+                    ? 'bg-status-success text-text-inverse-strong'
                     : isCurrent
-                    ? 'bg-amber-500 text-neutral-950 ring-4 ring-amber-500/20'
-                    : 'bg-neutral-800 text-neutral-500'
+                    ? 'bg-brand-accent text-surface-dark ring-4 ring-brand-accent/20'
+                    : 'bg-surface-canvas border border-surface-border text-text-muted'
                 }`}
               >
                 {isCompleted ? <CheckCircle2 className="h-4 w-4" /> : s.step}
               </div>
               <span
                 className={`text-[11px] leading-tight font-medium ${
-                  isCurrent ? 'text-amber-400 font-bold' : isCompleted ? 'text-white' : 'text-neutral-500'
+                  isCurrent ? 'text-brand-accent font-bold' : isCompleted ? 'text-text-strong' : 'text-text-muted'
                 }`}
               >
                 {s.label}

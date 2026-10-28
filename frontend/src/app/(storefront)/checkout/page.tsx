@@ -8,11 +8,11 @@ export const metadata = {
 export default function CheckoutPage() {
   return (
     <div className="max-w-6xl mx-auto space-y-6">
-      <div className="border-b border-slate-200 pb-4">
-        <h1 className="text-2xl font-black text-slate-900 tracking-tight">
+      <div className="border-b border-surface-border pb-4">
+        <h1 className="text-2xl font-black text-text-strong tracking-tight">
           Finalizar Pedido
         </h1>
-        <p className="text-xs text-slate-500 mt-0.5">
+        <p className="text-xs text-text-muted mt-0.5">
           Ingresa tus datos de entrega y método de pago sin fricción
         </p>
       </div>

@@ -23,14 +23,14 @@ export function PaymentMethodSection({
   total,
 }: PaymentMethodSectionProps) {
   return (
-    <div className="bg-white rounded-2xl border border-slate-200 p-5 space-y-4 shadow-sm">
-      <div className="flex items-center gap-2 pb-3 border-b border-slate-100">
-        <div className="w-8 h-8 rounded-lg bg-slate-100 text-slate-700 flex items-center justify-center">
+    <div className="bg-surface-card rounded-2xl border border-surface-border p-5 space-y-4 shadow-sm">
+      <div className="flex items-center gap-2 pb-3 border-b border-surface-border-subtle">
+        <div className="w-8 h-8 rounded-lg bg-surface-canvas text-text-base flex items-center justify-center">
           <Banknote className="w-4 h-4" />
         </div>
         <div>
-          <h3 className="text-sm font-bold text-slate-900">Método de Pago</h3>
-          <p className="text-[11px] text-slate-500">
+          <h3 className="text-sm font-bold text-text-strong">Método de Pago</h3>
+          <p className="text-[11px] text-text-muted">
             Selecciona cómo deseas cancelar tu pedido
           </p>
         </div>
@@ -42,19 +42,19 @@ export function PaymentMethodSection({
           onClick={() => setValue("paymentMethod", 1)}
           className={`p-3.5 rounded-xl border text-left text-xs transition-all flex flex-col justify-between ${
             selectedPaymentMethod === 1
-              ? "border-orange-500 bg-orange-50/50 shadow-sm"
-              : "border-slate-200 hover:border-slate-300 bg-white"
+              ? "border-brand-primary bg-brand-primary-light shadow-sm"
+              : "border-surface-border hover:border-surface-border-subtle bg-surface-card"
           }`}
         >
           <div className="flex items-center justify-between mb-2">
-            <Banknote className="w-5 h-5 text-orange-600" />
+            <Banknote className="w-5 h-5 text-brand-primary" />
             {selectedPaymentMethod === 1 && (
-              <CheckCircle2 className="w-4 h-4 text-orange-600" />
+              <CheckCircle2 className="w-4 h-4 text-brand-primary" />
             )}
           </div>
           <div>
-            <p className="font-bold text-slate-900">Efectivo contra Entrega</p>
-            <p className="text-[10px] text-slate-500 mt-0.5">Paga al repartidor al recibir</p>
+            <p className="font-bold text-text-strong">Efectivo contra Entrega</p>
+            <p className="text-[10px] text-text-muted mt-0.5">Paga al repartidor al recibir</p>
           </div>
         </button>
 
@@ -63,27 +63,27 @@ export function PaymentMethodSection({
           onClick={() => setValue("paymentMethod", 2)}
           className={`p-3.5 rounded-xl border text-left text-xs transition-all flex flex-col justify-between ${
             selectedPaymentMethod === 2
-              ? "border-orange-500 bg-orange-50/50 shadow-sm"
-              : "border-slate-200 hover:border-slate-300 bg-white"
+              ? "border-status-info bg-status-info/10 shadow-sm"
+              : "border-surface-border hover:border-surface-border-subtle bg-surface-card"
           }`}
         >
           <div className="flex items-center justify-between mb-2">
-            <Building2 className="w-5 h-5 text-blue-600" />
+            <Building2 className="w-5 h-5 text-status-info" />
             {selectedPaymentMethod === 2 && (
-              <CheckCircle2 className="w-4 h-4 text-blue-600" />
+              <CheckCircle2 className="w-4 h-4 text-status-info" />
             )}
           </div>
           <div>
-            <p className="font-bold text-slate-900">Transferencia / Deuna</p>
-            <p className="text-[10px] text-slate-500 mt-0.5">Validación previa con cajero</p>
+            <p className="font-bold text-text-strong">Transferencia / Deuna</p>
+            <p className="text-[10px] text-text-muted mt-0.5">Validación previa con cajero</p>
           </div>
         </button>
       </div>
 
       {/* Detalle si selecciona Efectivo */}
       {selectedPaymentMethod === 1 && (
-        <div className="p-4 bg-slate-50 border border-slate-200 rounded-xl space-y-3 animate-in fade-in text-xs">
-          <label className="block font-bold text-slate-800">
+        <div className="p-4 bg-surface-canvas border border-surface-border rounded-xl space-y-3 animate-in fade-in text-xs">
+          <label className="block font-bold text-text-strong">
             ¿Con cuánto billete pagarás para enviarte cambio exacto?
           </label>
           <div className="flex flex-wrap items-center gap-2">
@@ -94,8 +94,8 @@ export function PaymentMethodSection({
                 onClick={() => setValue("cashAmountPaid", amount)}
                 className={`px-3 py-1.5 rounded-lg border font-bold text-xs transition-colors ${
                   cashAmountPaid === amount
-                    ? "bg-slate-900 text-white border-slate-900"
-                    : "bg-white text-slate-700 border-slate-200 hover:bg-slate-100"
+                    ? "bg-brand-primary text-text-inverse-strong border-brand-primary"
+                    : "bg-surface-card text-text-base border-surface-border hover:bg-surface-canvas"
                 }`}
               >
                 $ {amount}.00
@@ -109,14 +109,14 @@ export function PaymentMethodSection({
               step="0.01"
               {...register("cashAmountPaid", { valueAsNumber: true })}
               placeholder={`Monto exacto (mínimo ${formatCurrency(total)})`}
-              className="w-full text-xs px-3.5 py-2.5 rounded-xl border border-slate-200 bg-white focus:outline-none focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500"
+              className="w-full text-xs px-3.5 py-2.5 rounded-xl border border-surface-border bg-surface-card text-text-strong focus:outline-none focus:ring-2 focus:ring-brand-primary/20 focus:border-brand-primary"
             />
           </div>
 
           {cashAmountPaid > 0 && (
             <div className="flex justify-between items-center text-xs font-bold pt-1">
-              <span className="text-slate-600">Cambio a entregar por el repartidor:</span>
-              <span className="text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded border border-emerald-200">
+              <span className="text-text-base">Cambio a entregar por el repartidor:</span>
+              <span className="text-status-success bg-status-success/10 px-2 py-0.5 rounded border border-status-success/20">
                 {formatCurrency(changeDue)}
               </span>
             </div>
@@ -126,12 +126,12 @@ export function PaymentMethodSection({
 
       {/* Detalle si selecciona Transferencia */}
       {selectedPaymentMethod === 2 && (
-        <div className="p-4 bg-blue-50/60 border border-blue-200/80 rounded-xl space-y-2 text-xs text-blue-950 animate-in fade-in">
+        <div className="p-4 bg-status-info/10 border border-status-info/30 rounded-xl space-y-2 text-xs text-status-info animate-in fade-in">
           <p className="font-bold">Datos Bancarios para Transferencia:</p>
           <p className="text-[11px] leading-relaxed">
             Banco Pichincha | Cta. Corriente: 2100456789 | Titular: Delivery Platform S.A. | RUC: 1792345678001
           </p>
-          <p className="text-[10px] text-blue-800">
+          <p className="text-[10px] text-status-info/90">
             * El cajero verificará la acreditación bancaria antes de enviar la orden al horno.
           </p>
         </div>

@@ -19,11 +19,11 @@ export function KitchenView() {
   return (
     <div className="space-y-4">
       {/* Barra de Control KDS */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between pb-3 border-b border-neutral-800 gap-3">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between pb-3 border-b border-surface-dark-border gap-3">
         <div className="flex items-center gap-3">
           <div>
-            <h1 className="text-xl font-bold text-white tracking-tight">Pantalla de Cocina (KDS)</h1>
-            <p className="text-xs text-neutral-400">
+            <h1 className="text-xl font-bold text-text-inverse-strong tracking-tight">Pantalla de Cocina (KDS)</h1>
+            <p className="text-xs text-text-inverse-muted">
               Despacho en secuencia FIFO y actualización en tiempo real
             </p>
           </div>
@@ -31,17 +31,17 @@ export function KitchenView() {
 
         <div className="flex flex-wrap items-center gap-2">
           {/* Selector de Sucursal */}
-          <div className="flex items-center gap-1.5 bg-neutral-900 border border-neutral-800 rounded px-2.5 py-1">
-            <Building2 className="h-4 w-4 text-amber-500" />
+          <div className="flex items-center gap-1.5 bg-surface-dark-card border border-surface-dark-border rounded px-2.5 py-1">
+            <Building2 className="h-4 w-4 text-brand-accent" />
             <select
               value={branchId}
               onChange={(e) => setBranchId(Number(e.target.value))}
-              className="bg-transparent text-xs text-white font-medium focus:outline-none cursor-pointer"
+              className="bg-transparent text-xs text-text-inverse-strong font-medium focus:outline-none cursor-pointer"
             >
-              <option value={1} className="bg-neutral-900 text-white">
+              <option value={1} className="bg-surface-dark-card text-text-inverse-strong">
                 Sucursal 1 - Norte
               </option>
-              <option value={2} className="bg-neutral-900 text-white">
+              <option value={2} className="bg-surface-dark-card text-text-inverse-strong">
                 Sucursal 2 - Sur
               </option>
             </select>
@@ -51,18 +51,18 @@ export function KitchenView() {
           <button
             onClick={() => kitchenAlertSound.playNewOrderChime()}
             title="Probar sonido de comanda"
-            className="flex items-center gap-1.5 px-2.5 py-1 bg-neutral-900 hover:bg-neutral-800 border border-neutral-800 rounded text-xs text-neutral-300 font-medium transition-colors"
+            className="flex items-center gap-1.5 px-2.5 py-1 bg-surface-dark-card hover:bg-surface-dark-hover border border-surface-dark-border rounded text-xs text-text-inverse-base font-medium transition-colors"
           >
-            <Volume2 className="h-4 w-4 text-amber-400" />
+            <Volume2 className="h-4 w-4 text-brand-accent" />
             <span className="hidden sm:inline">Probar Sonido</span>
           </button>
 
           {/* Refresco Manual */}
           <button
             onClick={() => refresh()}
-            className="flex items-center gap-1.5 px-2.5 py-1 bg-neutral-900 hover:bg-neutral-800 border border-neutral-800 rounded text-xs text-neutral-300 font-medium transition-colors"
+            className="flex items-center gap-1.5 px-2.5 py-1 bg-surface-dark-card hover:bg-surface-dark-hover border border-surface-dark-border rounded text-xs text-text-inverse-base font-medium transition-colors"
           >
-            <RefreshCw className={`h-4 w-4 ${loading ? 'animate-spin text-amber-500' : ''}`} />
+            <RefreshCw className={`h-4 w-4 ${loading ? 'animate-spin text-brand-accent' : ''}`} />
             <span className="hidden sm:inline">Refrescar</span>
           </button>
 
@@ -70,10 +70,10 @@ export function KitchenView() {
           <div
             className={`flex items-center gap-1.5 px-2.5 py-1 rounded text-xs font-semibold border ${
               connectionStatus === 'connected'
-                ? 'bg-emerald-950/80 text-emerald-400 border-emerald-800'
+                ? 'bg-status-success/20 text-status-success border-status-success/40'
                 : connectionStatus === 'connecting'
-                ? 'bg-amber-950/80 text-amber-400 border-amber-800'
-                : 'bg-red-950/80 text-red-400 border-red-800'
+                ? 'bg-status-warning/20 text-status-warning border-status-warning/40'
+                : 'bg-status-danger/20 text-status-danger border-status-danger/40'
             }`}
           >
             <Radio className="h-3.5 w-3.5" />
@@ -83,7 +83,7 @@ export function KitchenView() {
       </div>
 
       {error && (
-        <div className="p-3 bg-red-950/40 border border-red-800 rounded text-xs text-red-400">
+        <div className="p-3 bg-status-danger/20 border border-status-danger/40 rounded text-xs text-status-danger">
           {error}
         </div>
       )}
@@ -91,17 +91,17 @@ export function KitchenView() {
       {/* Grid de 3 Columnas FIFO */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4 min-h-[calc(100vh-160px)]">
         {/* Columna 1: Por Entrar a Horno */}
-        <div className="bg-neutral-900/50 rounded-lg border border-neutral-800 p-3 flex flex-col">
-          <div className="flex items-center justify-between pb-2.5 border-b border-neutral-800 text-xs font-bold text-amber-400">
+        <div className="bg-surface-dark-card/50 rounded-lg border border-surface-dark-border p-3 flex flex-col">
+          <div className="flex items-center justify-between pb-2.5 border-b border-surface-dark-border text-xs font-bold text-status-warning">
             <span>EN ESPERA (CONFIRMADOS)</span>
-            <span className="bg-amber-950 text-amber-400 px-2 py-0.5 rounded border border-amber-800/80 font-mono">
+            <span className="bg-status-warning/20 text-status-warning px-2 py-0.5 rounded border border-status-warning/40 font-mono">
               {confirmedOrders.length}
             </span>
           </div>
 
           <div className="flex-1 mt-3 space-y-3 overflow-y-auto max-h-[calc(100vh-220px)] pr-1">
             {confirmedOrders.length === 0 ? (
-              <div className="h-40 flex items-center justify-center text-xs text-neutral-500 font-medium border border-dashed border-neutral-800 rounded">
+              <div className="h-40 flex items-center justify-center text-xs text-text-inverse-subtle font-medium border border-dashed border-surface-dark-border rounded">
                 Sin pedidos en espera
               </div>
             ) : (
@@ -117,17 +117,17 @@ export function KitchenView() {
         </div>
 
         {/* Columna 2: En Cocina / Horno */}
-        <div className="bg-neutral-900/50 rounded-lg border border-neutral-800 p-3 flex flex-col">
-          <div className="flex items-center justify-between pb-2.5 border-b border-neutral-800 text-xs font-bold text-blue-400">
+        <div className="bg-surface-dark-card/50 rounded-lg border border-surface-dark-border p-3 flex flex-col">
+          <div className="flex items-center justify-between pb-2.5 border-b border-surface-dark-border text-xs font-bold text-status-info">
             <span>EN PREPARACIÓN (HORNO)</span>
-            <span className="bg-blue-950 text-blue-400 px-2 py-0.5 rounded border border-blue-800/80 font-mono">
+            <span className="bg-status-info/20 text-status-info px-2 py-0.5 rounded border border-status-info/40 font-mono">
               {inKitchenOrders.length}
             </span>
           </div>
 
           <div className="flex-1 mt-3 space-y-3 overflow-y-auto max-h-[calc(100vh-220px)] pr-1">
             {inKitchenOrders.length === 0 ? (
-              <div className="h-40 flex items-center justify-center text-xs text-neutral-500 font-medium border border-dashed border-neutral-800 rounded">
+              <div className="h-40 flex items-center justify-center text-xs text-text-inverse-subtle font-medium border border-dashed border-surface-dark-border rounded">
                 Sin pedidos en preparación
               </div>
             ) : (
@@ -143,17 +143,17 @@ export function KitchenView() {
         </div>
 
         {/* Columna 3: Listos para Despacho */}
-        <div className="bg-neutral-900/50 rounded-lg border border-neutral-800 p-3 flex flex-col">
-          <div className="flex items-center justify-between pb-2.5 border-b border-neutral-800 text-xs font-bold text-emerald-400">
+        <div className="bg-surface-dark-card/50 rounded-lg border border-surface-dark-border p-3 flex flex-col">
+          <div className="flex items-center justify-between pb-2.5 border-b border-surface-dark-border text-xs font-bold text-status-success">
             <span>LISTOS PARA DESPACHO</span>
-            <span className="bg-emerald-950 text-emerald-400 px-2 py-0.5 rounded border border-emerald-800/80 font-mono">
+            <span className="bg-status-success/20 text-status-success px-2 py-0.5 rounded border border-status-success/40 font-mono">
               {readyOrders.length}
             </span>
           </div>
 
           <div className="flex-1 mt-3 space-y-3 overflow-y-auto max-h-[calc(100vh-220px)] pr-1">
             {readyOrders.length === 0 ? (
-              <div className="h-40 flex items-center justify-center text-xs text-neutral-500 font-medium border border-dashed border-neutral-800 rounded">
+              <div className="h-40 flex items-center justify-center text-xs text-text-inverse-subtle font-medium border border-dashed border-surface-dark-border rounded">
                 Sin pedidos listos para entrega
               </div>
             ) : (

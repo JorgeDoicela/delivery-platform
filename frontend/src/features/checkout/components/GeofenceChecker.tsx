@@ -71,15 +71,15 @@ export function GeofenceChecker({ onLocationResolved }: GeofenceCheckerProps) {
   };
 
   return (
-    <div className="bg-white rounded-2xl border border-slate-200 p-5 space-y-4 shadow-sm">
-      <div className="flex items-center justify-between pb-3 border-b border-slate-100">
+    <div className="bg-surface-card rounded-2xl border border-surface-border p-5 space-y-4 shadow-sm">
+      <div className="flex items-center justify-between pb-3 border-b border-surface-border-subtle">
         <div className="flex items-center gap-2">
-          <div className="w-8 h-8 rounded-lg bg-orange-100 text-orange-600 flex items-center justify-center">
+          <div className="w-8 h-8 rounded-lg bg-brand-primary-light/60 text-brand-primary flex items-center justify-center">
             <MapPin className="w-4 h-4" />
           </div>
           <div>
-            <h3 className="text-sm font-bold text-slate-900">Validación de Cobertura</h3>
-            <p className="text-[11px] text-slate-500">
+            <h3 className="text-sm font-bold text-text-strong">Validación de Cobertura</h3>
+            <p className="text-[11px] text-text-muted">
               Verificamos con PostGIS la sucursal más cercana para tu entrega
             </p>
           </div>
@@ -93,12 +93,12 @@ export function GeofenceChecker({ onLocationResolved }: GeofenceCheckerProps) {
             type="button"
             onClick={handleGetCurrentLocation}
             disabled={isLoading}
-            className="flex items-center justify-center gap-2 bg-slate-900 hover:bg-slate-800 disabled:bg-slate-400 text-white text-xs font-bold py-2.5 px-4 rounded-xl shadow-sm transition-all active:scale-95"
+            className="flex items-center justify-center gap-2 bg-surface-dark hover:bg-surface-dark-hover disabled:bg-surface-border text-white text-xs font-bold py-2.5 px-4 rounded-xl shadow-sm transition-all active:scale-95"
           >
             {isLoading ? (
-              <Loader2 className="w-4 h-4 animate-spin text-orange-400" />
+              <Loader2 className="w-4 h-4 animate-spin text-brand-accent" />
             ) : (
-              <Navigation className="w-4 h-4 text-orange-400" />
+              <Navigation className="w-4 h-4 text-brand-accent" />
             )}
             <span>Detectar mi GPS</span>
           </button>
@@ -108,11 +108,11 @@ export function GeofenceChecker({ onLocationResolved }: GeofenceCheckerProps) {
             onClick={() => setShowMap(!showMap)}
             className={`flex items-center justify-center gap-2 text-xs font-bold py-2.5 px-4 rounded-xl border transition-all active:scale-95 ${
               showMap
-                ? 'bg-orange-50 border-orange-300 text-orange-700'
-                : 'bg-white border-slate-200 hover:bg-slate-50 text-slate-700'
+                ? 'bg-brand-primary-light/40 border-brand-primary text-brand-primary'
+                : 'bg-surface-card border-surface-border hover:bg-surface-card-hover text-text-base'
             }`}
           >
-            <MapPin className="w-4 h-4 text-orange-500" />
+            <MapPin className="w-4 h-4 text-brand-primary" />
             <span>{showMap ? 'Ocultar Mapa' : 'Seleccionar en Mapa'}</span>
           </button>
         </div>
@@ -124,12 +124,12 @@ export function GeofenceChecker({ onLocationResolved }: GeofenceCheckerProps) {
           </div>
         )}
 
-        <div className="flex items-center gap-2 pt-1 text-[11px] text-slate-500">
+        <div className="flex items-center gap-2 pt-1 text-[11px] text-text-muted">
           <span>O prueba una zona:</span>
           <button
             type="button"
             onClick={() => testLocation(-0.1782, -78.4845)}
-            className="font-bold text-orange-600 hover:underline"
+            className="font-bold text-brand-primary hover:underline"
           >
             Quito Norte (Sucursal 1)
           </button>
@@ -137,7 +137,7 @@ export function GeofenceChecker({ onLocationResolved }: GeofenceCheckerProps) {
           <button
             type="button"
             onClick={() => testLocation(-0.2300, -78.5180)}
-            className="font-bold text-orange-600 hover:underline"
+            className="font-bold text-brand-primary hover:underline"
           >
             Quito Sur (Sucursal 2)
           </button>
@@ -147,11 +147,11 @@ export function GeofenceChecker({ onLocationResolved }: GeofenceCheckerProps) {
       {/* Resultado Exitoso */}
       {resolvedBranch && (
         <div className="space-y-2">
-          <div className="bg-emerald-50 border border-emerald-200 rounded-xl p-3 flex items-start gap-2.5 text-xs text-emerald-900 animate-in fade-in">
-            <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0 mt-0.5" />
+          <div className="bg-status-success-bg border border-status-success-border rounded-xl p-3 flex items-start gap-2.5 text-xs text-status-success animate-in fade-in">
+            <CheckCircle2 className="w-4 h-4 text-status-success shrink-0 mt-0.5" />
             <div>
               <p className="font-bold">{resolvedBranch.branchName} asignada</p>
-              <p className="text-emerald-700 text-[11px] mt-0.5">{resolvedBranch.address}</p>
+              <p className="text-status-success/80 text-[11px] mt-0.5">{resolvedBranch.address}</p>
             </div>
           </div>
 
@@ -159,10 +159,10 @@ export function GeofenceChecker({ onLocationResolved }: GeofenceCheckerProps) {
             <div
               className={`p-3 rounded-xl border text-xs flex items-center justify-between gap-3 animate-in fade-in ${
                 capacity.isSaturated
-                  ? "bg-red-50 border-red-200 text-red-950"
+                  ? "bg-status-danger-bg border-status-danger-border text-status-danger"
                   : capacity.isHighDemand
-                  ? "bg-amber-50 border-amber-200 text-amber-950"
-                  : "bg-slate-50 border-slate-200 text-slate-800"
+                  ? "bg-status-warning-bg border-status-warning-border text-status-warning"
+                  : "bg-surface-canvas border-surface-border text-text-strong"
               }`}
             >
               <div>
@@ -173,11 +173,11 @@ export function GeofenceChecker({ onLocationResolved }: GeofenceCheckerProps) {
                     ? "Alta demanda en cocina"
                     : "Tiempo de entrega estimado"}
                 </p>
-                <p className="text-[11px] text-slate-600 mt-0.5 leading-relaxed">
+                <p className="text-[11px] text-text-muted mt-0.5 leading-relaxed">
                   {capacity.demandNotice || "Preparación y despacho en ritmo estándar"}
                 </p>
               </div>
-              <span className="font-mono font-extrabold text-xs px-2.5 py-1 rounded bg-white border border-slate-200 shadow-sm shrink-0">
+              <span className="font-mono font-extrabold text-xs px-2.5 py-1 rounded bg-surface-card border border-surface-border shadow-sm shrink-0">
                 {capacity.estimatedDeliveryTime}
               </span>
             </div>
@@ -187,11 +187,11 @@ export function GeofenceChecker({ onLocationResolved }: GeofenceCheckerProps) {
 
       {/* Alerta Fuera de Cobertura */}
       {error && (
-        <div className="bg-orange-50 border border-orange-200 rounded-xl p-3 flex items-start gap-2.5 text-xs text-orange-950 animate-in fade-in">
-          <AlertTriangle className="w-4 h-4 text-orange-600 shrink-0 mt-0.5" />
+        <div className="bg-status-warning-bg border border-status-warning-border rounded-xl p-3 flex items-start gap-2.5 text-xs text-status-warning animate-in fade-in">
+          <AlertTriangle className="w-4 h-4 text-status-warning shrink-0 mt-0.5" />
           <div>
             <p className="font-bold">Fuera de Cobertura de Despacho</p>
-            <p className="text-orange-800 text-[11px] mt-0.5 leading-relaxed">{error}</p>
+            <p className="text-status-warning/90 text-[11px] mt-0.5 leading-relaxed">{error}</p>
           </div>
         </div>
       )}

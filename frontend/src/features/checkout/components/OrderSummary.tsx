@@ -21,19 +21,19 @@ export function OrderSummary() {
 
   if (items.length === 0) {
     return (
-      <div className="bg-white rounded-2xl border border-slate-200 p-8 text-center space-y-4 shadow-sm">
-        <div className="w-12 h-12 rounded-full bg-slate-100 text-slate-400 flex items-center justify-center mx-auto">
+      <div className="bg-surface-card rounded-2xl border border-surface-border p-8 text-center space-y-4 shadow-sm">
+        <div className="w-12 h-12 rounded-full bg-surface-canvas text-text-subtle flex items-center justify-center mx-auto">
           <ShoppingBag className="w-6 h-6" />
         </div>
         <div>
-          <h3 className="font-bold text-slate-900 text-base">Tu pedido está vacío</h3>
-          <p className="text-xs text-slate-500 mt-1">
+          <h3 className="font-bold text-text-strong text-base">Tu pedido está vacío</h3>
+          <p className="text-xs text-text-muted mt-1">
             Agrega deliciosos combos de pollo asado desde nuestro menú.
           </p>
         </div>
         <Link
           href="/"
-          className="inline-flex items-center justify-center bg-orange-600 hover:bg-orange-500 text-white text-xs font-bold py-2.5 px-5 rounded-xl shadow-md shadow-orange-600/20 transition-all active:scale-95"
+          className="inline-flex items-center justify-center bg-brand-primary hover:bg-brand-primary-hover text-text-inverse-strong text-xs font-bold py-2.5 px-5 rounded-xl shadow-md shadow-brand-primary/20 transition-all active:scale-95"
         >
           Explorar el Menú
         </Link>
@@ -42,26 +42,26 @@ export function OrderSummary() {
   }
 
   return (
-    <div className="bg-white rounded-2xl border border-slate-200 p-5 space-y-5 shadow-sm">
-      <div className="flex items-center justify-between pb-3 border-b border-slate-100">
-        <h3 className="text-sm font-bold text-slate-900">Resumen del Pedido</h3>
-        <span className="text-xs text-slate-500 font-medium">
+    <div className="bg-surface-card rounded-2xl border border-surface-border p-5 space-y-5 shadow-sm">
+      <div className="flex items-center justify-between pb-3 border-b border-surface-border-subtle">
+        <h3 className="text-sm font-bold text-text-strong">Resumen del Pedido</h3>
+        <span className="text-xs text-text-muted font-medium">
           {items.reduce((acc, i) => acc + i.quantity, 0)} ítems
         </span>
       </div>
 
       {/* Selector de Modalidad (Delivery vs Takeout) */}
-      <div className="grid grid-cols-2 gap-2 p-1 bg-slate-100 rounded-xl">
+      <div className="grid grid-cols-2 gap-2 p-1 bg-surface-canvas rounded-xl">
         <button
           type="button"
           onClick={() => setDeliveryType("delivery")}
           className={`flex items-center justify-center gap-1.5 py-2 text-xs font-bold rounded-lg transition-all ${
             deliveryType === "delivery"
-              ? "bg-white text-slate-900 shadow-sm"
-              : "text-slate-500 hover:text-slate-900"
+              ? "bg-surface-card text-text-strong shadow-sm"
+              : "text-text-muted hover:text-text-strong"
           }`}
         >
-          <Truck className="w-3.5 h-3.5 text-orange-600" />
+          <Truck className="w-3.5 h-3.5 text-brand-primary" />
           <span>A Domicilio</span>
         </button>
 
@@ -70,24 +70,24 @@ export function OrderSummary() {
           onClick={() => setDeliveryType("takeout")}
           className={`flex items-center justify-center gap-1.5 py-2 text-xs font-bold rounded-lg transition-all ${
             deliveryType === "takeout"
-              ? "bg-white text-slate-900 shadow-sm"
-              : "text-slate-500 hover:text-slate-900"
+              ? "bg-surface-card text-text-strong shadow-sm"
+              : "text-text-muted hover:text-text-strong"
           }`}
         >
-          <Store className="w-3.5 h-3.5 text-orange-600" />
+          <Store className="w-3.5 h-3.5 text-brand-primary" />
           <span>Retiro en Local</span>
         </button>
       </div>
 
       {/* Lista de Productos en el Carrito */}
-      <div className="divide-y divide-slate-100 max-h-72 overflow-y-auto space-y-3 pr-1">
+      <div className="divide-y divide-surface-border-subtle max-h-72 overflow-y-auto space-y-3 pr-1">
         {items.map((item) => (
           <div key={item.cartItemId} className="pt-3 first:pt-0 space-y-2">
             <div className="flex items-start justify-between gap-3 text-xs">
               <div className="flex-1">
-                <p className="font-bold text-slate-900">{item.name}</p>
+                <p className="font-bold text-text-strong">{item.name}</p>
                 {item.selectedModifiers.length > 0 && (
-                  <ul className="text-[11px] text-slate-500 mt-0.5 space-y-0.5">
+                  <ul className="text-[11px] text-text-muted mt-0.5 space-y-0.5">
                     {item.selectedModifiers.map((mod) => (
                       <li key={mod.id}>
                         • {mod.name}
@@ -99,10 +99,10 @@ export function OrderSummary() {
               </div>
 
               <div className="text-right">
-                <p className="font-bold text-slate-900">
+                <p className="font-bold text-text-strong">
                   {formatCurrency(item.itemPrice * item.quantity)}
                 </p>
-                <p className="text-[10px] text-slate-400">
+                <p className="text-[10px] text-text-subtle">
                   {formatCurrency(item.itemPrice)} c/u
                 </p>
               </div>
@@ -110,21 +110,21 @@ export function OrderSummary() {
 
             {/* Controles de Cantidad */}
             <div className="flex items-center justify-between text-xs">
-              <div className="flex items-center gap-2 bg-slate-50 border border-slate-200 rounded-lg p-0.5">
+              <div className="flex items-center gap-2 bg-surface-canvas border border-surface-border rounded-lg p-0.5">
                 <button
                   type="button"
                   onClick={() => updateQuantity(item.cartItemId, -1)}
-                  className="w-6 h-6 rounded flex items-center justify-center text-slate-600 hover:bg-slate-200"
+                  className="w-6 h-6 rounded flex items-center justify-center text-text-base hover:bg-surface-card-hover"
                 >
                   <Minus className="w-3 h-3" />
                 </button>
-                <span className="w-4 text-center font-bold text-slate-900 text-xs">
+                <span className="w-4 text-center font-bold text-text-strong text-xs">
                   {item.quantity}
                 </span>
                 <button
                   type="button"
                   onClick={() => updateQuantity(item.cartItemId, 1)}
-                  className="w-6 h-6 rounded flex items-center justify-center text-slate-600 hover:bg-slate-200"
+                  className="w-6 h-6 rounded flex items-center justify-center text-text-base hover:bg-surface-card-hover"
                 >
                   <Plus className="w-3 h-3" />
                 </button>
@@ -133,7 +133,7 @@ export function OrderSummary() {
               <button
                 type="button"
                 onClick={() => removeItem(item.cartItemId)}
-                className="text-slate-400 hover:text-red-500 p-1 rounded transition-colors"
+                className="text-text-subtle hover:text-status-danger p-1 rounded transition-colors"
               >
                 <Trash2 className="w-3.5 h-3.5" />
               </button>
@@ -143,22 +143,22 @@ export function OrderSummary() {
       </div>
 
       {/* Desglose de Totales */}
-      <div className="pt-3 border-t border-slate-100 space-y-1.5 text-xs">
-        <div className="flex justify-between text-slate-600">
+      <div className="pt-3 border-t border-surface-border-subtle space-y-1.5 text-xs">
+        <div className="flex justify-between text-text-base">
           <span>Subtotal de productos:</span>
-          <span className="font-semibold text-slate-900">{formatCurrency(subtotal)}</span>
+          <span className="font-semibold text-text-strong">{formatCurrency(subtotal)}</span>
         </div>
 
-        <div className="flex justify-between text-slate-600">
+        <div className="flex justify-between text-text-base">
           <span>Tarifa de entrega:</span>
-          <span className="font-semibold text-slate-900">
+          <span className="font-semibold text-text-strong">
             {deliveryFee > 0 ? formatCurrency(deliveryFee) : "Gratis (Retiro)"}
           </span>
         </div>
 
-        <div className="pt-2 border-t border-slate-200 flex justify-between items-center text-sm font-black text-slate-900">
+        <div className="pt-2 border-t border-surface-border flex justify-between items-center text-sm font-black text-text-strong">
           <span>Total a Pagar:</span>
-          <span className="text-lg text-orange-600">{formatCurrency(total)}</span>
+          <span className="text-lg text-brand-primary">{formatCurrency(total)}</span>
         </div>
       </div>
     </div>

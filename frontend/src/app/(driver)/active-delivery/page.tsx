@@ -11,8 +11,8 @@ export default function ActiveDeliveryPage() {
   return (
     <Suspense
       fallback={
-        <div className="flex flex-col items-center justify-center min-h-[50vh] text-neutral-400">
-          <RefreshCw className="h-8 w-8 animate-spin text-amber-500 mb-4" />
+        <div className="flex flex-col items-center justify-center min-h-[50vh] text-text-inverse-muted">
+          <RefreshCw className="h-8 w-8 animate-spin text-brand-accent mb-4" />
           <p className="text-xs">Cargando aplicación de repartidor...</p>
         </div>
       }

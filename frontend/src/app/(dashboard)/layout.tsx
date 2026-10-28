@@ -7,12 +7,12 @@ export default function DashboardLayout({
   children: React.ReactNode;
 }) {
   return (
-    <div className="flex flex-col min-h-screen bg-slate-950 text-slate-100">
+    <div className="flex flex-col min-h-screen bg-surface-dark text-text-inverse-strong">
       {/* Barra de Estado KDS y Operaciones */}
-      <header className="h-14 bg-slate-900 border-b border-slate-800 px-4 flex items-center justify-between shrink-0">
+      <header className="h-14 bg-surface-dark-card border-b border-surface-dark-border px-4 flex items-center justify-between shrink-0">
         <div className="flex items-center gap-6">
           <Link href="/kitchen" className="flex items-center gap-2 font-bold text-base text-white">
-            <div className="w-8 h-8 rounded-lg bg-orange-600 flex items-center justify-center">
+            <div className="w-8 h-8 rounded-lg bg-brand-primary flex items-center justify-center">
               <Utensils className="w-4 h-4 text-white" />
             </div>
             <span>Delivery Ops</span>
@@ -22,48 +22,48 @@ export default function DashboardLayout({
           <nav className="hidden md:flex items-center gap-1 text-xs">
             <Link
               href="/kitchen"
-              className="px-3 py-1.5 rounded-lg text-slate-300 hover:text-white hover:bg-slate-800 transition-colors font-medium flex items-center gap-1.5"
+              className="px-3 py-1.5 rounded-lg text-text-inverse-muted hover:text-white hover:bg-surface-dark-hover transition-colors font-medium flex items-center gap-1.5"
             >
-              <Utensils className="w-3.5 h-3.5 text-orange-400" />
+              <Utensils className="w-3.5 h-3.5 text-brand-primary" />
               <span>Cocina KDS</span>
             </Link>
 
             <Link
               href="/admin/inventory"
-              className="px-3 py-1.5 rounded-lg text-slate-300 hover:text-white hover:bg-slate-800 transition-colors font-medium flex items-center gap-1.5"
+              className="px-3 py-1.5 rounded-lg text-text-inverse-muted hover:text-white hover:bg-surface-dark-hover transition-colors font-medium flex items-center gap-1.5"
             >
-              <Package className="w-3.5 h-3.5 text-amber-400" />
+              <Package className="w-3.5 h-3.5 text-brand-accent" />
               <span>Inventario</span>
             </Link>
 
             <Link
               href="/admin/branches"
-              className="px-3 py-1.5 rounded-lg text-slate-300 hover:text-white hover:bg-slate-800 transition-colors font-medium flex items-center gap-1.5"
+              className="px-3 py-1.5 rounded-lg text-text-inverse-muted hover:text-white hover:bg-surface-dark-hover transition-colors font-medium flex items-center gap-1.5"
             >
-              <Building2 className="w-3.5 h-3.5 text-blue-400" />
+              <Building2 className="w-3.5 h-3.5 text-status-info" />
               <span>Sucursales</span>
             </Link>
           </nav>
         </div>
 
         <div className="flex items-center gap-3 text-xs">
-          <span className="hidden lg:inline-block text-[11px] bg-slate-800 text-slate-300 px-2.5 py-1 rounded-md font-mono border border-slate-700">
+          <span className="hidden lg:inline-block text-[11px] bg-surface-dark-hover text-text-inverse-muted px-2.5 py-1 rounded-md font-mono border border-surface-dark-border">
             Sucursal #1 (Norte)
           </span>
 
-          <div className="flex items-center gap-2 bg-slate-800/80 px-2.5 py-1 rounded-lg border border-slate-700">
-            <span className="w-2 h-2 rounded-full bg-emerald-400 animate-ping"></span>
-            <span className="text-emerald-400 font-medium hidden sm:inline">SignalR Activo</span>
+          <div className="flex items-center gap-2 bg-surface-dark-hover/80 px-2.5 py-1 rounded-lg border border-surface-dark-border">
+            <span className="w-2 h-2 rounded-full bg-status-success animate-ping"></span>
+            <span className="text-status-success font-medium hidden sm:inline">SignalR Activo</span>
           </div>
 
-          <div className="flex items-center gap-1.5 text-slate-400 bg-slate-800 px-2.5 py-1 rounded-lg border border-slate-700">
-            <Volume2 className="w-3.5 h-3.5 text-orange-400" />
+          <div className="flex items-center gap-1.5 text-text-inverse-muted bg-surface-dark-hover px-2.5 py-1 rounded-lg border border-surface-dark-border">
+            <Volume2 className="w-3.5 h-3.5 text-brand-accent" />
             <span className="hidden sm:inline">Alarma</span>
           </div>
 
           <Link
             href="/"
-            className="text-xs text-slate-400 hover:text-white flex items-center gap-1 transition-colors px-2 py-1 rounded-lg hover:bg-slate-800"
+            className="text-xs text-text-inverse-muted hover:text-white flex items-center gap-1 transition-colors px-2 py-1 rounded-lg hover:bg-surface-dark-hover"
           >
             <ShieldCheck className="w-3.5 h-3.5" />
             <span className="hidden md:inline">Ver Tienda</span>

@@ -15,34 +15,34 @@ export function ProductCard({ product }: ProductCardProps) {
 
   return (
     <>
-      <div className="group relative flex flex-col justify-between bg-white rounded-2xl border border-slate-200/80 p-5 shadow-sm hover:shadow-md hover:border-slate-300 transition-all">
+      <div className="group relative flex flex-col justify-between bg-surface-card rounded-2xl border border-surface-border p-5 shadow-sm hover:shadow-md hover:border-brand-primary/40 transition-all">
         <div>
           <div className="flex items-center justify-between gap-2 mb-2">
-            <span className="text-[10px] font-bold uppercase tracking-wider text-orange-600 bg-orange-50 px-2 py-0.5 rounded">
+            <span className="text-[10px] font-bold uppercase tracking-wider text-brand-primary bg-brand-primary-light/50 px-2 py-0.5 rounded">
               {product.category}
             </span>
             {product.modifierGroups.length > 0 && (
-              <span className="text-[10px] text-slate-400 font-medium">
+              <span className="text-[10px] text-text-muted font-medium">
                 Personalizable
               </span>
             )}
           </div>
 
-          <h3 className="text-base font-bold text-slate-900 group-hover:text-orange-600 transition-colors">
+          <h3 className="text-base font-bold text-text-strong group-hover:text-brand-primary transition-colors">
             {product.name}
           </h3>
 
-          <p className="text-xs text-slate-500 mt-1 line-clamp-3 leading-relaxed">
+          <p className="text-xs text-text-muted mt-1 line-clamp-3 leading-relaxed">
             {product.description}
           </p>
         </div>
 
-        <div className="mt-6 pt-4 border-t border-slate-100 flex items-center justify-between">
+        <div className="mt-6 pt-4 border-t border-surface-border-subtle flex items-center justify-between">
           <div>
-            <span className="text-[10px] text-slate-400 block uppercase font-medium">
+            <span className="text-[10px] text-text-muted block uppercase font-medium">
               Precio Base
             </span>
-            <span className="text-lg font-black text-slate-900 tracking-tight">
+            <span className="text-lg font-black text-text-strong tracking-tight">
               {formatCurrency(product.basePrice)}
             </span>
           </div>
@@ -50,7 +50,7 @@ export function ProductCard({ product }: ProductCardProps) {
           <button
             type="button"
             onClick={() => setIsModalOpen(true)}
-            className="inline-flex items-center gap-1.5 bg-slate-900 hover:bg-orange-600 text-white text-xs font-bold py-2.5 px-4 rounded-xl shadow-sm transition-all active:scale-95"
+            className="inline-flex items-center gap-1.5 bg-surface-dark hover:bg-brand-primary text-white text-xs font-bold py-2.5 px-4 rounded-xl shadow-sm transition-all active:scale-95"
           >
             <Plus className="w-3.5 h-3.5" />
             <span>Pedir</span>
