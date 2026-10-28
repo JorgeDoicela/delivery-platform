@@ -121,3 +121,39 @@ body {
   background: var(--background);
   color: var(--foreground);
 }
+
+/* Selección de texto con identidad de marca */
+::selection {
+  background-color: var(--brand-primary-light);
+  color: var(--brand-primary);
+}
+
+/* Accesibilidad y foco uniforme WCAG 2.1 AA */
+:focus-visible {
+  outline: 2px solid var(--brand-primary);
+  outline-offset: 2px;
+}
+
+/* Scrollbar ergonómico para listas operativas KDS y carrito */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: var(--surface-dark-border-subtle) transparent;
+}
+
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--surface-dark-border-subtle);
+  border-radius: 9999px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--text-muted);
+}

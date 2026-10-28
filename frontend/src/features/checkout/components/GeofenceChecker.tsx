@@ -93,7 +93,7 @@ export function GeofenceChecker({ onLocationResolved }: GeofenceCheckerProps) {
             type="button"
             onClick={handleGetCurrentLocation}
             disabled={isLoading}
-            className="flex items-center justify-center gap-2 bg-surface-dark hover:bg-surface-dark-hover disabled:bg-surface-border text-white text-xs font-bold py-2.5 px-4 rounded-xl shadow-sm transition-all active:scale-95"
+            className="flex items-center justify-center gap-2 bg-surface-dark hover:bg-surface-dark-hover disabled:bg-surface-border text-text-inverse-strong text-xs font-bold py-2.5 px-4 rounded-xl shadow-sm transition-all active:scale-95"
           >
             {isLoading ? (
               <Loader2 className="w-4 h-4 animate-spin text-brand-accent" />

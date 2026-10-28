@@ -3,7 +3,7 @@ import { ArrowRight, Flame, Clock, ShieldCheck, MapPin } from "lucide-react";
 
 export function CatalogHero() {
   return (
-    <section className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-surface-dark via-surface-dark-card to-surface-dark text-white p-8 md:p-14 shadow-xl border border-surface-dark-border">
+    <section className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-surface-dark via-surface-dark-card to-surface-dark text-text-inverse-strong p-8 md:p-14 shadow-xl border border-surface-dark-border">
       <div className="relative z-10 max-w-2xl space-y-6">
         <div className="inline-flex items-center gap-2 bg-brand-primary-muted text-brand-accent border border-brand-accent/30 px-3 py-1 rounded-full text-xs font-semibold uppercase tracking-wider backdrop-blur-sm">
           <Flame className="w-4 h-4 text-brand-accent animate-pulse" />
@@ -21,7 +21,7 @@ export function CatalogHero() {
         <div className="flex flex-wrap items-center gap-4 pt-2">
           <Link
             href="#catalogo"
-            className="inline-flex items-center gap-2 bg-brand-primary hover:bg-brand-primary-hover text-white font-bold text-sm px-6 py-3.5 rounded-xl shadow-lg shadow-brand-primary/30 transition-all hover:-translate-y-0.5 active:translate-y-0"
+            className="inline-flex items-center gap-2 bg-brand-primary hover:bg-brand-primary-hover text-text-inverse-strong font-bold text-sm px-6 py-3.5 rounded-xl shadow-lg shadow-brand-primary/30 transition-all hover:-translate-y-0.5 active:translate-y-0"
           >
             <span>Ver Menú y Combos</span>
             <ArrowRight className="w-4 h-4" />
@@ -29,7 +29,7 @@ export function CatalogHero() {
 
           <Link
             href="/checkout"
-            className="inline-flex items-center gap-2 bg-white/10 hover:bg-white/20 text-white font-semibold text-sm px-5 py-3.5 rounded-xl border border-white/20 transition-all backdrop-blur-sm"
+            className="inline-flex items-center gap-2 bg-surface-card/10 hover:bg-surface-card/20 text-text-inverse-strong font-semibold text-sm px-5 py-3.5 rounded-xl border border-surface-card/20 transition-all backdrop-blur-sm"
           >
             <MapPin className="w-4 h-4 text-brand-accent" />
             <span>Verificar Cobertura</span>
@@ -44,7 +44,7 @@ export function CatalogHero() {
             <Clock className="w-4 h-4" />
           </div>
           <div>
-            <p className="font-bold text-white">Despacho Rápido</p>
+            <p className="font-bold text-text-inverse-strong">Despacho Rápido</p>
             <p className="text-text-inverse-subtle">Control por franjas de 20 min</p>
           </div>
         </div>
@@ -54,7 +54,7 @@ export function CatalogHero() {
             <MapPin className="w-4 h-4" />
           </div>
           <div>
-            <p className="font-bold text-white">2 Sucursales</p>
+            <p className="font-bold text-text-inverse-strong">2 Sucursales</p>
             <p className="text-text-inverse-subtle">Norte y Sur de la ciudad</p>
           </div>
         </div>
@@ -64,7 +64,7 @@ export function CatalogHero() {
             <ShieldCheck className="w-4 h-4" />
           </div>
           <div>
-            <p className="font-bold text-white">Factura SRI</p>
+            <p className="font-bold text-text-inverse-strong">Factura SRI</p>
             <p className="text-text-inverse-subtle">Emisión electrónica segura</p>
           </div>
         </div>

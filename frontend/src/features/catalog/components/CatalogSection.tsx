@@ -42,7 +42,7 @@ export function CatalogSection() {
         </p>
         <button
           onClick={() => refetch()}
-          className="inline-flex items-center gap-2 bg-surface-dark text-white text-xs font-semibold px-4 py-2 rounded-xl hover:bg-surface-dark-hover transition-colors"
+          className="inline-flex items-center gap-2 bg-surface-dark text-text-inverse-strong text-xs font-semibold px-4 py-2 rounded-xl hover:bg-surface-dark-hover transition-colors"
         >
           <RefreshCw className="w-3.5 h-3.5" />
           <span>Reintentar</span>
@@ -71,7 +71,7 @@ export function CatalogSection() {
               onClick={() => setSelectedCategory(category)}
               className={`px-4 py-2 rounded-xl text-xs font-bold transition-all whitespace-nowrap ${
                 isSelected
-                  ? "bg-brand-primary text-white shadow-md shadow-brand-primary/20"
+                  ? "bg-brand-primary text-text-inverse-strong shadow-md shadow-brand-primary/20"
                   : "bg-surface-card text-text-base hover:bg-surface-card-hover border border-surface-border"
               }`}
             >

@@ -11,7 +11,7 @@ export default function DriverLayout({
       <header className="h-14 bg-surface-dark-card border-b border-surface-dark-border px-4 flex items-center justify-between shrink-0">
         <div className="flex items-center gap-2">
           <div className="w-8 h-8 rounded-lg bg-status-success flex items-center justify-center">
-            <Navigation className="w-4 h-4 text-white" />
+            <Navigation className="w-4 h-4 text-text-inverse-strong" />
           </div>
           <div>
             <h1 className="font-bold text-sm leading-tight">Repartidor</h1>

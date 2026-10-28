@@ -22,12 +22,12 @@ export function CartButtonBadge() {
   return (
     <Link
       href="/checkout"
-      className="relative inline-flex items-center gap-2 bg-surface-dark hover:bg-surface-dark-hover text-white text-xs font-semibold px-4 py-2.5 rounded-xl shadow-sm transition-all active:scale-95 border border-surface-dark-border"
+      className="relative inline-flex items-center gap-2 bg-surface-dark hover:bg-surface-dark-hover text-text-inverse-strong text-xs font-semibold px-4 py-2.5 rounded-xl shadow-sm transition-all active:scale-95 border border-surface-dark-border"
     >
       <div className="relative">
         <ShoppingBag className="w-4 h-4 text-brand-accent" />
         {isClient && count > 0 && (
-          <span className="absolute -top-2 -right-2 w-4 h-4 bg-brand-primary text-white font-black text-[10px] rounded-full flex items-center justify-center animate-bounce">
+          <span className="absolute -top-2 -right-2 w-4 h-4 bg-brand-primary text-text-inverse-strong font-black text-[10px] rounded-full flex items-center justify-center animate-bounce">
             {count}
           </span>
         )}

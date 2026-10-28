@@ -18,7 +18,7 @@ export default function StorefrontLayout({
           </div>
           <div className="flex items-center gap-4 hidden sm:flex">
             <span>Envío estándar: $1.50</span>
-            <Link href="/track" className="hover:text-white transition-colors">
+            <Link href="/track" className="hover:text-text-inverse-strong transition-colors">
               Rastrear Pedido
             </Link>
           </div>
@@ -30,7 +30,7 @@ export default function StorefrontLayout({
         <div className="max-w-6xl mx-auto px-4 h-16 flex items-center justify-between gap-4">
           {/* Logo */}
           <Link href="/" className="flex items-center gap-2 group">
-            <div className="w-10 h-10 rounded-xl bg-brand-primary flex items-center justify-center text-white font-bold text-xl shadow-md shadow-brand-primary/20 group-hover:bg-brand-primary-hover transition-colors">
+            <div className="w-10 h-10 rounded-xl bg-brand-primary flex items-center justify-center text-text-inverse-strong font-bold text-xl shadow-md shadow-brand-primary/20 group-hover:bg-brand-primary-hover transition-colors">
               D
             </div>
             <div>
@@ -72,10 +72,10 @@ export default function StorefrontLayout({
         <div className="max-w-6xl mx-auto px-4 grid grid-cols-1 md:grid-cols-3 gap-8">
           <div>
             <div className="flex items-center gap-2 mb-3">
-              <div className="w-7 h-7 rounded-lg bg-brand-primary flex items-center justify-center text-white font-bold text-sm">
+              <div className="w-7 h-7 rounded-lg bg-brand-primary flex items-center justify-center text-text-inverse-strong font-bold text-sm">
                 D
               </div>
-              <span className="font-bold text-white text-base">DELIVERY</span>
+              <span className="font-bold text-text-inverse-strong text-base">DELIVERY</span>
             </div>
             <p className="text-text-inverse-muted leading-relaxed">
               Plataforma directa de pedidos y despacho logístico sin comisiones abusivas de intermediarios.
@@ -83,7 +83,7 @@ export default function StorefrontLayout({
           </div>
 
           <div>
-            <h4 className="font-semibold text-white uppercase tracking-wider text-[11px] mb-3">
+            <h4 className="font-semibold text-text-inverse-strong uppercase tracking-wider text-[11px] mb-3">
               Sucursales Operativas
             </h4>
             <ul className="space-y-2">
@@ -99,7 +99,7 @@ export default function StorefrontLayout({
           </div>
 
           <div>
-            <h4 className="font-semibold text-white uppercase tracking-wider text-[11px] mb-3">
+            <h4 className="font-semibold text-text-inverse-strong uppercase tracking-wider text-[11px] mb-3">
               Garantía y Facturación
             </h4>
             <p className="text-text-inverse-muted leading-relaxed mb-2">

@@ -11,9 +11,9 @@ export default function DashboardLayout({
       {/* Barra de Estado KDS y Operaciones */}
       <header className="h-14 bg-surface-dark-card border-b border-surface-dark-border px-4 flex items-center justify-between shrink-0">
         <div className="flex items-center gap-6">
-          <Link href="/kitchen" className="flex items-center gap-2 font-bold text-base text-white">
+          <Link href="/kitchen" className="flex items-center gap-2 font-bold text-base text-text-inverse-strong">
             <div className="w-8 h-8 rounded-lg bg-brand-primary flex items-center justify-center">
-              <Utensils className="w-4 h-4 text-white" />
+              <Utensils className="w-4 h-4 text-text-inverse-strong" />
             </div>
             <span>Delivery Ops</span>
           </Link>
@@ -22,7 +22,7 @@ export default function DashboardLayout({
           <nav className="hidden md:flex items-center gap-1 text-xs">
             <Link
               href="/kitchen"
-              className="px-3 py-1.5 rounded-lg text-text-inverse-muted hover:text-white hover:bg-surface-dark-hover transition-colors font-medium flex items-center gap-1.5"
+              className="px-3 py-1.5 rounded-lg text-text-inverse-muted hover:text-text-inverse-strong hover:bg-surface-dark-hover transition-colors font-medium flex items-center gap-1.5"
             >
               <Utensils className="w-3.5 h-3.5 text-brand-primary" />
               <span>Cocina KDS</span>
@@ -30,7 +30,7 @@ export default function DashboardLayout({
 
             <Link
               href="/admin/inventory"
-              className="px-3 py-1.5 rounded-lg text-text-inverse-muted hover:text-white hover:bg-surface-dark-hover transition-colors font-medium flex items-center gap-1.5"
+              className="px-3 py-1.5 rounded-lg text-text-inverse-muted hover:text-text-inverse-strong hover:bg-surface-dark-hover transition-colors font-medium flex items-center gap-1.5"
             >
               <Package className="w-3.5 h-3.5 text-brand-accent" />
               <span>Inventario</span>
@@ -38,7 +38,7 @@ export default function DashboardLayout({
 
             <Link
               href="/admin/branches"
-              className="px-3 py-1.5 rounded-lg text-text-inverse-muted hover:text-white hover:bg-surface-dark-hover transition-colors font-medium flex items-center gap-1.5"
+              className="px-3 py-1.5 rounded-lg text-text-inverse-muted hover:text-text-inverse-strong hover:bg-surface-dark-hover transition-colors font-medium flex items-center gap-1.5"
             >
               <Building2 className="w-3.5 h-3.5 text-status-info" />
               <span>Sucursales</span>
@@ -63,7 +63,7 @@ export default function DashboardLayout({
 
           <Link
             href="/"
-            className="text-xs text-text-inverse-muted hover:text-white flex items-center gap-1 transition-colors px-2 py-1 rounded-lg hover:bg-surface-dark-hover"
+            className="text-xs text-text-inverse-muted hover:text-text-inverse-strong flex items-center gap-1 transition-colors px-2 py-1 rounded-lg hover:bg-surface-dark-hover"
           >
             <ShieldCheck className="w-3.5 h-3.5" />
             <span className="hidden md:inline">Ver Tienda</span>
