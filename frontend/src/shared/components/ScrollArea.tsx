@@ -189,3 +189,4 @@ export const ScrollArea = forwardRef<ScrollAreaHandle, ScrollAreaProps>(
 );
 
 ScrollArea.displayName = "ScrollArea";
+
