@@ -8,6 +8,7 @@ public class RefreshToken
 
     public string TokenHash { get; set; } = string.Empty;
     public DateTime ExpiresAt { get; set; }
+    public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
     public DateTime? RevokedAt { get; set; }
     public string CreatedByIp { get; set; } = string.Empty;
 

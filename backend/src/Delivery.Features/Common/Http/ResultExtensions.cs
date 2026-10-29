@@ -42,6 +42,12 @@ public static class ResultExtensions
 
     private static int DetermineStatusCode(string errorCode) => errorCode switch
     {
+        var code when code.Contains("Unauthorized", StringComparison.OrdinalIgnoreCase) ||
+                       code.Contains("InvalidCredentials", StringComparison.OrdinalIgnoreCase) ||
+                       code.Contains("InvalidRefreshToken", StringComparison.OrdinalIgnoreCase) => StatusCodes.Status401Unauthorized,
+        var code when code.Contains("Forbidden", StringComparison.OrdinalIgnoreCase) ||
+                       code.Contains("UserInactive", StringComparison.OrdinalIgnoreCase) ||
+                       code.Contains("TenantInactive", StringComparison.OrdinalIgnoreCase) => StatusCodes.Status403Forbidden,
         var code when code.EndsWith("NotFound", StringComparison.OrdinalIgnoreCase) => StatusCodes.Status404NotFound,
         var code when code.Contains("OutsideCoverage", StringComparison.OrdinalIgnoreCase) => StatusCodes.Status422UnprocessableEntity,
         var code when code.Contains("SlotCapacityExceeded", StringComparison.OrdinalIgnoreCase) => StatusCodes.Status429TooManyRequests,
@@ -54,6 +60,8 @@ public static class ResultExtensions
     private static string GetTitleForStatusCode(int statusCode) => statusCode switch
     {
         StatusCodes.Status400BadRequest => "Bad Request",
+        StatusCodes.Status401Unauthorized => "Unauthorized",
+        StatusCodes.Status403Forbidden => "Forbidden",
         StatusCodes.Status404NotFound => "Not Found",
         StatusCodes.Status409Conflict => "Conflict",
         StatusCodes.Status422UnprocessableEntity => "Unprocessable Entity",

@@ -66,9 +66,9 @@ public class VerticalSliceArchitectureRegistrationTests
         // Act
         services.AddDeliveryFeatures();
 
-        // Assert: Deben registrarse exactamente 11 endpoints autónomos
+        // Assert: Deben registrarse exactamente 15 endpoints autónomos (11 operativos + 4 de autenticación)
         var endpointDescriptors = services.Where(s => s.ServiceType == typeof(IEndpoint)).ToList();
-        endpointDescriptors.Should().HaveCount(11);
+        endpointDescriptors.Should().HaveCount(15);
 
         var endpointImplementationTypes = endpointDescriptors.Select(d => d.ImplementationType).ToHashSet();
         endpointImplementationTypes.Should().Contain(typeof(ResolveBranchEndpoint));
@@ -82,6 +82,10 @@ public class VerticalSliceArchitectureRegistrationTests
         endpointImplementationTypes.Should().Contain(typeof(ApproveTransferOrderEndpoint));
         endpointImplementationTypes.Should().Contain(typeof(IngestDriverLocationEndpoint));
         endpointImplementationTypes.Should().Contain(typeof(GetDriverLocationEndpoint));
+        endpointImplementationTypes.Should().Contain(typeof(Delivery.Features.Auth.Login.LoginEndpoint));
+        endpointImplementationTypes.Should().Contain(typeof(Delivery.Features.Auth.RefreshToken.RefreshTokenEndpoint));
+        endpointImplementationTypes.Should().Contain(typeof(Delivery.Features.Auth.GetCurrentUser.GetCurrentUserEndpoint));
+        endpointImplementationTypes.Should().Contain(typeof(Delivery.Features.Auth.RevokeToken.RevokeTokenEndpoint));
     }
 
     [Fact]

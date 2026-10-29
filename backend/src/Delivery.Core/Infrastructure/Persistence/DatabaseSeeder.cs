@@ -7,7 +7,7 @@ namespace Delivery.Core.Infrastructure.Persistence;
 public static class DatabaseSeeder
 {
     private static readonly GeometryFactory GeometryFactory = new(new PrecisionModel(), 4326);
-    private const string DefaultDevPasswordHash = "$2a$11$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi";
+    private static readonly string DefaultDevPasswordHash = BCrypt.Net.BCrypt.EnhancedHashPassword("Admin123!", 11);
 
     public static async Task SeedAsync(AppDbContext context)
     {

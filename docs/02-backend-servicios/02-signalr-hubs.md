@@ -72,5 +72,5 @@ sequenceDiagram
 
 ## Navegacion de Documentacion
 * **Anterior:** [01. Vertical Slices y APIs Backend](./01-vertical-slices-api.md)
-* **Siguiente:** [01. Modelo de Datos Relacional y Extension Espacial PostGIS](../03-base-de-datos/01-modelo-datos-postgis.md)
+* **Siguiente:** [03. Autenticacion, Sesiones y Seguridad RBAC](./03-autenticacion-y-seguridad-rbac.md)
 * **Indice General:** [README Principal](../../README.md)

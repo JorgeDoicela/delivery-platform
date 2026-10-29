@@ -14,6 +14,7 @@ La documentacion tecnica detallada del sistema se encuentra organizada bajo taxo
 * **02. Backend y Servicios:**
   - [`01-vertical-slices-api.md`](docs/02-backend-servicios/01-vertical-slices-api.md): Catalogo de endpoints REST, DTOs de entrada y salida, codigos de error y validaciones.
   - [`02-signalr-hubs.md`](docs/02-backend-servicios/02-signalr-hubs.md): Especificacion de WebSocket Hubs (`KitchenHub` y `TrackingHub`) para cocina y seguimiento.
+  - [`03-autenticacion-y-seguridad-rbac.md`](docs/02-backend-servicios/03-autenticacion-y-seguridad-rbac.md): Arquitectura de autenticacion JWT, rotacion criptografica de refresh tokens en cookies HttpOnly y politicas RBAC.
 * **03. Base de Datos y Persistencia:**
   - [`01-modelo-datos-postgis.md`](docs/03-base-de-datos/01-modelo-datos-postgis.md): Diagrama ERD completo (24 tablas), modelo espacial PostGIS SRID 4326, kardex inmutable, facturacion SRI Ecuador, filtros multitenant e indices de alta frecuencia.
   - [`02-redis-geo-cache.md`](docs/03-base-de-datos/02-redis-geo-cache.md): Telemetria de conductores con Redis GEO, llaves con TTL y cache de idempotencia.

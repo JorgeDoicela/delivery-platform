@@ -147,6 +147,10 @@ public class VerticalSliceArchitectureBoundaryTests
     [InlineData("Delivery.Features.Orders.UpdateOrderStatus")]
     [InlineData("Delivery.Features.Tracking.GetDriverLocation")]
     [InlineData("Delivery.Features.Tracking.IngestDriverLocation")]
+    [InlineData("Delivery.Features.Auth.Login")]
+    [InlineData("Delivery.Features.Auth.RefreshToken")]
+    [InlineData("Delivery.Features.Auth.GetCurrentUser")]
+    [InlineData("Delivery.Features.Auth.RevokeToken")]
     public void EachFeatureSlice_MustContainEndpointAndHandler(string sliceNamespace)
     {
         var sliceTypes = FeaturesAssembly.GetTypes()

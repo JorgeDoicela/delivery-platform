@@ -5,6 +5,70 @@ El backend de la plataforma esta construido en .NET 8 utilizando C# 12 y Minimal
 
 ## 2. Catalogo de Endpoints
 
+### 2.0. Autenticacion, Sesiones y RBAC (Modulo Auth)
+
+#### 2.0.1. Inicio de Sesion (`POST /api/v1/auth/login`)
+* **Descripcion:** Autentica a un usuario dentro del contexto de un Tenant activo (por subdominio, cabecera o payload). Emite un Access Token (JWT) de 15 minutos y un Refresh Token rotativo de 7 dias almacenado en cookie `HttpOnly` y `Secure`.
+* **Seguridad:** Proteccion estricta contra XSS mediante cookies `HttpOnly`, `SameSite=Strict`.
+* **Payload de Entrada:**
+  ```json
+  {
+    "email": "esmeralda@lagranjita.com",
+    "password": "Admin123!",
+    "tenantSlug": "la-granjita"
+  }
+  ```
+* **Respuesta Exitosa (200 OK):**
+  ```json
+  {
+    "accessToken": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
+    "refreshToken": "4a7f8b9c...",
+    "expiresAt": "2026-10-29T14:45:00Z",
+    "user": {
+      "id": "e81d4fae-7dec-11d0-a765-00a0c91e6bf6",
+      "email": "esmeralda@lagranjita.com",
+      "fullName": "Esmeralda - Administradora",
+      "phone": "0987654321",
+      "tenantId": "c3b9e4a1-0000-0000-0000-000000000001",
+      "branchId": null,
+      "roles": ["TenantAdmin"]
+    }
+  }
+  ```
+* **Cabecera Set-Cookie Emitida:**
+  `refreshToken=<token>; Path=/api/v1/auth; HttpOnly; SameSite=Strict; Secure; Max-Age=604800`
+* **Errores Posibles:** `400 Bad Request` (validacion), `401 Unauthorized` (`Auth.InvalidCredentials`), `403 Forbidden` (`Auth.UserInactive`, `Auth.TenantInactive`).
+
+#### 2.0.2. Renovacion de Token (`POST /api/v1/auth/refresh`)
+* **Descripcion:** Renueva el Access Token validando y rotando atomicamente el Refresh Token (el token anterior se marca como revocado en base de datos para impedir reusos fraudulentos).
+* **Entrada:** Extraido automaticamente de la cookie `refreshToken` o recibido en el cuerpo JSON `{"refreshToken": "..."}`.
+* **Respuesta Exitosa (200 OK):** Retorna nuevo par `accessToken` y `refreshToken`.
+
+#### 2.0.3. Perfil de Usuario en Sesion (`GET /api/v1/auth/me`)
+* **Cabecera Requerida:** `Authorization: Bearer <accessToken>`
+* **Descripcion:** Retorna la identidad del usuario autenticado, roles asignados, identificador del Tenant y sucursal fisica asignada.
+* **Respuesta Exitosa (200 OK):**
+  ```json
+  {
+    "id": "e81d4fae-7dec-11d0-a765-00a0c91e6bf6",
+    "email": "cajero@lagranjita.com",
+    "fullName": "Cajero Principal Norte",
+    "phone": "0987654323",
+    "tenantId": "c3b9e4a1-0000-0000-0000-000000000001",
+    "tenantName": "La Granjita Asadero",
+    "tenantSlug": "la-granjita",
+    "branchId": 1,
+    "branchName": "Sucursal #1 (Norte)",
+    "roles": ["Cashier"]
+  }
+  ```
+
+#### 2.0.4. Cierre de Sesion (`POST /api/v1/auth/logout`)
+* **Descripcion:** Revoca el Refresh Token en base de datos y borra la cookie `refreshToken` del navegador.
+* **Respuesta Exitosa (200 OK):** `{"message": "Sesion cerrada exitosamente."}`
+
+---
+
 ### 2.1. Geofencing (Resolucion Espacial de Cobertura)
 * **Ruta:** `POST /api/geofencing/resolve`
 * **Descripcion:** Evalua si un punto geografico `(latitude, longitude)` esta contenido dentro del poligono de cobertura de alguna sucursal activa.

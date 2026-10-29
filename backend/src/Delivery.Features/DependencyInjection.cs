@@ -1,6 +1,7 @@
 using System.Reflection;
 using Delivery.Features.Common.Endpoints;
 using Delivery.Features.Common.Handlers;
+using Delivery.Features.Common.Security;
 using FluentValidation;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -11,6 +12,10 @@ public static class DependencyInjection
     public static IServiceCollection AddDeliveryFeatures(this IServiceCollection services)
     {
         var assembly = typeof(DependencyInjection).Assembly;
+
+        // 0. Servicios de Seguridad y Autenticacion
+        services.AddSingleton<IPasswordHasher, BCryptPasswordHasher>();
+        services.AddSingleton<ITokenProvider, JwtTokenProvider>();
 
         // 1. Registro automático de Validadores FluentValidation
         services.AddValidatorsFromAssembly(assembly);

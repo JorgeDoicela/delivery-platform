@@ -14,6 +14,26 @@ public class TenantResolutionMiddleware
 
     public async Task InvokeAsync(HttpContext context, TenantContext tenantContext, AppDbContext dbContext)
     {
+        // 0. Deteccion prioritaria por Claim en JWT de usuario autenticado
+        if (context.User.Identity?.IsAuthenticated == true)
+        {
+            var tenantIdClaim = context.User.FindFirst("tenant_id")?.Value;
+            if (!string.IsNullOrWhiteSpace(tenantIdClaim) && Guid.TryParse(tenantIdClaim, out var claimTenantId))
+            {
+                var jwtTenant = await dbContext.Tenants
+                    .IgnoreQueryFilters()
+                    .AsNoTracking()
+                    .FirstOrDefaultAsync(t => t.Id == claimTenantId && t.IsActive);
+
+                if (jwtTenant != null)
+                {
+                    tenantContext.SetTenant(jwtTenant.Id, jwtTenant.Slug);
+                    await _next(context);
+                    return;
+                }
+            }
+        }
+
         string? tenantSlug = null;
 
         // 1. Detección por Header explícito
