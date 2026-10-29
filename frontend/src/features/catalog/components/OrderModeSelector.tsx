@@ -1,7 +1,7 @@
 "use client";
 
 import React from "react";
-import { Bike, Store, Flame, ShieldCheck } from "lucide-react";
+import { Bike, Store } from "lucide-react";
 import { useCartStore } from "@/features/cart";
 
 export function OrderModeSelector() {
@@ -88,22 +88,12 @@ export function OrderModeSelector() {
       </div>
 
       {/* Píldora de Utilidad y Cupones estilo KFC */}
-      <div className="inline-flex flex-wrap items-center justify-center gap-3 bg-white border border-neutral-300 py-2.5 px-6 rounded-full shadow-sm text-xs text-neutral-800">
+      <div className="inline-flex items-center justify-center gap-2 bg-white border border-neutral-300 py-2 px-5 rounded-full shadow-sm text-xs text-neutral-800">
         <div className="flex items-center gap-1.5 font-bold text-brand-primary">
           <span className="w-4 h-4 rounded-full bg-brand-primary text-white flex items-center justify-center text-[10px] font-black">
             %
           </span>
           <span className="uppercase tracking-wider">Cupones y Descuentos</span>
-        </div>
-        <span className="text-neutral-300 hidden sm:inline">•</span>
-        <div className="flex items-center gap-1.5 text-neutral-600">
-          <Flame className="w-3.5 h-3.5 text-brand-primary" />
-          <span>Asado tradicional al carbón</span>
-        </div>
-        <span className="text-neutral-300 hidden sm:inline">•</span>
-        <div className="flex items-center gap-1.5 text-neutral-600">
-          <ShieldCheck className="w-3.5 h-3.5 text-status-success" />
-          <span>Facturación autorizada SRI</span>
         </div>
       </div>
     </section>
