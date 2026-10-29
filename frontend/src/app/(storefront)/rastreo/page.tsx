@@ -7,7 +7,7 @@ export const metadata = {
 
 export default function RastreoPage() {
   return (
-    <div className="w-full px-4 sm:px-8 lg:px-12 py-8">
+    <div className="w-full max-w-[1240px] mx-auto px-4 sm:px-8 lg:px-12 py-8">
       <OrderSearchView />
     </div>
   );

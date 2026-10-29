@@ -1,6 +1,6 @@
 import Link from "next/link";
 import Image from "next/image";
-import { Utensils, Volume2, ShieldCheck, Package, Building2 } from "lucide-react";
+import { Utensils, Volume2, Package, Building2 } from "lucide-react";
 
 export default function DashboardLayout({
   children,
@@ -81,10 +81,9 @@ export default function DashboardLayout({
 
           <Link
             href="/"
-            className="text-xs font-bold uppercase tracking-wider text-text-inverse-muted hover:text-white flex items-center gap-1.5 transition-colors px-3 py-1.5 rounded-full bg-surface-dark-hover hover:bg-surface-dark-hover/80 border border-surface-dark-border"
+            className="text-xs font-bold uppercase tracking-wider text-text-inverse-muted hover:text-white transition-colors px-3 py-1.5 rounded-full bg-surface-dark-hover hover:bg-surface-dark-hover/80 border border-surface-dark-border"
           >
-            <ShieldCheck className="w-3.5 h-3.5 text-brand-primary" />
-            <span className="hidden md:inline">Ver Tienda</span>
+            <span>Ver Tienda</span>
           </Link>
         </div>
       </header>

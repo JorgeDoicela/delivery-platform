@@ -20,9 +20,9 @@ export function OrderSearchView() {
   };
 
   return (
-    <div className="w-full py-12 space-y-6">
+    <div className="w-full max-w-xl mx-auto py-12 space-y-6">
       <div className="text-center space-y-2">
-        <div className="w-14 h-14 bg-brand-primary text-white rounded-2xl mx-auto flex items-center justify-center mb-3 shadow-md shadow-brand-primary/25">
+        <div className="w-14 h-14 bg-brand-primary text-white rounded-2xl mx-auto flex items-center justify-center mb-3 shadow-md">
           <MapPin className="w-7 h-7" />
         </div>
         <h1 className="text-3xl sm:text-4xl font-black text-text-strong uppercase tracking-wide font-display">
@@ -59,7 +59,7 @@ export function OrderSearchView() {
 
         <button
           type="submit"
-          className="w-full flex items-center justify-center gap-2 bg-brand-primary hover:bg-brand-primary-hover text-text-inverse-strong font-black text-xs uppercase tracking-wider py-4 px-6 rounded-full shadow-xl shadow-brand-primary/25 transition-all hover:scale-[1.01] active:scale-95"
+          className="w-full flex items-center justify-center gap-2 bg-brand-primary hover:bg-brand-primary-hover text-text-inverse-strong font-black text-xs uppercase tracking-wider py-4 px-6 rounded-full shadow-xl transition-all hover:scale-[1.01] active:scale-95"
         >
           <span>Consultar Estado</span>
           <ArrowRight className="w-4 h-4" />

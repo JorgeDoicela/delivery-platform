@@ -51,7 +51,7 @@ export function OrderTrackingView({ orderId }: OrderTrackingViewProps) {
           </button>
           <button
             onClick={() => router.push('/')}
-            className="inline-flex items-center gap-2 px-5 py-2.5 bg-brand-primary hover:bg-brand-primary-hover text-text-inverse-strong text-xs uppercase tracking-wider rounded-full font-black transition-all shadow-md shadow-brand-primary/20 active:scale-95"
+            className="inline-flex items-center gap-2 px-5 py-2.5 bg-brand-primary hover:bg-brand-primary-hover text-text-inverse-strong text-xs uppercase tracking-wider rounded-full font-black transition-all shadow-md active:scale-95"
           >
             <ArrowLeft className="h-3.5 w-3.5" />
             Volver a la carta

@@ -25,7 +25,7 @@ export default function StorefrontHomePage() {
         <PromotionalBanners />
 
         {/* 4. Menú y Combos Interactivo en Vivo */}
-        <section id="catalogo" className="space-y-6 pt-6">
+        <section id="catalogo" className="max-w-[1240px] mx-auto space-y-6 pt-6 w-full">
           <div className="flex items-center justify-between pb-3 border-b border-surface-border">
             <div>
               <h2 className="text-3xl sm:text-4xl font-black text-text-strong uppercase tracking-wide">

@@ -71,7 +71,7 @@ export function CatalogHero() {
     <section
       onMouseEnter={() => setIsPaused(true)}
       onMouseLeave={() => setIsPaused(false)}
-      className="relative overflow-hidden w-full min-h-[440px] sm:min-h-[480px] md:min-h-[520px] bg-neutral-950 text-white shadow-xl flex items-center py-12 sm:py-16 md:py-20 px-6 sm:px-12 md:px-16 lg:px-20 select-none"
+      className="relative overflow-hidden w-full min-h-[480px] sm:min-h-[530px] md:min-h-[590px] lg:min-h-[610px] bg-neutral-950 text-white shadow-xl flex items-center py-14 sm:py-18 md:py-22 px-6 sm:px-12 md:px-16 lg:px-20 select-none"
     >
       {/* Capas de Imágenes Panorámicas de Fondo con Transición Suave y Efecto Ken Burns */}
       {HERO_SLIDES.map((s, idx) => {
@@ -173,7 +173,7 @@ export function CatalogHero() {
       </div>
 
       {/* Paginación por Puntos estilo KFC con Expansión Dinámica */}
-      <div className="absolute bottom-6 left-0 right-0 flex items-center justify-center gap-2 z-10">
+      <div className="absolute bottom-6 sm:bottom-7 left-0 right-0 flex items-center justify-center gap-2 z-10">
         {HERO_SLIDES.map((_, idx) => (
           <button
             key={idx}

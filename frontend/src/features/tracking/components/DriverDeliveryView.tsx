@@ -266,7 +266,7 @@ export function DriverDeliveryView() {
               type="button"
               onClick={handleCompleteDelivery}
               disabled={isCompleting}
-              className="w-full flex items-center justify-center gap-2 bg-status-success hover:bg-status-success/90 text-text-inverse-strong font-black uppercase tracking-wider py-4 px-6 rounded-full text-xs shadow-lg shadow-status-success/20 transition-all active:scale-95 disabled:opacity-50"
+              className="w-full flex items-center justify-center gap-2 bg-status-success hover:bg-status-success/90 text-text-inverse-strong font-black uppercase tracking-wider py-4 px-6 rounded-full text-xs shadow-lg transition-all active:scale-95 disabled:opacity-50"
             >
               <CheckCircle className="w-4 h-4" />
               <span>{isCompleting ? 'Procesando entrega...' : 'Confirmar Entrega y Cobro'}</span>

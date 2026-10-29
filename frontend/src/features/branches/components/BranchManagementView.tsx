@@ -10,7 +10,6 @@ import {
   Layers,
   Phone,
   RefreshCw,
-  ShieldCheck,
   AlertTriangle,
 } from "lucide-react";
 
@@ -161,11 +160,6 @@ export function BranchManagementView() {
                     <h3 className="text-xl font-black uppercase tracking-tight text-text-inverse-strong font-display mt-2">{branch.name}</h3>
                     <p className="text-xs text-text-inverse-muted mt-0.5">{branch.zoneName}</p>
                   </div>
-
-                  <span className="flex items-center gap-1 text-[10px] font-bold uppercase tracking-wider text-status-success bg-status-success/20 border border-status-success/40 px-3 py-1 rounded-full">
-                    <ShieldCheck className="w-3.5 h-3.5" />
-                    Operativa
-                  </span>
                 </div>
 
                 {/* Datos de Contacto y Ubicación */}

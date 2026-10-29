@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import Image from "next/image";
 import { useQueryClient } from "@tanstack/react-query";
 import { useMenuQuery } from "../hooks/useMenuQuery";
 import { apiClient } from "@/shared/lib/api-client";
@@ -180,10 +181,22 @@ export function InventoryManagerView() {
                 return (
                   <tr key={product.id} className="hover:bg-surface-dark-hover/40 transition-colors">
                     <td className="px-5 py-4">
-                      <p className="font-bold text-text-inverse-strong text-sm">{product.name}</p>
-                      <p className="text-text-inverse-muted text-[11px] line-clamp-1 mt-0.5">
-                        {product.description}
-                      </p>
+                      <div className="flex items-center gap-3">
+                        <div className="relative w-10 h-10 rounded-xl overflow-hidden bg-surface-dark shrink-0 border border-surface-dark-border">
+                          <Image
+                            src={product.imageUrl || "/images/banners/hero-pollo-brasa.jpg"}
+                            alt={product.name}
+                            fill
+                            className="object-cover"
+                          />
+                        </div>
+                        <div>
+                          <p className="font-bold text-text-inverse-strong text-sm">{product.name}</p>
+                          <p className="text-text-inverse-muted text-[11px] line-clamp-1 mt-0.5">
+                            {product.description}
+                          </p>
+                        </div>
+                      </div>
                     </td>
 
                     <td className="px-4 py-4">

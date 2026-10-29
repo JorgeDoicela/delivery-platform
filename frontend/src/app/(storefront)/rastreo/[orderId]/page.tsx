@@ -18,7 +18,7 @@ async function OrderTrackingLoader({ params }: RastreoDetallePageProps) {
 
 export default function RastreoDetallePage({ params }: RastreoDetallePageProps) {
   return (
-    <div className="w-full px-4 sm:px-8 lg:px-12 py-8 space-y-6">
+    <div className="w-full max-w-[1240px] mx-auto px-4 sm:px-8 lg:px-12 py-8 space-y-6">
       <Suspense
         fallback={
           <div className="flex flex-col items-center justify-center min-h-[50vh] text-text-muted">

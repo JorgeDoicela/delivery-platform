@@ -69,10 +69,10 @@ export function CatalogSection() {
             <button
               key={category}
               onClick={() => setSelectedCategory(category)}
-              className={`px-5 py-2.5 rounded-full text-xs font-bold uppercase tracking-wider transition-all whitespace-nowrap shadow-sm ${
+              className={`px-6 py-2.5 rounded-full text-xs font-bold uppercase tracking-wider transition-all whitespace-nowrap shadow-sm ${
                 isSelected
-                  ? "bg-brand-primary text-text-inverse-strong shadow-lg scale-105"
-                  : "bg-surface-card text-text-base hover:bg-surface-card-hover border border-surface-border hover:border-neutral-400"
+                  ? "bg-brand-primary text-white shadow-md scale-105"
+                  : "bg-white text-neutral-800 hover:bg-neutral-50 border border-neutral-300 hover:border-neutral-400"
               }`}
             >
               {category}
@@ -82,7 +82,7 @@ export function CatalogSection() {
       </div>
 
       {/* Grid de Productos Adaptado a Ancho Completo */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-7">
         {filteredProducts.map((product) => (
           <ProductCard key={product.id} product={product} />
         ))}

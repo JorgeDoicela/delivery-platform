@@ -1,4 +1,4 @@
-import { MapPin, Phone, Clock, ShieldCheck } from "lucide-react";
+import { MapPin, Phone, Clock } from "lucide-react";
 import Link from "next/link";
 
 export const metadata = {
@@ -8,7 +8,7 @@ export const metadata = {
 
 export default function SucursalesPage() {
   return (
-    <div className="w-full px-4 sm:px-8 lg:px-12 py-8 space-y-8">
+    <div className="w-full max-w-[1240px] mx-auto px-4 sm:px-8 lg:px-12 py-8 space-y-8">
       <div className="border-b border-surface-border pb-4">
         <h1 className="text-3xl sm:text-4xl font-black text-text-strong uppercase tracking-wide font-display">
           Nuestras Sucursales
@@ -30,10 +30,6 @@ export default function SucursalesPage() {
               </h2>
               <p className="text-xs text-text-muted mt-0.5">Sector Financiero & La Carolina</p>
             </div>
-            <span className="flex items-center gap-1 text-[10px] font-bold uppercase tracking-wider text-status-success bg-status-success/15 border border-status-success/30 px-3 py-1 rounded-full">
-              <ShieldCheck className="w-3.5 h-3.5" />
-              Abierto
-            </span>
           </div>
 
           <div className="space-y-3 text-xs text-text-base bg-surface-canvas border border-surface-border rounded-2xl p-4">
@@ -70,10 +66,6 @@ export default function SucursalesPage() {
               </h2>
               <p className="text-xs text-text-muted mt-0.5">Sector Villa Flora & Centro Sur</p>
             </div>
-            <span className="flex items-center gap-1 text-[10px] font-bold uppercase tracking-wider text-status-success bg-status-success/15 border border-status-success/30 px-3 py-1 rounded-full">
-              <ShieldCheck className="w-3.5 h-3.5" />
-              Abierto
-            </span>
           </div>
 
           <div className="space-y-3 text-xs text-text-base bg-surface-canvas border border-surface-border rounded-2xl p-4">
