@@ -37,9 +37,9 @@ public class LoginEndpoint : IEndpoint
                 {
                     HttpOnly = true,
                     Secure = httpContext.Request.IsHttps,
-                    SameSite = SameSiteMode.Strict,
+                    SameSite = SameSiteMode.Lax,
                     Expires = DateTimeOffset.UtcNow.AddDays(7),
-                    Path = "/api/v1/auth"
+                    Path = "/"
                 };
 
                 httpContext.Response.Cookies.Append("refreshToken", result.Value.RefreshToken, cookieOptions);

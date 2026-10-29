@@ -27,10 +27,10 @@ public class RevokeTokenEndpoint : IEndpoint
             // Elimina la cookie del cliente
             httpContext.Response.Cookies.Delete("refreshToken", new CookieOptions
             {
-                Path = "/api/v1/auth",
+                Path = "/",
                 HttpOnly = true,
                 Secure = httpContext.Request.IsHttps,
-                SameSite = SameSiteMode.Strict
+                SameSite = SameSiteMode.Lax
             });
 
             return Results.Ok(new { message = "Sesion cerrada exitosamente." });

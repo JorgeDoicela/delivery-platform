@@ -110,7 +110,21 @@ describe("useAuthStore", () => {
     expect(authApi.logout).toHaveBeenCalledTimes(1);
   });
 
+  it("no debe invocar authApi.refresh si el usuario no tiene sesion previa", async () => {
+    localStorage.removeItem("delivery_has_session");
+
+    const isAuthed = await useAuthStore.getState().checkAuth();
+
+    expect(isAuthed).toBe(false);
+    expect(authApi.refresh).not.toHaveBeenCalled();
+    const state = useAuthStore.getState();
+    expect(state.isAuthenticated).toBe(false);
+    expect(state.user).toBeNull();
+  });
+
   it("debe restaurar la sesión con checkAuth si existe cookie de refresh", async () => {
+    localStorage.setItem("delivery_has_session", "1");
+
     const mockUser = {
       id: "2",
       email: "admin@asaderolagranjita.com",
