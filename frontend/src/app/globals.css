@@ -328,3 +328,49 @@ textarea {
 .scrollbar-none::-webkit-scrollbar {
   display: none !important;
 }
+
+/* ==========================================================================
+   Animaciones Cinematográficas de Carrusel (Hero Transition Effects)
+   ========================================================================== */
+@keyframes heroSlideInNext {
+  0% {
+    opacity: 0;
+    transform: translate3d(36px, 0, 0);
+  }
+  100% {
+    opacity: 1;
+    transform: translate3d(0, 0, 0);
+  }
+}
+
+@keyframes heroSlideInPrev {
+  0% {
+    opacity: 0;
+    transform: translate3d(-36px, 0, 0);
+  }
+  100% {
+    opacity: 1;
+    transform: translate3d(0, 0, 0);
+  }
+}
+
+@keyframes heroKenBurns {
+  0% {
+    transform: scale(1.08);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+.animate-hero-next {
+  animation: heroSlideInNext 0.55s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+.animate-hero-prev {
+  animation: heroSlideInPrev 0.55s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+.animate-hero-kenburns {
+  animation: heroKenBurns 6s cubic-bezier(0.25, 1, 0.5, 1) forwards;
+}

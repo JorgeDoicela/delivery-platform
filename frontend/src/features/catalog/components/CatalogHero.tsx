@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { ArrowRight, ChevronLeft, ChevronRight, MapPin } from "lucide-react";
@@ -38,61 +38,96 @@ const HERO_SLIDES: HeroSlide[] = [
 
 export function CatalogHero() {
   const [currentSlideIndex, setCurrentSlideIndex] = useState(0);
+  const [direction, setDirection] = useState<"next" | "prev">("next");
+  const [isPaused, setIsPaused] = useState(false);
+
   const slide = HERO_SLIDES[currentSlideIndex];
 
-  const handlePrev = () => {
+  const handlePrev = useCallback(() => {
+    setDirection("prev");
     setCurrentSlideIndex((prev) => (prev === 0 ? HERO_SLIDES.length - 1 : prev - 1));
+  }, []);
+
+  const handleNext = useCallback(() => {
+    setDirection("next");
+    setCurrentSlideIndex((prev) => (prev === HERO_SLIDES.length - 1 ? 0 : prev + 1));
+  }, []);
+
+  const handleSelectSlide = (idx: number) => {
+    setDirection(idx >= currentSlideIndex ? "next" : "prev");
+    setCurrentSlideIndex(idx);
   };
 
-  const handleNext = () => {
-    setCurrentSlideIndex((prev) => (prev === HERO_SLIDES.length - 1 ? 0 : prev + 1));
-  };
+  // Avance automático con pausa en hover
+  useEffect(() => {
+    if (isPaused) return;
+    const timer = setInterval(() => {
+      handleNext();
+    }, 6500);
+
+    return () => clearInterval(timer);
+  }, [isPaused, handleNext]);
 
   return (
-    <section className="relative overflow-hidden w-full min-h-[420px] sm:min-h-[460px] md:min-h-[500px] bg-neutral-950 text-white shadow-xl flex items-center py-12 sm:py-16 md:py-20 px-6 sm:px-12 md:px-16 lg:px-20">
-      {/* Capas de Imágenes Panorámicas de Fondo con Transición Suave */}
-      {HERO_SLIDES.map((s, idx) => (
-        <div
-          key={s.imageUrl}
-          className={`absolute inset-0 transition-opacity duration-700 ease-in-out ${
-            idx === currentSlideIndex ? "opacity-100 z-0" : "opacity-0 pointer-events-none"
-          }`}
-        >
-          <Image
-            src={s.imageUrl}
-            alt={s.title}
-            fill
-            priority={idx === 0}
-            sizes="100vw"
-            className="object-cover object-center md:object-right scale-100 transition-transform duration-1000 ease-out"
-          />
-          {/* Overlay cinematográfico gastronómico: oscurecido a la izquierda para contraste tipográfico */}
-          <div className="absolute inset-0 bg-gradient-to-r from-black/95 via-black/75 to-transparent sm:from-black/90 sm:via-black/60 md:to-black/20" />
-          <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-black/30" />
-        </div>
-      ))}
+    <section
+      onMouseEnter={() => setIsPaused(true)}
+      onMouseLeave={() => setIsPaused(false)}
+      className="relative overflow-hidden w-full min-h-[440px] sm:min-h-[480px] md:min-h-[520px] bg-neutral-950 text-white shadow-xl flex items-center py-12 sm:py-16 md:py-20 px-6 sm:px-12 md:px-16 lg:px-20 select-none"
+    >
+      {/* Capas de Imágenes Panorámicas de Fondo con Transición Suave y Efecto Ken Burns */}
+      {HERO_SLIDES.map((s, idx) => {
+        const isActive = idx === currentSlideIndex;
+        return (
+          <div
+            key={s.imageUrl}
+            className={`absolute inset-0 transition-opacity duration-700 ease-in-out ${
+              isActive ? "opacity-100 z-0" : "opacity-0 pointer-events-none"
+            }`}
+          >
+            <div className={`relative w-full h-full ${isActive ? "animate-hero-kenburns" : ""}`}>
+              <Image
+                src={s.imageUrl}
+                alt={s.title}
+                fill
+                priority={idx === 0}
+                sizes="100vw"
+                className="object-cover object-center md:object-right"
+              />
+            </div>
 
-      {/* Flechas de Navegación del Carrusel estilo KFC */}
+            {/* Overlay cinematográfico gastronómico: oscurecido para contraste tipográfico */}
+            <div className="absolute inset-0 bg-gradient-to-r from-black/95 via-black/75 to-transparent sm:from-black/90 sm:via-black/60 md:to-black/20" />
+            <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-black/30" />
+          </div>
+        );
+      })}
+
+      {/* Flechas de Navegación del Carrusel con Microinteracción Fluida */}
       <button
         type="button"
         onClick={handlePrev}
         aria-label="Anterior promoción"
-        className="absolute left-4 top-1/2 -translate-y-1/2 w-11 h-11 rounded-full bg-black/40 hover:bg-black/60 text-white flex items-center justify-center transition-all backdrop-blur-md z-20 border border-white/20 active:scale-95"
+        className="absolute left-3 sm:left-6 top-1/2 -translate-y-1/2 w-11 h-11 sm:w-12 sm:h-12 rounded-full bg-black/40 hover:bg-brand-primary text-white flex items-center justify-center transition-all duration-300 backdrop-blur-md z-20 border border-white/20 shadow-xl hover:scale-110 active:scale-90"
       >
-        <ChevronLeft className="w-6 h-6" />
+        <ChevronLeft className="w-6 h-6 transition-transform group-hover:-translate-x-0.5" />
       </button>
 
       <button
         type="button"
         onClick={handleNext}
         aria-label="Siguiente promoción"
-        className="absolute right-4 top-1/2 -translate-y-1/2 w-11 h-11 rounded-full bg-black/40 hover:bg-black/60 text-white flex items-center justify-center transition-all backdrop-blur-md z-20 border border-white/20 active:scale-95"
+        className="absolute right-3 sm:right-6 top-1/2 -translate-y-1/2 w-11 h-11 sm:w-12 sm:h-12 rounded-full bg-black/40 hover:bg-brand-primary text-white flex items-center justify-center transition-all duration-300 backdrop-blur-md z-20 border border-white/20 shadow-xl hover:scale-110 active:scale-90"
       >
-        <ChevronRight className="w-6 h-6" />
+        <ChevronRight className="w-6 h-6 transition-transform group-hover:translate-x-0.5" />
       </button>
 
-      {/* Contenido Informativo y Tipografía Display sobre el Banner */}
-      <div className="relative z-10 w-full max-w-2xl space-y-6">
+      {/* Contenido Informativo y Tipografía con Animación de Entrada Suave */}
+      <div
+        key={currentSlideIndex}
+        className={`relative z-10 w-full max-w-2xl space-y-6 ${
+          direction === "next" ? "animate-hero-next" : "animate-hero-prev"
+        }`}
+      >
         {/* Badge Superior */}
         <div className="inline-flex items-center gap-2 bg-brand-primary text-white px-3.5 py-1 rounded-full text-xs font-bold uppercase tracking-wider shadow-md">
           <span>{slide.badge}</span>
@@ -137,18 +172,18 @@ export function CatalogHero() {
         </div>
       </div>
 
-      {/* Paginación por Puntos estilo KFC */}
+      {/* Paginación por Puntos estilo KFC con Expansión Dinámica */}
       <div className="absolute bottom-6 left-0 right-0 flex items-center justify-center gap-2 z-10">
         {HERO_SLIDES.map((_, idx) => (
           <button
             key={idx}
             type="button"
-            onClick={() => setCurrentSlideIndex(idx)}
+            onClick={() => handleSelectSlide(idx)}
             aria-label={`Ir al banner ${idx + 1}`}
-            className={`h-2.5 rounded-full transition-all ${
+            className={`h-2.5 rounded-full transition-all duration-300 ${
               idx === currentSlideIndex
-                ? "w-8 bg-white"
-                : "w-2.5 bg-white/40 hover:bg-white/70"
+                ? "w-8 bg-brand-primary shadow-md"
+                : "w-2.5 bg-white/40 hover:bg-white/75"
             }`}
           />
         ))}
