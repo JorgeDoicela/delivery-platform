@@ -1,6 +1,6 @@
 import Link from "next/link";
 import Image from "next/image";
-import { MapPin, Search } from "lucide-react";
+import { MapPin, Search, User } from "lucide-react";
 import { CartButtonBadge } from "@/features/cart";
 
 export default function StorefrontLayout({
@@ -10,63 +10,89 @@ export default function StorefrontLayout({
 }) {
   return (
     <div className="flex flex-col min-h-screen bg-surface-canvas">
-      {/* Header Comercial Blanco Limpio estilo KFC con Identidad La Granjita */}
-      <header className="sticky top-0 z-40 bg-white/95 backdrop-blur-md border-b border-neutral-200">
-        <div className="w-full px-4 sm:px-8 h-16 flex items-center justify-between gap-4">
-          {/* Logo Oficial La Granjita */}
-          <Link href="/" className="flex items-center gap-3 group">
-            <div className="relative w-10 h-10 shrink-0">
-              <Image
-                src="/images/identidad/logo.png"
-                alt="Logo La Granjita"
-                width={40}
-                height={40}
-                priority
-                className="w-full h-full object-contain group-hover:scale-105 transition-transform"
-              />
-            </div>
-            <div>
-              <span
-                data-display-brand
-                className="font-black text-2xl tracking-tight text-brand-primary block leading-none uppercase font-display"
-              >
-                LA GRANJITA
-              </span>
-              <span className="text-[10px] tracking-widest text-text-muted font-bold uppercase block mt-0.5">
-                Asadero
-              </span>
-            </div>
-          </Link>
+      {/* Header Comercial Blanco Limpio estilo KFC con Barra Roja Inferior */}
+      <header className="sticky top-0 z-40 bg-white border-b-2 border-brand-primary shadow-sm">
+        <div className="w-full px-4 sm:px-8 lg:px-12 h-16 sm:h-[68px] flex items-center justify-between gap-4">
+          
+          {/* Bloque Izquierdo: Logo + Navegación Agrupada con Espaciado estilo KFC */}
+          <div className="flex items-center gap-8 lg:gap-10 shrink-0">
+            {/* Logo Oficial La Granjita Asadero sin fondo */}
+            <Link href="/" className="flex items-center gap-2.5 group shrink-0">
+              <div className="relative w-9 h-9 sm:w-10 sm:h-10 shrink-0">
+                <Image
+                  src="/images/identidad/logo.png"
+                  alt="Logo La Granjita Asadero"
+                  width={40}
+                  height={40}
+                  priority
+                  className="w-full h-full object-contain group-hover:scale-105 transition-transform"
+                />
+              </div>
+              <div>
+                <span
+                  data-display-brand
+                  className="font-black text-2xl sm:text-[26px] tracking-tight text-brand-primary block leading-none uppercase font-display"
+                >
+                  LA GRANJITA
+                </span>
+                <span className="text-[10px] tracking-widest text-text-muted font-bold uppercase block mt-0.5">
+                  Asadero
+                </span>
+              </div>
+            </Link>
 
-          {/* Enlaces de Navegación estilo KFC */}
-          <nav className="hidden lg:flex items-center gap-6 text-xs font-bold uppercase tracking-wider text-neutral-800">
-            <Link href="/catalogo" className="hover:text-brand-primary transition-colors">
-              Ordenar
-            </Link>
-            <Link href="/rastreo" className="hover:text-brand-primary transition-colors">
-              Rastrear Pedido
-            </Link>
-            <Link href="/sucursales" className="hover:text-brand-primary transition-colors text-neutral-600">
-              Sucursales
-            </Link>
-          </nav>
-
-          {/* Selector Rápido de Cobertura / Buscador Píldora */}
-          <div className="flex-1 max-w-sm hidden md:flex items-center">
-            <Link
-              href="/catalogo"
-              className="w-full flex items-center gap-2.5 px-4 py-2 text-xs text-neutral-500 bg-neutral-100 hover:bg-neutral-200/70 rounded-full transition-colors border border-neutral-200/60"
-            >
-              <Search className="w-3.5 h-3.5 text-neutral-400" />
-              <span className="truncate">Buscar productos o combos...</span>
-              <MapPin className="w-3.5 h-3.5 text-brand-primary ml-auto shrink-0" />
-            </Link>
+            {/* Enlaces de Navegación estilo KFC (Tipografía en caja mixta y espaciado cómodo) */}
+            <nav className="hidden lg:flex items-center gap-7 text-[13px] sm:text-sm font-semibold text-neutral-800">
+              <Link href="/catalogo" className="hover:text-brand-primary transition-colors">
+                Ordenar
+              </Link>
+              <Link href="/sucursales" className="hover:text-brand-primary transition-colors">
+                Restaurantes
+              </Link>
+              <Link href="/rastreo" className="hover:text-brand-primary transition-colors">
+                Rastrear Pedido
+              </Link>
+              <a href="#sucursales" className="hover:text-brand-primary transition-colors">
+                Nosotros
+              </a>
+            </nav>
           </div>
 
-          {/* Acciones: Carrito */}
-          <div className="flex items-center gap-3">
+          {/* Bloque Derecho: Buscador Píldora + Perfil + Botón Ingresar + Bolsa estilo KFC */}
+          <div className="flex items-center gap-3 sm:gap-4 md:gap-5 shrink-0">
+            {/* Buscador Píldora con fondo gris claro y lupa */}
+            <div className="hidden md:flex items-center">
+              <Link
+                href="/catalogo"
+                className="flex items-center gap-2.5 px-4 py-2 w-48 sm:w-56 lg:w-64 bg-[#f8f7f5] hover:bg-neutral-200/70 rounded-full transition-colors border border-neutral-200/70 text-neutral-500 group"
+              >
+                <Search className="w-4 h-4 text-neutral-500 group-hover:text-brand-primary transition-colors shrink-0" />
+                <span className="text-xs sm:text-sm text-neutral-400 font-normal">Buscar</span>
+              </Link>
+            </div>
+
+            {/* Icono Perfil con etiqueta inferior estilo KFC */}
+            <Link
+              href="/rastreo"
+              className="flex flex-col items-center justify-center text-neutral-800 hover:text-brand-primary transition-colors px-1 shrink-0"
+              title="Mi Perfil"
+            >
+              <User className="w-5 h-5 text-neutral-800 stroke-[1.8]" />
+              <span className="text-[10px] font-semibold text-neutral-700 leading-none mt-1">Perfil</span>
+            </Link>
+
+            {/* Botón Píldora Negra estilo KFC "Ingresar" */}
+            <Link
+              href="/rastreo"
+              className="bg-neutral-950 hover:bg-neutral-800 text-white text-xs font-bold px-4 sm:px-5 py-2 rounded-full transition-colors shadow-sm shrink-0"
+            >
+              Ingresar
+            </Link>
+
+            {/* Bolsa de Compras con Badge Rojo estilo KFC */}
             <CartButtonBadge />
           </div>
+
         </div>
       </header>
 

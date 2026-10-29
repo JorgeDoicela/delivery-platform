@@ -22,23 +22,20 @@ export function CartButtonBadge() {
   return (
     <Link
       href="/finalizar-pedido"
-      className="relative inline-flex items-center gap-2 bg-neutral-100 hover:bg-neutral-200/80 text-neutral-800 text-xs font-semibold px-4 py-2 rounded-full shadow-sm transition-all active:scale-95 border border-neutral-200/80"
+      className="relative flex items-center justify-center p-1.5 text-neutral-800 hover:text-brand-primary transition-colors group shrink-0"
+      aria-label="Ver bolsa de compras"
     >
       <div className="relative">
-        <ShoppingBag className="w-4 h-4 text-brand-primary" />
-        {isClient && count > 0 && (
-          <span className="absolute -top-2 -right-2 w-4 h-4 bg-brand-primary text-white font-black text-[10px] rounded-full flex items-center justify-center animate-bounce">
-            {count}
-          </span>
-        )}
-      </div>
-
-      <div className="flex items-baseline gap-1.5 leading-tight">
-        <span className="text-[11px] text-neutral-500 hidden sm:inline font-medium">Carrito</span>
-        <span className="font-black text-brand-primary tabular-nums">
-          ${isClient ? total.toFixed(2) : "0.00"}
+        <ShoppingBag className="w-6 h-6 text-neutral-900 group-hover:text-brand-primary transition-colors stroke-[1.8]" />
+        <span className="absolute -top-1.5 -right-2 min-w-[18px] h-[18px] px-1 bg-brand-primary text-white font-black text-[10px] rounded-full flex items-center justify-center shadow-sm leading-none">
+          {isClient ? count : 0}
         </span>
       </div>
+      {isClient && total > 0 && (
+        <span className="font-bold text-xs text-neutral-900 ml-1.5 tabular-nums hidden xl:inline">
+          ${total.toFixed(2)}
+        </span>
+      )}
     </Link>
   );
 }
