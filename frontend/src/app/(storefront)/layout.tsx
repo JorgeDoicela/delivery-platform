@@ -41,14 +41,14 @@ export default function StorefrontLayout({
               </div>
             </Link>
 
-            {/* Enlaces de Navegación estilo KFC (Tipografía en caja mixta y espaciado cómodo) */}
+            {/* Enlaces de Navegación estilo KFC con Anclas a la Misma Página */}
             <nav className="hidden lg:flex items-center gap-5 xl:gap-6 text-[13px] sm:text-sm font-semibold text-neutral-800">
-              <Link href="/catalogo" className="hover:text-brand-primary transition-colors">
+              <a href="#catalogo" className="hover:text-brand-primary transition-colors">
                 Ordenar
-              </Link>
-              <Link href="/sucursales" className="hover:text-brand-primary transition-colors">
+              </a>
+              <a href="#sucursales" className="hover:text-brand-primary transition-colors">
                 Restaurantes
-              </Link>
+              </a>
               <Link href="/rastreo" className="hover:text-brand-primary transition-colors">
                 Rastrear Pedido
               </Link>
@@ -60,15 +60,15 @@ export default function StorefrontLayout({
 
           {/* Bloque Derecho: Buscador Píldora + Perfil + Botón Ingresar + Bolsa estilo KFC */}
           <div className="flex items-center gap-3 sm:gap-4 lg:gap-5 shrink-0">
-            {/* Buscador Píldora con fondo gris claro y lupa */}
+            {/* Buscador Píldora con ancla al catálogo */}
             <div className="hidden md:flex items-center">
-              <Link
-                href="/catalogo"
+              <a
+                href="#catalogo"
                 className="flex items-center gap-2.5 px-4 py-2 w-56 sm:w-64 md:w-72 lg:w-80 bg-[#f8f7f5] hover:bg-neutral-200/70 rounded-full transition-colors border border-neutral-200/60 text-neutral-500 group"
               >
                 <Search className="w-4 h-4 text-neutral-500 group-hover:text-brand-primary transition-colors shrink-0" />
                 <span className="text-xs sm:text-sm text-neutral-400 font-normal">Buscar</span>
-              </Link>
+              </a>
             </div>
 
             {/* Icono Perfil con etiqueta inferior estilo KFC */}
