@@ -168,8 +168,8 @@ textarea {
 
 /* Selección de texto con identidad de marca */
 ::selection {
-  background-color: var(--brand-primary-light);
-  color: var(--brand-primary);
+  background-color: var(--brand-primary);
+  color: #ffffff;
 }
 
 /* Accesibilidad y foco uniforme WCAG 2.1 AA */

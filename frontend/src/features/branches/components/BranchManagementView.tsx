@@ -155,7 +155,7 @@ export function BranchManagementView() {
                 {/* Cabecera de Tarjeta */}
                 <div className="flex items-start justify-between">
                   <div>
-                    <span className="text-[10px] font-bold uppercase tracking-wider text-brand-primary bg-brand-primary-light border border-brand-primary/30 px-2.5 py-0.5 rounded-full">
+                    <span className="text-[10px] font-bold uppercase tracking-wider text-neutral-200 bg-neutral-800 border border-neutral-700 px-2.5 py-0.5 rounded-full">
                       ID Sucursal #{branch.id}
                     </span>
                     <h3 className="text-xl font-black uppercase tracking-tight text-text-inverse-strong font-display mt-2">{branch.name}</h3>

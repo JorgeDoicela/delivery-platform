@@ -50,7 +50,7 @@ export function OrderSearchView() {
                 if (error) setError(null);
               }}
               placeholder="Ej. 3fa85f64-5717-4562-b3fc-2c963f66afa6"
-              className="w-full text-xs pl-5 pr-12 py-3.5 rounded-full border border-surface-border bg-surface-card text-text-strong focus:outline-none focus:ring-2 focus:ring-brand-primary/20 focus:border-brand-primary font-mono"
+              className="w-full text-xs pl-5 pr-12 py-3.5 rounded-full border border-surface-border bg-surface-card text-text-strong focus:outline-none focus:ring-1 focus:ring-brand-primary focus:border-brand-primary font-mono"
             />
             <Search className="w-4 h-4 text-text-subtle absolute right-4 top-4" />
           </div>

@@ -106,7 +106,7 @@ export function ModifierModal({ product, onClose }: ModifierModalProps) {
         {/* Header Modal */}
         <div className="p-4 sm:p-6 border-b border-surface-border-subtle flex items-start justify-between">
           <div>
-            <span className="text-[10px] font-bold uppercase tracking-wider text-brand-primary bg-brand-primary-light/50 px-2.5 py-0.5 rounded-full">
+            <span className="text-[10px] font-bold uppercase tracking-wider text-neutral-800 bg-neutral-100 border border-neutral-200 px-2.5 py-0.5 rounded-full">
               {product.category}
             </span>
             <h3 className="text-2xl font-black uppercase tracking-tight text-text-strong mt-1.5 font-display">
@@ -168,7 +168,7 @@ export function ModifierModal({ product, onClose }: ModifierModalProps) {
                         onClick={() => handleToggleOption(group, option.id)}
                         className={`w-full flex items-center justify-between p-3.5 rounded-xl border text-left text-xs transition-all ${
                           isSelected
-                            ? "border-brand-primary bg-brand-primary-light/40 shadow-sm ring-1 ring-brand-primary/20"
+                            ? "border-2 border-brand-primary bg-neutral-50 shadow-sm"
                             : "border-surface-border hover:border-surface-border-subtle bg-surface-card"
                         }`}
                       >

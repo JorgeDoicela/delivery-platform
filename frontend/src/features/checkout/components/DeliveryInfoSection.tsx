@@ -13,7 +13,7 @@ export function DeliveryInfoSection({ register, errors }: DeliveryInfoSectionPro
   return (
     <div className="bg-surface-card rounded-2xl border border-surface-border p-5 space-y-4 shadow-sm">
       <div className="flex items-center gap-2 pb-3 border-b border-surface-border-subtle">
-        <div className="w-8 h-8 rounded-lg bg-brand-primary-light text-brand-primary flex items-center justify-center">
+        <div className="w-8 h-8 rounded-lg bg-neutral-100 text-neutral-900 flex items-center justify-center">
           <User className="w-4 h-4" />
         </div>
         <div>
@@ -32,7 +32,7 @@ export function DeliveryInfoSection({ register, errors }: DeliveryInfoSectionPro
           <input
             {...register("customerName")}
             placeholder="Ej. Carlos Mendoza"
-            className="w-full text-xs px-3.5 py-2.5 rounded-xl border border-surface-border focus:outline-none focus:ring-2 focus:ring-brand-primary/20 focus:border-brand-primary bg-surface-card text-text-strong"
+            className="w-full text-xs px-3.5 py-2.5 rounded-xl border border-surface-border focus:outline-none focus:ring-1 focus:ring-brand-primary focus:border-brand-primary bg-surface-card text-text-strong"
           />
           {errors.customerName && (
             <p className="text-[11px] text-status-danger mt-1 font-medium">
@@ -48,7 +48,7 @@ export function DeliveryInfoSection({ register, errors }: DeliveryInfoSectionPro
           <input
             {...register("customerPhone")}
             placeholder="Ej. 0987654321"
-            className="w-full text-xs px-3.5 py-2.5 rounded-xl border border-surface-border focus:outline-none focus:ring-2 focus:ring-brand-primary/20 focus:border-brand-primary bg-surface-card text-text-strong"
+            className="w-full text-xs px-3.5 py-2.5 rounded-xl border border-surface-border focus:outline-none focus:ring-1 focus:ring-brand-primary focus:border-brand-primary bg-surface-card text-text-strong"
           />
           {errors.customerPhone && (
             <p className="text-[11px] text-status-danger mt-1 font-medium">
@@ -64,7 +64,7 @@ export function DeliveryInfoSection({ register, errors }: DeliveryInfoSectionPro
           <input
             {...register("addressStreet")}
             placeholder="Ej. Av. Amazonas N34-120 y República"
-            className="w-full text-xs px-3.5 py-2.5 rounded-xl border border-surface-border focus:outline-none focus:ring-2 focus:ring-brand-primary/20 focus:border-brand-primary bg-surface-card text-text-strong"
+            className="w-full text-xs px-3.5 py-2.5 rounded-xl border border-surface-border focus:outline-none focus:ring-1 focus:ring-brand-primary focus:border-brand-primary bg-surface-card text-text-strong"
           />
           {errors.addressStreet && (
             <p className="text-[11px] text-status-danger mt-1 font-medium">
@@ -80,7 +80,7 @@ export function DeliveryInfoSection({ register, errors }: DeliveryInfoSectionPro
           <input
             {...register("addressReference")}
             placeholder="Ej. Edificio Sky, Timbre 4B, junto a la farmacia"
-            className="w-full text-xs px-3.5 py-2.5 rounded-xl border border-surface-border focus:outline-none focus:ring-2 focus:ring-brand-primary/20 focus:border-brand-primary bg-surface-card text-text-strong"
+            className="w-full text-xs px-3.5 py-2.5 rounded-xl border border-surface-border focus:outline-none focus:ring-1 focus:ring-brand-primary focus:border-brand-primary bg-surface-card text-text-strong"
           />
         </div>
       </div>

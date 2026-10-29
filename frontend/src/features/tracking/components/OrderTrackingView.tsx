@@ -95,7 +95,7 @@ export function OrderTrackingView({ orderId }: OrderTrackingViewProps) {
                       ? 'bg-status-danger/15 text-status-danger border border-status-danger/30'
                       : order.status === OrderStatus.Delivered
                       ? 'bg-status-success/15 text-status-success border border-status-success/30'
-                      : 'bg-brand-primary/10 text-brand-primary border border-brand-primary/25'
+                      : 'bg-neutral-900 text-white border border-neutral-800'
                   }`}
                 >
                   {statusLabels[order.status as OrderStatus] || `Estado ${order.status}`}

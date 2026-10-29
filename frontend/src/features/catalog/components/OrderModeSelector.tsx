@@ -28,10 +28,10 @@ export function OrderModeSelector() {
         <button
           type="button"
           onClick={() => handleSelectMode("delivery")}
-          className={`group relative overflow-hidden p-6 sm:p-8 rounded-2xl flex flex-col sm:flex-row items-center justify-center gap-5 text-left transition-all active:scale-98 shadow-md bg-brand-primary hover:bg-brand-primary-hover text-white ${
+          className={`group relative overflow-hidden p-6 sm:p-8 rounded-2xl flex flex-col sm:flex-row items-center justify-center gap-5 text-left transition-all active:scale-98 bg-brand-primary hover:bg-brand-primary-hover text-white ${
             deliveryType === "delivery"
-              ? "ring-4 ring-brand-primary/30 shadow-xl"
-              : ""
+              ? "shadow-2xl scale-[1.01]"
+              : "shadow-md opacity-90 hover:opacity-100"
           }`}
         >
           <div className="w-16 h-16 rounded-2xl bg-white/20 flex items-center justify-center shrink-0 border border-white/25">
@@ -59,10 +59,10 @@ export function OrderModeSelector() {
         <button
           type="button"
           onClick={() => handleSelectMode("takeout")}
-          className={`group relative overflow-hidden p-6 sm:p-8 rounded-2xl flex flex-col sm:flex-row items-center justify-center gap-5 text-left transition-all active:scale-98 shadow-md bg-brand-primary hover:bg-brand-primary-hover text-white ${
+          className={`group relative overflow-hidden p-6 sm:p-8 rounded-2xl flex flex-col sm:flex-row items-center justify-center gap-5 text-left transition-all active:scale-98 bg-brand-primary hover:bg-brand-primary-hover text-white ${
             deliveryType === "takeout"
-              ? "ring-4 ring-brand-primary/30 shadow-xl"
-              : ""
+              ? "shadow-2xl scale-[1.01]"
+              : "shadow-md opacity-90 hover:opacity-100"
           }`}
         >
           <div className="w-16 h-16 rounded-2xl bg-white/20 flex items-center justify-center shrink-0 border border-white/25">

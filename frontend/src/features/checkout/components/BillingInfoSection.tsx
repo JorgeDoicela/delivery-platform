@@ -18,7 +18,7 @@ export function BillingInfoSection({
   return (
     <div className="bg-surface-card rounded-2xl border border-surface-border p-5 space-y-4 shadow-sm">
       <div className="flex items-center gap-2 pb-3 border-b border-surface-border-subtle">
-        <div className="w-8 h-8 rounded-lg bg-brand-primary-light text-brand-primary flex items-center justify-center">
+        <div className="w-8 h-8 rounded-lg bg-neutral-100 text-neutral-900 flex items-center justify-center">
           <FileText className="w-4 h-4" />
         </div>
         <div>
@@ -45,7 +45,7 @@ export function BillingInfoSection({
                 setValue("identificationNumber", "");
               }
             }}
-            className="w-full text-xs px-3.5 py-2.5 rounded-xl border border-surface-border bg-surface-card text-text-strong focus:outline-none focus:ring-2 focus:ring-brand-primary/20 focus:border-brand-primary"
+            className="w-full text-xs px-3.5 py-2.5 rounded-xl border border-surface-border bg-surface-card text-text-strong focus:outline-none focus:ring-1 focus:ring-brand-primary focus:border-brand-primary"
           >
             <option value="CONSUMIDOR_FINAL">Consumidor Final</option>
             <option value="CEDULA">Cédula de Identidad</option>
@@ -60,7 +60,7 @@ export function BillingInfoSection({
           <input
             {...register("identificationNumber")}
             placeholder="9999999999999"
-            className="w-full text-xs px-3.5 py-2.5 rounded-xl border border-surface-border bg-surface-card text-text-strong focus:outline-none focus:ring-2 focus:ring-brand-primary/20 focus:border-brand-primary"
+            className="w-full text-xs px-3.5 py-2.5 rounded-xl border border-surface-border bg-surface-card text-text-strong focus:outline-none focus:ring-1 focus:ring-brand-primary focus:border-brand-primary"
           />
           {errors.identificationNumber && (
             <p className="text-[11px] text-status-danger mt-1 font-medium">

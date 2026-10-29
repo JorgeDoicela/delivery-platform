@@ -22,7 +22,7 @@ export default function SucursalesPage() {
         <div className="bg-surface-card border border-surface-border rounded-3xl p-6 sm:p-8 space-y-5 shadow-sm">
           <div className="flex items-start justify-between">
             <div>
-              <span className="text-[10px] font-bold uppercase tracking-wider text-brand-primary bg-brand-primary-light px-2.5 py-0.5 rounded-full">
+              <span className="text-[10px] font-bold uppercase tracking-wider text-neutral-800 bg-neutral-100 border border-neutral-200 px-2.5 py-0.5 rounded-full">
                 Sucursal #1
               </span>
               <h2 className="text-2xl font-black uppercase tracking-tight text-text-strong font-display mt-2">
@@ -62,7 +62,7 @@ export default function SucursalesPage() {
         <div className="bg-surface-card border border-surface-border rounded-3xl p-6 sm:p-8 space-y-5 shadow-sm">
           <div className="flex items-start justify-between">
             <div>
-              <span className="text-[10px] font-bold uppercase tracking-wider text-brand-primary bg-brand-primary-light px-2.5 py-0.5 rounded-full">
+              <span className="text-[10px] font-bold uppercase tracking-wider text-neutral-800 bg-neutral-100 border border-neutral-200 px-2.5 py-0.5 rounded-full">
                 Sucursal #2
               </span>
               <h2 className="text-2xl font-black uppercase tracking-tight text-text-strong font-display mt-2">

@@ -198,8 +198,8 @@ export function OrderMap({ destination, driverLocation, className = '' }: OrderM
           Rastreo Vectorial
         </span>
         {driverLocation && (
-          <span className="flex items-center gap-1.5 px-3.5 py-1.5 rounded-full bg-brand-primary/20 backdrop-blur-md border border-brand-primary/40 text-[10px] font-bold uppercase tracking-wider text-brand-primary animate-pulse shadow-md">
-            <span className="h-2 w-2 rounded-full bg-brand-primary" />
+          <span className="flex items-center gap-1.5 px-3.5 py-1.5 rounded-full bg-brand-primary text-white border border-brand-primary-hover text-[10px] font-bold uppercase tracking-wider animate-pulse shadow-md">
+            <span className="h-2 w-2 rounded-full bg-white" />
             GPS Activo
           </span>
         )}

@@ -51,7 +51,7 @@ export function StatusTimeline({ status }: StatusTimelineProps) {
                   isCompleted
                     ? 'bg-status-success text-text-inverse-strong'
                     : isCurrent
-                    ? 'bg-brand-primary text-white ring-4 ring-brand-primary/20 scale-110 shadow-md'
+                    ? 'bg-brand-primary text-white scale-110 shadow-lg'
                     : 'bg-surface-canvas border border-surface-border text-text-muted'
                 }`}
               >

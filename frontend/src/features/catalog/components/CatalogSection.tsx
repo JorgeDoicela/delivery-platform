@@ -32,7 +32,7 @@ export function CatalogSection() {
 
   if (isError || !data) {
     return (
-      <div className="bg-brand-primary-light/40 border border-brand-primary/30 rounded-2xl p-8 text-center space-y-3">
+      <div className="bg-surface-card border border-surface-border rounded-2xl p-8 text-center space-y-3 shadow-sm">
         <AlertTriangle className="w-8 h-8 text-brand-primary mx-auto" />
         <h3 className="font-bold text-text-strong text-sm">
           No se pudo sincronizar el menú en vivo
@@ -71,8 +71,8 @@ export function CatalogSection() {
               onClick={() => setSelectedCategory(category)}
               className={`px-5 py-2.5 rounded-full text-xs font-bold uppercase tracking-wider transition-all whitespace-nowrap shadow-sm ${
                 isSelected
-                  ? "bg-brand-primary text-text-inverse-strong shadow-brand-primary/30 scale-105"
-                  : "bg-surface-card text-text-base hover:bg-surface-card-hover border border-surface-border hover:border-brand-primary/40"
+                  ? "bg-brand-primary text-text-inverse-strong shadow-lg scale-105"
+                  : "bg-surface-card text-text-base hover:bg-surface-card-hover border border-surface-border hover:border-neutral-400"
               }`}
             >
               {category}

@@ -42,7 +42,7 @@ export function PaymentMethodSection({
           onClick={() => setValue("paymentMethod", 1)}
           className={`p-4 rounded-2xl border text-left text-xs transition-all flex flex-col justify-between ${
             selectedPaymentMethod === 1
-              ? "border-brand-primary bg-brand-primary-light/40 shadow-sm ring-1 ring-brand-primary/25"
+              ? "border-2 border-brand-primary bg-white shadow-sm"
               : "border-surface-border hover:border-surface-border-subtle bg-surface-card"
           }`}
         >
@@ -63,7 +63,7 @@ export function PaymentMethodSection({
           onClick={() => setValue("paymentMethod", 2)}
           className={`p-4 rounded-2xl border text-left text-xs transition-all flex flex-col justify-between ${
             selectedPaymentMethod === 2
-              ? "border-brand-primary bg-brand-primary-light/40 shadow-sm ring-1 ring-brand-primary/25"
+              ? "border-2 border-brand-primary bg-white shadow-sm"
               : "border-surface-border hover:border-surface-border-subtle bg-surface-card"
           }`}
         >
@@ -109,7 +109,7 @@ export function PaymentMethodSection({
               step="0.01"
               {...register("cashAmountPaid", { valueAsNumber: true })}
               placeholder={`Monto exacto (mínimo ${formatCurrency(total)})`}
-              className="w-full text-xs px-3.5 py-2.5 rounded-xl border border-surface-border bg-surface-card text-text-strong focus:outline-none focus:ring-2 focus:ring-brand-primary/20 focus:border-brand-primary"
+              className="w-full text-xs px-3.5 py-2.5 rounded-xl border border-surface-border bg-surface-card text-text-strong focus:outline-none focus:ring-1 focus:ring-brand-primary focus:border-brand-primary"
             />
           </div>
 
