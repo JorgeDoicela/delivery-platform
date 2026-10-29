@@ -34,6 +34,15 @@ const HERO_SLIDES: HeroSlide[] = [
     ctaHref: "/catalogo",
     imageUrl: "/images/banners/hero-combo-familiar.jpg",
   },
+  {
+    badge: "Favorito del Almuerzo",
+    title: "COMBO CUARTO DE POLLO CLÁSICO",
+    subtitle: "Presa dorada y jugosa con papas fritas rústicas artesanales, ensalada fresca, ají criollo y bebida personal.",
+    highlightPrice: "$5.99",
+    ctaText: "ORDENA AQUÍ",
+    ctaHref: "/catalogo",
+    imageUrl: "/images/banners/hero-combo-personal.jpg",
+  },
 ];
 
 export function CatalogHero() {
