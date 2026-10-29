@@ -10,8 +10,8 @@ export default function StorefrontLayout({
 }) {
   return (
     <div className="flex flex-col min-h-screen bg-surface-canvas">
-      {/* Header Comercial Blanco Limpio estilo KFC con Barra Roja Inferior */}
-      <header className="sticky top-0 z-40 bg-white border-b-2 border-brand-primary shadow-sm">
+      {/* Header Comercial Blanco Limpio estilo KFC */}
+      <header className="sticky top-0 z-40 bg-white border-b border-neutral-200/80 shadow-xs">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 sm:h-[68px] flex items-center justify-between gap-4 sm:gap-6 lg:gap-8">
           
           {/* Bloque Izquierdo: Logo + Navegación Agrupada con Espaciado estilo KFC */}
