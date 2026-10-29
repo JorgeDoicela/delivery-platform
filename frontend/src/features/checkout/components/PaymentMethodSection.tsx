@@ -29,7 +29,7 @@ export function PaymentMethodSection({
           <Banknote className="w-4 h-4" />
         </div>
         <div>
-          <h3 className="text-sm font-bold text-text-strong">Método de Pago</h3>
+          <h3 className="text-sm font-bold uppercase tracking-wider text-text-strong font-display">Método de Pago</h3>
           <p className="text-[11px] text-text-muted">
             Selecciona cómo deseas cancelar tu pedido
           </p>
@@ -40,9 +40,9 @@ export function PaymentMethodSection({
         <button
           type="button"
           onClick={() => setValue("paymentMethod", 1)}
-          className={`p-3.5 rounded-xl border text-left text-xs transition-all flex flex-col justify-between ${
+          className={`p-4 rounded-2xl border text-left text-xs transition-all flex flex-col justify-between ${
             selectedPaymentMethod === 1
-              ? "border-brand-primary bg-brand-primary-light shadow-sm"
+              ? "border-brand-primary bg-brand-primary-light/40 shadow-sm ring-1 ring-brand-primary/25"
               : "border-surface-border hover:border-surface-border-subtle bg-surface-card"
           }`}
         >
@@ -61,16 +61,16 @@ export function PaymentMethodSection({
         <button
           type="button"
           onClick={() => setValue("paymentMethod", 2)}
-          className={`p-3.5 rounded-xl border text-left text-xs transition-all flex flex-col justify-between ${
+          className={`p-4 rounded-2xl border text-left text-xs transition-all flex flex-col justify-between ${
             selectedPaymentMethod === 2
-              ? "border-status-info bg-status-info/10 shadow-sm"
+              ? "border-brand-primary bg-brand-primary-light/40 shadow-sm ring-1 ring-brand-primary/25"
               : "border-surface-border hover:border-surface-border-subtle bg-surface-card"
           }`}
         >
           <div className="flex items-center justify-between mb-2">
-            <Building2 className="w-5 h-5 text-status-info" />
+            <Building2 className="w-5 h-5 text-brand-primary" />
             {selectedPaymentMethod === 2 && (
-              <CheckCircle2 className="w-4 h-4 text-status-info" />
+              <CheckCircle2 className="w-4 h-4 text-brand-primary" />
             )}
           </div>
           <div>
@@ -82,7 +82,7 @@ export function PaymentMethodSection({
 
       {/* Detalle si selecciona Efectivo */}
       {selectedPaymentMethod === 1 && (
-        <div className="p-4 bg-surface-canvas border border-surface-border rounded-xl space-y-3 animate-in fade-in text-xs">
+        <div className="p-4 bg-surface-canvas border border-surface-border rounded-2xl space-y-3 animate-in fade-in text-xs">
           <label className="block font-bold text-text-strong">
             ¿Con cuánto billete pagarás para enviarte cambio exacto?
           </label>
@@ -92,9 +92,9 @@ export function PaymentMethodSection({
                 key={amount}
                 type="button"
                 onClick={() => setValue("cashAmountPaid", amount)}
-                className={`px-3 py-1.5 rounded-lg border font-bold text-xs transition-colors ${
+                className={`px-4 py-2 rounded-full border font-bold text-xs transition-colors ${
                   cashAmountPaid === amount
-                    ? "bg-brand-primary text-text-inverse-strong border-brand-primary"
+                    ? "bg-brand-primary text-text-inverse-strong border-brand-primary shadow-sm"
                     : "bg-surface-card text-text-base border-surface-border hover:bg-surface-canvas"
                 }`}
               >
@@ -129,7 +129,7 @@ export function PaymentMethodSection({
         <div className="p-4 bg-status-info/10 border border-status-info/30 rounded-xl space-y-2 text-xs text-status-info animate-in fade-in">
           <p className="font-bold">Datos Bancarios para Transferencia:</p>
           <p className="text-[11px] leading-relaxed">
-            Banco Pichincha | Cta. Corriente: 2100456789 | Titular: La Granjita S.A. | RUC: 1792345678001
+            Banco Pichincha | Cta. Corriente: 2100456789 | Titular: La Granjita Asadero S.A. | RUC: 1792345678001
           </p>
           <p className="text-[10px] text-status-info/90">
             * El cajero verificará la acreditación bancaria antes de enviar la orden al horno.

@@ -21,7 +21,7 @@ export function CartButtonBadge() {
 
   return (
     <Link
-      href="/checkout"
+      href="/finalizar-pedido"
       className="relative inline-flex items-center gap-2 bg-neutral-100 hover:bg-neutral-200/80 text-neutral-800 text-xs font-semibold px-4 py-2 rounded-full shadow-sm transition-all active:scale-95 border border-neutral-200/80"
     >
       <div className="relative">

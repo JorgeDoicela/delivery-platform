@@ -47,19 +47,19 @@ export function StatusTimeline({ status }: StatusTimelineProps) {
           return (
             <div key={s.step} className="flex flex-col items-center text-center">
               <div
-                className={`h-8 w-8 rounded-full flex items-center justify-center font-bold text-xs mb-2 transition-all ${
+                className={`h-9 w-9 rounded-full flex items-center justify-center font-bold text-xs mb-2 transition-all shadow-sm ${
                   isCompleted
                     ? 'bg-status-success text-text-inverse-strong'
                     : isCurrent
-                    ? 'bg-brand-accent text-surface-dark ring-4 ring-brand-accent/20'
+                    ? 'bg-brand-primary text-white ring-4 ring-brand-primary/20 scale-110 shadow-md'
                     : 'bg-surface-canvas border border-surface-border text-text-muted'
                 }`}
               >
                 {isCompleted ? <CheckCircle2 className="h-4 w-4" /> : s.step}
               </div>
               <span
-                className={`text-[11px] leading-tight font-medium ${
-                  isCurrent ? 'text-brand-accent font-bold' : isCompleted ? 'text-text-strong' : 'text-text-muted'
+                className={`text-[10px] uppercase tracking-wider leading-tight ${
+                  isCurrent ? 'text-brand-primary font-black' : isCompleted ? 'text-text-strong font-bold' : 'text-text-muted font-medium'
                 }`}
               >
                 {s.label}

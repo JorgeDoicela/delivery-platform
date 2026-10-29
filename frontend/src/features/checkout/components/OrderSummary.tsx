@@ -26,14 +26,14 @@ export function OrderSummary() {
           <ShoppingBag className="w-6 h-6" />
         </div>
         <div>
-          <h3 className="font-bold text-text-strong text-base">Tu pedido está vacío</h3>
-          <p className="text-xs text-text-muted mt-1">
-            Agrega deliciosos combos de pollo asado desde nuestro menú.
+          <h3 className="font-bold text-text-strong text-base font-display uppercase tracking-wide">Tu pedido está vacío</h3>
+          <p className="text-xs text-text-muted mt-1 leading-relaxed">
+            Agrega deliciosos combos de pollo asado desde nuestro menú para continuar.
           </p>
         </div>
         <Link
-          href="/"
-          className="inline-flex items-center justify-center bg-brand-primary hover:bg-brand-primary-hover text-text-inverse-strong text-xs font-bold py-2.5 px-5 rounded-xl shadow-md shadow-brand-primary/20 transition-all active:scale-95"
+          href="/catalogo"
+          className="inline-flex items-center justify-center bg-brand-primary hover:bg-brand-primary-hover text-text-inverse-strong text-xs font-black uppercase tracking-wider py-3.5 px-7 rounded-full shadow-md shadow-brand-primary/25 transition-all active:scale-95"
         >
           Explorar el Menú
         </Link>
@@ -44,37 +44,37 @@ export function OrderSummary() {
   return (
     <div className="bg-surface-card rounded-2xl border border-surface-border p-5 space-y-5 shadow-sm">
       <div className="flex items-center justify-between pb-3 border-b border-surface-border-subtle">
-        <h3 className="text-sm font-bold text-text-strong">Resumen del Pedido</h3>
-        <span className="text-xs text-text-muted font-medium">
+        <h3 className="text-sm font-bold uppercase tracking-wider text-text-strong font-display">Resumen del Pedido</h3>
+        <span className="text-xs text-text-muted font-bold uppercase tracking-wider bg-surface-canvas px-2.5 py-0.5 rounded-full border border-surface-border">
           {items.reduce((acc, i) => acc + i.quantity, 0)} ítems
         </span>
       </div>
 
       {/* Selector de Modalidad (Delivery vs Takeout) */}
-      <div className="grid grid-cols-2 gap-2 p-1 bg-surface-canvas rounded-xl">
+      <div className="grid grid-cols-2 gap-2 p-1 bg-surface-canvas rounded-full border border-surface-border">
         <button
           type="button"
           onClick={() => setDeliveryType("delivery")}
-          className={`flex items-center justify-center gap-1.5 py-2 text-xs font-bold rounded-lg transition-all ${
+          className={`flex items-center justify-center gap-1.5 py-2.5 text-xs font-bold uppercase tracking-wider rounded-full transition-all ${
             deliveryType === "delivery"
-              ? "bg-surface-card text-text-strong shadow-sm"
+              ? "bg-brand-primary text-white shadow-sm"
               : "text-text-muted hover:text-text-strong"
           }`}
         >
-          <Truck className="w-3.5 h-3.5 text-brand-primary" />
+          <Truck className="w-3.5 h-3.5" />
           <span>A Domicilio</span>
         </button>
 
         <button
           type="button"
           onClick={() => setDeliveryType("takeout")}
-          className={`flex items-center justify-center gap-1.5 py-2 text-xs font-bold rounded-lg transition-all ${
+          className={`flex items-center justify-center gap-1.5 py-2.5 text-xs font-bold uppercase tracking-wider rounded-full transition-all ${
             deliveryType === "takeout"
-              ? "bg-surface-card text-text-strong shadow-sm"
+              ? "bg-brand-primary text-white shadow-sm"
               : "text-text-muted hover:text-text-strong"
           }`}
         >
-          <Store className="w-3.5 h-3.5 text-brand-primary" />
+          <Store className="w-3.5 h-3.5" />
           <span>Retiro en Local</span>
         </button>
       </div>
@@ -156,9 +156,9 @@ export function OrderSummary() {
           </span>
         </div>
 
-        <div className="pt-2 border-t border-surface-border flex justify-between items-center text-sm font-black text-text-strong">
+        <div className="pt-2.5 border-t border-surface-border flex justify-between items-center text-sm font-black text-text-strong font-display uppercase tracking-wide">
           <span>Total a Pagar:</span>
-          <span className="text-lg text-brand-primary tabular-nums">{formatCurrency(total)}</span>
+          <span className="text-xl text-brand-primary font-mono tabular-nums">{formatCurrency(total)}</span>
         </div>
       </div>
     </div>

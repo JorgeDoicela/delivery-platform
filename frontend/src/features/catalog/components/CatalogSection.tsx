@@ -42,7 +42,7 @@ export function CatalogSection() {
         </p>
         <button
           onClick={() => refetch()}
-          className="inline-flex items-center gap-2 bg-surface-dark text-text-inverse-strong text-xs font-semibold px-4 py-2 rounded-xl hover:bg-surface-dark-hover transition-colors"
+          className="inline-flex items-center gap-2 bg-neutral-900 hover:bg-neutral-800 text-white text-xs font-bold uppercase tracking-wider px-6 py-2.5 rounded-full transition-all active:scale-95 shadow-sm"
         >
           <RefreshCw className="w-3.5 h-3.5" />
           <span>Reintentar</span>

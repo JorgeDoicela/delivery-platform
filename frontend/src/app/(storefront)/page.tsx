@@ -6,8 +6,8 @@ import {
 } from "@/features/catalog";
 
 export const metadata = {
-  title: "La Granjita | Pollo a la Brasa y Pedidos Directos",
-  description: "Pollo asado al carbón y combos familiares directos a tu domicilio desde La Granjita.",
+  title: "La Granjita Asadero | Pedidos Directos y Delivery",
+  description: "Pollo asado al carbón y combos familiares directos a tu domicilio desde La Granjita Asadero.",
 };
 
 export default function StorefrontHomePage() {
@@ -16,8 +16,8 @@ export default function StorefrontHomePage() {
       {/* 1. Gran Banner Panorámico Promocional (Estilo Hero KFC a Ancho Completo) */}
       <CatalogHero />
 
-      {/* Contenedor centralizado para el resto de secciones */}
-      <div className="w-full max-w-7xl mx-auto px-4 sm:px-8 lg:px-12 space-y-12">
+      {/* Contenedor a ancho completo para el resto de secciones */}
+      <div className="w-full px-4 sm:px-8 lg:px-12 space-y-12">
         {/* 2. Selector Principal: ¿Cómo te gustaría ordenar hoy? (Estilo Bloques Rojos KFC) */}
         <OrderModeSelector />
 

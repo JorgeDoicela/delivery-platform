@@ -28,8 +28,8 @@ export const viewport: Viewport = {
 };
 
 export const metadata: Metadata = {
-  title: "La Granjita | Pollo a la Brasa y Pedidos Directos",
-  description: "Plataforma de delivery directa de La Granjita. Pollo a la brasa al carbón y leña.",
+  title: "La Granjita Asadero | Pedidos Directos y Delivery",
+  description: "Plataforma de delivery directa de La Granjita Asadero. Pollo asado al carbón y leña seleccionada.",
   manifest: "/manifest.json",
 };
 

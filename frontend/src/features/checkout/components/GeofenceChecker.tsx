@@ -74,11 +74,11 @@ export function GeofenceChecker({ onLocationResolved }: GeofenceCheckerProps) {
     <div className="bg-surface-card rounded-2xl border border-surface-border p-5 space-y-4 shadow-sm">
       <div className="flex items-center justify-between pb-3 border-b border-surface-border-subtle">
         <div className="flex items-center gap-2">
-          <div className="w-8 h-8 rounded-lg bg-brand-primary-light/60 text-brand-primary flex items-center justify-center">
+          <div className="w-8 h-8 rounded-lg bg-brand-primary-light text-brand-primary flex items-center justify-center">
             <MapPin className="w-4 h-4" />
           </div>
           <div>
-            <h3 className="text-sm font-bold text-text-strong">Validación de Cobertura</h3>
+            <h3 className="text-sm font-bold uppercase tracking-wider text-text-strong font-display">Validación de Cobertura</h3>
             <p className="text-[11px] text-text-muted">
               Verificamos con PostGIS la sucursal más cercana para tu entrega
             </p>
@@ -93,12 +93,12 @@ export function GeofenceChecker({ onLocationResolved }: GeofenceCheckerProps) {
             type="button"
             onClick={handleGetCurrentLocation}
             disabled={isLoading}
-            className="flex items-center justify-center gap-2 bg-surface-dark hover:bg-surface-dark-hover disabled:bg-surface-border text-text-inverse-strong text-xs font-bold py-2.5 px-4 rounded-xl shadow-sm transition-all active:scale-95"
+            className="flex items-center justify-center gap-2 bg-neutral-900 hover:bg-neutral-800 disabled:bg-surface-border text-white text-xs font-bold uppercase tracking-wider py-3 px-5 rounded-full shadow-sm transition-all active:scale-95"
           >
             {isLoading ? (
-              <Loader2 className="w-4 h-4 animate-spin text-brand-accent" />
+              <Loader2 className="w-4 h-4 animate-spin text-amber-300" />
             ) : (
-              <Navigation className="w-4 h-4 text-brand-accent" />
+              <Navigation className="w-4 h-4 text-amber-300" />
             )}
             <span>Detectar mi GPS</span>
           </button>
@@ -106,13 +106,13 @@ export function GeofenceChecker({ onLocationResolved }: GeofenceCheckerProps) {
           <button
             type="button"
             onClick={() => setShowMap(!showMap)}
-            className={`flex items-center justify-center gap-2 text-xs font-bold py-2.5 px-4 rounded-xl border transition-all active:scale-95 ${
+            className={`flex items-center justify-center gap-2 text-xs font-bold uppercase tracking-wider py-3 px-5 rounded-full border transition-all active:scale-95 ${
               showMap
-                ? 'bg-brand-primary-light/40 border-brand-primary text-brand-primary'
-                : 'bg-surface-card border-surface-border hover:bg-surface-card-hover text-text-base'
+                ? 'bg-brand-primary text-white border-brand-primary shadow-sm'
+                : 'bg-surface-card border-surface-border hover:bg-surface-card-hover text-text-strong'
             }`}
           >
-            <MapPin className="w-4 h-4 text-brand-primary" />
+            <MapPin className="w-4 h-4" />
             <span>{showMap ? 'Ocultar Mapa' : 'Seleccionar en Mapa'}</span>
           </button>
         </div>

@@ -105,18 +105,19 @@ export function ModifierModal({ product, onClose }: ModifierModalProps) {
         {/* Header Modal */}
         <div className="p-4 sm:p-6 border-b border-surface-border-subtle flex items-start justify-between">
           <div>
-            <span className="text-[10px] font-bold uppercase tracking-wider text-brand-primary bg-brand-primary-light/50 px-2 py-0.5 rounded">
+            <span className="text-[10px] font-bold uppercase tracking-wider text-brand-primary bg-brand-primary-light/50 px-2.5 py-0.5 rounded-full">
               {product.category}
             </span>
-            <h3 className="text-xl font-black text-text-strong mt-1">
+            <h3 className="text-2xl font-black uppercase tracking-tight text-text-strong mt-1.5 font-display">
               {product.name}
             </h3>
-            <p className="text-xs text-text-muted mt-0.5 line-clamp-2">
+            <p className="text-xs text-text-muted mt-0.5 line-clamp-2 leading-relaxed">
               {product.description}
             </p>
           </div>
           <button
             onClick={onClose}
+            aria-label="Cerrar modal"
             className="p-1.5 rounded-full hover:bg-surface-card-hover text-text-muted hover:text-text-strong transition-colors"
           >
             <X className="w-5 h-5" />
@@ -143,7 +144,7 @@ export function ModifierModal({ product, onClose }: ModifierModalProps) {
                     </p>
                   </div>
                   <span
-                    className={`text-[10px] font-bold px-2 py-0.5 rounded ${
+                    className={`text-[10px] font-bold uppercase tracking-wider px-2.5 py-0.5 rounded-full ${
                       group.isRequired
                         ? isGroupValid
                           ? "bg-status-success-bg text-status-success"
@@ -164,9 +165,9 @@ export function ModifierModal({ product, onClose }: ModifierModalProps) {
                         key={option.id}
                         type="button"
                         onClick={() => handleToggleOption(group, option.id)}
-                        className={`w-full flex items-center justify-between p-3 rounded-xl border text-left text-xs transition-all ${
+                        className={`w-full flex items-center justify-between p-3.5 rounded-xl border text-left text-xs transition-all ${
                           isSelected
-                            ? "border-brand-primary bg-brand-primary-light/30 shadow-sm"
+                            ? "border-brand-primary bg-brand-primary-light/40 shadow-sm ring-1 ring-brand-primary/20"
                             : "border-surface-border hover:border-surface-border-subtle bg-surface-card"
                         }`}
                       >
@@ -189,7 +190,7 @@ export function ModifierModal({ product, onClose }: ModifierModalProps) {
                           </span>
                         </div>
 
-                        <span className="font-semibold text-text-muted">
+                        <span className="font-bold text-text-muted tabular-nums">
                           {option.additionalPrice > 0
                             ? `+ ${formatCurrency(option.additionalPrice)}`
                             : "Incluido"}
@@ -206,22 +207,24 @@ export function ModifierModal({ product, onClose }: ModifierModalProps) {
         {/* Footer Modal: Cantidad y Botón de Acción */}
         <div className="p-4 sm:p-6 bg-surface-canvas border-t border-surface-border-subtle flex items-center justify-between gap-4">
           {/* Stepper Cantidad */}
-          <div className="flex items-center gap-2 bg-surface-card border border-surface-border rounded-xl p-1 shadow-sm">
+          <div className="flex items-center gap-2 bg-surface-card border border-surface-border rounded-full p-1 shadow-sm">
             <button
               type="button"
               onClick={() => setQuantity((q) => Math.max(1, q - 1))}
               disabled={quantity <= 1}
-              className="w-8 h-8 rounded-lg flex items-center justify-center text-text-base hover:bg-surface-card-hover disabled:opacity-30 disabled:hover:bg-transparent"
+              aria-label="Disminuir cantidad"
+              className="w-8 h-8 rounded-full flex items-center justify-center text-text-base hover:bg-surface-card-hover disabled:opacity-30 disabled:hover:bg-transparent transition-colors"
             >
               <Minus className="w-4 h-4" />
             </button>
-            <span className="w-6 text-center text-sm font-bold text-text-strong">
+            <span className="w-6 text-center text-sm font-black text-text-strong font-mono tabular-nums">
               {quantity}
             </span>
             <button
               type="button"
               onClick={() => setQuantity((q) => Math.min(20, q + 1))}
-              className="w-8 h-8 rounded-lg flex items-center justify-center text-text-base hover:bg-surface-card-hover"
+              aria-label="Aumentar cantidad"
+              className="w-8 h-8 rounded-full flex items-center justify-center text-text-base hover:bg-surface-card-hover transition-colors"
             >
               <Plus className="w-4 h-4" />
             </button>
@@ -232,10 +235,10 @@ export function ModifierModal({ product, onClose }: ModifierModalProps) {
             type="button"
             onClick={handleAddToCart}
             disabled={!isValid}
-            className="flex-1 flex items-center justify-between bg-brand-primary hover:bg-brand-primary-hover disabled:bg-surface-border disabled:text-text-muted text-text-inverse-strong text-xs font-bold py-3.5 px-5 rounded-xl shadow-md shadow-brand-primary/20 transition-all active:scale-95 disabled:active:scale-100"
+            className="flex-1 flex items-center justify-between bg-brand-primary hover:bg-brand-primary-hover disabled:bg-surface-border disabled:text-text-muted text-text-inverse-strong text-xs font-black uppercase tracking-wider py-4 px-6 rounded-full shadow-lg shadow-brand-primary/25 transition-all hover:scale-[1.01] active:scale-95 disabled:active:scale-100"
           >
-            <span>{isValid ? "Agregar al Pedido" : "Selecciona las opciones obligatorias"}</span>
-            <span className="text-sm font-black tracking-tight tabular-nums">
+            <span>{isValid ? "Agregar al Pedido" : "Selecciona las opciones requeridas"}</span>
+            <span className="text-sm font-black tracking-tight font-mono tabular-nums">
               {formatCurrency(lineTotal)}
             </span>
           </button>

@@ -18,11 +18,11 @@ export function BillingInfoSection({
   return (
     <div className="bg-surface-card rounded-2xl border border-surface-border p-5 space-y-4 shadow-sm">
       <div className="flex items-center gap-2 pb-3 border-b border-surface-border-subtle">
-        <div className="w-8 h-8 rounded-lg bg-surface-canvas text-text-base flex items-center justify-center">
+        <div className="w-8 h-8 rounded-lg bg-brand-primary-light text-brand-primary flex items-center justify-center">
           <FileText className="w-4 h-4" />
         </div>
         <div>
-          <h3 className="text-sm font-bold text-text-strong">Facturación Electrónica</h3>
+          <h3 className="text-sm font-bold uppercase tracking-wider text-text-strong font-display">Facturación Electrónica</h3>
           <p className="text-[11px] text-text-muted">
             Comprobantes autorizados por el SRI posterior al pago
           </p>

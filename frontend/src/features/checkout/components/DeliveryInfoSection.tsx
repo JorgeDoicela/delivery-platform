@@ -13,11 +13,11 @@ export function DeliveryInfoSection({ register, errors }: DeliveryInfoSectionPro
   return (
     <div className="bg-surface-card rounded-2xl border border-surface-border p-5 space-y-4 shadow-sm">
       <div className="flex items-center gap-2 pb-3 border-b border-surface-border-subtle">
-        <div className="w-8 h-8 rounded-lg bg-surface-card-hover text-text-base flex items-center justify-center">
+        <div className="w-8 h-8 rounded-lg bg-brand-primary-light text-brand-primary flex items-center justify-center">
           <User className="w-4 h-4" />
         </div>
         <div>
-          <h3 className="text-sm font-bold text-text-strong">Datos de Entrega</h3>
+          <h3 className="text-sm font-bold uppercase tracking-wider text-text-strong font-display">Datos de Entrega</h3>
           <p className="text-[11px] text-text-muted">
             Información para el repartidor y comanda física de cocina
           </p>

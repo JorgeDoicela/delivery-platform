@@ -109,31 +109,33 @@ export function BranchManagementView() {
   }, []);
 
   return (
-    <div className="space-y-6 max-w-5xl mx-auto">
+    <div className="space-y-6 w-full">
       {/* Cabecera de Administración de Sucursales */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between pb-4 border-b border-surface-dark-border gap-4">
         <div>
-          <div className="flex items-center gap-2">
-            <Building2 className="w-5 h-5 text-brand-primary" />
-            <h1 className="text-xl font-black text-text-inverse-strong tracking-tight">
+          <div className="flex items-center gap-2.5">
+            <div className="w-8 h-8 rounded-xl bg-brand-primary flex items-center justify-center text-white">
+              <Building2 className="w-4 h-4" />
+            </div>
+            <h1 className="text-2xl sm:text-3xl font-black uppercase tracking-wide text-text-inverse-strong font-display">
               Sucursales y Capacidad de Horno
             </h1>
           </div>
-          <p className="text-xs text-text-inverse-muted mt-1">
+          <p className="text-xs text-text-inverse-muted mt-1 leading-relaxed">
             Supervisión de cobertura PostGIS y capacidad por ranuras de 20 min en Redis.
           </p>
         </div>
 
         <div className="flex items-center gap-3">
-          <span className="text-[11px] text-text-inverse-muted font-mono">
+          <span className="text-[10px] text-text-inverse-muted font-mono uppercase tracking-wider">
             Actualizado: {lastRefreshed ? lastRefreshed.toLocaleTimeString() : "Consultando..."}
           </span>
           <button
             onClick={handleManualRefresh}
             disabled={loading}
-            className="flex items-center gap-1.5 px-3 py-1.5 bg-surface-dark-card hover:bg-surface-dark-hover border border-surface-dark-border rounded-xl text-xs text-text-inverse-strong transition-colors disabled:opacity-50"
+            className="flex items-center gap-1.5 px-4 py-2 bg-surface-dark-card hover:bg-surface-dark-hover border border-surface-dark-border rounded-full text-xs font-bold uppercase tracking-wider text-text-inverse-strong transition-all active:scale-95 disabled:opacity-50"
           >
-            <RefreshCw className={`w-3.5 h-3.5 ${loading ? "animate-spin text-brand-accent" : ""}`} />
+            <RefreshCw className={`w-3.5 h-3.5 ${loading ? "animate-spin text-brand-primary" : ""}`} />
             <span>Refrescar</span>
           </button>
         </div>
@@ -147,27 +149,27 @@ export function BranchManagementView() {
           return (
             <div
               key={branch.id}
-              className="bg-surface-dark-card border border-surface-dark-border rounded-2xl p-6 space-y-5 shadow-xl flex flex-col justify-between"
+              className="bg-surface-dark-card border border-surface-dark-border rounded-3xl p-6 sm:p-7 space-y-5 shadow-xl flex flex-col justify-between"
             >
               <div className="space-y-4">
                 {/* Cabecera de Tarjeta */}
                 <div className="flex items-start justify-between">
                   <div>
-                    <span className="text-[10px] font-bold uppercase tracking-wider text-brand-primary bg-brand-primary-light border border-brand-primary/30 px-2 py-0.5 rounded">
+                    <span className="text-[10px] font-bold uppercase tracking-wider text-brand-primary bg-brand-primary-light border border-brand-primary/30 px-2.5 py-0.5 rounded-full">
                       ID Sucursal #{branch.id}
                     </span>
-                    <h3 className="text-lg font-black text-text-inverse-strong mt-1.5">{branch.name}</h3>
+                    <h3 className="text-xl font-black uppercase tracking-tight text-text-inverse-strong font-display mt-2">{branch.name}</h3>
                     <p className="text-xs text-text-inverse-muted mt-0.5">{branch.zoneName}</p>
                   </div>
 
-                  <span className="flex items-center gap-1 text-[11px] font-bold text-status-success bg-status-success/20 border border-status-success/40 px-2.5 py-1 rounded-full">
+                  <span className="flex items-center gap-1 text-[10px] font-bold uppercase tracking-wider text-status-success bg-status-success/20 border border-status-success/40 px-3 py-1 rounded-full">
                     <ShieldCheck className="w-3.5 h-3.5" />
                     Operativa
                   </span>
                 </div>
 
                 {/* Datos de Contacto y Ubicación */}
-                <div className="space-y-2 text-xs text-text-inverse-base bg-surface-dark/60 border border-surface-dark-border/80 rounded-xl p-3.5">
+                <div className="space-y-2 text-xs text-text-inverse-base bg-surface-dark/60 border border-surface-dark-border/80 rounded-2xl p-4">
                   <div className="flex items-start gap-2">
                     <MapPin className="w-4 h-4 text-brand-primary shrink-0 mt-0.5" />
                     <span>{branch.address}</span>

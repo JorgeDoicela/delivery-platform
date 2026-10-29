@@ -46,15 +46,15 @@ export function KitchenTicketCard({ order, onAdvance }: KitchenTicketCardProps) 
   const isTakeout = order.deliveryType === DeliveryType.Takeout;
 
   return (
-    <div className="bg-surface-dark-card border border-surface-dark-border rounded-lg shadow-lg flex flex-col justify-between overflow-hidden">
+    <div className="bg-surface-dark-card border border-surface-dark-border rounded-2xl shadow-lg flex flex-col justify-between overflow-hidden">
       {/* Cabecera del Ticket */}
-      <div className="p-3 bg-surface-dark/60 border-b border-surface-dark-border flex items-center justify-between">
+      <div className="p-3.5 bg-surface-dark/60 border-b border-surface-dark-border flex items-center justify-between">
         <div className="flex items-center gap-2">
-          <span className="font-mono text-xs font-bold text-text-inverse-strong bg-surface-dark-hover px-2 py-0.5 rounded">
+          <span className="font-mono text-xs font-bold text-text-inverse-strong bg-surface-dark-hover px-2.5 py-0.5 rounded-full border border-surface-dark-border">
             #{order.orderId.slice(0, 8)}
           </span>
           <span
-            className={`inline-flex items-center gap-1 text-[11px] font-semibold px-2 py-0.5 rounded uppercase tracking-wider ${
+            className={`inline-flex items-center gap-1 text-[10px] font-bold px-2.5 py-0.5 rounded-full uppercase tracking-wider ${
               isTakeout
                 ? 'bg-status-info/20 text-status-info border border-status-info/40'
                 : 'bg-surface-dark-hover text-text-inverse-base'
@@ -74,7 +74,7 @@ export function KitchenTicketCard({ order, onAdvance }: KitchenTicketCardProps) 
 
         {/* Cronómetro Semáforo */}
         <div
-          className={`flex items-center gap-1.5 px-2 py-0.5 rounded border text-xs font-mono font-bold ${timerBadgeColor}`}
+          className={`flex items-center gap-1.5 px-2.5 py-0.5 rounded-full border text-xs font-mono font-bold ${timerBadgeColor}`}
         >
           <Clock className="h-3.5 w-3.5" />
           <span>{elapsedMinutes}m</span>
@@ -83,17 +83,17 @@ export function KitchenTicketCard({ order, onAdvance }: KitchenTicketCardProps) 
       </div>
 
       {/* Datos del Cliente */}
-      <div className="px-3 pt-2 pb-1 border-b border-surface-dark-border/60 text-xs">
+      <div className="px-3.5 pt-2.5 pb-1.5 border-b border-surface-dark-border/60 text-xs">
         <p className="font-bold text-text-inverse-strong truncate">{order.customerName}</p>
         {!isTakeout && order.addressStreet && (
-          <p className="text-text-inverse-muted text-[11px] truncate">
+          <p className="text-text-inverse-muted text-[11px] truncate mt-0.5">
             {order.addressStreet} {order.addressReference && `(${order.addressReference})`}
           </p>
         )}
       </div>
 
       {/* Lista de Items */}
-      <div className="p-3 space-y-2.5 flex-1 overflow-y-auto max-h-60 divide-y divide-surface-dark-border/40">
+      <div className="p-3.5 space-y-2.5 flex-1 overflow-y-auto max-h-60 divide-y divide-surface-dark-border/40">
         {order.items.map((item, idx) => (
           <div key={idx} className="pt-2 first:pt-0">
             <div className="flex items-start gap-2">
@@ -107,7 +107,7 @@ export function KitchenTicketCard({ order, onAdvance }: KitchenTicketCardProps) 
                     {item.modifiers.map((m, mIdx) => (
                       <li
                         key={mIdx}
-                        className="text-[11px] font-medium text-brand-accent-light bg-surface-dark/80 px-1.5 py-0.5 rounded border border-surface-dark-border inline-block mr-1 mb-1"
+                        className="text-[10px] font-bold uppercase tracking-wider text-brand-accent-light bg-surface-dark/80 px-2 py-0.5 rounded-full border border-surface-dark-border inline-block mr-1 mb-1"
                       >
                         + {m.modifierName}
                       </li>
@@ -126,7 +126,7 @@ export function KitchenTicketCard({ order, onAdvance }: KitchenTicketCardProps) 
           <button
             onClick={() => handleAdvance(OrderStatus.InKitchen)}
             disabled={isSubmitting}
-            className="w-full flex items-center justify-center gap-2 py-2 px-3 bg-brand-accent hover:bg-brand-accent-hover text-surface-dark text-xs font-bold rounded transition-colors disabled:opacity-50"
+            className="w-full flex items-center justify-center gap-2 py-2.5 px-4 bg-brand-primary hover:bg-brand-primary-hover text-white text-xs font-bold uppercase tracking-wider rounded-full shadow-md transition-all active:scale-95 disabled:opacity-50"
           >
             <ChefHat className="h-4 w-4" />
             {isSubmitting ? 'Iniciando...' : 'Iniciar en Cocina'}
@@ -137,7 +137,7 @@ export function KitchenTicketCard({ order, onAdvance }: KitchenTicketCardProps) 
           <button
             onClick={() => handleAdvance(OrderStatus.ReadyForDelivery)}
             disabled={isSubmitting}
-            className="w-full flex items-center justify-center gap-2 py-2 px-3 bg-status-info hover:bg-status-info/80 text-text-inverse-strong text-xs font-bold rounded transition-colors disabled:opacity-50"
+            className="w-full flex items-center justify-center gap-2 py-2.5 px-4 bg-status-info hover:bg-status-info/80 text-text-inverse-strong text-xs font-bold uppercase tracking-wider rounded-full shadow-md transition-all active:scale-95 disabled:opacity-50"
           >
             <CheckCircle2 className="h-4 w-4" />
             {isSubmitting ? 'Guardando...' : 'Listo para Reparto'}
@@ -148,7 +148,7 @@ export function KitchenTicketCard({ order, onAdvance }: KitchenTicketCardProps) 
           <button
             onClick={() => handleAdvance(OrderStatus.OnTheWay)}
             disabled={isSubmitting}
-            className="w-full flex items-center justify-center gap-2 py-2 px-3 bg-status-success hover:bg-status-success/80 text-text-inverse-strong text-xs font-bold rounded transition-colors disabled:opacity-50"
+            className="w-full flex items-center justify-center gap-2 py-2.5 px-4 bg-status-success hover:bg-status-success/80 text-text-inverse-strong text-xs font-bold uppercase tracking-wider rounded-full shadow-md transition-all active:scale-95 disabled:opacity-50"
           >
             <Bike className="h-4 w-4" />
             {isSubmitting ? 'Despachando...' : 'Despachar / En Camino'}

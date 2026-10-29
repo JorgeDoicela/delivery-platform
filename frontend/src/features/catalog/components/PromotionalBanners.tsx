@@ -24,7 +24,7 @@ export function PromotionalBanners() {
 
         <div className="pt-6 relative z-10">
           <Link
-            href="#catalogo"
+            href="/catalogo"
             className="inline-flex items-center gap-2 bg-brand-primary hover:bg-brand-primary-hover text-white text-xs font-bold uppercase tracking-wider px-6 py-3 rounded-full transition-all shadow-md active:scale-95"
           >
             <span>Conoce Más</span>
@@ -50,7 +50,7 @@ export function PromotionalBanners() {
 
         <div className="pt-6 relative z-10">
           <Link
-            href="#catalogo"
+            href="/catalogo"
             className="inline-flex items-center gap-2 bg-white hover:bg-neutral-100 text-brand-primary text-xs font-black uppercase tracking-wider px-6 py-3 rounded-full transition-all shadow-md active:scale-95"
           >
             <span>Ver Combos</span>

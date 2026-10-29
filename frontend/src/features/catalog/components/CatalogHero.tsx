@@ -20,7 +20,7 @@ const HERO_SLIDES: HeroSlide[] = [
     subtitle: "Pollo entero asado lentamente al carbón vegetal con guarniciones calientes, ensalada fresca y ají artesanal.",
     highlightPrice: "$18.99",
     ctaText: "ORDENA AQUÍ",
-    ctaHref: "#catalogo",
+    ctaHref: "/catalogo",
   },
   {
     badge: "Ahorro Familiar",
@@ -28,7 +28,7 @@ const HERO_SLIDES: HeroSlide[] = [
     subtitle: "Rinde para 5 a 6 personas. Incluye porción doble de papas fritas rústicas, ensalada grande y gaseosa familiar.",
     highlightPrice: "$24.99",
     ctaText: "ORDENA AQUÍ",
-    ctaHref: "#catalogo",
+    ctaHref: "/catalogo",
   },
 ];
 
@@ -65,7 +65,7 @@ export function CatalogHero() {
         <ChevronRight className="w-6 h-6" />
       </button>
 
-      <div className="relative z-10 max-w-5xl mx-auto space-y-6">
+      <div className="relative z-10 w-full space-y-6">
         {/* Badge Superior */}
         <div className="inline-flex items-center gap-2 bg-black/25 text-white px-3.5 py-1 rounded-full text-xs font-bold uppercase tracking-wider backdrop-blur-md border border-white/20">
           <span>{slide.badge}</span>
@@ -77,7 +77,7 @@ export function CatalogHero() {
         </h1>
 
         {/* Descripción */}
-        <p className="text-white/90 text-sm sm:text-base leading-relaxed max-w-xl font-medium">
+        <p className="text-white/90 text-sm sm:text-base leading-relaxed font-medium">
           {slide.subtitle}
         </p>
 
@@ -94,14 +94,14 @@ export function CatalogHero() {
 
           <Link
             href={slide.ctaHref}
-            className="inline-flex items-center gap-2 bg-white text-[#e4002b] hover:bg-neutral-100 font-black text-sm uppercase tracking-wider px-9 py-4 rounded-full shadow-2xl transition-all hover:scale-105 active:scale-95"
+            className="inline-flex items-center gap-2 bg-white text-brand-primary hover:bg-neutral-100 font-black text-sm uppercase tracking-wider px-9 py-4 rounded-full shadow-2xl transition-all hover:scale-105 active:scale-95"
           >
             <span>{slide.ctaText}</span>
-            <ArrowRight className="w-4 h-4 text-[#e4002b]" />
+            <ArrowRight className="w-4 h-4 text-brand-primary" />
           </Link>
 
           <Link
-            href="/checkout"
+            href="/finalizar-pedido"
             className="inline-flex items-center gap-2 bg-black/25 hover:bg-black/40 text-white font-bold text-xs uppercase tracking-wider px-6 py-4 rounded-full border border-white/25 transition-all backdrop-blur-sm"
           >
             <MapPin className="w-4 h-4 text-amber-300" />

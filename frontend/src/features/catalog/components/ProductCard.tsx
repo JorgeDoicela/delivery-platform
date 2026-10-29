@@ -18,31 +18,31 @@ export function ProductCard({ product }: ProductCardProps) {
       <div className="group relative flex flex-col justify-between bg-surface-card rounded-2xl border border-surface-border p-5 shadow-sm hover:shadow-md hover:border-brand-primary/40 transition-all">
         <div>
           <div className="flex items-center justify-between gap-2 mb-2">
-            <span className="text-[10px] font-bold uppercase tracking-wider text-brand-primary bg-brand-primary-light/50 px-2 py-0.5 rounded">
+            <span className="text-[10px] font-bold uppercase tracking-wider text-brand-primary bg-brand-primary-light px-2.5 py-0.5 rounded-full">
               {product.category}
             </span>
             {product.modifierGroups.length > 0 && (
-              <span className="text-[10px] text-text-muted font-medium">
+              <span className="text-[10px] text-text-muted font-bold uppercase tracking-wider">
                 Personalizable
               </span>
             )}
           </div>
 
-          <h3 className="text-base font-bold text-text-strong group-hover:text-brand-primary transition-colors">
+          <h3 className="text-base font-bold text-text-strong group-hover:text-brand-primary transition-colors leading-snug">
             {product.name}
           </h3>
 
-          <p className="text-xs text-text-muted mt-1 line-clamp-3 leading-relaxed">
+          <p className="text-xs text-text-muted mt-1.5 line-clamp-3 leading-relaxed">
             {product.description}
           </p>
         </div>
 
         <div className="mt-6 pt-4 border-t border-surface-border-subtle flex items-center justify-between">
           <div>
-            <span className="text-[10px] text-text-muted block uppercase font-medium">
+            <span className="text-[10px] text-text-muted block uppercase font-bold tracking-wider">
               Precio Base
             </span>
-            <span className="text-lg font-black text-text-strong tracking-tight tabular-nums">
+            <span className="text-xl font-black text-text-strong tracking-tight tabular-nums font-mono">
               {formatCurrency(product.basePrice)}
             </span>
           </div>
@@ -50,7 +50,7 @@ export function ProductCard({ product }: ProductCardProps) {
           <button
             type="button"
             onClick={() => setIsModalOpen(true)}
-            className="inline-flex items-center gap-1.5 bg-brand-primary hover:bg-brand-primary-hover text-text-inverse-strong text-xs font-bold uppercase tracking-wider py-2.5 px-5 rounded-full shadow-md shadow-brand-primary/20 transition-all hover:scale-105 active:scale-95"
+            className="inline-flex items-center gap-1.5 bg-brand-primary hover:bg-brand-primary-hover text-text-inverse-strong text-xs font-black uppercase tracking-wider py-2.5 px-6 rounded-full shadow-md shadow-brand-primary/20 transition-all hover:scale-105 active:scale-95"
           >
             <Plus className="w-3.5 h-3.5" />
             <span>Pedir</span>

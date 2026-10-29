@@ -1,7 +1,7 @@
 {
-  "name": "La Granjita - Pollo a la Brasa",
+  "name": "La Granjita Asadero",
   "short_name": "La Granjita",
-  "description": "Pedidos directos y entrega a domicilio de La Granjita",
+  "description": "Pedidos directos y entrega a domicilio de La Granjita Asadero",
   "start_url": "/",
   "display": "standalone",
   "background_color": "#0f172a",
@@ -11,6 +11,11 @@
       "src": "/favicon.ico",
       "sizes": "64x64 32x32 24x24 16x16",
       "type": "image/x-icon"
+    },
+    {
+      "src": "/images/identidad/logo.png",
+      "sizes": "192x192 512x512",
+      "type": "image/png"
     }
   ]
 }

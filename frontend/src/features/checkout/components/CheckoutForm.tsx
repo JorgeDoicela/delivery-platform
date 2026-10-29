@@ -105,9 +105,9 @@ export function CheckoutForm() {
         idempotencyKey
       );
 
-      // Limpiar carrito y redirigir a tracking
+      // Limpiar carrito y redirigir a tracking en español
       clearCart();
-      router.push(`/track/${response.orderId}`);
+      router.push(`/rastreo/${response.orderId}`);
     } catch (err: unknown) {
       const message =
         err instanceof Error ? err.message : "Error al procesar el pedido. Intenta nuevamente.";
@@ -151,7 +151,7 @@ export function CheckoutForm() {
           <button
             type="submit"
             disabled={isSubmitting || items.length === 0}
-            className="w-full flex items-center justify-center gap-2 bg-brand-primary hover:bg-brand-primary-hover disabled:bg-surface-border disabled:text-text-muted text-text-inverse-strong font-extrabold text-sm py-4 px-6 rounded-2xl shadow-xl shadow-brand-primary/30 transition-all active:scale-95 disabled:active:scale-100"
+            className="w-full flex items-center justify-center gap-2 bg-brand-primary hover:bg-brand-primary-hover disabled:bg-surface-border disabled:text-text-muted text-text-inverse-strong font-black text-sm uppercase tracking-wider py-4 px-8 rounded-full shadow-xl shadow-brand-primary/25 transition-all hover:scale-[1.01] active:scale-95 disabled:active:scale-100 disabled:hover:scale-100"
           >
             {isSubmitting ? (
               <>

@@ -92,29 +92,31 @@ export function InventoryManagerView() {
   const inactiveCount = allProducts.length - activeCount;
 
   return (
-    <div className="space-y-6 max-w-5xl mx-auto">
+    <div className="space-y-6 w-full">
       {/* Cabecera Operativa */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between pb-4 border-b border-surface-dark-border gap-4">
         <div>
-          <div className="flex items-center gap-2">
-            <Package className="w-5 h-5 text-brand-primary" />
-            <h1 className="text-xl font-black text-text-inverse-strong tracking-tight">
+          <div className="flex items-center gap-2.5">
+            <div className="w-8 h-8 rounded-xl bg-brand-primary flex items-center justify-center text-white">
+              <Package className="w-4 h-4" />
+            </div>
+            <h1 className="text-2xl sm:text-3xl font-black uppercase tracking-wide text-text-inverse-strong font-display">
               Control de Inventario y Disponibilidad
             </h1>
           </div>
-          <p className="text-xs text-text-inverse-muted mt-1">
+          <p className="text-xs text-text-inverse-muted mt-1 leading-relaxed">
             Conmutador de stock en tiempo real. Los cambios se sincronizan al KDS y al catálogo cliente al instante.
           </p>
         </div>
 
         <div className="flex items-center gap-3">
-          <div className="bg-surface-dark-card border border-surface-dark-border px-3 py-1.5 rounded-xl text-xs flex items-center gap-2">
-            <span className="w-2 h-2 rounded-full bg-status-success" />
-            <span className="text-text-inverse-base font-medium">{activeCount} Disponibles</span>
+          <div className="bg-surface-dark-card border border-surface-dark-border px-3.5 py-1.5 rounded-full text-xs font-bold uppercase tracking-wider flex items-center gap-2">
+            <span className="w-2 h-2 rounded-full bg-status-success animate-pulse" />
+            <span className="text-text-inverse-base">{activeCount} Disponibles</span>
           </div>
-          <div className="bg-surface-dark-card border border-surface-dark-border px-3 py-1.5 rounded-xl text-xs flex items-center gap-2">
+          <div className="bg-surface-dark-card border border-surface-dark-border px-3.5 py-1.5 rounded-full text-xs font-bold uppercase tracking-wider flex items-center gap-2">
             <span className="w-2 h-2 rounded-full bg-status-danger" />
-            <span className="text-text-inverse-base font-medium">{inactiveCount} Agotados</span>
+            <span className="text-text-inverse-base">{inactiveCount} Agotados</span>
           </div>
         </div>
       </div>
@@ -122,7 +124,7 @@ export function InventoryManagerView() {
       {/* Alerta de Acción */}
       {actionMessage && (
         <div
-          className={`p-3.5 rounded-xl border text-xs font-semibold flex items-center gap-2 animate-in fade-in ${
+          className={`p-3.5 rounded-2xl border text-xs font-semibold flex items-center gap-2 animate-in fade-in ${
             actionMessage.type === "success"
               ? "bg-status-success/20 border-status-success/40 text-status-success"
               : "bg-status-danger/20 border-status-danger/40 text-status-danger"
@@ -138,7 +140,7 @@ export function InventoryManagerView() {
       )}
 
       {/* Barra de Filtro y Búsqueda */}
-      <div className="flex items-center gap-3 bg-surface-dark-card border border-surface-dark-border rounded-xl px-3.5 py-2">
+      <div className="flex items-center gap-3 bg-surface-dark-card border border-surface-dark-border rounded-full px-5 py-3 shadow-sm">
         <Search className="w-4 h-4 text-text-inverse-muted shrink-0" />
         <input
           type="text"
@@ -150,7 +152,7 @@ export function InventoryManagerView() {
         {searchTerm && (
           <button
             onClick={() => setSearchTerm("")}
-            className="text-xs text-text-inverse-muted hover:text-text-inverse-strong"
+            className="text-xs font-bold uppercase tracking-wider text-text-inverse-muted hover:text-white transition-colors"
           >
             Limpiar
           </button>
@@ -158,10 +160,10 @@ export function InventoryManagerView() {
       </div>
 
       {/* Tabla de Productos */}
-      <div className="bg-surface-dark-card border border-surface-dark-border rounded-2xl overflow-hidden shadow-xl">
+      <div className="bg-surface-dark-card border border-surface-dark-border rounded-3xl overflow-hidden shadow-xl">
         <div className="overflow-x-auto">
           <table className="w-full text-left text-xs">
-            <thead className="bg-surface-dark text-text-inverse-muted uppercase font-mono tracking-wider border-b border-surface-dark-border">
+            <thead className="bg-surface-dark text-text-inverse-muted uppercase font-mono tracking-wider text-[11px] border-b border-surface-dark-border">
               <tr>
                 <th className="px-5 py-3.5">Producto</th>
                 <th className="px-4 py-3.5">Categoría</th>
@@ -229,7 +231,7 @@ export function InventoryManagerView() {
                         type="button"
                         onClick={() => handleToggleStatus(product.id, product.isActive)}
                         disabled={isPending}
-                        className={`inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs font-bold transition-all active:scale-95 disabled:opacity-50 ${
+                        className={`inline-flex items-center gap-1.5 px-4 py-1.5 rounded-full text-xs font-bold uppercase tracking-wider transition-all active:scale-95 disabled:opacity-50 ${
                           product.isActive
                             ? "bg-status-danger/20 hover:bg-status-danger/30 text-status-danger border border-status-danger/40"
                             : "bg-status-success/20 hover:bg-status-success/30 text-status-success border border-status-success/40"
