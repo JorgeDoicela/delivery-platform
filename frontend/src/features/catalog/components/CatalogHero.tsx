@@ -47,23 +47,17 @@ const HERO_SLIDES: HeroSlide[] = [
 
 export function CatalogHero() {
   const [currentSlideIndex, setCurrentSlideIndex] = useState(0);
-  const [direction, setDirection] = useState<"next" | "prev">("next");
   const [isPaused, setIsPaused] = useState(false);
 
-  const slide = HERO_SLIDES[currentSlideIndex];
-
   const handlePrev = useCallback(() => {
-    setDirection("prev");
     setCurrentSlideIndex((prev) => (prev === 0 ? HERO_SLIDES.length - 1 : prev - 1));
   }, []);
 
   const handleNext = useCallback(() => {
-    setDirection("next");
     setCurrentSlideIndex((prev) => (prev === HERO_SLIDES.length - 1 ? 0 : prev + 1));
   }, []);
 
   const handleSelectSlide = (idx: number) => {
-    setDirection(idx >= currentSlideIndex ? "next" : "prev");
     setCurrentSlideIndex(idx);
   };
 
@@ -130,55 +124,65 @@ export function CatalogHero() {
         <ChevronRight className="w-6 h-6 transition-transform group-hover:translate-x-0.5" />
       </button>
 
-      {/* Contenido Informativo y Tipografía con Animación de Entrada Suave */}
-      <div
-        key={currentSlideIndex}
-        className={`relative z-10 w-full max-w-2xl space-y-6 ${
-          direction === "next" ? "animate-hero-next" : "animate-hero-prev"
-        }`}
-      >
-        {/* Badge Superior */}
-        <div className="inline-flex items-center gap-2 bg-brand-primary text-white px-3.5 py-1 rounded-full text-xs font-bold uppercase tracking-wider shadow-md">
-          <span>{slide.badge}</span>
-        </div>
+      {/* Contenido Informativo y Tipografía con Transición de Disolución Sincronizada 1:1 con la Imagen */}
+      <div className="relative z-10 w-full max-w-2xl grid grid-cols-1 grid-rows-1">
+        {HERO_SLIDES.map((s, idx) => {
+          const isActive = idx === currentSlideIndex;
+          return (
+            <div
+              key={s.imageUrl}
+              aria-hidden={!isActive}
+              className={`col-start-1 row-start-1 space-y-6 transition-opacity duration-700 ease-in-out ${
+                isActive ? "opacity-100 z-10" : "opacity-0 pointer-events-none z-0"
+              }`}
+            >
+              {/* Badge Superior */}
+              <div className="inline-flex items-center gap-2 bg-brand-primary text-white px-3.5 py-1 rounded-full text-xs font-bold uppercase tracking-wider shadow-md">
+                <span>{s.badge}</span>
+              </div>
 
-        {/* Titular Principal en Barlow Condensed */}
-        <h1 className="text-4xl sm:text-6xl md:text-7xl font-black uppercase tracking-tight leading-none text-white drop-shadow-md font-display">
-          {slide.title}
-        </h1>
+              {/* Titular Principal en Barlow Condensed */}
+              <h1 className="text-4xl sm:text-6xl md:text-7xl font-black uppercase tracking-tight leading-none text-white drop-shadow-md font-display">
+                {s.title}
+              </h1>
 
-        {/* Descripción Gastronómica */}
-        <p className="text-white/90 text-sm sm:text-base leading-relaxed font-medium drop-shadow">
-          {slide.subtitle}
-        </p>
+              {/* Descripción Gastronómica */}
+              <p className="text-white/90 text-sm sm:text-base leading-relaxed font-medium drop-shadow">
+                {s.subtitle}
+              </p>
 
-        {/* Precio Destacado e Interacción Primaria estilo KFC */}
-        <div className="flex flex-wrap items-center gap-4 pt-3">
-          <div className="bg-black/50 backdrop-blur-md px-5 py-2.5 rounded-full border border-white/20 flex items-baseline gap-2 text-white shadow-lg">
-            <span className="text-[11px] font-bold uppercase tracking-widest text-white/80">
-              Desde
-            </span>
-            <span className="text-2xl sm:text-3xl font-black text-amber-300 tabular-nums">
-              {slide.highlightPrice}
-            </span>
-          </div>
+              {/* Precio Destacado e Interacción Primaria estilo KFC */}
+              <div className="flex flex-wrap items-center gap-4 pt-3">
+                <div className="bg-black/50 backdrop-blur-md px-5 py-2.5 rounded-full border border-white/20 flex items-baseline gap-2 text-white shadow-lg">
+                  <span className="text-[11px] font-bold uppercase tracking-widest text-white/80">
+                    Desde
+                  </span>
+                  <span className="text-2xl sm:text-3xl font-black text-amber-300 tabular-nums">
+                    {s.highlightPrice}
+                  </span>
+                </div>
 
-          <Link
-            href={slide.ctaHref}
-            className="inline-flex items-center gap-2 bg-brand-primary hover:bg-brand-primary-hover text-white font-black text-sm uppercase tracking-wider px-9 py-4 rounded-full shadow-2xl transition-all hover:scale-105 active:scale-95"
-          >
-            <span>{slide.ctaText}</span>
-            <ArrowRight className="w-4 h-4 text-white" />
-          </Link>
+                <Link
+                  href={s.ctaHref}
+                  tabIndex={isActive ? 0 : -1}
+                  className="inline-flex items-center gap-2 bg-brand-primary hover:bg-brand-primary-hover text-white font-black text-sm uppercase tracking-wider px-9 py-4 rounded-full shadow-2xl transition-all hover:scale-105 active:scale-95"
+                >
+                  <span>{s.ctaText}</span>
+                  <ArrowRight className="w-4 h-4 text-white" />
+                </Link>
 
-          <Link
-            href="/finalizar-pedido"
-            className="inline-flex items-center gap-2 bg-black/40 hover:bg-black/60 text-white font-bold text-xs uppercase tracking-wider px-6 py-4 rounded-full border border-white/25 transition-all backdrop-blur-md shadow-md"
-          >
-            <MapPin className="w-4 h-4 text-amber-300" />
-            <span>Verificar Cobertura</span>
-          </Link>
-        </div>
+                <Link
+                  href="/finalizar-pedido"
+                  tabIndex={isActive ? 0 : -1}
+                  className="inline-flex items-center gap-2 bg-black/40 hover:bg-black/60 text-white font-bold text-xs uppercase tracking-wider px-6 py-4 rounded-full border border-white/25 transition-all backdrop-blur-md shadow-md"
+                >
+                  <MapPin className="w-4 h-4 text-amber-300" />
+                  <span>Verificar Cobertura</span>
+                </Link>
+              </div>
+            </div>
+          );
+        })}
       </div>
 
       {/* Paginación por Puntos estilo KFC con Expansión Dinámica */}
