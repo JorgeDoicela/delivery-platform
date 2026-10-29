@@ -1,93 +1,208 @@
 ---
 name: delivery-estilos
-description: Sistema de diseño, UI/UX premium y guía de estilos para Delivery Platform (Paleta asadero carbón/ámbar, cero emojis, cero KPIs enormes, mínimo uso de iconos SVG, accesibilidad WCAG y diseño ergonómico).
+description: Sistema de diseño, UI/UX premium y guía de estilos para Delivery Platform (Paleta fast-food asadero estilo KFC/La Granjita, modo claro comercial en Storefront, modo oscuro antirreflejo en KDS, tipografía dual Barlow/Inter, scrollbars flotantes sin flechas, cero emojis y ergonomía táctil).
 ---
-# Sistema de Diseño y Guía de Estilos para Delivery Platform
+# Sistema de Diseño y Guía de Estilos Oficial (Delivery Platform)
 
-Esta habilidad define los principios visuales, tokens de diseño, criterios de experiencia de usuario (UX) y estándares de accesibilidad para la interfaz de Delivery Platform.
-
----
-
-## 1. Identidad Visual: Asadero Artesanal Premium
-
-La identidad estética combina la elegancia contemporánea con los atributos gastronómicos de un asadero tradicional de pollos y carnes a la brasa:
-* **Sensación:** Cálida, limpia, apetitosa y de alta tecnología.
-* **Tonalidades Base:** Carbón intenso, brasa encendida, acentos tostados y contrastes definidos.
-* **Prohibición Estricta:** Prohibido el uso de colores planos genéricos sin calibrar (ej. rojo puro `#ff0000` o azul primario `#0000ff`). Todos los tonos deben derivar de la paleta calibrada.
+Esta habilidad define los principios visuales, tokens de diseño, criterios de experiencia de usuario (UX), componentes canónicos y estándares de accesibilidad para la interfaz de Delivery Platform (La Granjita Asadero).
 
 ---
 
-## 2. Paleta de Colores y Design Tokens
+## 1. Identidad Visual: Fast-Food Asadero Contemporáneo
 
-### 2.1. Modo Oscuro (Storefront Hero, Tracking y KDS)
-* **Fondo Principal:** `neutral-950` (`#0a0a0a`) - Profundo, reduce el cansancio visual en cocina y resalta los productos.
-* **Superficies y Tarjetas:** `neutral-900` (`#171717`) con bordes sutiles en `neutral-800` (`#262626`).
-* **Superficies Interactivas Elevadas:** `neutral-800/80` con desenfoque de fondo (`backdrop-blur-md`).
-* **Texto Principal:** `neutral-50` (`#fafafa`) y `neutral-200` (`#e5e5e5`).
-* **Texto Secundario / Metadatos:** `neutral-400` (`#a3a3a3`) y `neutral-500` (`#737373`).
-
-### 2.2. Acentos Gastronómicos (Fuego y Brasa)
-* **Primario (Ámbar Dorado):** `amber-500` (`#f59e0b`) y `amber-400` (`#fbbf24`). Empleado en estados de preparación, botones de acción primaria y badges de cocción.
-* **Secundario (Naranja Brasa):** `orange-600` (`#ea580c`) y `orange-500` (`#f97316`). Empleado en indicadores de oferta, pines de destino y alertas de alta demanda.
-* **Resaltado y Halos:** `amber-500/20` o `orange-500/20` para sombras volumétricas y efectos de pulso.
-
-### 2.3. Modo Claro Funcional (Formularios de Checkout y Facturación)
-* **Fondo:** `white` (`#ffffff`) y `slate-50` (`#f8fafc`).
-* **Bordes y Divisores:** `slate-200` (`#e2e8f0`).
-* **Texto Primario:** `slate-900` (`#0f172a`).
-
-### 2.4. Colores Semánticos de Operación
-* **Éxito (Entregado / Pagado):** `emerald-600` (`#16a34a`) con fondo `emerald-950/40`.
-* **Atención / En Horno:** `amber-500` (`#f59e0b`) con fondo `amber-950/40`.
-* **Cancelado / Error:** `red-600` (`#dc2626`) con fondo `red-950/40`.
-* **En Camino (Despachado):** `blue-500` (`#3b82f6`) con halo dinámico.
+La plataforma unifica la calidez gastronómica de un asadero artesanal de pollos y carnes a la brasa con la ergonomía visual y comercial de cadenas líderes de alta conversión (inspirado en la arquitectura limpia de KFC y la fuerza tipográfica de El Pollo Loco):
+* **Sensación:** Apetitosa, luminosa, directa, moderna y de alta tecnología operativa.
+* **Paleta Protagónica:** Rojo Vivo Asadero (`#e4002b`) como color primario de acción comercial, acompañado de Dorado/Ámbar (`#f59e0b`) como acento gastronómico de fuego, maíz y brasa.
+* **Prohibición de Colores Deslavados:** Prohibido el uso de tonos rosáceos deslavados (`bg-brand-primary-light`, `#fee2e2`, `bg-brand-primary/10` o `bg-brand-primary/20`) en tarjetas, badges o fondos. Los fondos deben ser blancos puros (`#ffffff`), grises neutros limpios (`#f9fafb`, `neutral-100`) o negro carbón (`#09090b`), manteniendo el rojo exclusivamente en estados sólidos, botones y acentos de marca.
 
 ---
 
-## 3. Tipografía y Jerarquía (Sistema Estricto de 2 Fuentes)
+## 2. Arquitectura Visual de Dos Entornos
+
+La interfaz está rigurosamente dividida según el contexto operacional del usuario:
+
+### 2.1. Entorno Comercial B2C (Storefront, Catálogo, Sucursales, Checkout y Rastreo)
+* **Estilo:** Modo Claro Comercial Luminoso.
+* **Fondo General del Canvas:** `--surface-canvas` (`#f9fafb`).
+* **Superficies y Tarjetas:** Blanco puro (`#ffffff`) con bordes calibrados `border-neutral-200` y radios amplios (`rounded-3xl`).
+* **Encabezado Comercial:** Fondo blanco limpio (`bg-white border-b border-neutral-200/80 shadow-xs h-[70px] sm:h-[76px]`), centrado con `max-w-7xl mx-auto px-4 sm:px-6 lg:px-8` sin líneas rojas gruesas inferiores.
+* **Botones de Acción:** Botones píldora completamente redondeados (`rounded-full`) en Rojo de Marca (`bg-brand-primary hover:bg-brand-primary-hover text-white shadow-md active:scale-95`).
+
+### 2.2. Entorno Operativo B2B (Dashboard KDS Cocina, Turnos de Caja, Inventario y Acceso)
+* **Estilo:** Modo Oscuro Antirreflejos de Alta Tecnología.
+* **Propósito:** Optimizado para pantallas táctiles industriales de 1080p en entornos de cocina con humo, calor y reflejos de luz.
+* **Fondo Principal:** Negro carbón profundo `--surface-dark` (`#09090b`).
+* **Superficies de Comandas y Paneles:** `bg-surface-dark-card` (`#18181b`) con bordes en `border-surface-dark-border` (`#27272a`).
+* **Texto Inverso:** Blanco neutro `--text-inverse-strong` (`#fafafa`) y gris suave `--text-inverse-muted` (`#a1a1aa`).
+
+---
+
+## 3. Paleta de Colores y Design Tokens Globales (`globals.css`)
+
+```css
+:root {
+  /* Marca Primaria (Rojo Fast-Food Asadero estilo KFC) */
+  --brand-primary: #e4002b;
+  --brand-primary-hover: #c40024;
+  --brand-primary-light: #fee2e2;
+  --brand-primary-muted: rgba(228, 0, 43, 0.12);
+
+  /* Acento Gastronómico (Dorado / Ámbar Brasa) */
+  --brand-accent: #f59e0b;
+  --brand-accent-hover: #d97706;
+  --brand-accent-light: #fef3c7;
+  --brand-accent-muted: rgba(245, 158, 11, 0.12);
+
+  /* Superficies en Modo Claro (Storefront / Checkout) */
+  --surface-canvas: #f9fafb;
+  --surface-card: #ffffff;
+  --surface-card-hover: #f3f4f6;
+  --surface-border: #e5e7eb;
+  --surface-border-subtle: #f3f4f6;
+
+  /* Superficies en Modo Oscuro (KDS Cocina / Dashboard / Login) */
+  --surface-dark: #09090b;
+  --surface-dark-card: #18181b;
+  --surface-dark-hover: #27272a;
+  --surface-dark-border: #27272a;
+  --surface-dark-border-subtle: #3f3f46;
+
+  /* Tipografía y Contraste */
+  --text-strong: #0f172a;
+  --text-base: #334155;
+  --text-muted: #64748b;
+  --text-subtle: #94a3b8;
+  --text-inverse-strong: #fafafa;
+  --text-inverse-base: #d4d4d8;
+  --text-inverse-muted: #a1a1aa;
+
+  /* Estados Semánticos de Operación */
+  --status-success: #16a34a;
+  --status-success-bg: rgba(22, 163, 74, 0.12);
+  --status-warning: #f59e0b;
+  --status-warning-bg: rgba(245, 158, 11, 0.12);
+  --status-danger: #dc2626;
+  --status-danger-bg: rgba(220, 38, 38, 0.12);
+  --status-info: #0284c7;
+  --status-info-bg: rgba(2, 132, 199, 0.12);
+}
+```
+
+---
+
+## 4. Anatomía Canónica de la Landing Page Comercial
+
+La página principal (`src/app/(storefront)/page.tsx`) está estructurada bajo una jerarquía visual limpia y directa:
+
+1. **Header Comercial Estilo KFC (`layout.tsx`):**
+   - Altura: `h-[70px] sm:h-[76px]`.
+   - Contenedor centrado `max-w-7xl mx-auto px-4 sm:px-6 lg:px-8`.
+   - Logotipo oficial a la izquierda: isotipo con llama/pollo y tipografía dual `LA GRANJITA` (Barlow Condensed rojo) + `Asadero` (subtítulo gris).
+   - Navegación central con anclas suaves a la misma página: `Ordenar` (`#catalogo`), `Restaurantes` (`#sucursales`), `Rastrear Pedido` (`/rastreo`), `Nosotros` (`#sucursales`).
+   - Bloque derecho: Buscador píldora gris claro (`#f8f7f5`), icono de perfil con enlace directo al portal operativo (`/login`), y bolsa de compras roja con contador numérico reactivo (`CartButtonBadge`).
+
+2. **Gran Carrusel Panorámico Hero a Ancho Completo (`CatalogHero.tsx`):**
+   - Se extiende de borde a borde de la pantalla sin restricciones artificiales de anchura (`w-full`).
+   - Soporte para 3 slides fotográficos de alta resolución con relación de aspecto panorámica.
+   - Micro-interacciones de cambio direccional fluido con sincronización de texto y crossfade.
+   - Titulares de impacto en `Barlow Condensed font-black text-4xl sm:text-6xl text-white uppercase tracking-tight`.
+
+3. **Selector de Modo de Pedido (`OrderModeSelector.tsx`):**
+   - Dos bloques limpios inspirados en kioscos modernos ("Para Entrega a Domicilio" vs "Para Retiro en Restaurante").
+   - Bordes en `neutral-200`, transiciones suaves y botones de confirmación destacados.
+
+4. **Tarjetas Promocionales de Especialidad (`PromotionalBanners.tsx`):**
+   - Banners horizontales con fotografía gastronómica real ("Hecho a la Brasa", "Receta Tradicional", "Combo Personal").
+   - Radios redondeados `rounded-3xl`, texto en mayúsculas `Barlow Condensed` y botones píldora.
+
+5. **Vitrina de Catálogo y Tarjetas de Producto (`ProductCard.tsx`):**
+   - Tarjetas en blanco puro (`bg-white rounded-3xl border border-neutral-200 overflow-hidden shadow-sm hover:shadow-xl hover:border-neutral-300 transition-all duration-300`).
+   - Fotografía de comida en proporción `aspect-[16/10] sm:aspect-[4/3]` con efecto de zoom suave al hover (`group-hover:scale-105 duration-500 ease-out`).
+   - Badges superiores flotantes con `backdrop-blur-md` (categoría en blanco traslúcido, modificadores en negro traslúcido).
+   - Título en `font-display font-black text-xl text-neutral-900 uppercase tracking-tight`.
+   - Precio en `font-mono text-2xl font-black text-neutral-950 tabular-nums`.
+   - Botón de acción: `bg-brand-primary hover:bg-brand-primary-hover text-white rounded-full py-3 px-6 text-xs font-black uppercase tracking-wider shadow-md hover:scale-105 active:scale-95`.
+
+6. **Panel de Accesos Directos Operativos (Pie de Landing):**
+   - Reubicado en la base de la landing (no en la cabecera comercial) para soporte a desarrolladores y supervisores sin alterar la conversión del cliente final.
+   - Organizado en tarjetas redondeadas por dominio: Tienda (blanca), Cocina & Admin (oscura carbón), Repartidor (blanca).
+
+---
+
+## 5. Sistema Tipográfico Estricto (2 Familias Calibradas)
 
 La plataforma utiliza estrictamente dos familias tipográficas calibradas, sin añadir una tercera fuente externa:
-* **1. Titulares, Display y Botones de Acción Primaria (`--font-display`):** `Barlow Condensed` (pesos `700 Bold`, `800 ExtraBold` y `900 Black`).
-  - Empleada en mayúsculas (`uppercase tracking-wide` o `tracking-wider`) para encabezados de sección, nombres de combos, logotipo y badges de marca (estética artesanal de fuego inspirada en El Pollo Loco).
-* **2. Cuerpo, Controles, Modales y Precios (`--font-sans`):** `Inter` (pesos `400 Regular`, `500 Medium` y `600 SemiBold`).
-  - Cero tercera fuente para cifras o precios: Se activan las cifras tabulares de la propia fuente `Inter` (`font-mono tabular-nums` con `font-feature-settings: "tnum" 1`) para alinear importes sin oscilaciones visuales.
-* **Escala Tipográfica:**
-  - Encabezados principales: `text-2xl` a `text-4xl font-black uppercase tracking-wide`.
-  - Títulos de tarjeta / Combos: `text-base` a `text-lg font-bold text-text-strong`.
-  - Texto de lectura y descripciones: `text-xs` a `text-sm font-normal leading-relaxed text-text-muted`.
-  - Importes y precios: `text-sm` a `text-lg font-black font-mono tabular-nums`.
-  - Etiquetas compactas y metadatos: `text-[10px]` y `text-[11px] font-bold uppercase tracking-wider`.
+
+1. **Titulares, Display, Logotipo y Botones de Acción Primaria (`--font-display`):**
+   - **Fuente:** `Barlow Condensed` (pesos `700 Bold`, `800 ExtraBold` y `900 Black`).
+   - **Aplicación:** Siempre en mayúsculas (`uppercase tracking-wide` o `tracking-wider`).
+   - **Uso:** Encabezados de sección (`h1`, `h2`), títulos de productos en tarjetas, botones de pedir/confirmar, títulos de modales y marca.
+
+2. **Cuerpo de Lectura, Formularios, Controles y Metadatos (`--font-sans`):**
+   - **Fuente:** `Inter` (pesos `400 Regular`, `500 Medium` y `600 SemiBold`).
+   - **Aplicación:** Descripciones de producto, campos de texto, tablas, badges y textos legales.
+
+3. **Precios e Importes Numéricos (Cero Tercera Fuente):**
+   - Se utilizan las **cifras tabulares nativas de `Inter`** mediante la utilidad `font-mono tabular-nums` (`font-feature-settings: "tnum" 1`).
+   - Alinea importes monetarios en columnas sin vibraciones visuales y sin recargar fuentes externas.
 
 ---
 
-## 4. Ergonomía Táctil y Mobile-First
+## 6. Sistema de Barras de Desplazamiento Ergonómicas (`ScrollArea`)
+
+Para eliminar las barras de desplazamiento toscas y flechas nativas del sistema operativo (flechas grises de Windows):
+
+1. **Supresión Absoluta de Flechas Nativas:**
+   ```css
+   *::-webkit-scrollbar-button,
+   ::-webkit-scrollbar-button {
+     display: none !important;
+     width: 0 !important;
+     height: 0 !important;
+   }
+   ```
+2. **Barra Flotante Minimalista:**
+   - Grosor estándar de `7px`.
+   - Track 100% transparente (`background: transparent !important`).
+   - Píldora oscura minimalista flotante (`#262329`) con bordes redondeados (`rounded-full`).
+3. **Componente Reutilizable `ScrollArea`:**
+   - Ubicación: `frontend/src/shared/components/ScrollArea.tsx`.
+   - Soporte para sombras progresivas de desplazamiento (`scrollShadows`) para indicar contenido oculto en modales y listas.
+   - Variantes integradas: `brand`, `dark`, `subtle`.
+
+---
+
+## 7. Ergonomía Táctil y Mobile-First
 
 * **Zonas de Pulsación (Touch Targets):**
-  - Cualquier botón interactivo, selector o casilla en móvil debe tener una dimensión mínima de `44px` (ideal `48px`) para evitar pulsaciones erróneas de repartidores con guantes o clientes en smartphones.
-* **Micro-Interacciones:**
-  - Retroalimentación háptica visual en botones mediante escalado sutil: `active:scale-95`.
+  - Todo botón interactivo, selector de modificador, casilla o campo de formulario debe tener una dimensión mínima de `44px` (ideal `48px`) para garantizar operatividad con una sola mano o por personal en cocina y reparto.
+* **Micro-Interacciones Hápticas:**
+  - Reducción visual al pulsar: `active:scale-95`.
   - Transiciones suaves y consistentes: `transition-all duration-200 ease-out`.
-  - Pulso continuo para indicadores de seguimiento GPS activo: `animate-pulse` o `animate-ping`.
+  - Pulso continuo en estados satelitales GPS en vivo: `animate-pulse` o `animate-ping`.
 
 ---
 
-## 5. Accesibilidad (WCAG 2.1 AA)
+## 8. Accesibilidad (WCAG 2.1 AA)
 
-* **Contraste de Color:**
-  - Relación de contraste mínima de 4.5:1 para texto estándar y 3:1 para texto de gran tamaño o controles de interfaz.
-* **Estados de Foco:**
-  - Todo elemento interactivo debe disponer de anillo de foco visible (`focus-visible:ring-2 focus-visible:ring-amber-500/50 focus:outline-none`).
-* **Semántica:**
-  - Empleo de elementos semánticos de HTML5 (`<main>`, `<nav>`, `<section>`, `<header>`, `<button>`). Prohibido sustituir enlaces o botones por `<div>` sin atributos ARIA ni soporte de teclado.
+* **Contraste de Color:** Mínimo de 4.5:1 en textos estándar sobre fondo blanco o carbón, y 3:1 en botones y controles.
+* **Anillos de Foco Visibles:** Anillo de foco accesible sin distorsionar el diseño (`focus-visible:ring-2 focus-visible:ring-brand-primary focus:outline-none`).
+* **Semántica HTML5 Estricta:** Uso de `<header>`, `<nav>`, `<main>`, `<section>`, `<article>`, `<button>`. Prohibido crear botones mediante etiquetas `<div>` o `<span>` sin soporte de teclado y accesibilidad.
 
 ---
 
-## 6. Prohibiciones Técnicas y Restricciones Estéticas Estrictas
+## 9. Prohibiciones Técnicas y Restricciones Estéticas Innegociables
 
-* **Cero Emojis:** Prohibido el uso de emojis en cualquier componente, botón, título, badge, alerta o texto de la interfaz. La comunicación visual debe ser 100% profesional, sobria y fáctica.
-* **Cero KPIs Enormes:** Prohibido el uso de tipografía desproporcionada o métricas gigantescas (ej. `text-5xl`, `text-6xl` o bloques masivos de KPIs decorativos). Las cifras clave y totales deben mantener proporciones compactas y equilibradas (`text-xl` a `text-2xl font-bold font-mono`).
-* **Mínimos Iconos SVG (Uso Exclusivamente Esencial):** Prohibido saturar la interfaz con iconos en cada botón, título, enlace o tarjeta. Los iconos SVG quedan reservados únicamente a casos donde la funcionalidad no puede comunicarse solo con texto (ej. botón de cierre `X`, feedback de carga activa, o marcadores de ubicación en mapas). Si un botón o texto se comprende de forma autónoma, no debe incluir SVG.
-* **Prohibido Badges/Pills de Estado Decorativas con Iconos SVG:** Queda terminantemente prohibido el uso de insignias o píldoras con fondos pastel (ej. verde `bg-status-success/15` o similares), iconos SVG decorativos (como escudos `ShieldCheck`, checks o candados) y palabras redundantes u obvias como "ABIERTO", "OPERATIVA", "ACTIVO" o similares. Rompen la estética gastronómica limpia y saturan visualmente la interfaz simulando software corporativo o antivirus. Si se requiere comunicar disponibilidad o estado, debe hacerse mediante tipografía sobria, datos contextuales o de forma implícita en el flujo operativo sin cápsulas decorativas.
-* **Prohibido `!important`:** Todo conflicto de especificidad debe resolverse ajustando el orden o utilizando capas de Tailwind / CSS estructurado.
-* **Prohibido Estilos Inline Aleatorios:** Estilos visuales como colores de fondo, márgenes y tipografías deben definirse con los tokens globales de CSS y utilidades predecibles.
-* **Prohibido Desbordamientos Horizontales:** El diseño debe ser 100% responsivo y fluido desde una anchura mínima de 360px hasta monitores ultrapanorámicos.
+1. **Cero Emojis:** Queda estrictamente prohibido el uso de emojis en cualquier componente, botón, título, badge, alerta, commit o documentación. La estética es 100% sobria, fáctica y profesional.
+2. **Cero KPIs Gigantes:** Prohibido el uso de tipografía desproporcionada o métricas gigantescas (`text-5xl`, `text-6xl`). Totales y cifras operativas se mantienen compactas y equilibradas (`text-xl` a `text-2xl font-black font-mono`).
+3. **Mínimos Iconos SVG (Uso Exclusivamente Esencial):**
+   - Prohibido saturar la interfaz con iconos decorativos en cada botón o enlace.
+   - Los iconos SVG se limitan a acciones donde el texto no es suficiente (cerrar modal `X`, feedback de carga activa `Loader2`, flecha de retroceso o pines de mapa). Si un botón ya indica "PEDIR" o "ACCEDER AL SISTEMA", no debe acompañarse de un SVG redundante.
+4. **Prohibido Badges/Pills de Estado Decorativas con Iconos SVG:**
+   - Prohibido utilizar píldoras pastel (ej. verde `bg-status-success/15` con escudos `ShieldCheck`, candados o checks) con palabras obvias como "ABIERTO", "ACTIVO", "OPERATIVA" o "SEGURO". Simulan software antivirus corporativo y rompen la estética gastronómica limpia.
+5. **Prohibido Fondos Rosáceos Deslavados:**
+   - Prohibido el uso de `bg-brand-primary-light` o transparencias bajas de rojo en tarjetas y componentes. Los fondos de tarjetas son blancos sólidos o carbón oscuro.
+6. **Prohibido `!important` y Estilos Inline Aleatorios:**
+   - Todo estilo debe resolverse mediante las capas estructuradas de Tailwind CSS y tokens de diseño globales.
+7. **Prohibido Desbordamientos Horizontales:**
+   - El diseño debe ser 100% responsivo y fluido desde una anchura mínima de 360px hasta monitores ultrapanorámicos.

@@ -41,20 +41,20 @@ export default function StorefrontLayout({
               </div>
             </Link>
 
-            {/* Enlaces de Navegación estilo KFC con Anclas a la Misma Página */}
+            {/* Enlaces de Navegación estilo KFC con Anclas a la Página Principal */}
             <nav className="hidden lg:flex items-center gap-5 xl:gap-6 text-[13px] sm:text-sm font-semibold text-neutral-800">
-              <a href="#catalogo" className="hover:text-brand-primary transition-colors">
+              <Link href="/#catalogo" className="hover:text-brand-primary transition-colors">
                 Ordenar
-              </a>
-              <a href="#sucursales" className="hover:text-brand-primary transition-colors">
+              </Link>
+              <Link href="/#sucursales" className="hover:text-brand-primary transition-colors">
                 Restaurantes
-              </a>
+              </Link>
               <Link href="/rastreo" className="hover:text-brand-primary transition-colors">
                 Rastrear Pedido
               </Link>
-              <a href="#sucursales" className="hover:text-brand-primary transition-colors">
+              <Link href="/#sucursales" className="hover:text-brand-primary transition-colors">
                 Nosotros
-              </a>
+              </Link>
             </nav>
           </div>
 
@@ -71,22 +71,14 @@ export default function StorefrontLayout({
               </a>
             </div>
 
-            {/* Icono Perfil con etiqueta inferior estilo KFC */}
+            {/* Icono Perfil que lleva a /login */}
             <Link
-              href="/rastreo"
+              href="/login"
               className="flex flex-col items-center justify-center text-neutral-800 hover:text-brand-primary transition-colors px-1 shrink-0"
-              title="Mi Perfil"
+              title="Mi Perfil / Iniciar Sesión"
             >
               <User className="w-5 h-5 text-neutral-800 stroke-[1.8]" />
               <span className="text-[10px] font-semibold text-neutral-700 leading-none mt-1">Perfil</span>
-            </Link>
-
-            {/* Botón Píldora Negra estilo KFC "Ingresar" */}
-            <Link
-              href="/rastreo"
-              className="bg-neutral-950 hover:bg-neutral-800 text-white text-xs font-bold px-4 sm:px-5 py-2 rounded-full transition-colors shadow-sm shrink-0"
-            >
-              Ingresar
             </Link>
 
             {/* Bolsa de Compras con Badge Rojo estilo KFC */}

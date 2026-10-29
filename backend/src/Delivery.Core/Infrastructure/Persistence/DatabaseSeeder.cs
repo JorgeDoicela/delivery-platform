@@ -185,6 +185,8 @@ public static class DatabaseSeeder
     {
         var staffSpecs = new[]
         {
+            (Email: "jorge@lagranjita.com", Name: "Jorge - Super Administrador", Phone: "0999999999", RoleId: Role.SuperAdmin, BranchScoped: false),
+            (Email: "jorge@admin.com", Name: "Jorge - Super Administrador Global", Phone: "0999999999", RoleId: Role.SuperAdmin, BranchScoped: false),
             (Email: "esmeralda@lagranjita.com", Name: "Esmeralda - Administradora", Phone: "0987654321", RoleId: Role.TenantAdmin, BranchScoped: false),
             (Email: "cajero@lagranjita.com", Name: "Cajero Principal Norte", Phone: "0987654323", RoleId: Role.Cashier, BranchScoped: true),
             (Email: "cocina@lagranjita.com", Name: "Maestro Hornero KDS", Phone: "0987654324", RoleId: Role.KitchenStaff, BranchScoped: true),
@@ -308,6 +310,7 @@ public static class DatabaseSeeder
                 var movements = items.Select(item => new InventoryMovement
                 {
                     TenantId = tenantId,
+                    BranchId = branch.Id,
                     InventoryItemId = item.Id,
                     SupplierId = supplier.Id,
                     MovementType = "COMPRA_PROVEEDOR",

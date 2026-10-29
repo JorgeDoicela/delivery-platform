@@ -15,6 +15,7 @@ flowchart TD
     App --> Storefront["(storefront)/ (Canal Cliente B2C y Vitrina)"]
     App --> Dashboard["(dashboard)/ (KDS y Operaciones de Sede)"]
     App --> Driver["(driver)/ (Smartphone Repartidores)"]
+    App --> Auth["(auth)/ (Portal de Acceso y Sesion)"]
 
     Storefront --> StoreLayout["Storefront Layout (Header con Carrito + Footer)"]
     StoreLayout --> Home["/ (Vitrina Principal, Banner, Catalogo #catalogo y Sucursales #sucursales)"]
@@ -23,14 +24,17 @@ flowchart TD
     StoreLayout --> CheckoutRoute["/checkout y /finalizar-pedido (Resolucion de Geocerca + Formulario)"]
     StoreLayout --> TrackRoute["/track/[orderId] y /rastreo (Seguimiento Satelital SignalR)"]
 
-    Dashboard --> DashLayout["Dashboard Layout (Fullscreen Dark KDS)"]
-    DashLayout --> Kitchen["/kitchen y /cocina (Tablero Kanban FIFO de Cocina)"]
+    Dashboard --> DashLayout["Dashboard Layout (Fullscreen Dark KDS + UserNav)"]
+    DashLayout --> Kitchen["/kitchen y /cocina (Tablero Kanban FIFO de Cocina con AuthGuard)"]
     DashLayout --> AdminInventario["/admin/inventario (Control de Insumos y Kardex)"]
     DashLayout --> AdminSucursales["/admin/sucursales (Capacidad de Hornos por Slot)"]
 
     Driver --> DriverLayout["Driver Layout (Mobile Shell 430px Centrado)"]
     DriverLayout --> RepartidorPortal["/repartidor (Portal del Motorizado)"]
     DriverLayout --> ActiveDelivery["/active-delivery (Ruta Activa con Transmision GPS)"]
+
+    Auth --> AuthLayout["Auth Layout (Minimalista Centrado)"]
+    AuthLayout --> LoginRoute["/login (Formulario React Hook Form + Zod)"]
 ```
 
 ---
@@ -50,6 +54,7 @@ La plataforma implementa un panel de accesos directos en [`src/app/(storefront)/
 | **Cocina & Admin** | `/admin/sucursales` | N/A | Throttling de hornos (pedidos por slot de 20 min)|
 | **Repartidor** | `/repartidor` | N/A | Portal y lista de pedidos asignados al conductor|
 | **Repartidor** | `/active-delivery` | N/A | Transmision continua de geolocalizacion GPS |
+| **Autenticacion** | `/login` | N/A | Inicio de sesion operativo con rotacion HttpOnly y RBAC |
 
 > [!NOTE]
 > Las anclas `#catalogo` y `#sucursales` en el encabezado ([`Header.tsx`](file:///c:/Users/DESARROLLADOR/Desktop/Proyectos/delivery-platform/frontend/src/features/catalog/components/Header.tsx)) permiten desplazamiento suave directo a las secciones de la vitrina principal sin recargar la aplicacion.
@@ -72,6 +77,10 @@ La plataforma implementa un panel de accesos directos en [`src/app/(storefront)/
 * **URL Publica:** `/active-delivery`, `/repartidor`
 * **Diseno Visual:** Shell restringido a ancho de smartphone (maximo 512px) con botones de toque amplio para facilitar operacion a una sola mano en motocicleta.
 
+### 4.4. Canal Autenticacion y Acceso (`src/app/(auth)/`)
+* **URL Publica:** `/login`
+* **Diseno Visual:** Layout centrado minimalista sin cabeceras comerciales ni de cocina. Formulario reactivo con React Hook Form + Zod, validacion en tiempo real y gestion de estados `idle`, `loading`, `error` y `success`.
+
 ---
 
 ## 5. Gestion de Estado Global (Zustand Store)
@@ -92,6 +101,26 @@ interface CartItem {
 
 > [!NOTE]
 > La clave deterministica `id` permite que si el cliente anade dos veces el mismo combo con exactamente los mismos modificadores, se incremente la cantidad en lugar de duplicar lineas en la comanda.
+
+---
+
+## 6. Seguridad y Control de Acceso en Frontend (RBAC)
+
+La autenticacion y proteccion de vistas operativas opera bajo una arquitectura de defensa en profundidad de dos capas:
+
+### 6.1. Guardia Perimetral en Edge (`src/middleware.ts`)
+Interpreta las peticiones entrantes antes de renderizar paginas protegidas (`/cocina`, `/kitchen`, `/admin/*`, `/driver/*`):
+* Comprueba la presencia de la cookie de sesion `refresh_token`.
+* Si no existe o esta vacia, redirige inmediatamente a `/login?redirect={pathname}` sin descargar el codigo del cliente.
+
+### 6.2. Guardia RBAC en Cliente (`AuthGuard.tsx`)
+* Resuelve la identidad y el rol activo del usuario contra el store en memoria (`useAuthStore`).
+* Bloquea el acceso a nivel de componente si el rol del usuario no figura en la lista permitida para la vista (ej. un repartidor intentando operar `/cocina`).
+* Emite un banner de acceso denegado con estados de carga transparentes mediante el hook `useIsMounted`.
+
+### 6.3. Almacenamiento Seguro sin XSS
+* El `accessToken` vive exclusivamente en la memoria volatil del store Zustand (`useAuthStore.ts`), nunca en `localStorage`.
+* Las llamadas a `/api/v1/auth/*` utilizan `credentials: "include"` para permitir la transmision automatica y segura de cookies `HttpOnly`.
 
 ---
 

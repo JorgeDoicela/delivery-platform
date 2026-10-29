@@ -1,6 +1,7 @@
 import Link from "next/link";
 import Image from "next/image";
 import { Utensils, Volume2, Package, Building2 } from "lucide-react";
+import { UserNav } from "@/features/auth";
 
 export default function DashboardLayout({
   children,
@@ -85,6 +86,8 @@ export default function DashboardLayout({
           >
             <span>Ver Tienda</span>
           </Link>
+
+          <UserNav />
         </div>
       </header>
 

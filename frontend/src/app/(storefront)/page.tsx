@@ -101,6 +101,14 @@ export default function StorefrontHomePage() {
                 </span>
                 <div className="flex flex-col gap-2">
                   <Link
+                    href="/login"
+                    className="flex items-center justify-between px-4 py-2.5 rounded-full border border-neutral-800 hover:border-brand-primary hover:bg-neutral-900 text-xs font-black uppercase tracking-wider font-display transition-colors text-white"
+                  >
+                    <span>Portal de Acceso (Login)</span>
+                    <span className="text-[10px] text-brand-primary font-mono font-bold">/login</span>
+                  </Link>
+
+                  <Link
                     href="/cocina"
                     className="flex items-center justify-between px-4 py-2.5 rounded-full border border-neutral-800 hover:border-brand-primary hover:bg-neutral-900 text-xs font-black uppercase tracking-wider font-display transition-colors text-white"
                   >

@@ -1,4 +1,5 @@
 import { KitchenView } from '@/features/kitchen';
+import { AuthGuard, UserRole } from '@/features/auth';
 
 export const metadata = {
   title: 'KDS Cocina | La Granjita Asadero',
@@ -6,6 +7,21 @@ export const metadata = {
 };
 
 export default function CocinaPage() {
-  return <KitchenView />;
+  return (
+    <AuthGuard
+      allowedRoles={[
+        UserRole.KitchenStaff,
+        UserRole.BranchManager,
+        UserRole.TenantAdmin,
+        UserRole.SuperAdmin,
+        'KitchenStaff',
+        'BranchManager',
+        'TenantAdmin',
+        'SuperAdmin',
+      ]}
+    >
+      <KitchenView />
+    </AuthGuard>
+  );
 }
 

@@ -1,6 +1,6 @@
 namespace Delivery.Features.Auth.Login;
 
-public record LoginRequest(string Email, string Password, string? TenantSlug);
+public record LoginRequest(string Email, string Password, string? TenantSlug = null);
 
 public record UserAuthInfoDto(
     Guid Id,

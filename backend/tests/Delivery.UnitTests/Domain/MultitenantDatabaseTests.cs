@@ -130,7 +130,7 @@ public class MultitenantDatabaseTests
         (await context.Tenants.CountAsync()).Should().Be(1);
         (await context.TenantSettings.CountAsync()).Should().Be(1);
         (await context.Roles.CountAsync()).Should().Be(7);
-        (await context.Users.CountAsync()).Should().Be(4);
+        (await context.Users.CountAsync()).Should().Be(6); // 2 SuperAdmin (jorge@...) + 4 operativos
         (await context.Drivers.CountAsync()).Should().Be(1);
         (await context.Branches.CountAsync()).Should().Be(2);
         (await context.DiningTables.CountAsync()).Should().Be(16); // 8 mesas por cada una de las 2 sucursales

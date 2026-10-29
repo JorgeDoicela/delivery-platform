@@ -61,15 +61,15 @@ public class LoginHandler : IHandler<LoginCommand, Result<LoginResponse>>
             return Result.Failure<LoginResponse>(AuthErrors.TenantInactive);
         }
 
-        // 2. Busqueda del usuario dentro del tenant
-        var emailLower = request.Email.Trim().ToLowerInvariant();
+        // 2. Busqueda del usuario dentro del tenant o global (SuperAdmin)
+#pragma warning disable CA1862, CA1304, CA1311
+        var emailLower = request.Email.Trim().ToLower(System.Globalization.CultureInfo.InvariantCulture);
 
-#pragma warning disable CA1862
         var user = await _context.Users.IgnoreQueryFilters()
             .Include(u => u.UserRoles)
                 .ThenInclude(ur => ur.Role)
-            .FirstOrDefaultAsync(u => u.TenantId == tenant.Id && u.Email.ToLowerInvariant() == emailLower, cancellationToken);
-#pragma warning restore CA1862
+            .FirstOrDefaultAsync(u => (u.TenantId == tenant.Id || u.TenantId == null) && u.Email.ToLower() == emailLower, cancellationToken);
+#pragma warning restore CA1862, CA1304, CA1311
 
         if (user == null)
         {
