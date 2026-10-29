@@ -9,7 +9,6 @@ interface HeroSlide {
   badge: string;
   title: string;
   subtitle: string;
-  highlightPrice: string;
   ctaText: string;
   ctaHref: string;
   imageUrl: string;
@@ -20,7 +19,6 @@ const HERO_SLIDES: HeroSlide[] = [
     badge: "Especial del Asador",
     title: "LO QUE TE FALTA ES BRASA Y LEÑA",
     subtitle: "Pollo entero asado lentamente al carbón vegetal con guarniciones calientes, ensalada fresca y ají artesanal.",
-    highlightPrice: "$18.99",
     ctaText: "ORDENA AQUÍ",
     ctaHref: "/catalogo",
     imageUrl: "/images/banners/hero-pollo-brasa.jpg",
@@ -29,7 +27,6 @@ const HERO_SLIDES: HeroSlide[] = [
     badge: "Ahorro Familiar",
     title: "SUPER COMBO ASADOR 12 PRESAS",
     subtitle: "Rinde para 5 a 6 personas. Incluye porción doble de papas fritas rústicas, ensalada grande y gaseosa familiar.",
-    highlightPrice: "$24.99",
     ctaText: "ORDENA AQUÍ",
     ctaHref: "/catalogo",
     imageUrl: "/images/banners/hero-combo-familiar.jpg",
@@ -38,7 +35,6 @@ const HERO_SLIDES: HeroSlide[] = [
     badge: "Favorito del Almuerzo",
     title: "COMBO CUARTO DE POLLO CLÁSICO",
     subtitle: "Presa dorada y jugosa con papas fritas rústicas artesanales, ensalada fresca, ají criollo y bebida personal.",
-    highlightPrice: "$5.99",
     ctaText: "ORDENA AQUÍ",
     ctaHref: "/catalogo",
     imageUrl: "/images/banners/hero-combo-personal.jpg",
@@ -151,17 +147,8 @@ export function CatalogHero() {
                 {s.subtitle}
               </p>
 
-              {/* Precio Destacado e Interacción Primaria estilo KFC */}
+              {/* Botones de Interacción Primaria estilo KFC */}
               <div className="flex flex-wrap items-center gap-4 pt-3">
-                <div className="bg-black/50 backdrop-blur-md px-5 py-2.5 rounded-full border border-white/20 flex items-baseline gap-2 text-white shadow-lg">
-                  <span className="text-[11px] font-bold uppercase tracking-widest text-white/80">
-                    Desde
-                  </span>
-                  <span className="text-2xl sm:text-3xl font-black text-amber-300 tabular-nums">
-                    {s.highlightPrice}
-                  </span>
-                </div>
-
                 <Link
                   href={s.ctaHref}
                   tabIndex={isActive ? 0 : -1}

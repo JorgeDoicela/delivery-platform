@@ -1,7 +1,7 @@
 "use client";
 
 import React from "react";
-import { Bike, Store, Clock, ShieldCheck } from "lucide-react";
+import { Bike, Store, Flame, ShieldCheck } from "lucide-react";
 import { useCartStore } from "@/features/cart";
 
 export function OrderModeSelector() {
@@ -45,7 +45,7 @@ export function OrderModeSelector() {
               A Domicilio
             </span>
             <span className="text-xs text-white/80 block mt-0.5">
-              Tarifa estándar: $1.50 • Despacho en 20-35 min
+              Despacho directo y seguro a tu dirección
             </span>
           </div>
           {deliveryType === "delivery" && (
@@ -76,7 +76,7 @@ export function OrderModeSelector() {
               Recoge en Local
             </span>
             <span className="text-xs text-white/80 block mt-0.5">
-              Retiro en La Granjita Norte o Sur • Listo en 20 min
+              Retiro disponible en todas nuestras sucursales
             </span>
           </div>
           {deliveryType === "takeout" && (
@@ -97,13 +97,13 @@ export function OrderModeSelector() {
         </div>
         <span className="text-neutral-300 hidden sm:inline">•</span>
         <div className="flex items-center gap-1.5 text-neutral-600">
-          <Clock className="w-3.5 h-3.5 text-brand-primary" />
-          <span>Horno en marcha: 20 min por tanda</span>
+          <Flame className="w-3.5 h-3.5 text-brand-primary" />
+          <span>Asado tradicional al carbón</span>
         </div>
         <span className="text-neutral-300 hidden sm:inline">•</span>
         <div className="flex items-center gap-1.5 text-neutral-600">
           <ShieldCheck className="w-3.5 h-3.5 text-status-success" />
-          <span>Envío estándar $1.50 • Facturación SRI</span>
+          <span>Facturación autorizada SRI</span>
         </div>
       </div>
     </section>
