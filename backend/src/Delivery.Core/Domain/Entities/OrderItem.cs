@@ -20,7 +20,17 @@ public class OrderItem
     /// </summary>
     public decimal UnitPriceSnapshot { get; set; }
 
+    /// <summary>
+    /// Snapshot del porcentaje de IVA aplicable al momento de la venta.
+    /// </summary>
+    public decimal TaxRateSnapshot { get; set; }
+
     public int Quantity { get; set; }
+
+    /// <summary>
+    /// Instrucciones específicas de preparación en cocina (ej. "Pechuga bien cocida, sin ensalada").
+    /// </summary>
+    public string? Notes { get; set; }
 
     // Navegación
     public ICollection<OrderItemModifier> Modifiers { get; set; } = new List<OrderItemModifier>();

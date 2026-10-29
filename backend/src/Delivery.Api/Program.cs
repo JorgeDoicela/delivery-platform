@@ -1,8 +1,10 @@
 using Delivery.Features.Common.Endpoints;
 using Delivery.Api.Hubs;
 using Delivery.Api.Middlewares;
+using Delivery.Api.Multitenancy;
 using Delivery.Api.Realtime;
 using Delivery.Core.Contracts.Realtime;
+using Delivery.Core.Domain.Common;
 using Delivery.Core.Infrastructure.Persistence;
 using Delivery.Features;
 using Hangfire;
@@ -15,6 +17,9 @@ var builder = WebApplication.CreateBuilder(args);
 // 1. Configuración de Base de Datos PostgreSQL con NetTopologySuite (PostGIS)
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection")
     ?? throw new InvalidOperationException("Cadena de conexión 'DefaultConnection' no encontrada.");
+
+builder.Services.AddScoped<TenantContext>();
+builder.Services.AddScoped<ITenantContext>(sp => sp.GetRequiredService<TenantContext>());
 
 builder.Services.AddDbContext<AppDbContext>(options =>
 {
@@ -83,6 +88,7 @@ if (app.Environment.IsDevelopment())
 
 app.UseMiddleware<ExceptionHandlingMiddleware>();
 app.UseCors("AllowFrontend");
+app.UseMiddleware<TenantResolutionMiddleware>();
 app.UseMiddleware<IdempotencyMiddleware>();
 
 // Dashboard de Hangfire para auditoría de tareas en segundo plano (restringido a Development por seguridad)
