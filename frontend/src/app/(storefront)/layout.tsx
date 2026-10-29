@@ -12,10 +12,10 @@ export default function StorefrontLayout({
     <div className="flex flex-col min-h-screen bg-surface-canvas">
       {/* Header Comercial Blanco Limpio estilo KFC con Barra Roja Inferior */}
       <header className="sticky top-0 z-40 bg-white border-b-2 border-brand-primary shadow-sm">
-        <div className="w-full px-4 sm:px-8 lg:px-12 h-16 sm:h-[68px] flex items-center justify-between gap-4">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 sm:h-[68px] flex items-center justify-between gap-4 sm:gap-6 lg:gap-8">
           
           {/* Bloque Izquierdo: Logo + Navegación Agrupada con Espaciado estilo KFC */}
-          <div className="flex items-center gap-8 lg:gap-10 shrink-0">
+          <div className="flex items-center gap-6 lg:gap-8 shrink-0">
             {/* Logo Oficial La Granjita Asadero sin fondo */}
             <Link href="/" className="flex items-center gap-2.5 group shrink-0">
               <div className="relative w-9 h-9 sm:w-10 sm:h-10 shrink-0">
@@ -42,7 +42,7 @@ export default function StorefrontLayout({
             </Link>
 
             {/* Enlaces de Navegación estilo KFC (Tipografía en caja mixta y espaciado cómodo) */}
-            <nav className="hidden lg:flex items-center gap-7 text-[13px] sm:text-sm font-semibold text-neutral-800">
+            <nav className="hidden lg:flex items-center gap-5 xl:gap-6 text-[13px] sm:text-sm font-semibold text-neutral-800">
               <Link href="/catalogo" className="hover:text-brand-primary transition-colors">
                 Ordenar
               </Link>
@@ -59,12 +59,12 @@ export default function StorefrontLayout({
           </div>
 
           {/* Bloque Derecho: Buscador Píldora + Perfil + Botón Ingresar + Bolsa estilo KFC */}
-          <div className="flex items-center gap-3 sm:gap-4 md:gap-5 shrink-0">
+          <div className="flex items-center gap-3 sm:gap-4 lg:gap-5 shrink-0">
             {/* Buscador Píldora con fondo gris claro y lupa */}
             <div className="hidden md:flex items-center">
               <Link
                 href="/catalogo"
-                className="flex items-center gap-2.5 px-4 py-2 w-48 sm:w-56 lg:w-64 bg-[#f8f7f5] hover:bg-neutral-200/70 rounded-full transition-colors border border-neutral-200/70 text-neutral-500 group"
+                className="flex items-center gap-2.5 px-4 py-2 w-56 sm:w-64 md:w-72 lg:w-80 bg-[#f8f7f5] hover:bg-neutral-200/70 rounded-full transition-colors border border-neutral-200/60 text-neutral-500 group"
               >
                 <Search className="w-4 h-4 text-neutral-500 group-hover:text-brand-primary transition-colors shrink-0" />
                 <span className="text-xs sm:text-sm text-neutral-400 font-normal">Buscar</span>
@@ -103,7 +103,7 @@ export default function StorefrontLayout({
 
       {/* Footer Estilo KFC Limpio con Accesos Operativos */}
       <footer id="sucursales" className="bg-neutral-100 text-neutral-600 text-xs border-t border-neutral-200 mt-16 py-12">
-        <div className="w-full px-4 sm:px-8 lg:px-12 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
           <div>
             <div className="flex items-center gap-2.5 mb-3">
               <div className="relative w-8 h-8 shrink-0">
