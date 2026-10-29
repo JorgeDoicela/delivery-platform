@@ -179,37 +179,37 @@ textarea {
 }
 
 /* ==========================================================================
-   Sistema de Barras de Desplazamiento Ergonómicas (Estilo Asadero La Granjita)
-   Elimina flechas nativas del SO y ofrece scrollbars flotantes minimalistas
+   Barra de Desplazamiento Minimalista Flotante (Sin selectores/flechas)
+   Píldora oscura sobre track 100% transparente estilo moderno
    ========================================================================== */
 
-/* 1. Ocultar botones y flechas nativas del sistema operativo (▲ y ▼ de Windows) */
-::-webkit-scrollbar-button {
+/* 1. Ocultar absolutamente los botones y selectores nativos de arriba y abajo (▲ y ▼) */
+*::-webkit-scrollbar-button,
+::-webkit-scrollbar-button,
+::-webkit-scrollbar-button:single-button,
+::-webkit-scrollbar-button:vertical:decrement,
+::-webkit-scrollbar-button:vertical:increment,
+::-webkit-scrollbar-button:horizontal:decrement,
+::-webkit-scrollbar-button:horizontal:increment {
   display: none !important;
   width: 0 !important;
   height: 0 !important;
 }
 
-/* 2. Barra de desplazamiento global de la ventana (html/body) */
-html {
-  scrollbar-width: thin;
-  scrollbar-color: #cbd5e1 transparent;
-}
-
+/* 2. Barra de desplazamiento global de la ventana y elementos WebKit/Chromium */
 ::-webkit-scrollbar {
-  width: 8px;
-  height: 8px;
+  width: 7px;
+  height: 7px;
 }
 
-::-webkit-scrollbar-track {
-  background: transparent;
+::-webkit-scrollbar-track,
+::-webkit-scrollbar-track-piece {
+  background: transparent !important;
 }
 
 ::-webkit-scrollbar-thumb {
-  background-color: #cbd5e1;
+  background-color: #262329;
   border-radius: 9999px;
-  border: 2px solid transparent;
-  background-clip: content-box;
   transition: background-color 0.2s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
@@ -218,29 +218,36 @@ html {
 }
 
 ::-webkit-scrollbar-corner {
-  background: transparent;
+  background: transparent !important;
 }
 
-/* 3. Clases de utilidad para componentes ScrollArea y contenedores desplazables */
-.custom-scrollbar {
-  scrollbar-width: thin;
-  scrollbar-color: #cbd5e1 transparent;
+/* 3. Soporte para Firefox donde scrollbar-width thin elimina flechas nativas */
+@supports not selector(::-webkit-scrollbar) {
+  * {
+    scrollbar-width: thin;
+    scrollbar-color: #262329 transparent;
+  }
 }
 
+/* 4. Clases de utilidad para componentes ScrollArea y contenedores desplazables */
 .custom-scrollbar::-webkit-scrollbar {
-  width: 6px;
-  height: 6px;
+  width: 7px;
+  height: 7px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-button {
+  display: none !important;
+  width: 0 !important;
+  height: 0 !important;
 }
 
 .custom-scrollbar::-webkit-scrollbar-track {
-  background: transparent;
+  background: transparent !important;
 }
 
 .custom-scrollbar::-webkit-scrollbar-thumb {
-  background-color: #cbd5e1;
+  background-color: #262329;
   border-radius: 9999px;
-  border: 1.5px solid transparent;
-  background-clip: content-box;
   transition: background-color 0.2s ease;
 }
 
@@ -249,39 +256,45 @@ html {
 }
 
 /* Variante Marca (Rojo Asadero) */
-.scrollbar-brand {
-  scrollbar-width: thin;
-  scrollbar-color: var(--brand-primary) transparent;
+.scrollbar-brand::-webkit-scrollbar {
+  width: 7px;
+  height: 7px;
 }
 
-.scrollbar-brand::-webkit-scrollbar {
-  width: 6px;
-  height: 6px;
+.scrollbar-brand::-webkit-scrollbar-button {
+  display: none !important;
+  width: 0 !important;
+  height: 0 !important;
+}
+
+.scrollbar-brand::-webkit-scrollbar-track {
+  background: transparent !important;
 }
 
 .scrollbar-brand::-webkit-scrollbar-thumb {
   background-color: var(--brand-primary);
   border-radius: 9999px;
-  border: 1px solid transparent;
-  background-clip: content-box;
 }
 
 /* Variante Oscura (Para terminales KDS y Repartidor) */
-.scrollbar-dark {
-  scrollbar-width: thin;
-  scrollbar-color: #3f3f46 transparent;
+.scrollbar-dark::-webkit-scrollbar {
+  width: 7px;
+  height: 7px;
 }
 
-.scrollbar-dark::-webkit-scrollbar {
-  width: 6px;
-  height: 6px;
+.scrollbar-dark::-webkit-scrollbar-button {
+  display: none !important;
+  width: 0 !important;
+  height: 0 !important;
+}
+
+.scrollbar-dark::-webkit-scrollbar-track {
+  background: transparent !important;
 }
 
 .scrollbar-dark::-webkit-scrollbar-thumb {
-  background-color: #3f3f46;
+  background-color: #262329;
   border-radius: 9999px;
-  border: 1px solid transparent;
-  background-clip: content-box;
   transition: background-color 0.2s ease;
 }
 
@@ -290,23 +303,20 @@ html {
 }
 
 /* Variante Sutil */
-.scrollbar-subtle {
-  scrollbar-width: thin;
-  scrollbar-color: #e2e8f0 transparent;
+.scrollbar-subtle::-webkit-scrollbar {
+  width: 5px;
+  height: 5px;
 }
 
-.scrollbar-subtle::-webkit-scrollbar {
-  width: 4px;
-  height: 4px;
+.scrollbar-subtle::-webkit-scrollbar-button {
+  display: none !important;
+  width: 0 !important;
+  height: 0 !important;
 }
 
 .scrollbar-subtle::-webkit-scrollbar-thumb {
-  background-color: #e2e8f0;
-  border-radius: 9999px;
-}
-
-.scrollbar-subtle::-webkit-scrollbar-thumb:hover {
   background-color: #94a3b8;
+  border-radius: 9999px;
 }
 
 /* Ocultar barra manteniendo desplazamiento táctil y de rueda */
@@ -316,5 +326,5 @@ html {
 }
 
 .scrollbar-none::-webkit-scrollbar {
-  display: none;
+  display: none !important;
 }
