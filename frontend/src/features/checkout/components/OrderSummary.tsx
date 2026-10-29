@@ -2,6 +2,7 @@
 
 import { useCartStore } from "@/features/cart";
 import { formatCurrency } from "@/shared/lib/utils";
+import { ScrollArea } from "@/shared/components";
 import { Trash2, Plus, Minus, ShoppingBag, Truck, Store } from "lucide-react";
 import Link from "next/link";
 
@@ -79,8 +80,13 @@ export function OrderSummary() {
         </button>
       </div>
 
-      {/* Lista de Productos en el Carrito */}
-      <div className="divide-y divide-surface-border-subtle max-h-72 overflow-y-auto space-y-3 pr-1">
+      {/* Lista de Productos en el Carrito (ScrollArea Ergonómico) */}
+      <ScrollArea
+        maxHeight="288px"
+        variant="brand"
+        scrollShadows
+        viewportClassName="divide-y divide-surface-border-subtle space-y-3 pr-1"
+      >
         {items.map((item) => (
           <div key={item.cartItemId} className="pt-3 first:pt-0 space-y-2">
             <div className="flex items-start justify-between gap-3 text-xs">
@@ -140,7 +146,7 @@ export function OrderSummary() {
             </div>
           </div>
         ))}
-      </div>
+      </ScrollArea>
 
       {/* Desglose de Totales */}
       <div className="pt-3 border-t border-surface-border-subtle space-y-1.5 text-xs">

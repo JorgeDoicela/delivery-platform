@@ -4,6 +4,7 @@ import { useState } from "react";
 import type { MenuProductDto, MenuModifierGroupDto } from "@/shared/types/api";
 import { useCartStore, type SelectedModifier } from "@/features/cart";
 import { formatCurrency } from "@/shared/lib/utils";
+import { ScrollArea } from "@/shared/components";
 import { X, Plus, Minus, Check } from "lucide-react";
 
 interface ModifierModalProps {
@@ -124,8 +125,8 @@ export function ModifierModal({ product, onClose }: ModifierModalProps) {
           </button>
         </div>
 
-        {/* Grupos de Modificadores (Scroll) */}
-        <div className="flex-1 overflow-y-auto p-4 sm:p-6 space-y-6">
+        {/* Grupos de Modificadores (ScrollArea Ergonómico con Sombras Progresivas) */}
+        <ScrollArea variant="brand" scrollShadows className="flex-1 min-h-0" viewportClassName="p-4 sm:p-6 space-y-6">
           {product.modifierGroups.map((group) => {
             const selectedIds = selections[group.id] || [];
             const isGroupValid = !group.isRequired || selectedIds.length >= group.minSelectable;
@@ -202,7 +203,7 @@ export function ModifierModal({ product, onClose }: ModifierModalProps) {
               </div>
             );
           })}
-        </div>
+        </ScrollArea>
 
         {/* Footer Modal: Cantidad y Botón de Acción */}
         <div className="p-4 sm:p-6 bg-surface-canvas border-t border-surface-border-subtle flex items-center justify-between gap-4">
