@@ -1,4 +1,4 @@
-import React from "react";
+import React, { Suspense } from "react";
 import { RestaurantStorefrontView } from "@/features/tenant/components/RestaurantStorefrontView";
 
 interface RestaurantPageProps {
@@ -20,8 +20,16 @@ export async function generateMetadata({ params }: RestaurantPageProps) {
   };
 }
 
-export default async function RestaurantPage({ params }: RestaurantPageProps) {
+async function RestaurantPageContent({ params }: RestaurantPageProps) {
   const { slug } = await params;
   return <RestaurantStorefrontView initialSlug={slug} />;
+}
+
+export default function RestaurantPage({ params }: RestaurantPageProps) {
+  return (
+    <Suspense fallback={<div className="min-h-screen bg-surface-canvas" />}>
+      <RestaurantPageContent params={params} />
+    </Suspense>
+  );
 }
 
