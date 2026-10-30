@@ -99,7 +99,7 @@ export default function DashboardLayout({
                 className="px-3.5 py-1.5 rounded-full text-text-inverse-muted hover:text-white hover:bg-surface-dark-hover transition-colors flex items-center gap-1.5"
               >
                 <ShieldCheck className="w-3.5 h-3.5 text-emerald-400" />
-                <span>Tenants SaaS</span>
+                <span>Gobernanza de Marcas</span>
               </Link>
             )}
           </nav>

@@ -133,13 +133,13 @@ export function PlatformTenantsGovernanceView() {
       <div className="bg-surface-dark-card border border-surface-dark-border rounded-3xl p-6 flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
         <div>
           <span className="text-[11px] font-bold uppercase tracking-widest text-brand-accent block mb-1">
-            Consola SuperAdmin • Gobernanza Multi-Tenant
+            Consola SuperAdmin • Gobernanza Multi-Marca
           </span>
           <h1 className="text-2xl sm:text-3xl font-black uppercase tracking-tight text-white font-display">
-            Comercios & Franquicias Afiliadas
+            Restaurantes & Franquicias Afiliadas
           </h1>
           <p className="text-xs text-text-inverse-muted mt-1 max-w-2xl">
-            Administra el ciclo de vida de cada restaurante en la plataforma: aprovisiona nuevos tenants con su propia sucursal matriz, catálogo independiente, colores corporativos y cuenta propietaria.
+            Administra el ciclo de vida de cada restaurante en la plataforma: afilia nuevos comercios con su propia sucursal matriz, catálogo independiente, colores corporativos y cuenta de administración.
           </p>
         </div>
 
@@ -159,7 +159,7 @@ export function PlatformTenantsGovernanceView() {
             className="px-5 py-2.5 rounded-full bg-brand-primary hover:bg-brand-primary-hover text-white text-xs font-black uppercase tracking-wider font-display inline-flex items-center gap-2 shadow-lg shadow-brand-primary/20 transition-all cursor-pointer"
           >
             <Plus className="w-4 h-4" />
-            <span>Nuevo Comercio (Tenant)</span>
+            <span>Afiliar Nuevo Restaurante</span>
           </button>
         </div>
       </div>
@@ -184,13 +184,13 @@ export function PlatformTenantsGovernanceView() {
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         <div className="bg-surface-dark-card border border-surface-dark-border rounded-2xl p-4">
           <span className="text-[11px] font-bold uppercase tracking-wider text-text-inverse-muted block">
-            Total Comercios Registrados
+            Total Marcas Registradas
           </span>
           <div className="text-3xl font-black text-white font-mono mt-1">
             {tenants.length}
           </div>
           <span className="text-[11px] text-emerald-400 font-semibold">
-            {activeCount} activos en tienda pública
+            {activeCount} activas en tienda pública
           </span>
         </div>
 
@@ -347,11 +347,11 @@ export function PlatformTenantsGovernanceView() {
                   </button>
 
                   <Link
-                    href={`/?tenant=${tenant.slug}`}
+                    href={`/?marca=${tenant.slug}`}
                     onClick={() => setTenantSlug(tenant.slug)}
                     className="px-3 py-1.5 rounded-full border border-surface-dark-border hover:border-white/40 text-text-inverse-muted hover:text-white text-[11px] font-bold uppercase tracking-wider transition-colors inline-flex items-center gap-1"
                   >
-                    <span>Tienda</span>
+                    <span>Ver Tienda</span>
                     <ExternalLink className="w-3 h-3" />
                   </Link>
                 </div>

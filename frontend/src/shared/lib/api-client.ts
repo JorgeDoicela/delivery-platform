@@ -44,7 +44,11 @@ export function getApiClientTenantSlug(): string {
   if (typeof window !== "undefined") {
     try {
       const params = new URLSearchParams(window.location.search);
-      const queryTenant = params.get("tenant")?.trim().toLowerCase();
+      const queryTenant =
+        params.get("restaurante")?.trim().toLowerCase() ||
+        params.get("marca")?.trim().toLowerCase() ||
+        params.get("tenant")?.trim().toLowerCase();
+
       if (queryTenant) {
         currentTenantSlugMemory = queryTenant;
         window.localStorage.setItem(ACTIVE_TENANT_STORAGE_KEY, queryTenant);

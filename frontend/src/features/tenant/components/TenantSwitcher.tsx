@@ -45,7 +45,7 @@ export function TenantSwitcher() {
       <button
         type="button"
         onClick={() => setIsOpen((prev) => !prev)}
-        aria-label="Cambiar de restaurante o negocio"
+        aria-label="Cambiar de restaurante"
         aria-expanded={isOpen}
         className="flex items-center gap-2 px-3 py-1.5 rounded-full border border-neutral-200 bg-neutral-50 hover:bg-neutral-100 text-neutral-800 transition-all text-xs font-bold shadow-2xs active:scale-95"
       >
@@ -56,7 +56,7 @@ export function TenantSwitcher() {
           }}
         />
         <span className="hidden sm:inline text-[10px] uppercase tracking-wider text-neutral-500 font-semibold">
-          Negocio:
+          Restaurante:
         </span>
         <span className="font-display uppercase tracking-wide font-black text-xs text-neutral-900 max-w-[130px] truncate">
           {currentTenant?.name || "Seleccionar"}
@@ -72,14 +72,14 @@ export function TenantSwitcher() {
         <div className="absolute right-0 mt-2 w-80 bg-white rounded-3xl border border-neutral-200 shadow-2xl p-3 z-50 space-y-2">
           <div className="px-2 pt-1 pb-1.5 border-b border-neutral-100 flex items-center justify-between">
             <span className="text-[10px] font-bold uppercase tracking-wider text-neutral-500">
-              Directorio Multi-Tenant
+              Nuestras Marcas & Locales
             </span>
             <Link
               href="/admin/personalizacion"
               onClick={() => setIsOpen(false)}
               className="text-[10px] font-bold uppercase tracking-wider text-brand-primary hover:underline"
             >
-              Personalizar Landing
+              Gestionar Marca
             </Link>
           </div>
 
