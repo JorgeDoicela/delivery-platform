@@ -16,7 +16,7 @@
   - `GET /api/tenants/current`: Configuración completa del storefront y sucursales del tenant resuelto (`GetCurrentTenant`).
   - `PUT /api/tenants/current/storefront`: Actualización en vivo de identidad, colores, hero slides, banners promocionales, tarifas y cuenta bancaria (`UpdateTenantStorefront`).
   - `GET /api/branches`: Listado de sucursales y coordenadas PostGIS del tenant activo (`GetBranches`).
-* **Semillas Multi-Tenant (`DatabaseSeeder`):** Siembra tres negocios independientes (`la-granjita`, `brasas-del-valle`, `el-lenador`) con paletas de colores, geocercas PostGIS, catálogos, cuentas bancarias y landings diferenciadas.
+* **Semillas Multi-Tenant (`DatabaseSeeder`):** Siembra dos negocios independientes (`la-granjita` y `brasas-del-valle`) con paletas de colores, geocercas PostGIS, catálogos, cuentas bancarias y landings diferenciadas. Soporta aprovisionamiento dinámico de nuevos comercios desde la consola SuperAdmin (`/superadmin`).
 * **Estado y Temas Dinámicos en Frontend (`src/features/tenant/`):**
   - `TenantThemeProvider` inyecta `--brand-primary`, `--brand-primary-hover` y `--brand-accent` en `:root` y sincroniza el contexto del carrito.
   - `useCartStore` particiona los carritos, sucursales y tarifas de envío en `cartsByTenant` por `tenantSlug` para impedir colisiones en `localStorage`.

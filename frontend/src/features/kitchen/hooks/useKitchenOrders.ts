@@ -51,25 +51,35 @@ export function useKitchenOrders(branchId: number) {
     const connection = new signalR.HubConnectionBuilder()
       .withUrl(hubUrl)
       .withAutomaticReconnect()
+      .configureLogging(signalR.LogLevel.None)
       .build();
 
-    connection
+    const startPromise = connection
       .start()
       .then(async () => {
-        if (isSubscribed) setConnectionStatus('connected');
+        if (!isSubscribed) {
+          await connection.stop().catch(() => {});
+          return;
+        }
+        setConnectionStatus('connected');
         await connection.invoke('JoinBranchKitchen', branchId).catch(() => {});
       })
       .catch(() => {
         if (isSubscribed) setConnectionStatus('disconnected');
       });
 
-    connection.onreconnecting(() => setConnectionStatus('connecting'));
+    connection.onreconnecting(() => {
+      if (isSubscribed) setConnectionStatus('connecting');
+    });
     connection.onreconnected(async () => {
+      if (!isSubscribed) return;
       setConnectionStatus('connected');
       await connection.invoke('JoinBranchKitchen', branchId).catch(() => {});
       fetchOrders();
     });
-    connection.onclose(() => setConnectionStatus('disconnected'));
+    connection.onclose(() => {
+      if (isSubscribed) setConnectionStatus('disconnected');
+    });
 
     connection.on('ReceiveNewOrder', (newOrder: KitchenOrderTicketDto) => {
       kitchenAlertSound.playNewOrderChime();
@@ -123,8 +133,14 @@ export function useKitchenOrders(branchId: number) {
     return () => {
       isSubscribed = false;
       clearInterval(pollInterval);
-      connection.invoke('LeaveBranchKitchen', branchId).catch(() => {});
-      connection.stop().catch(() => {});
+      void startPromise.finally(async () => {
+        if (connection.state === signalR.HubConnectionState.Connected) {
+          await connection.invoke('LeaveBranchKitchen', branchId).catch(() => {});
+        }
+        if (connection.state !== signalR.HubConnectionState.Disconnected) {
+          await connection.stop().catch(() => {});
+        }
+      });
     };
   }, [branchId, fetchOrders]);
 

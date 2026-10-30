@@ -42,10 +42,9 @@ public class TenantStorefrontHandlersTests
         var result = await handler.Handle(new GetPublicTenantsQuery());
 
         result.IsSuccess.Should().BeTrue();
-        result.Value.Tenants.Should().HaveCount(3);
+        result.Value.Tenants.Should().HaveCount(2);
         result.Value.Tenants.Select(t => t.Slug).Should().Contain("la-granjita");
         result.Value.Tenants.Select(t => t.Slug).Should().Contain("brasas-del-valle");
-        result.Value.Tenants.Select(t => t.Slug).Should().Contain("el-lenador");
     }
 
     [Fact]
@@ -84,11 +83,11 @@ public class TenantStorefrontHandlersTests
         await using var setupContext = new AppDbContext(CreateOptions(dbName));
         await DatabaseSeeder.SeedAsync(setupContext);
 
-        var lenador = await setupContext.Tenants.FirstAsync(t => t.Slug == "el-lenador");
+        var brasas = await setupContext.Tenants.FirstAsync(t => t.Slug == "brasas-del-valle");
         var tenantCtx = new FakeTenantContext
         {
-            TenantId = lenador.Id,
-            TenantSlug = lenador.Slug
+            TenantId = brasas.Id,
+            TenantSlug = brasas.Slug
         };
 
         await using var scopedContext = new AppDbContext(CreateOptions(dbName), tenantCtx);
@@ -96,18 +95,18 @@ public class TenantStorefrontHandlersTests
         var handler = new UpdateTenantStorefrontHandler(scopedContext, tenantCtx, validator);
 
         var command = new UpdateTenantStorefrontCommand(
-            Name: "El Leñador Ahumados Premium",
-            Tagline: "Ahumador Artesanal",
-            Description: "Costillas San Luis ahumadas durante 8 horas en leña seleccionada.",
-            HeroSubtitle: "Elige tus salsas y guarniciones al fuego",
-            BusinessName: "Ahumados El Leñador Cia. Ltda.",
-            TaxId: "1794500800001",
+            Name: "Brasas del Valle Premium Angus",
+            Tagline: "Parrilla de Autor",
+            Description: "Bife de chorizo y asado de tira madurado al quebracho.",
+            HeroSubtitle: "Elige tus cortes y guarniciones al fuego",
+            BusinessName: "Gastronomía Brasas del Valle S.A.S.",
+            TaxId: "1793100200001",
             LogoUrl: "/images/identidad/logo.png",
-            BrandPrimaryColor: "#D97706",
-            BrandPrimaryHoverColor: "#B45309",
+            BrandPrimaryColor: "#059669",
+            BrandPrimaryHoverColor: "#047857",
             BrandAccentColor: "#F59E0B",
             ContactPhone: "0991112233",
-            ContactEmail: "contacto@ellenador.com",
+            ContactEmail: "contacto@brasasdelvalle.com",
             BaseDeliveryFee: 2.25m,
             EnableDelivery: true,
             EnableTakeout: true,
@@ -117,11 +116,11 @@ public class TenantStorefrontHandlersTests
             AcceptsCard: true,
             QuickLinksEnabled: false,
             BankDetails: new UpdateTenantBankDetailsDto(
-                "Banco Produbanco",
+                "Banco Guayaquil",
                 "Cuenta Corriente",
-                "1200987654",
-                "Ahumados El Leñador Cia. Ltda.",
-                "1794500800001"
+                "0045891230",
+                "Gastronomía Brasas del Valle S.A.S.",
+                "1793100200001"
             ),
             HeroSlides: new List<TenantHeroSlide>
             {
@@ -129,8 +128,8 @@ public class TenantStorefrontHandlersTests
                 {
                     Id = "custom-slide-1",
                     Badge = "Edición Especial",
-                    Title = "FESTIVAL DEL COSTILLAR AHUMADO",
-                    Subtitle = "Doble porción de costillas con papas cuña.",
+                    Title = "FESTIVAL DEL BIFE DE CHORIZO",
+                    Subtitle = "Doble porción de bife con papas rústicas.",
                     CtaText = "PEDIR AHORA",
                     CtaHref = "/catalogo",
                     ImageUrl = "/images/banners/hero-combo-personal.jpg",
@@ -144,11 +143,11 @@ public class TenantStorefrontHandlersTests
         var result = await handler.Handle(command);
 
         result.IsSuccess.Should().BeTrue();
-        result.Value.Name.Should().Be("El Leñador Ahumados Premium");
-        result.Value.BrandPrimaryColor.Should().Be("#D97706");
+        result.Value.Name.Should().Be("Brasas del Valle Premium Angus");
+        result.Value.BrandPrimaryColor.Should().Be("#059669");
         result.Value.BaseDeliveryFee.Should().Be(2.25m);
         result.Value.QuickLinksEnabled.Should().BeFalse();
-        result.Value.HeroSlides.Should().ContainSingle(s => s.Title == "FESTIVAL DEL COSTILLAR AHUMADO");
+        result.Value.HeroSlides.Should().ContainSingle(s => s.Title == "FESTIVAL DEL BIFE DE CHORIZO");
     }
 
     [Fact]
@@ -218,7 +217,7 @@ public class TenantStorefrontHandlersTests
         var platformHandler = new GetPlatformTenantsHandler(context);
         var platformResult = await platformHandler.Handle(new GetPlatformTenantsQuery());
         platformResult.IsSuccess.Should().BeTrue();
-        platformResult.Value.Tenants.Should().HaveCount(4);
+        platformResult.Value.Tenants.Should().HaveCount(3);
         platformResult.Value.Tenants.Should().Contain(t => t.Slug == "don-fuego" && t.AdminEmail == "martin@donfuego.com");
 
         var toggleHandler = new ToggleTenantStatusHandler(context);
@@ -226,9 +225,9 @@ public class TenantStorefrontHandlersTests
         toggleResult.IsSuccess.Should().BeTrue();
         toggleResult.Value.IsActive.Should().BeFalse();
 
-        // El directorio público solo expone los 3 tenants activos
+        // El directorio público solo expone los 2 tenants activos iniciales
         var publicHandler = new GetPublicTenantsHandler(context);
         var publicResult = await publicHandler.Handle(new GetPublicTenantsQuery());
-        publicResult.Value.Tenants.Should().HaveCount(3);
+        publicResult.Value.Tenants.Should().HaveCount(2);
     }
 }

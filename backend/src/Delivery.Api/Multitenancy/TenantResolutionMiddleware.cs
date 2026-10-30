@@ -22,6 +22,7 @@ public class TenantResolutionMiddleware
         if (path.Equals("/health", StringComparison.OrdinalIgnoreCase) ||
             path.StartsWith("/swagger", StringComparison.OrdinalIgnoreCase) ||
             path.StartsWith("/hangfire", StringComparison.OrdinalIgnoreCase) ||
+            path.StartsWith("/hubs", StringComparison.OrdinalIgnoreCase) ||
             path.StartsWith("/api/v1/auth", StringComparison.OrdinalIgnoreCase) ||
             path.Equals("/api/tenants", StringComparison.OrdinalIgnoreCase) ||
             path.Equals("/api/tenants/platform", StringComparison.OrdinalIgnoreCase) ||

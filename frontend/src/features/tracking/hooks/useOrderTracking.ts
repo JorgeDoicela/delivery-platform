@@ -73,12 +73,17 @@ export function useOrderTracking({ orderId }: UseOrderTrackingProps): UseOrderTr
     const connection = new signalR.HubConnectionBuilder()
       .withUrl(wsUrl)
       .withAutomaticReconnect([0, 2000, 5000, 10000, 30000])
+      .configureLogging(signalR.LogLevel.None)
       .build();
 
-    connection
+    const startPromise = connection
       .start()
-      .then(() => {
-        connection.invoke('JoinOrderTracking', orderId).catch(() => {});
+      .then(async () => {
+        if (!isSubscribed) {
+          await connection.stop().catch(() => {});
+          return;
+        }
+        await connection.invoke('JoinOrderTracking', orderId).catch(() => {});
       })
       .catch(() => {});
 
@@ -114,8 +119,14 @@ export function useOrderTracking({ orderId }: UseOrderTrackingProps): UseOrderTr
     return () => {
       isSubscribed = false;
       clearInterval(interval);
-      connection.invoke('LeaveOrderTracking', orderId).catch(() => {});
-      connection.stop().catch(() => {});
+      void startPromise.finally(async () => {
+        if (connection.state === signalR.HubConnectionState.Connected) {
+          await connection.invoke('LeaveOrderTracking', orderId).catch(() => {});
+        }
+        if (connection.state !== signalR.HubConnectionState.Disconnected) {
+          await connection.stop().catch(() => {});
+        }
+      });
     };
   }, [orderId]);
 

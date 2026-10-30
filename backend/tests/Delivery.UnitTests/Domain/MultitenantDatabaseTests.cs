@@ -127,25 +127,21 @@ public class MultitenantDatabaseTests
         // Second execution to verify idempotency
         await DatabaseSeeder.SeedAsync(context);
 
-        (await context.Tenants.CountAsync()).Should().Be(3); // la-granjita, brasas-del-valle, el-lenador
-        (await context.TenantSettings.CountAsync()).Should().Be(3);
+        (await context.Tenants.CountAsync()).Should().Be(2); // la-granjita, brasas-del-valle
+        (await context.TenantSettings.CountAsync()).Should().Be(2);
         (await context.Roles.CountAsync()).Should().Be(7);
 
         var laGranjita = await context.Tenants.FirstAsync(t => t.Slug == "la-granjita");
         var brasas = await context.Tenants.FirstAsync(t => t.Slug == "brasas-del-valle");
-        var lenador = await context.Tenants.FirstAsync(t => t.Slug == "el-lenador");
 
         laGranjita.BrandPrimaryColor.Should().Be("#E4002B");
         brasas.BrandPrimaryColor.Should().Be("#047857");
-        lenador.BrandPrimaryColor.Should().Be("#EA580C");
 
         (await context.Branches.CountAsync(b => b.TenantId == laGranjita.Id)).Should().Be(2);
         (await context.Branches.CountAsync(b => b.TenantId == brasas.Id)).Should().Be(1);
-        (await context.Branches.CountAsync(b => b.TenantId == lenador.Id)).Should().Be(1);
         (await context.DiningTables.CountAsync(dt => dt.TenantId == laGranjita.Id)).Should().Be(16);
         (await context.Products.CountAsync(p => p.TenantId == laGranjita.Id)).Should().Be(3);
         (await context.Products.CountAsync(p => p.TenantId == brasas.Id)).Should().Be(3);
-        (await context.Products.CountAsync(p => p.TenantId == lenador.Id)).Should().Be(3);
         (await context.Customers.CountAsync(c => c.TenantId == laGranjita.Id)).Should().Be(1);
     }
 }
