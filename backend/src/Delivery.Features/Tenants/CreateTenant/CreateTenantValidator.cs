@@ -4,6 +4,14 @@ namespace Delivery.Features.Tenants.CreateTenant;
 
 public sealed class CreateTenantValidator : AbstractValidator<CreateTenantCommand>
 {
+    public static readonly HashSet<string> ReservedSlugs = new(StringComparer.OrdinalIgnoreCase)
+    {
+        "admin", "superadmin", "api", "login", "checkout", "catalogo", "finalizar-pedido",
+        "cocina", "kitchen", "repartidor", "active-delivery", "rastreo", "track",
+        "sucursales", "terminos", "privacidad", "terms", "privacy", "static", "assets",
+        "health", "hub", "hubs", "ws", "auth", "register", "cart", "favicon", "robots", "r"
+    };
+
     public CreateTenantValidator()
     {
         RuleFor(x => x.Name)
@@ -13,7 +21,9 @@ public sealed class CreateTenantValidator : AbstractValidator<CreateTenantComman
         RuleFor(x => x.Slug)
             .NotEmpty().WithMessage("El identificador de URL (slug) es obligatorio.")
             .MaximumLength(60)
-            .Matches("^[a-z0-9-]+$").WithMessage("El slug solo puede contener letras minúsculas, números y guiones.");
+            .Matches("^[a-z0-9-]+$").WithMessage("El slug solo puede contener letras minúsculas, números y guiones.")
+            .Must(slug => !ReservedSlugs.Contains(slug))
+            .WithMessage("El slug ingresado corresponde a una ruta reservada del sistema.");
 
         RuleFor(x => x.BusinessName)
             .NotEmpty().WithMessage("La razón social es obligatoria.")

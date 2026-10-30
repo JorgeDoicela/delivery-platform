@@ -161,7 +161,7 @@ export function PlatformLandingView() {
 
               <div className="p-6 sm:p-8 pt-0">
                 <Link
-                  href={`/r/${t.slug}`}
+                  href={`/${t.slug}`}
                   onClick={() => setTenantSlug(t.slug)}
                   className="w-full py-4 rounded-full text-white text-xs font-black uppercase tracking-wider font-display flex items-center justify-center gap-2 shadow-md transition-all active:scale-95 hover:opacity-95"
                   style={{ backgroundColor: t.brandPrimaryColor }}

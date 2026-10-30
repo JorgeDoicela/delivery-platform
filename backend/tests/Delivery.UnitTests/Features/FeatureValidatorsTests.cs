@@ -5,6 +5,7 @@ using Delivery.Features.Kitchen.GetActiveKitchenOrders;
 using Delivery.Features.Orders.ApproveTransferOrder;
 using Delivery.Features.Orders.GetOrderById;
 using Delivery.Features.Orders.UpdateOrderStatus;
+using Delivery.Features.Tenants.CreateTenant;
 using Delivery.Features.Tracking.GetDriverLocation;
 using Delivery.Features.Tracking.IngestDriverLocation;
 using FluentAssertions;
@@ -97,13 +98,41 @@ public class FeatureValidatorsTests
     }
 
     [Theory]
-    [InlineData(1, true)]
-    [InlineData(0, false)]
-    [InlineData(-1, false)]
-    public void GetActiveKitchenOrdersValidator_ValidatesBranchId(int branchId, bool expectedValid)
+    [InlineData("login", false)]
+    [InlineData("cocina", false)]
+    [InlineData("checkout", false)]
+    [InlineData("admin", false)]
+    [InlineData("api", false)]
+    [InlineData("pollos-hermanos", true)]
+    [InlineData("asadero-don-pedro", true)]
+    public void CreateTenantValidator_ValidatesReservedSlugs(string slug, bool expectedValid)
     {
-        var validator = new GetActiveKitchenOrdersValidator();
-        var result = validator.Validate(new GetActiveKitchenOrdersQuery(branchId));
+        var validator = new CreateTenantValidator();
+        var command = new CreateTenantCommand(
+            Name: "Comercio Test",
+            Slug: slug,
+            BusinessName: "Comercio Test S.A.",
+            TaxId: "1790011223001",
+            Tagline: "Sabor tradicional",
+            Description: "Restaurante de comida tradicional.",
+            BrandPrimaryColor: "#E4002B",
+            BrandPrimaryHoverColor: "#C00024",
+            BrandAccentColor: "#FFC72C",
+            BaseDeliveryFee: 2.50m,
+            ContactPhone: "+593991234567",
+            ContactEmail: "info@comercio.com",
+            PrimaryBranchName: "Matriz Centro",
+            PrimaryBranchAddress: "Av. 10 de Agosto",
+            AdminFullName: "Juan Admin",
+            AdminEmail: "admin@comercio.com",
+            AdminPassword: "Password123"
+        );
+
+        var result = validator.Validate(command);
         result.IsValid.Should().Be(expectedValid);
+        if (!expectedValid)
+        {
+            result.Errors.Should().Contain(e => e.PropertyName == "Slug");
+        }
     }
 }

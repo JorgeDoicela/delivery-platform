@@ -40,7 +40,7 @@ export function TenantSwitcher() {
   const handleSelectTenant = (slug: string) => {
     setTenantSlug(slug);
     setIsOpen(false);
-    router.push(`/r/${slug}`);
+    router.push(`/${slug}`);
   };
 
   return (

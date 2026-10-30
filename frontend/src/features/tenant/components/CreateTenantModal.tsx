@@ -4,6 +4,7 @@ import React, { useState } from "react";
 import { X, Loader2, Building2, Palette, ShieldCheck } from "lucide-react";
 import type { CreateTenantCommand } from "@/shared/types/api";
 import { useCreateTenantMutation } from "../hooks/useTenantQueries";
+import { RESERVED_TENANT_SLUGS } from "../constants";
 
 interface CreateTenantModalProps {
   isOpen: boolean;
@@ -61,6 +62,12 @@ export function CreateTenantModal({
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setFormError(null);
+
+    const normalizedSlug = form.slug.trim().toLowerCase();
+    if (RESERVED_TENANT_SLUGS.has(normalizedSlug)) {
+      setFormError("El identificador (slug) ingresado corresponde a una ruta reservada de la plataforma.");
+      return;
+    }
 
     try {
       const result = await createMutation.mutateAsync(form);

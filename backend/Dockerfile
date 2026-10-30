@@ -30,12 +30,15 @@ ENV DOTNET_RUNNING_IN_CONTAINER=true
 
 EXPOSE 5005
 
+# Instalar curl para validación de salud (Healthchecks)
+RUN apt-get update && apt-get install -y --no-install-recommends curl && rm -rf /var/lib/apt/lists/*
+
 COPY --from=build /app/publish .
 
 # Usuario sin privilegios de root (estándar en .NET 8)
 USER $APP_UID
 
 HEALTHCHECK --interval=10s --timeout=5s --start-period=15s --retries=3 \
-  CMD wget --no-verbose --tries=1 --spider http://127.0.0.1:5005/health || exit 1
+  CMD curl -f http://127.0.0.1:5005/health || exit 1
 
 ENTRYPOINT ["dotnet", "Delivery.Api.dll"]

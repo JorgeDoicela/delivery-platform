@@ -17,6 +17,7 @@ const nextConfig: NextConfig = {
   agentRules: false,
   async redirects() {
     return [
+      { source: "/r/:slug", destination: "/:slug", permanent: true },
       { source: "/checkout", destination: "/finalizar-pedido", permanent: true },
       { source: "/track", destination: "/rastreo", permanent: true },
       { source: "/track/:orderId", destination: "/rastreo/:orderId", permanent: true },

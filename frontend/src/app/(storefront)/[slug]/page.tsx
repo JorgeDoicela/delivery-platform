@@ -1,5 +1,7 @@
 import React, { Suspense } from "react";
+import { notFound } from "next/navigation";
 import { RestaurantStorefrontView } from "@/features/tenant/components/RestaurantStorefrontView";
+import { RESERVED_TENANT_SLUGS } from "@/features/tenant/constants";
 
 interface RestaurantPageProps {
   params: Promise<{
@@ -9,6 +11,12 @@ interface RestaurantPageProps {
 
 export async function generateMetadata({ params }: RestaurantPageProps) {
   const { slug } = await params;
+  if (RESERVED_TENANT_SLUGS.has(slug.toLowerCase())) {
+    return {
+      title: "No Encontrado | Delivery Platform",
+    };
+  }
+
   const formatted = slug
     .split("-")
     .map((w) => w.charAt(0).toUpperCase() + w.slice(1))
@@ -20,16 +28,16 @@ export async function generateMetadata({ params }: RestaurantPageProps) {
   };
 }
 
-async function RestaurantPageContent({ params }: RestaurantPageProps) {
+export default async function RestaurantPage({ params }: RestaurantPageProps) {
   const { slug } = await params;
-  return <RestaurantStorefrontView initialSlug={slug} />;
-}
 
-export default function RestaurantPage({ params }: RestaurantPageProps) {
+  if (RESERVED_TENANT_SLUGS.has(slug.toLowerCase())) {
+    notFound();
+  }
+
   return (
     <Suspense fallback={<div className="min-h-screen bg-surface-canvas" />}>
-      <RestaurantPageContent params={params} />
+      <RestaurantStorefrontView initialSlug={slug} />
     </Suspense>
   );
 }
-
