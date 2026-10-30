@@ -1020,6 +1020,9 @@ namespace Delivery.Core.Infrastructure.Persistence.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uuid");
 
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("timestamp with time zone");
+
                     b.Property<string>("CreatedByIp")
                         .IsRequired()
                         .HasMaxLength(45)
@@ -1119,17 +1122,43 @@ namespace Delivery.Core.Infrastructure.Persistence.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uuid");
 
+                    b.Property<string>("BrandAccentColor")
+                        .HasMaxLength(15)
+                        .HasColumnType("character varying(15)");
+
                     b.Property<string>("BrandPrimaryColor")
-                        .HasMaxLength(10)
-                        .HasColumnType("character varying(10)");
+                        .HasMaxLength(15)
+                        .HasColumnType("character varying(15)");
+
+                    b.Property<string>("BrandPrimaryHoverColor")
+                        .HasMaxLength(15)
+                        .HasColumnType("character varying(15)");
 
                     b.Property<string>("BusinessName")
                         .IsRequired()
                         .HasMaxLength(200)
                         .HasColumnType("character varying(200)");
 
+                    b.Property<string>("ContactEmail")
+                        .HasMaxLength(150)
+                        .HasColumnType("character varying(150)");
+
+                    b.Property<string>("ContactPhone")
+                        .HasMaxLength(30)
+                        .HasColumnType("character varying(30)");
+
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("Description")
+                        .IsRequired()
+                        .HasMaxLength(500)
+                        .HasColumnType("character varying(500)");
+
+                    b.Property<string>("HeroSubtitle")
+                        .IsRequired()
+                        .HasMaxLength(250)
+                        .HasColumnType("character varying(250)");
 
                     b.Property<bool>("IsActive")
                         .HasColumnType("boolean");
@@ -1147,6 +1176,11 @@ namespace Delivery.Core.Infrastructure.Persistence.Migrations
                         .IsRequired()
                         .HasMaxLength(50)
                         .HasColumnType("character varying(50)");
+
+                    b.Property<string>("Tagline")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
 
                     b.Property<string>("TaxId")
                         .IsRequired()
@@ -1167,6 +1201,39 @@ namespace Delivery.Core.Infrastructure.Persistence.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uuid");
 
+                    b.Property<bool>("AcceptsBankTransfer")
+                        .HasColumnType("boolean");
+
+                    b.Property<bool>("AcceptsCard")
+                        .HasColumnType("boolean");
+
+                    b.Property<bool>("AcceptsCash")
+                        .HasColumnType("boolean");
+
+                    b.Property<string>("BankAccountHolder")
+                        .HasMaxLength(150)
+                        .HasColumnType("character varying(150)");
+
+                    b.Property<string>("BankAccountNumber")
+                        .HasMaxLength(50)
+                        .HasColumnType("character varying(50)");
+
+                    b.Property<string>("BankAccountTaxId")
+                        .HasMaxLength(30)
+                        .HasColumnType("character varying(30)");
+
+                    b.Property<string>("BankAccountType")
+                        .HasMaxLength(50)
+                        .HasColumnType("character varying(50)");
+
+                    b.Property<string>("BankName")
+                        .HasMaxLength(120)
+                        .HasColumnType("character varying(120)");
+
+                    b.Property<decimal>("BaseDeliveryFee")
+                        .HasPrecision(18, 2)
+                        .HasColumnType("numeric(18,2)");
+
                     b.Property<string>("CurrencyCode")
                         .IsRequired()
                         .HasMaxLength(3)
@@ -1175,6 +1242,26 @@ namespace Delivery.Core.Infrastructure.Persistence.Migrations
                     b.Property<string>("CustomDomain")
                         .HasMaxLength(150)
                         .HasColumnType("character varying(150)");
+
+                    b.Property<bool>("EnableDelivery")
+                        .HasColumnType("boolean");
+
+                    b.Property<bool>("EnableDineIn")
+                        .HasColumnType("boolean");
+
+                    b.Property<bool>("EnableTakeout")
+                        .HasColumnType("boolean");
+
+                    b.Property<string>("HeroSlidesJson")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("PromotionalBannersJson")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<bool>("QuickLinksEnabled")
+                        .HasColumnType("boolean");
 
                     b.Property<string>("SriCertificatePasswordHash")
                         .HasColumnType("text");

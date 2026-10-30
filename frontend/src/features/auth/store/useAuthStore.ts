@@ -1,10 +1,26 @@
 import { create } from "zustand";
 import { persist, createJSONStorage } from "zustand/middleware";
 import { authApi } from "../api/authApi";
+import {
+  setApiClientAccessToken,
+  setApiClientTenantSlug,
+} from "@/shared/lib/api-client";
 import type { AuthState, AuthUser, AuthStatus } from "../types";
 import type { LoginFormData } from "../schemas/loginSchema";
 
 const SESSION_STORAGE_KEY = "delivery_has_session";
+
+function normalizeAuthUser(user: AuthUser): AuthUser {
+  const primaryRole = user.role || user.roles?.[0] || "Customer";
+  if (user.tenantSlug) {
+    setApiClientTenantSlug(user.tenantSlug);
+  }
+  return {
+    ...user,
+    role: primaryRole,
+    isActive: user.isActive ?? true,
+  };
+}
 
 interface AuthActions {
   login: (credentials: LoginFormData) => Promise<boolean>;
@@ -27,6 +43,7 @@ export const useAuthStore = create<AuthStore>()(
       isAuthenticated: false,
 
       setAccessToken: (accessToken) => {
+        setApiClientAccessToken(accessToken);
         set({
           accessToken,
           isAuthenticated: accessToken !== null,
@@ -34,7 +51,7 @@ export const useAuthStore = create<AuthStore>()(
       },
 
       setUser: (user) => {
-        set({ user });
+        set({ user: user ? normalizeAuthUser(user) : null });
       },
 
       resetStatus: () => {
@@ -45,13 +62,15 @@ export const useAuthStore = create<AuthStore>()(
         set({ status: "loading", error: null });
         try {
           const response = await authApi.login(credentials);
+          const normalizedUser = normalizeAuthUser(response.user);
+          setApiClientAccessToken(response.accessToken);
 
           if (typeof window !== "undefined") {
             localStorage.setItem(SESSION_STORAGE_KEY, "1");
           }
 
           set({
-            user: response.user,
+            user: normalizedUser,
             accessToken: response.accessToken,
             isAuthenticated: true,
             status: "success",
@@ -62,6 +81,7 @@ export const useAuthStore = create<AuthStore>()(
           const message =
             err instanceof Error ? err.message : "Error al iniciar sesión.";
 
+          setApiClientAccessToken(null);
           if (typeof window !== "undefined") {
             localStorage.removeItem(SESSION_STORAGE_KEY);
           }
@@ -83,6 +103,7 @@ export const useAuthStore = create<AuthStore>()(
         } catch {
           // Si el logout remoto falla por red, se limpia de todas formas el estado local
         } finally {
+          setApiClientAccessToken(null);
           if (typeof window !== "undefined") {
             localStorage.removeItem(SESSION_STORAGE_KEY);
           }
@@ -99,7 +120,9 @@ export const useAuthStore = create<AuthStore>()(
 
       checkAuth: async () => {
         // 1. Si ya tiene accessToken en memoria y usuario activo, la sesión es válida
-        if (get().accessToken && get().user) {
+        const currentToken = get().accessToken;
+        if (currentToken && get().user) {
+          setApiClientAccessToken(currentToken);
           return true;
         }
 
@@ -108,6 +131,7 @@ export const useAuthStore = create<AuthStore>()(
         if (typeof window !== "undefined") {
           const hasSession = localStorage.getItem(SESSION_STORAGE_KEY);
           if (!hasSession && !get().isAuthenticated && !get().user) {
+            setApiClientAccessToken(null);
             set({
               user: null,
               accessToken: null,
@@ -122,13 +146,18 @@ export const useAuthStore = create<AuthStore>()(
         set({ status: "loading" });
         try {
           const refreshResponse = await authApi.refresh();
+          const fallbackUser = get().user;
+          const resolvedUser = refreshResponse.user
+            ? normalizeAuthUser(refreshResponse.user)
+            : fallbackUser;
 
+          setApiClientAccessToken(refreshResponse.accessToken);
           if (typeof window !== "undefined") {
             localStorage.setItem(SESSION_STORAGE_KEY, "1");
           }
 
           set({
-            user: refreshResponse.user,
+            user: resolvedUser,
             accessToken: refreshResponse.accessToken,
             isAuthenticated: true,
             status: "idle",
@@ -136,6 +165,7 @@ export const useAuthStore = create<AuthStore>()(
           });
           return true;
         } catch {
+          setApiClientAccessToken(null);
           if (typeof window !== "undefined") {
             localStorage.removeItem(SESSION_STORAGE_KEY);
           }

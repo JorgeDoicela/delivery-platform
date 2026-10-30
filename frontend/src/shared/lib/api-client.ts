@@ -9,6 +9,10 @@ import type {
   DriverLocationResponse,
   KitchenOrderTicketDto,
   PublicTenantsResponse,
+  PlatformTenantsResponse,
+  CreateTenantCommand,
+  CreatedTenantDto,
+  ToggleTenantStatusResponse,
   TenantStorefrontConfigDto,
   UpdateTenantStorefrontCommand,
   ApiError,
@@ -146,6 +150,36 @@ export const apiClient = {
       cache: "no-store",
     });
     return handleResponse<PublicTenantsResponse>(res);
+  },
+
+  async getPlatformTenants(): Promise<PlatformTenantsResponse> {
+    const res = await fetch(`${API_BASE_URL}/api/tenants/platform`, {
+      method: "GET",
+      headers: buildHeaders(),
+      cache: "no-store",
+    });
+    return handleResponse<PlatformTenantsResponse>(res);
+  },
+
+  async createTenant(command: CreateTenantCommand): Promise<CreatedTenantDto> {
+    const res = await fetch(`${API_BASE_URL}/api/tenants`, {
+      method: "POST",
+      headers: buildHeaders(),
+      body: JSON.stringify(command),
+    });
+    return handleResponse<CreatedTenantDto>(res);
+  },
+
+  async toggleTenantStatus(
+    tenantId: string,
+    isActive: boolean
+  ): Promise<ToggleTenantStatusResponse> {
+    const res = await fetch(`${API_BASE_URL}/api/tenants/${tenantId}/status`, {
+      method: "PATCH",
+      headers: buildHeaders(),
+      body: JSON.stringify({ isActive }),
+    });
+    return handleResponse<ToggleTenantStatusResponse>(res);
   },
 
   async getCurrentTenant(tenantSlugOverride?: string): Promise<TenantStorefrontConfigDto> {

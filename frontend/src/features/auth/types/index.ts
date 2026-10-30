@@ -23,9 +23,12 @@ export interface AuthUser {
   id: string;
   email: string;
   fullName: string;
+  phone?: string | null;
   role: UserRole | UserRoleName;
-  tenantId: string;
-  branchId: string | null;
+  roles?: UserRoleName[];
+  tenantId: string | null;
+  tenantSlug?: string | null;
+  branchId: string | number | null;
   isActive: boolean;
 }
 

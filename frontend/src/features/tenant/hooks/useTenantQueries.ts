@@ -4,6 +4,8 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { apiClient } from "@/shared/lib/api-client";
 import type {
   BranchDetailDto,
+  CreateTenantCommand,
+  PlatformTenantsResponse,
   PublicTenantsResponse,
   TenantStorefrontConfigDto,
   UpdateTenantStorefrontCommand,
@@ -77,7 +79,41 @@ export function useUpdateTenantStorefrontMutation() {
     onSuccess: (updatedConfig) => {
       queryClient.setQueryData(["tenant", "current", tenantSlug], updatedConfig);
       queryClient.invalidateQueries({ queryKey: ["tenant", "public-list"] });
+      queryClient.invalidateQueries({ queryKey: ["tenant", "platform-list"] });
       queryClient.invalidateQueries({ queryKey: ["branches", tenantSlug] });
+    },
+  });
+}
+
+export function usePlatformTenantsQuery() {
+  return useQuery<PlatformTenantsResponse>({
+    queryKey: ["tenant", "platform-list"],
+    queryFn: () => apiClient.getPlatformTenants(),
+    staleTime: 1000 * 30,
+  });
+}
+
+export function useCreateTenantMutation() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: (command: CreateTenantCommand) => apiClient.createTenant(command),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["tenant", "platform-list"] });
+      queryClient.invalidateQueries({ queryKey: ["tenant", "public-list"] });
+    },
+  });
+}
+
+export function useToggleTenantStatusMutation() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: ({ tenantId, isActive }: { tenantId: string; isActive: boolean }) =>
+      apiClient.toggleTenantStatus(tenantId, isActive),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["tenant", "platform-list"] });
+      queryClient.invalidateQueries({ queryKey: ["tenant", "public-list"] });
     },
   });
 }

@@ -3,8 +3,8 @@
 import React from "react";
 import Link from "next/link";
 import Image from "next/image";
-import { Utensils, Volume2, Package, Building2, Palette } from "lucide-react";
-import { UserNav } from "@/features/auth";
+import { Utensils, Volume2, Package, Building2, Palette, ShieldCheck } from "lucide-react";
+import { UserNav, useAuthStore, UserRole } from "@/features/auth";
 import { TenantSwitcher, useCurrentTenantQuery } from "@/features/tenant";
 
 export default function DashboardLayout({
@@ -13,6 +13,18 @@ export default function DashboardLayout({
   children: React.ReactNode;
 }) {
   const { data: tenant } = useCurrentTenantQuery();
+  const user = useAuthStore((s) => s.user);
+  const isSuperAdmin =
+    !user ||
+    user.role === "SuperAdmin" ||
+    user.role === UserRole.SuperAdmin ||
+    user.roles?.includes("SuperAdmin");
+  const canManageFranchise =
+    isSuperAdmin ||
+    user?.role === "TenantAdmin" ||
+    user?.role === UserRole.TenantAdmin ||
+    user?.role === "BranchManager" ||
+    user?.role === UserRole.BranchManager;
   const brandName = tenant?.name || "La Granjita";
   const brandLogo = tenant?.logoUrl || "/images/identidad/logo.png";
 
@@ -53,34 +65,48 @@ export default function DashboardLayout({
               <span>Cocina KDS</span>
             </Link>
 
-            <Link
-              href="/admin/inventario"
-              className="px-3.5 py-1.5 rounded-full text-text-inverse-muted hover:text-white hover:bg-surface-dark-hover transition-colors flex items-center gap-1.5"
-            >
-              <Package className="w-3.5 h-3.5 text-brand-accent" />
-              <span>Inventario</span>
-            </Link>
+            {canManageFranchise && (
+              <>
+                <Link
+                  href="/admin/inventario"
+                  className="px-3.5 py-1.5 rounded-full text-text-inverse-muted hover:text-white hover:bg-surface-dark-hover transition-colors flex items-center gap-1.5"
+                >
+                  <Package className="w-3.5 h-3.5 text-brand-accent" />
+                  <span>Inventario</span>
+                </Link>
 
-            <Link
-              href="/admin/sucursales"
-              className="px-3.5 py-1.5 rounded-full text-text-inverse-muted hover:text-white hover:bg-surface-dark-hover transition-colors flex items-center gap-1.5"
-            >
-              <Building2 className="w-3.5 h-3.5 text-status-info" />
-              <span>Sucursales</span>
-            </Link>
+                <Link
+                  href="/admin/sucursales"
+                  className="px-3.5 py-1.5 rounded-full text-text-inverse-muted hover:text-white hover:bg-surface-dark-hover transition-colors flex items-center gap-1.5"
+                >
+                  <Building2 className="w-3.5 h-3.5 text-status-info" />
+                  <span>Sucursales</span>
+                </Link>
 
-            <Link
-              href="/admin/personalizacion"
-              className="px-3.5 py-1.5 rounded-full text-text-inverse-muted hover:text-white hover:bg-surface-dark-hover transition-colors flex items-center gap-1.5"
-            >
-              <Palette className="w-3.5 h-3.5 text-brand-primary" />
-              <span>Marca & Landing</span>
-            </Link>
+                <Link
+                  href="/admin/personalizacion"
+                  className="px-3.5 py-1.5 rounded-full text-text-inverse-muted hover:text-white hover:bg-surface-dark-hover transition-colors flex items-center gap-1.5"
+                >
+                  <Palette className="w-3.5 h-3.5 text-brand-primary" />
+                  <span>Marca & Landing</span>
+                </Link>
+              </>
+            )}
+
+            {isSuperAdmin && (
+              <Link
+                href="/superadmin"
+                className="px-3.5 py-1.5 rounded-full text-text-inverse-muted hover:text-white hover:bg-surface-dark-hover transition-colors flex items-center gap-1.5"
+              >
+                <ShieldCheck className="w-3.5 h-3.5 text-emerald-400" />
+                <span>Tenants SaaS</span>
+              </Link>
+            )}
           </nav>
         </div>
 
         <div className="flex items-center gap-3 text-xs">
-          <TenantSwitcher />
+          {isSuperAdmin && <TenantSwitcher />}
 
           <div className="flex items-center gap-2 bg-surface-dark-hover/80 px-3 py-1 rounded-full border border-surface-dark-border text-[11px] font-bold uppercase tracking-wider">
             <span className="w-2 h-2 rounded-full bg-status-success animate-ping"></span>

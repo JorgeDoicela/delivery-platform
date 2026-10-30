@@ -66,9 +66,9 @@ public class VerticalSliceArchitectureRegistrationTests
         // Act
         services.AddDeliveryFeatures();
 
-        // Assert: Deben registrarse exactamente 19 endpoints autónomos (11 operativos + 4 de autenticación + 4 de tenants y sucursales)
+        // Assert: Deben registrarse exactamente 22 endpoints autónomos (11 operativos + 4 de autenticación + 7 de tenants y sucursales)
         var endpointDescriptors = services.Where(s => s.ServiceType == typeof(IEndpoint)).ToList();
-        endpointDescriptors.Should().HaveCount(19);
+        endpointDescriptors.Should().HaveCount(22);
 
         var endpointImplementationTypes = endpointDescriptors.Select(d => d.ImplementationType).ToHashSet();
         endpointImplementationTypes.Should().Contain(typeof(ResolveBranchEndpoint));
@@ -82,6 +82,9 @@ public class VerticalSliceArchitectureRegistrationTests
         endpointImplementationTypes.Should().Contain(typeof(UpdateOrderStatusEndpoint));
         endpointImplementationTypes.Should().Contain(typeof(ApproveTransferOrderEndpoint));
         endpointImplementationTypes.Should().Contain(typeof(Delivery.Features.Tenants.GetPublicTenants.GetPublicTenantsEndpoint));
+        endpointImplementationTypes.Should().Contain(typeof(Delivery.Features.Tenants.GetPlatformTenants.GetPlatformTenantsEndpoint));
+        endpointImplementationTypes.Should().Contain(typeof(Delivery.Features.Tenants.CreateTenant.CreateTenantEndpoint));
+        endpointImplementationTypes.Should().Contain(typeof(Delivery.Features.Tenants.ToggleTenantStatus.ToggleTenantStatusEndpoint));
         endpointImplementationTypes.Should().Contain(typeof(Delivery.Features.Tenants.GetCurrentTenant.GetCurrentTenantEndpoint));
         endpointImplementationTypes.Should().Contain(typeof(Delivery.Features.Tenants.UpdateTenantStorefront.UpdateTenantStorefrontEndpoint));
         endpointImplementationTypes.Should().Contain(typeof(IngestDriverLocationEndpoint));

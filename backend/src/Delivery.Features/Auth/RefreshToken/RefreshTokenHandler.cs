@@ -30,6 +30,8 @@ public class RefreshTokenHandler : IHandler<RefreshTokenCommand, Result<RefreshT
 
         var existingToken = await _context.RefreshTokens.IgnoreQueryFilters()
             .Include(rt => rt.User)
+                .ThenInclude(u => u.Tenant)
+            .Include(rt => rt.User)
                 .ThenInclude(u => u.UserRoles)
                     .ThenInclude(ur => ur.Role)
             .FirstOrDefaultAsync(rt => rt.TokenHash == tokenHash, cancellationToken);
@@ -68,7 +70,22 @@ public class RefreshTokenHandler : IHandler<RefreshTokenCommand, Result<RefreshT
         await _context.RefreshTokens.AddAsync(newRefreshTokenEntity, cancellationToken);
         await _context.SaveChangesAsync(cancellationToken);
 
-        var response = new RefreshTokenResponse(newAccessToken, newRawToken, accessExpiresAt);
+        var roleNames = roles.Select(r => r.Name).ToList();
+        var primaryRoleName = roleNames.FirstOrDefault() ?? "Customer";
+
+        var userDto = new RefreshUserAuthInfoDto(
+            user.Id,
+            user.Email,
+            user.FullName,
+            user.Phone,
+            primaryRoleName,
+            user.TenantId,
+            user.Tenant?.Slug,
+            primaryBranchId,
+            user.IsActive,
+            roleNames);
+
+        var response = new RefreshTokenResponse(newAccessToken, newRawToken, accessExpiresAt, userDto);
         return Result.Success(response);
     }
 }

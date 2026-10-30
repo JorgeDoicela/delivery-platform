@@ -61,6 +61,9 @@ public class AuthHandlerTests
         result.Value.AccessToken.Should().NotBeNullOrWhiteSpace();
         result.Value.RefreshToken.Should().NotBeNullOrWhiteSpace();
         result.Value.User.Email.Should().Be("esmeralda@lagranjita.com");
+        result.Value.User.Role.Should().Be("TenantAdmin");
+        result.Value.User.TenantSlug.Should().Be("la-granjita");
+        result.Value.User.IsActive.Should().BeTrue();
         result.Value.User.Roles.Should().Contain("TenantAdmin");
 
         // Verify Refresh Token was persisted in DB
@@ -141,6 +144,10 @@ public class AuthHandlerTests
         refreshResult.IsSuccess.Should().BeTrue();
         refreshResult.Value.AccessToken.Should().NotBeNullOrWhiteSpace();
         refreshResult.Value.RefreshToken.Should().NotBe(initialRefreshToken);
+        refreshResult.Value.User.Should().NotBeNull();
+        refreshResult.Value.User.Email.Should().Be("esmeralda@lagranjita.com");
+        refreshResult.Value.User.Role.Should().Be("TenantAdmin");
+        refreshResult.Value.User.IsActive.Should().BeTrue();
 
         // Old token must be marked as revoked
         var oldHash = tokenProvider.HashToken(initialRefreshToken);
@@ -201,6 +208,30 @@ public class AuthHandlerTests
         var hash = tokenProvider.HashToken(rawToken);
         var entity = await context.RefreshTokens.FirstAsync(rt => rt.TokenHash == hash);
         entity.RevokedAt.Should().NotBeNull();
+    }
+
+    [Fact]
+    public async Task Login_WithoutExplicitTenantSlug_ShouldAutoResolveUserTenantFromEmail()
+    {
+        var dbName = Guid.NewGuid().ToString();
+        var passwordHasher = new BCryptPasswordHasher();
+        var tokenProvider = new JwtTokenProvider(Options.Create(CreateJwtOptions()));
+
+        await using (var seedCtx = new AppDbContext(CreateInMemoryOptions(dbName)))
+        {
+            await DatabaseSeeder.SeedAsync(seedCtx);
+        }
+
+        await using var context = new AppDbContext(CreateInMemoryOptions(dbName));
+        var handler = new LoginHandler(context, new FakeTenantContext(), passwordHasher, tokenProvider);
+
+        // Inicia sesión con usuario de Brasas del Valle sin enviar TenantSlug explícito
+        var result = await handler.Handle(new LoginCommand("esmeralda@brasasdelvalle.com", "Admin123!", null, "127.0.0.1"));
+
+        result.IsSuccess.Should().BeTrue();
+        result.Value.User.Email.Should().Be("esmeralda@brasasdelvalle.com");
+        result.Value.User.TenantSlug.Should().Be("brasas-del-valle");
+        result.Value.User.Role.Should().Be("TenantAdmin");
     }
 }
 

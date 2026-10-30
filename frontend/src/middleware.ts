@@ -1,7 +1,14 @@
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 
-const PROTECTED_PREFIXES = ["/cocina", "/kitchen", "/admin", "/driver"];
+const PROTECTED_PREFIXES = [
+  "/cocina",
+  "/kitchen",
+  "/admin",
+  "/superadmin",
+  "/driver",
+  "/repartidor",
+];
 
 export function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
@@ -30,7 +37,9 @@ export const config = {
     "/cocina/:path*",
     "/kitchen/:path*",
     "/admin/:path*",
+    "/superadmin/:path*",
     "/driver/:path*",
+    "/repartidor/:path*",
   ],
 };
 

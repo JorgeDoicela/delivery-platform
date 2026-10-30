@@ -66,10 +66,8 @@ public static partial class DatabaseSeeder
             await context.SaveChangesAsync();
         }
 
-        // 3. Semilla de Tenant #1: La Granjita Asadero
+        // 3. Semilla de Tenant #1: La Granjita Asadero y Tenants Adicionales
         await SeedLaGranjitaTenantAsync(context);
-
-        // 4. Semilla de Tenants Adicionales para Demostración Multi-Tenant Real
         await SeedSecondaryTenantsAsync(context);
     }
 
@@ -217,6 +215,9 @@ public static partial class DatabaseSeeder
         }
         else if (string.IsNullOrWhiteSpace(settings.HeroSlidesJson) || settings.HeroSlidesJson == "[]")
         {
+            if (settings.BaseDeliveryFee <= 0m) settings.BaseDeliveryFee = 1.50m;
+            (settings.EnableDelivery, settings.EnableTakeout, settings.EnableDineIn) = (true, true, true);
+            (settings.AcceptsCash, settings.AcceptsBankTransfer, settings.QuickLinksEnabled) = (true, true, true);
             settings.BankName ??= "Banco Pichincha";
             settings.BankAccountType ??= "Cuenta Corriente";
             settings.BankAccountNumber ??= "2100456789";

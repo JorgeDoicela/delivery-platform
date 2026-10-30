@@ -216,5 +216,44 @@ public partial class AppDbContext
 
             ct.HasQueryFilter(x => CurrentTenantId == null || x.TenantId == CurrentTenantId);
         });
+
+        // -------------------------------------------------------------
+        // 4.1 Repartidores y Telemetría
+        // -------------------------------------------------------------
+        modelBuilder.Entity<Driver>(d =>
+        {
+            d.ToTable("Drivers");
+            d.HasKey(x => x.Id);
+            d.Property(x => x.VehicleType).HasMaxLength(50).IsRequired();
+            d.Property(x => x.LicensePlate).HasMaxLength(20);
+
+            d.Property(x => x.CurrentLocation)
+                .HasColumnType("geometry(Point, 4326)");
+
+            d.HasOne(x => x.User)
+                .WithOne()
+                .HasForeignKey<Driver>(x => x.UserId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            d.HasQueryFilter(x => CurrentTenantId == null || x.TenantId == CurrentTenantId);
+        });
+
+        modelBuilder.Entity<OrderDelivery>(od =>
+        {
+            od.ToTable("OrderDeliveries");
+            od.HasKey(x => x.Id);
+
+            od.HasOne(x => x.Order)
+                .WithOne()
+                .HasForeignKey<OrderDelivery>(x => x.OrderId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            od.HasOne(x => x.Driver)
+                .WithMany(x => x.Deliveries)
+                .HasForeignKey(x => x.DriverId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            od.HasQueryFilter(x => CurrentTenantId == null || x.Order.TenantId == CurrentTenantId);
+        });
     }
 }

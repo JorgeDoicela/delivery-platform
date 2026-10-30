@@ -130,9 +130,32 @@ function LoginContent() {
               </div>
 
               <div className="flex flex-wrap items-center justify-center gap-3 pt-4">
+                {(user.role === "SuperAdmin" || Number(user.role) === 1) && (
+                  <Link
+                    href="/superadmin"
+                    className="bg-neutral-950 hover:bg-neutral-800 active:scale-95 text-white font-black text-xs uppercase tracking-wider font-display px-6 py-3 rounded-full shadow-md transition-all inline-flex items-center gap-2"
+                  >
+                    <span>Consola SuperAdmin</span>
+                    <ArrowRight className="w-3.5 h-3.5" />
+                  </Link>
+                )}
+
+                {(user.role === "TenantAdmin" ||
+                  user.role === "SuperAdmin" ||
+                  Number(user.role) === 2 ||
+                  Number(user.role) === 1) && (
+                  <Link
+                    href="/admin/personalizacion"
+                    className="bg-brand-primary hover:bg-brand-primary-hover active:scale-95 text-white font-black text-xs uppercase tracking-wider font-display px-6 py-3 rounded-full shadow-md shadow-brand-primary/20 transition-all inline-flex items-center gap-2"
+                  >
+                    <span>Panel de Marca</span>
+                    <ArrowRight className="w-3.5 h-3.5" />
+                  </Link>
+                )}
+
                 <Link
                   href="/cocina"
-                  className="bg-brand-primary hover:bg-brand-primary-hover active:scale-95 text-white font-black text-xs uppercase tracking-wider font-display px-6 py-3 rounded-full shadow-md shadow-brand-primary/20 transition-all inline-flex items-center gap-2"
+                  className="bg-neutral-800 hover:bg-neutral-700 active:scale-95 text-white font-black text-xs uppercase tracking-wider font-display px-6 py-3 rounded-full shadow-sm transition-all inline-flex items-center gap-2"
                 >
                   <span>Ir a Cocina KDS</span>
                   <ArrowRight className="w-3.5 h-3.5" />

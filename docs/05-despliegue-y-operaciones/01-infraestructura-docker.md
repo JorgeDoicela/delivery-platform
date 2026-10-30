@@ -35,6 +35,43 @@ La persistencia y el motor de cache local estan orquestados mediante Docker Comp
   retries: 5
   ```
 
+### 2.3. Backend API .NET 8: `delivery-backend`
+* **Imagen:** `delivery-backend:latest` (construida desde `backend/Dockerfile`)
+* **Puerto Expuesto:** `5005:5005`
+* **Variables de Entorno:**
+  - `ASPNETCORE_ENVIRONMENT=Development`
+  - `ASPNETCORE_URLS=http://+:5005`
+  - `ConnectionStrings__DefaultConnection=Host=postgres;Port=5432;Database=delivery;Username=postgres;Password=postgres_dev_password`
+  - `ConnectionStrings__Redis=redis:6379,password=redis_dev_password`
+* **Dependencias:** `postgres` y `redis` en estado saludable (`service_healthy`).
+* **Mecanismo de Healthcheck:**
+  ```yaml
+  test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://127.0.0.1:5005/health"]
+  interval: 10s
+  timeout: 5s
+  retries: 5
+  start_period: 20s
+  ```
+
+### 2.4. Frontend Web Next.js 16: `delivery-frontend`
+* **Imagen:** `delivery-frontend:latest` (construida desde `frontend/Dockerfile`)
+* **Puerto Expuesto:** `3005:3005`
+* **Variables de Entorno:**
+  - `NODE_ENV=production`
+  - `PORT=3005`
+  - `HOSTNAME=0.0.0.0`
+  - `NEXT_PUBLIC_API_URL=http://localhost:5005`
+  - `NEXT_PUBLIC_WS_URL=http://localhost:5005/hubs`
+* **Dependencias:** `backend` en estado saludable (`service_healthy`).
+* **Mecanismo de Healthcheck:**
+  ```yaml
+  test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://127.0.0.1:3005/api/health"]
+  interval: 10s
+  timeout: 5s
+  retries: 5
+  start_period: 15s
+  ```
+
 ---
 
 ## 3. Comandos de Gestion de Infraestructura

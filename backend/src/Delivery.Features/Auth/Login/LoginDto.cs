@@ -7,8 +7,11 @@ public record UserAuthInfoDto(
     string Email,
     string FullName,
     string? Phone,
+    string Role,
     Guid? TenantId,
+    string? TenantSlug,
     int? BranchId,
+    bool IsActive,
     List<string> Roles);
 
 public record LoginResponse(

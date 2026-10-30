@@ -70,14 +70,35 @@ public class LoginHandler : IHandler<LoginCommand, Result<LoginResponse>>
         var emailLower = request.Email.Trim().ToLower(System.Globalization.CultureInfo.InvariantCulture);
 
         var user = await _context.Users.IgnoreQueryFilters()
+            .Include(u => u.Tenant)
             .Include(u => u.UserRoles)
                 .ThenInclude(ur => ur.Role)
             .FirstOrDefaultAsync(u => (u.TenantId == tenant.Id || u.TenantId == null) && u.Email.ToLower() == emailLower, cancellationToken);
+
+        // Si no se especificó un TenantSlug forzado en el request y el usuario pertenece a otro comercio, resolver su propio Tenant
+        if (user == null && string.IsNullOrWhiteSpace(request.TenantSlug))
+        {
+            user = await _context.Users.IgnoreQueryFilters()
+                .Include(u => u.Tenant)
+                .Include(u => u.UserRoles)
+                    .ThenInclude(ur => ur.Role)
+                .FirstOrDefaultAsync(u => u.Email.ToLower() == emailLower, cancellationToken);
+
+            if (user?.Tenant != null)
+            {
+                tenant = user.Tenant;
+            }
+        }
 #pragma warning restore CA1862, CA1304, CA1311
 
         if (user == null)
         {
             return Result.Failure<LoginResponse>(AuthErrors.InvalidCredentials);
+        }
+
+        if (!tenant.IsActive)
+        {
+            return Result.Failure<LoginResponse>(AuthErrors.TenantInactive);
         }
 
         // 3. Verificacion de contrasena
@@ -113,14 +134,20 @@ public class LoginHandler : IHandler<LoginCommand, Result<LoginResponse>>
         await _context.RefreshTokens.AddAsync(refreshTokenEntity, cancellationToken);
         await _context.SaveChangesAsync(cancellationToken);
 
+        var roleNames = roles.Select(r => r.Name).ToList();
+        var primaryRoleName = roleNames.FirstOrDefault() ?? "Customer";
+
         var userDto = new UserAuthInfoDto(
             user.Id,
             user.Email,
             user.FullName,
             user.Phone,
+            primaryRoleName,
             user.TenantId,
+            user.Tenant?.Slug ?? (user.TenantId.HasValue ? tenant.Slug : null),
             primaryBranchId,
-            roles.Select(r => r.Name).ToList());
+            user.IsActive,
+            roleNames);
 
         var response = new LoginResponse(accessToken, rawRefreshToken, accessExpiresAt, userDto);
         return Result.Success(response);

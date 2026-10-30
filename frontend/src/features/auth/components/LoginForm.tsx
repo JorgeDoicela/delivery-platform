@@ -8,7 +8,8 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { Loader2, AlertCircle } from "lucide-react";
 import { loginSchema, type LoginFormData } from "../schemas/loginSchema";
 import { useAuthStore } from "../store/useAuthStore";
-import { useCurrentTenantQuery } from "@/features/tenant";
+import { UserRole } from "../types";
+import { useCurrentTenantQuery, useTenantStore } from "@/features/tenant";
 
 interface LoginFormProps {
   redirectUrl?: string;
@@ -41,7 +42,29 @@ export function LoginForm({ redirectUrl, embedded = false }: LoginFormProps) {
     const success = await login(data);
 
     if (success) {
-      const destination = redirectUrl || "/cocina";
+      const loggedUser = useAuthStore.getState().user;
+      if (loggedUser?.tenantSlug) {
+        useTenantStore.getState().setTenantSlug(loggedUser.tenantSlug);
+      }
+
+      const isSuperAdmin =
+        loggedUser?.role === "SuperAdmin" ||
+        loggedUser?.role === UserRole.SuperAdmin;
+      const isTenantAdmin =
+        loggedUser?.role === "TenantAdmin" ||
+        loggedUser?.role === UserRole.TenantAdmin;
+
+      const defaultDestination = isSuperAdmin
+        ? "/superadmin"
+        : isTenantAdmin
+          ? "/admin/personalizacion"
+          : "/cocina";
+
+      const destination =
+        redirectUrl && redirectUrl !== "/cocina"
+          ? redirectUrl
+          : defaultDestination;
+
       router.push(destination);
       router.refresh();
     } else {

@@ -327,3 +327,69 @@ export interface UpdateTenantStorefrontCommand {
   heroSlides: TenantHeroSlide[];
   promotionalBanners: TenantPromoBanner[];
 }
+
+export interface PlatformTenantItemDto {
+  id: string;
+  slug: string;
+  name: string;
+  businessName: string;
+  taxId: string;
+  tagline: string;
+  description: string;
+  logoUrl: string;
+  brandPrimaryColor: string;
+  brandPrimaryHoverColor: string;
+  brandAccentColor: string;
+  contactPhone: string;
+  contactEmail: string;
+  baseDeliveryFee: number;
+  isActive: boolean;
+  branchesCount: number;
+  productsCount: number;
+  adminEmail: string;
+  primaryBranchAddress: string;
+  createdAt: string;
+}
+
+export interface PlatformTenantsResponse {
+  tenants: PlatformTenantItemDto[];
+}
+
+export interface CreateTenantCommand {
+  name: string;
+  slug: string;
+  businessName: string;
+  taxId: string;
+  tagline: string;
+  description: string;
+  brandPrimaryColor: string;
+  brandPrimaryHoverColor: string;
+  brandAccentColor: string;
+  baseDeliveryFee: number;
+  contactPhone: string;
+  contactEmail: string;
+  primaryBranchName: string;
+  primaryBranchAddress: string;
+  adminFullName: string;
+  adminEmail: string;
+  adminPassword: string;
+}
+
+export interface CreatedTenantDto {
+  id: string;
+  slug: string;
+  name: string;
+  businessName: string;
+  taxId: string;
+  brandPrimaryColor: string;
+  isActive: boolean;
+  adminEmail: string;
+  primaryBranchId: number;
+}
+
+export interface ToggleTenantStatusResponse {
+  id: string;
+  slug: string;
+  name: string;
+  isActive: boolean;
+}
