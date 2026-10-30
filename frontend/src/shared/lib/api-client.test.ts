@@ -79,7 +79,10 @@ describe('apiClient - RFC 7807 Error Handling', () => {
       expect.stringContaining('/api/catalog/products/1/status'),
       expect.objectContaining({
         method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
+        headers: {
+          'Content-Type': 'application/json',
+          'X-Tenant-Slug': 'la-granjita',
+        },
         body: JSON.stringify({ productId: 1, isActive: false }),
       })
     );

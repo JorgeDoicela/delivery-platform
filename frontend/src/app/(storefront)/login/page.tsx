@@ -16,6 +16,7 @@ import {
   ArrowRight,
 } from "lucide-react";
 import { useIsMounted } from "@/shared/hooks/useIsMounted";
+import { useCurrentTenantQuery } from "@/features/tenant";
 
 function LoginContent() {
   const searchParams = useSearchParams();
@@ -23,6 +24,8 @@ function LoginContent() {
   const hasExplicitRedirect = Boolean(searchParams.get("redirect"));
 
   const isMounted = useIsMounted();
+  const { data: tenant } = useCurrentTenantQuery();
+  const brandName = tenant?.name || "La Granjita Asadero";
   const user = useAuthStore((s) => s.user);
   const isAuthenticated = useAuthStore((s) => s.isAuthenticated);
   const logout = useAuthStore((s) => s.logout);
@@ -53,24 +56,24 @@ function LoginContent() {
       {/* 2. Titular Principal en Barlow Condensed */}
       <div>
         <h1 className="text-3xl sm:text-4xl font-black text-neutral-950 uppercase tracking-tight font-display">
-          Hola, bienvenido/a a La Granjita Asadero
+          Hola, bienvenido/a a {brandName}
         </h1>
       </div>
 
       {/* 3. Cuadrícula de Dos Columnas estilo KFC */}
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 sm:gap-8 items-start pt-2">
-        {/* Columna Izquierda: Banner Promocional Rojo + Navegación Lateral */}
+        {/* Columna Izquierda: Banner Promocional + Navegación Lateral */}
         <div className="lg:col-span-4 space-y-4">
-          {/* Banner Rojo de Beneficios */}
-          <div className="bg-gradient-to-br from-[#b3001e] via-brand-primary to-[#8c0017] text-white rounded-3xl p-6 shadow-sm relative overflow-hidden">
+          {/* Banner de Beneficios */}
+          <div className="bg-brand-primary text-white rounded-3xl p-6 shadow-sm relative overflow-hidden">
             <span className="text-[10px] font-bold tracking-widest uppercase text-brand-accent block mb-1">
               Programa de Clientes
             </span>
             <h2 className="text-xl font-black uppercase tracking-tight font-display leading-tight mb-2">
-              Únete a Beneficios La Granjita
+              Únete a Beneficios {brandName}
             </h2>
             <p className="text-xs text-white/90 leading-relaxed font-sans">
-              Acumula pedidos en cada compra directa, accede a combos exclusivos y rastrea tus despachos en tiempo real.
+              Acumula pedidos en cada compra directa, accede a promociones exclusivas y rastrea tus despachos en tiempo real.
             </p>
           </div>
 

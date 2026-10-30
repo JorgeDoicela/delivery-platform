@@ -54,7 +54,8 @@ public sealed class ToggleProductStatusHandler : IHandler<ToggleProductStatusCom
             return Result.Failure<ToggleProductStatusResponse>(new Error(firstError.ErrorCode, firstError.ErrorMessage));
         }
 
-        var product = await _context.Products.FindAsync(new object[] { command.ProductId }, cancellationToken);
+        var product = await _context.Products
+            .FirstOrDefaultAsync(p => p.Id == command.ProductId, cancellationToken);
         if (product is null)
         {
             return Result.Failure<ToggleProductStatusResponse>(ToggleProductStatusErrors.ProductNotFound);

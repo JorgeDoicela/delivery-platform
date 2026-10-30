@@ -1,4 +1,5 @@
 using System.Text.Json;
+using Delivery.Core.Domain.Common;
 using Microsoft.AspNetCore.Mvc;
 using StackExchange.Redis;
 
@@ -15,7 +16,7 @@ public class IdempotencyMiddleware
         _redis = redis;
     }
 
-    public async Task InvokeAsync(HttpContext context)
+    public async Task InvokeAsync(HttpContext context, ITenantContext tenantContext)
     {
         // Solo aplica a creación de órdenes POST /api/orders
         if (context.Request.Method != HttpMethods.Post || !context.Request.Path.StartsWithSegments("/api/orders"))
@@ -30,7 +31,8 @@ public class IdempotencyMiddleware
             return;
         }
 
-        string idempotencyKey = $"idempotency:{keyValues.ToString().Trim()}";
+        string tenantScope = tenantContext.TenantSlug ?? "default";
+        string idempotencyKey = $"tenant:{tenantScope}:idempotency:{keyValues.ToString().Trim()}";
         var db = _redis.GetDatabase();
 
         // Intentar registrar la clave en estado PROCESSING con TTL transitorio de 120 segundos

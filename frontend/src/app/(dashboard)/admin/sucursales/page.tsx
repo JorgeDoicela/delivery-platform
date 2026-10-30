@@ -3,8 +3,8 @@ import { RefreshCw } from "lucide-react";
 import { BranchManagementView } from "@/features/branches";
 
 export const metadata = {
-  title: "Sucursales y Cobertura | La Granjita Asadero",
-  description: "Monitoreo de geocercas poligonales PostGIS y límites por ranura en Redis para La Granjita Asadero.",
+  title: "Sucursales y Cobertura | Operaciones",
+  description: "Monitoreo de geocercas poligonales PostGIS y límites por ranura en Redis.",
 };
 
 export default function AdminSucursalesPage() {

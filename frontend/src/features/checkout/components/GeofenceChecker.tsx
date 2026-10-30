@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { apiClient } from "@/shared/lib/api-client";
 import { useCartStore } from "@/features/cart";
+import { useCurrentTenantQuery } from "@/features/tenant";
 import type { BranchCoverageDto, BranchCapacityResponse } from "@/shared/types/api";
 import { MapPin, Navigation, CheckCircle2, AlertTriangle, Loader2 } from "lucide-react";
 import { AddressSelector } from "./AddressSelector";
@@ -13,6 +14,8 @@ interface GeofenceCheckerProps {
 
 export function GeofenceChecker({ onLocationResolved }: GeofenceCheckerProps) {
   const setBranch = useCartStore((s) => s.setBranch);
+  const { data: tenant } = useCurrentTenantQuery();
+  const tenantBranches = tenant?.branches ?? [];
 
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -124,23 +127,20 @@ export function GeofenceChecker({ onLocationResolved }: GeofenceCheckerProps) {
           </div>
         )}
 
-        <div className="flex items-center gap-2 pt-1 text-[11px] text-text-muted">
-          <span>O prueba una zona:</span>
-          <button
-            type="button"
-            onClick={() => testLocation(-0.1782, -78.4845)}
-            className="font-bold text-brand-primary hover:underline"
-          >
-            Quito Norte (Sucursal 1)
-          </button>
-          <span>•</span>
-          <button
-            type="button"
-            onClick={() => testLocation(-0.2300, -78.5180)}
-            className="font-bold text-brand-primary hover:underline"
-          >
-            Quito Sur (Sucursal 2)
-          </button>
+        <div className="flex flex-wrap items-center gap-2 pt-1 text-[11px] text-text-muted">
+          <span>O prueba cobertura en una sucursal de {tenant?.name}:</span>
+          {tenantBranches.map((branch, idx) => (
+            <span key={branch.id} className="inline-flex items-center gap-2">
+              {idx > 0 && <span>•</span>}
+              <button
+                type="button"
+                onClick={() => testLocation(branch.latitude, branch.longitude)}
+                className="font-bold text-brand-primary hover:underline"
+              >
+                {branch.name}
+              </button>
+            </span>
+          ))}
         </div>
       </div>
 

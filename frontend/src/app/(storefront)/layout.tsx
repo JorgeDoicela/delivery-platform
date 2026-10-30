@@ -1,27 +1,38 @@
+"use client";
+
+import React from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { MapPin, Search, User } from "lucide-react";
 import { CartButtonBadge } from "@/features/cart";
+import { TenantSwitcher, useCurrentTenantQuery } from "@/features/tenant";
 
 export default function StorefrontLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
+  const { data: tenant } = useCurrentTenantQuery();
+
+  const brandName = tenant?.name || "La Granjita Asadero";
+  const brandTagline = tenant?.tagline || "Asadero & Leña";
+  const brandLogo = tenant?.logoUrl || "/images/identidad/logo.png";
+  const brandDescription =
+    tenant?.description ||
+    "Pedidos directos sin intermediarios con despacho geolocalizado en tiempo real.";
+  const branches = tenant?.branches ?? [];
+
   return (
     <div className="flex flex-col min-h-screen bg-surface-canvas">
-      {/* Header Comercial Blanco Limpio estilo KFC */}
+      {/* Header Comercial Dinámico Multi-Tenant */}
       <header className="sticky top-0 z-40 bg-white border-b border-neutral-200/80 shadow-xs">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-[70px] sm:h-[76px] flex items-center justify-between gap-4 sm:gap-6 lg:gap-8">
-          
-          {/* Bloque Izquierdo: Logo + Navegación Agrupada con Espaciado estilo KFC */}
-          <div className="flex items-center gap-6 lg:gap-8 shrink-0">
-            {/* Logo Oficial La Granjita Asadero sin fondo */}
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-[70px] sm:h-[76px] flex items-center justify-between gap-3 sm:gap-6">
+          <div className="flex items-center gap-5 lg:gap-7 shrink-0">
             <Link href="/" className="flex items-center gap-2.5 group shrink-0">
               <div className="relative w-9 h-9 sm:w-10 sm:h-10 shrink-0">
                 <Image
-                  src="/images/identidad/logo.png"
-                  alt="Logo La Granjita Asadero"
+                  src={brandLogo}
+                  alt={`Logo ${brandName}`}
                   width={40}
                   height={40}
                   priority
@@ -33,100 +44,115 @@ export default function StorefrontLayout({
                   data-display-brand
                   className="font-black text-2xl sm:text-[26px] tracking-tight text-brand-primary block leading-none uppercase font-display"
                 >
-                  LA GRANJITA
+                  {brandName}
                 </span>
                 <span className="text-[10px] tracking-widest text-text-muted font-bold uppercase block mt-0.5">
-                  Asadero
+                  {brandTagline}
                 </span>
               </div>
             </Link>
 
-            {/* Enlaces de Navegación estilo KFC con Anclas a la Página Principal */}
-            <nav className="hidden lg:flex items-center gap-5 xl:gap-6 text-[13px] sm:text-sm font-semibold text-neutral-800">
-              <Link href="/#catalogo" className="hover:text-brand-primary transition-colors">
+            <nav className="hidden xl:flex items-center gap-5 text-[13px] sm:text-sm font-semibold text-neutral-800">
+              <Link
+                href="/#catalogo"
+                className="hover:text-brand-primary transition-colors"
+              >
                 Ordenar
               </Link>
-              <Link href="/#sucursales" className="hover:text-brand-primary transition-colors">
-                Restaurantes
+              <Link
+                href="/sucursales"
+                className="hover:text-brand-primary transition-colors"
+              >
+                Sucursales
               </Link>
-              <Link href="/rastreo" className="hover:text-brand-primary transition-colors">
+              <Link
+                href="/rastreo"
+                className="hover:text-brand-primary transition-colors"
+              >
                 Rastrear Pedido
               </Link>
-              <Link href="/#sucursales" className="hover:text-brand-primary transition-colors">
-                Nosotros
+              <Link
+                href="/admin/personalizacion"
+                className="hover:text-brand-primary transition-colors"
+              >
+                Personalizar
               </Link>
             </nav>
           </div>
 
-          {/* Bloque Derecho: Buscador Píldora + Perfil + Botón Ingresar + Bolsa estilo KFC */}
-          <div className="flex items-center gap-3 sm:gap-4 lg:gap-5 shrink-0">
-            {/* Buscador Píldora con ancla al catálogo */}
-            <div className="hidden md:flex items-center">
+          <div className="flex items-center gap-2.5 sm:gap-3.5 shrink-0">
+            {/* Conmutador de Negocio / Directorio Multi-Tenant */}
+            <TenantSwitcher />
+
+            <div className="hidden lg:flex items-center">
               <a
                 href="#catalogo"
-                className="flex items-center gap-2.5 px-4 py-2 w-56 sm:w-64 md:w-72 lg:w-80 bg-[#f8f7f5] hover:bg-neutral-200/70 rounded-full transition-colors border border-neutral-200/60 text-neutral-500 group"
+                className="flex items-center gap-2.5 px-4 py-2 w-48 xl:w-64 bg-[#f8f7f5] hover:bg-neutral-200/70 rounded-full transition-colors border border-neutral-200/60 text-neutral-500 group"
               >
                 <Search className="w-4 h-4 text-neutral-500 group-hover:text-brand-primary transition-colors shrink-0" />
-                <span className="text-xs sm:text-sm text-neutral-400 font-normal">Buscar</span>
+                <span className="text-xs sm:text-sm text-neutral-400 font-normal">
+                  Buscar en menú
+                </span>
               </a>
             </div>
 
-            {/* Icono Perfil que lleva a /login */}
             <Link
               href="/login"
               className="flex flex-col items-center justify-center text-neutral-800 hover:text-brand-primary transition-colors px-1 shrink-0"
               title="Mi Perfil / Iniciar Sesión"
             >
               <User className="w-5 h-5 text-neutral-800 stroke-[1.8]" />
-              <span className="text-[10px] font-semibold text-neutral-700 leading-none mt-1">Perfil</span>
+              <span className="text-[10px] font-semibold text-neutral-700 leading-none mt-1">
+                Perfil
+              </span>
             </Link>
 
-            {/* Bolsa de Compras con Badge Rojo estilo KFC */}
             <CartButtonBadge />
           </div>
-
         </div>
       </header>
 
-      {/* Contenido Principal a Ancho Completo */}
-      <main className="flex-1 w-full">
-        {children}
-      </main>
+      <main className="flex-1 w-full">{children}</main>
 
-      {/* Footer Estilo KFC Limpio con Accesos Operativos */}
-      <footer id="sucursales" className="bg-neutral-100 text-neutral-600 text-xs border-t border-neutral-200 mt-16 py-12">
+      {/* Footer Dinámico por Tenant */}
+      <footer
+        id="sucursales"
+        className="bg-neutral-100 text-neutral-600 text-xs border-t border-neutral-200 mt-16 py-12"
+      >
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
           <div>
             <div className="flex items-center gap-2.5 mb-3">
               <div className="relative w-8 h-8 shrink-0">
                 <Image
-                  src="/images/identidad/logo.png"
-                  alt="Logo La Granjita"
+                  src={brandLogo}
+                  alt={`Logo ${brandName}`}
                   width={32}
                   height={32}
                   className="w-full h-full object-contain"
                 />
               </div>
-              <span className="font-black text-brand-primary text-base uppercase tracking-tight font-display">LA GRANJITA ASADERO</span>
+              <span className="font-black text-brand-primary text-base uppercase tracking-tight font-display">
+                {brandName}
+              </span>
             </div>
             <p className="text-neutral-500 leading-relaxed">
-              Pollo asado artesanalmente al carbón vegetal y leña seleccionada en La Granjita Asadero. Pedidos directos sin intermediarios.
+              {brandDescription}
             </p>
           </div>
 
           <div>
             <h4 className="font-bold text-neutral-900 uppercase tracking-wider text-[11px] mb-3">
-              Sucursales Operativas
+              Sucursales Operativas ({branches.length})
             </h4>
             <ul className="space-y-2">
-              <li className="flex items-start gap-1.5">
-                <MapPin className="w-3.5 h-3.5 text-brand-primary mt-0.5 shrink-0" />
-                <span>La Granjita Norte: Av. Amazonas y República</span>
-              </li>
-              <li className="flex items-start gap-1.5">
-                <MapPin className="w-3.5 h-3.5 text-brand-primary mt-0.5 shrink-0" />
-                <span>La Granjita Sur: Av. Rodrigo de Chávez y Maldonado</span>
-              </li>
+              {branches.map((branch) => (
+                <li key={branch.id} className="flex items-start gap-1.5">
+                  <MapPin className="w-3.5 h-3.5 text-brand-primary mt-0.5 shrink-0" />
+                  <span>
+                    {branch.name}: {branch.address}
+                  </span>
+                </li>
+              ))}
             </ul>
           </div>
 
@@ -135,26 +161,36 @@ export default function StorefrontLayout({
               Garantía y Facturación
             </h4>
             <p className="text-neutral-500 leading-relaxed mb-2">
-              Facturación electrónica autorizada SRI. Despacho y entrega monitoreados en tiempo real.
+              Facturación electrónica autorizada SRI ({tenant?.businessName} • RUC{" "}
+              {tenant?.taxId}). Despacho monitoreado en tiempo real.
             </p>
-            <span className="text-[11px] text-neutral-400">© 2026 La Granjita Asadero. Todos los derechos reservados.</span>
+            <span className="text-[11px] text-neutral-400">
+              © 2026 {brandName}. Todos los derechos reservados.
+            </span>
           </div>
 
-          {/* Accesos Operativos Reubicados (Horno y KDS) */}
           <div>
             <h4 className="font-bold text-neutral-900 uppercase tracking-wider text-[11px] mb-3">
               Accesos Operativos
             </h4>
-            <div className="space-y-3">
+            <div className="space-y-2.5">
               <div className="flex items-center gap-2 text-neutral-700 bg-white p-2.5 rounded-xl border border-neutral-200">
                 <span className="w-2 h-2 rounded-full bg-status-success animate-pulse shrink-0"></span>
-                <span className="text-[11px] font-medium leading-tight">Horno encendido: Tomando pedidos</span>
+                <span className="text-[11px] font-medium leading-tight">
+                  Cocina activa: Tomando pedidos
+                </span>
               </div>
               <Link
                 href="/cocina"
                 className="inline-flex items-center justify-center w-full text-xs font-bold uppercase tracking-wider bg-neutral-900 hover:bg-neutral-800 text-white px-4 py-2.5 rounded-full transition-colors shadow-sm"
               >
-                Terminal KDS - La Granjita
+                Terminal KDS • {brandName}
+              </Link>
+              <Link
+                href="/admin/personalizacion"
+                className="inline-flex items-center justify-center w-full text-xs font-bold uppercase tracking-wider bg-white hover:bg-neutral-50 text-neutral-900 border border-neutral-300 px-4 py-2 rounded-full transition-colors"
+              >
+                Personalizar Landing & Marca
               </Link>
             </div>
           </div>

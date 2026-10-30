@@ -3,8 +3,8 @@ import { RefreshCw } from "lucide-react";
 import { InventoryManagerView } from "@/features/catalog";
 
 export const metadata = {
-  title: "Control de Inventario | La Granjita Asadero",
-  description: "Conmutador de disponibilidad inmediata de productos y combos en La Granjita Asadero.",
+  title: "Control de Inventario | Operaciones",
+  description: "Conmutador de disponibilidad inmediata de productos y combos.",
 };
 
 export default function AdminInventarioPage() {

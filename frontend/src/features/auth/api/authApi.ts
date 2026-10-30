@@ -1,4 +1,7 @@
-import { ApiClientError } from "@/shared/lib/api-client";
+import {
+  ApiClientError,
+  getApiClientTenantSlug,
+} from "@/shared/lib/api-client";
 import type {
   AuthUser,
   LoginResponse,
@@ -41,13 +44,15 @@ async function handleAuthResponse<T>(response: Response): Promise<T> {
 
 export const authApi = {
   async login(credentials: LoginFormData): Promise<LoginResponse> {
+    const tenantSlug = getApiClientTenantSlug();
     const res = await fetch(`${API_BASE_URL}/api/v1/auth/login`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
+        "X-Tenant-Slug": tenantSlug,
       },
       credentials: "include",
-      body: JSON.stringify(credentials),
+      body: JSON.stringify({ ...credentials, tenantSlug }),
     });
     return handleAuthResponse<LoginResponse>(res);
   },
@@ -57,6 +62,7 @@ export const authApi = {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
+        "X-Tenant-Slug": getApiClientTenantSlug(),
       },
       credentials: "include",
       body: JSON.stringify({}),
@@ -67,6 +73,7 @@ export const authApi = {
   async getCurrentUser(accessToken?: string | null): Promise<AuthUser> {
     const headers: Record<string, string> = {
       "Content-Type": "application/json",
+      "X-Tenant-Slug": getApiClientTenantSlug(),
     };
 
     if (accessToken) {
@@ -86,6 +93,7 @@ export const authApi = {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
+        "X-Tenant-Slug": getApiClientTenantSlug(),
       },
       credentials: "include",
       body: JSON.stringify({}),

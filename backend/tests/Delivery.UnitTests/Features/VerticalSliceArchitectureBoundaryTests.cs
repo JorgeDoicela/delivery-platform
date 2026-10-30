@@ -137,6 +137,7 @@ public class VerticalSliceArchitectureBoundaryTests
 
     [Theory]
     [InlineData("Delivery.Features.Branches.GetBranchCapacity")]
+    [InlineData("Delivery.Features.Branches.GetBranches")]
     [InlineData("Delivery.Features.Branches.ResolveBranch")]
     [InlineData("Delivery.Features.Catalog.GetActiveMenu")]
     [InlineData("Delivery.Features.Catalog.ToggleProductStatus")]
@@ -145,6 +146,9 @@ public class VerticalSliceArchitectureBoundaryTests
     [InlineData("Delivery.Features.Orders.CreateOrder")]
     [InlineData("Delivery.Features.Orders.GetOrderById")]
     [InlineData("Delivery.Features.Orders.UpdateOrderStatus")]
+    [InlineData("Delivery.Features.Tenants.GetCurrentTenant")]
+    [InlineData("Delivery.Features.Tenants.GetPublicTenants")]
+    [InlineData("Delivery.Features.Tenants.UpdateTenantStorefront")]
     [InlineData("Delivery.Features.Tracking.GetDriverLocation")]
     [InlineData("Delivery.Features.Tracking.IngestDriverLocation")]
     [InlineData("Delivery.Features.Auth.Login")]

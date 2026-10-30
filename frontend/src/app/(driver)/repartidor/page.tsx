@@ -3,8 +3,8 @@ import { RefreshCw } from 'lucide-react';
 import { DriverDeliveryView } from '@/features/tracking';
 
 export const metadata = {
-  title: 'Repartidor - Hoja de Ruta | La Granjita Asadero',
-  description: 'Terminal móvil de telemetría y liquidación para repartidores de La Granjita Asadero.',
+  title: 'Repartidor - Hoja de Ruta',
+  description: 'Terminal móvil de telemetría y liquidación para repartidores.',
 };
 
 export default function RepartidorPage() {

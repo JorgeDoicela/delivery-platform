@@ -29,7 +29,7 @@ export function OrderSummary() {
         <div>
           <h3 className="font-bold text-text-strong text-base font-display uppercase tracking-wide">Tu pedido está vacío</h3>
           <p className="text-xs text-text-muted mt-1 leading-relaxed">
-            Agrega deliciosos combos de pollo asado desde nuestro menú para continuar.
+            Agrega productos desde nuestro menú para continuar.
           </p>
         </div>
         <Link

@@ -77,7 +77,7 @@ public sealed class GetBranchCapacityHandler : IHandler<GetBranchCapacityQuery, 
         bool isSaturated = currentCount > hardCap;
         string estimatedTime = isHighDemand ? "60-75 min" : (isSaturated ? "Pausado (Saturación)" : "35-45 min");
         string? notice = isHighDemand
-            ? "Tiempo estimado de entrega extendido a 60-75 min por alta demanda en horno."
+            ? "Tiempo estimado de entrega extendido a 60-75 min por alta demanda en cocina."
             : (isSaturated ? "Cocina saturada temporalmente. Pedidos en pausa." : null);
 
         return Result.Success(new BranchCapacityResponse(

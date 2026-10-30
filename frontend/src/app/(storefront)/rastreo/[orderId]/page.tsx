@@ -7,8 +7,8 @@ interface RastreoDetallePageProps {
 }
 
 export const metadata = {
-  title: 'Seguimiento de Pedido | La Granjita Asadero',
-  description: 'Rastreo satelital en tiempo real de tu pedido con mapa vectorial en La Granjita Asadero.',
+  title: 'Seguimiento de Pedido en Tiempo Real',
+  description: 'Rastreo satelital en tiempo real de tu pedido con mapa vectorial.',
 };
 
 async function OrderTrackingLoader({ params }: RastreoDetallePageProps) {

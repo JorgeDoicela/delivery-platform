@@ -17,10 +17,17 @@ public partial class AppDbContext
             t.Property(x => x.Slug).HasMaxLength(50).IsRequired();
             t.HasIndex(x => x.Slug).IsUnique();
             t.Property(x => x.Name).HasMaxLength(150).IsRequired();
+            t.Property(x => x.Tagline).HasMaxLength(100);
+            t.Property(x => x.Description).HasMaxLength(500);
+            t.Property(x => x.HeroSubtitle).HasMaxLength(250);
             t.Property(x => x.BusinessName).HasMaxLength(200);
             t.Property(x => x.TaxId).HasMaxLength(20);
             t.Property(x => x.LogoUrl).HasMaxLength(500);
-            t.Property(x => x.BrandPrimaryColor).HasMaxLength(10);
+            t.Property(x => x.BrandPrimaryColor).HasMaxLength(15);
+            t.Property(x => x.BrandPrimaryHoverColor).HasMaxLength(15);
+            t.Property(x => x.BrandAccentColor).HasMaxLength(15);
+            t.Property(x => x.ContactPhone).HasMaxLength(30);
+            t.Property(x => x.ContactEmail).HasMaxLength(150);
         });
 
         modelBuilder.Entity<TenantSetting>(ts =>
@@ -31,6 +38,14 @@ public partial class AppDbContext
             ts.Property(x => x.CurrencyCode).HasMaxLength(3).IsRequired();
             ts.Property(x => x.SriEnvironment).HasMaxLength(20).IsRequired();
             ts.Property(x => x.SriCertificatePath).HasMaxLength(500);
+            ts.Property(x => x.BaseDeliveryFee).HasPrecision(18, 2);
+            ts.Property(x => x.BankName).HasMaxLength(120);
+            ts.Property(x => x.BankAccountType).HasMaxLength(50);
+            ts.Property(x => x.BankAccountNumber).HasMaxLength(50);
+            ts.Property(x => x.BankAccountHolder).HasMaxLength(150);
+            ts.Property(x => x.BankAccountTaxId).HasMaxLength(30);
+            ts.Property(x => x.HeroSlidesJson).HasColumnType("text");
+            ts.Property(x => x.PromotionalBannersJson).HasColumnType("text");
 
             ts.HasOne(x => x.Tenant)
                 .WithOne(x => x.Settings)

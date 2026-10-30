@@ -66,13 +66,14 @@ public class VerticalSliceArchitectureRegistrationTests
         // Act
         services.AddDeliveryFeatures();
 
-        // Assert: Deben registrarse exactamente 15 endpoints autónomos (11 operativos + 4 de autenticación)
+        // Assert: Deben registrarse exactamente 19 endpoints autónomos (11 operativos + 4 de autenticación + 4 de tenants y sucursales)
         var endpointDescriptors = services.Where(s => s.ServiceType == typeof(IEndpoint)).ToList();
-        endpointDescriptors.Should().HaveCount(15);
+        endpointDescriptors.Should().HaveCount(19);
 
         var endpointImplementationTypes = endpointDescriptors.Select(d => d.ImplementationType).ToHashSet();
         endpointImplementationTypes.Should().Contain(typeof(ResolveBranchEndpoint));
         endpointImplementationTypes.Should().Contain(typeof(GetBranchCapacityEndpoint));
+        endpointImplementationTypes.Should().Contain(typeof(Delivery.Features.Branches.GetBranches.GetBranchesEndpoint));
         endpointImplementationTypes.Should().Contain(typeof(GetActiveMenuEndpoint));
         endpointImplementationTypes.Should().Contain(typeof(ToggleProductStatusEndpoint));
         endpointImplementationTypes.Should().Contain(typeof(GetActiveKitchenOrdersEndpoint));
@@ -80,6 +81,9 @@ public class VerticalSliceArchitectureRegistrationTests
         endpointImplementationTypes.Should().Contain(typeof(GetOrderByIdEndpoint));
         endpointImplementationTypes.Should().Contain(typeof(UpdateOrderStatusEndpoint));
         endpointImplementationTypes.Should().Contain(typeof(ApproveTransferOrderEndpoint));
+        endpointImplementationTypes.Should().Contain(typeof(Delivery.Features.Tenants.GetPublicTenants.GetPublicTenantsEndpoint));
+        endpointImplementationTypes.Should().Contain(typeof(Delivery.Features.Tenants.GetCurrentTenant.GetCurrentTenantEndpoint));
+        endpointImplementationTypes.Should().Contain(typeof(Delivery.Features.Tenants.UpdateTenantStorefront.UpdateTenantStorefrontEndpoint));
         endpointImplementationTypes.Should().Contain(typeof(IngestDriverLocationEndpoint));
         endpointImplementationTypes.Should().Contain(typeof(GetDriverLocationEndpoint));
         endpointImplementationTypes.Should().Contain(typeof(Delivery.Features.Auth.Login.LoginEndpoint));

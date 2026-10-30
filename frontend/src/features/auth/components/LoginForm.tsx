@@ -8,6 +8,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { Loader2, AlertCircle } from "lucide-react";
 import { loginSchema, type LoginFormData } from "../schemas/loginSchema";
 import { useAuthStore } from "../store/useAuthStore";
+import { useCurrentTenantQuery } from "@/features/tenant";
 
 interface LoginFormProps {
   redirectUrl?: string;
@@ -17,6 +18,10 @@ interface LoginFormProps {
 export function LoginForm({ redirectUrl, embedded = false }: LoginFormProps) {
   const router = useRouter();
   const login = useAuthStore((s) => s.login);
+  const { data: tenant } = useCurrentTenantQuery();
+  const brandName = tenant?.name || "La Granjita";
+  const brandTagline = tenant?.tagline || "Asadero";
+  const brandLogo = tenant?.logoUrl || "/images/identidad/logo.png";
   const [formError, setFormError] = useState<string | null>(null);
 
   const {
@@ -59,8 +64,8 @@ export function LoginForm({ redirectUrl, embedded = false }: LoginFormProps) {
           <div className="flex flex-col items-center text-center">
             <div className="relative w-14 h-14 mb-3 drop-shadow-sm">
               <Image
-                src="/images/identidad/logo.png"
-                alt="Logo La Granjita Asadero"
+                src={brandLogo}
+                alt={`Logo ${brandName}`}
                 width={56}
                 height={56}
                 priority
@@ -71,10 +76,10 @@ export function LoginForm({ redirectUrl, embedded = false }: LoginFormProps) {
               data-display-brand
               className="text-3xl font-black text-neutral-950 uppercase tracking-tight font-display leading-none"
             >
-              LA GRANJITA
+              {brandName}
             </h1>
             <span className="text-[11px] font-bold text-neutral-500 uppercase tracking-widest block mt-1 font-mono">
-              Asadero • Acceso al Sistema
+              {brandTagline} • Acceso al Sistema
             </span>
             <p className="text-xs text-neutral-500 mt-2 leading-relaxed">
               Ingresa tus credenciales para acceder a cocina KDS, pedidos y administración.

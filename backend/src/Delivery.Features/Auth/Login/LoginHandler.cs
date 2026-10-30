@@ -30,25 +30,29 @@ public class LoginHandler : IHandler<LoginCommand, Result<LoginResponse>>
 
     public async Task<Result<LoginResponse>> Handle(LoginCommand request, CancellationToken cancellationToken = default)
     {
-        // 1. Resolucion segura del Tenant
+        // 1. Resolucion segura del Tenant (priorizando el TenantSlug explícito de la petición)
         Tenant? tenant = null;
 
-        if (_tenantContext.TenantId.HasValue)
+        if (!string.IsNullOrWhiteSpace(request.TenantSlug))
+        {
+            var requestedSlug = request.TenantSlug.Trim().ToLowerInvariant();
+            tenant = await _context.Tenants.IgnoreQueryFilters()
+                .FirstOrDefaultAsync(t => t.Slug == requestedSlug, cancellationToken);
+        }
+        else if (_tenantContext.TenantId.HasValue)
         {
             tenant = await _context.Tenants.IgnoreQueryFilters()
                 .FirstOrDefaultAsync(t => t.Id == _tenantContext.TenantId.Value, cancellationToken);
         }
-        else if (!string.IsNullOrWhiteSpace(request.TenantSlug))
-        {
-            var requestedSlug = request.TenantSlug.Trim();
-            tenant = await _context.Tenants.IgnoreQueryFilters()
-                .FirstOrDefaultAsync(t => t.Slug == requestedSlug, cancellationToken);
-        }
         else
         {
-            // Tenant predeterminado de la plataforma ("la-granjita")
+            // Tenant predeterminado de la plataforma con fallback al primer comercio activo
             tenant = await _context.Tenants.IgnoreQueryFilters()
-                .FirstOrDefaultAsync(t => t.Slug == "la-granjita", cancellationToken);
+                .FirstOrDefaultAsync(t => t.Slug == "la-granjita", cancellationToken)
+                ?? await _context.Tenants.IgnoreQueryFilters()
+                    .Where(t => t.IsActive)
+                    .OrderBy(t => t.Id)
+                    .FirstOrDefaultAsync(cancellationToken);
         }
 
         if (tenant == null)

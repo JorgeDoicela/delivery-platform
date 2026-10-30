@@ -28,8 +28,9 @@ export const viewport: Viewport = {
 };
 
 export const metadata: Metadata = {
-  title: "La Granjita Asadero | Pedidos Directos y Delivery",
-  description: "Plataforma de delivery directa de La Granjita Asadero. Pollo asado al carbón y leña seleccionada.",
+  title: "Pedidos Directos y Delivery en Vivo",
+  description:
+    "Plataforma gastronómica multi-tenant de pedidos directos, despacho geolocalizado y seguimiento en tiempo real.",
   manifest: "/manifest.json",
 };
 

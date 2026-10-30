@@ -53,7 +53,7 @@ public static class CreateOrderErrors
 {
     public static readonly Error SlotCapacityExceeded = new(
         "Orders.SlotCapacityExceeded",
-        "La cocina se encuentra temporalmente al 150% de su capacidad física de horneado. Admisión pausada para proteger la calidad. Intenta en unos minutos."
+        "La cocina se encuentra temporalmente al 150% de su capacidad física de producción. Admisión pausada para proteger la calidad. Intenta en unos minutos."
     );
     public static readonly Error BranchNotFound = new(
         "Orders.BranchNotFound",
@@ -167,9 +167,18 @@ public sealed class CreateOrderHandler : IHandler<CreateOrderCommand, Result<Cre
                 .ToDictionaryAsync(mo => mo.Id, cancellationToken);
         }
 
+        // Obtener tarifa base de envío configurada para el tenant de la sucursal
+        var tenantSettings = await _context.TenantSettings
+            .IgnoreQueryFilters()
+            .AsNoTracking()
+            .FirstOrDefaultAsync(ts => ts.TenantId == branch.TenantId, cancellationToken);
+
+        decimal configuredDeliveryFee = tenantSettings?.BaseDeliveryFee ?? 1.50m;
+
         // Construir la orden y liquidar totales contables
         var order = new Order
         {
+            TenantId = branch.TenantId,
             BranchId = branch.Id,
             CustomerName = command.CustomerName.Trim(),
             CustomerPhone = command.CustomerPhone.Trim(),
@@ -181,7 +190,7 @@ public sealed class CreateOrderHandler : IHandler<CreateOrderCommand, Result<Cre
             PaymentMethod = command.PaymentMethod,
             DeliveryType = command.DeliveryType,
             TransferReceiptUrl = command.TransferReceiptUrl,
-            DeliveryFee = command.DeliveryType == DeliveryType.Delivery ? 1.50m : 0.00m,
+            DeliveryFee = command.DeliveryType == DeliveryType.Delivery ? configuredDeliveryFee : 0.00m,
             CreatedAt = DateTime.UtcNow
         };
 
@@ -283,7 +292,7 @@ public sealed class CreateOrderHandler : IHandler<CreateOrderCommand, Result<Cre
         if (currentSlotOrders > maxOrders)
         {
             estimatedTime = "60-75 min";
-            demandNotice = "Tiempo estimado de entrega extendido a 60-75 min por alta demanda en horno.";
+            demandNotice = "Tiempo estimado de entrega extendido a 60-75 min por alta demanda en cocina.";
         }
 
         try

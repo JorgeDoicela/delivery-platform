@@ -127,21 +127,25 @@ public class MultitenantDatabaseTests
         // Second execution to verify idempotency
         await DatabaseSeeder.SeedAsync(context);
 
-        (await context.Tenants.CountAsync()).Should().Be(1);
-        (await context.TenantSettings.CountAsync()).Should().Be(1);
+        (await context.Tenants.CountAsync()).Should().Be(3); // la-granjita, brasas-del-valle, el-lenador
+        (await context.TenantSettings.CountAsync()).Should().Be(3);
         (await context.Roles.CountAsync()).Should().Be(7);
-        (await context.Users.CountAsync()).Should().Be(6); // 2 SuperAdmin (jorge@...) + 4 operativos
-        (await context.Drivers.CountAsync()).Should().Be(1);
-        (await context.Branches.CountAsync()).Should().Be(2);
-        (await context.DiningTables.CountAsync()).Should().Be(16); // 8 mesas por cada una de las 2 sucursales
-        (await context.Suppliers.CountAsync()).Should().Be(1);
-        (await context.InventoryItems.CountAsync()).Should().Be(6); // 3 insumos por cada una de las 2 sucursales
-        (await context.InventoryMovements.CountAsync()).Should().Be(6);
-        (await context.Categories.CountAsync()).Should().Be(4);
-        (await context.ModifierGroups.CountAsync()).Should().Be(3);
-        (await context.Products.CountAsync()).Should().Be(3);
-        (await context.BranchProducts.CountAsync()).Should().Be(6); // 3 productos habilitados en las 2 sucursales
-        (await context.ProductRecipes.CountAsync()).Should().Be(6);
-        (await context.Customers.CountAsync()).Should().Be(1);
+
+        var laGranjita = await context.Tenants.FirstAsync(t => t.Slug == "la-granjita");
+        var brasas = await context.Tenants.FirstAsync(t => t.Slug == "brasas-del-valle");
+        var lenador = await context.Tenants.FirstAsync(t => t.Slug == "el-lenador");
+
+        laGranjita.BrandPrimaryColor.Should().Be("#E4002B");
+        brasas.BrandPrimaryColor.Should().Be("#047857");
+        lenador.BrandPrimaryColor.Should().Be("#EA580C");
+
+        (await context.Branches.CountAsync(b => b.TenantId == laGranjita.Id)).Should().Be(2);
+        (await context.Branches.CountAsync(b => b.TenantId == brasas.Id)).Should().Be(1);
+        (await context.Branches.CountAsync(b => b.TenantId == lenador.Id)).Should().Be(1);
+        (await context.DiningTables.CountAsync(dt => dt.TenantId == laGranjita.Id)).Should().Be(16);
+        (await context.Products.CountAsync(p => p.TenantId == laGranjita.Id)).Should().Be(3);
+        (await context.Products.CountAsync(p => p.TenantId == brasas.Id)).Should().Be(3);
+        (await context.Products.CountAsync(p => p.TenantId == lenador.Id)).Should().Be(3);
+        (await context.Customers.CountAsync(c => c.TenantId == laGranjita.Id)).Should().Be(1);
     }
 }

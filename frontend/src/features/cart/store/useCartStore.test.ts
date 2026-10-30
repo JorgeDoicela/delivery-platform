@@ -3,6 +3,7 @@ import { useCartStore } from "./useCartStore";
 
 describe("useCartStore", () => {
   beforeEach(() => {
+    useCartStore.getState().syncTenantContext("la-granjita", 1.5, { id: 1, name: "Sucursal #1 (Norte)" });
     useCartStore.getState().clearCart();
     useCartStore.getState().setDeliveryType("delivery");
     useCartStore.getState().setBranch(1, "Sucursal #1 (Norte)");
@@ -157,5 +158,49 @@ describe("useCartStore", () => {
     const state = useCartStore.getState();
     expect(state.getDeliveryFee()).toBe(0.0);
     expect(state.getTotal()).toBe(20.0);
+  });
+
+  it("debe aislar items, sucursal y tarifa base de envio por tenant con syncTenantContext", () => {
+    useCartStore.getState().addItem({
+      productId: 10,
+      name: "Pollo Entero Asado",
+      unitPrice: 15.0,
+      imageUrl: "/images/pollo.webp",
+      quantity: 1,
+      selectedModifiers: [],
+    });
+
+    expect(useCartStore.getState().items).toHaveLength(1);
+    expect(useCartStore.getState().getDeliveryFee()).toBe(1.5);
+
+    // Cambiar al tenant brasas-del-valle con tarifa de envio 2.00
+    useCartStore
+      .getState()
+      .syncTenantContext("brasas-del-valle", 2.0, { id: 3, name: "Parrilla Cumbaya" });
+
+    expect(useCartStore.getState().tenantSlug).toBe("brasas-del-valle");
+    expect(useCartStore.getState().items).toHaveLength(0);
+    expect(useCartStore.getState().branchId).toBe(3);
+
+    useCartStore.getState().addItem({
+      productId: 201,
+      name: "Bife de Chorizo",
+      unitPrice: 24.5,
+      imageUrl: "/images/bife.webp",
+      quantity: 1,
+      selectedModifiers: [],
+    });
+
+    expect(useCartStore.getState().getDeliveryFee()).toBe(2.0);
+    expect(useCartStore.getState().getTotal()).toBe(26.5);
+
+    // Regresar a la-granjita debe restaurar su carrito intacto
+    useCartStore
+      .getState()
+      .syncTenantContext("la-granjita", 1.5, { id: 1, name: "Sucursal #1 (Norte)" });
+
+    expect(useCartStore.getState().items).toHaveLength(1);
+    expect(useCartStore.getState().items[0].productId).toBe(10);
+    expect(useCartStore.getState().getDeliveryFee()).toBe(1.5);
   });
 });

@@ -11,7 +11,9 @@ export function middleware(request: NextRequest) {
   );
 
   if (isProtected) {
-    const refreshToken = request.cookies.get("refresh_token");
+    const refreshToken =
+      request.cookies.get("refresh_token") ??
+      request.cookies.get("refreshToken");
 
     if (!refreshToken || !refreshToken.value) {
       const loginUrl = new URL("/login", request.url);

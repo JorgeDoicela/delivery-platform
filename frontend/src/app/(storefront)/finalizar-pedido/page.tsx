@@ -1,8 +1,8 @@
 import { CheckoutForm } from "@/features/checkout";
 
 export const metadata = {
-  title: "Finalizar Pedido | La Granjita Asadero",
-  description: "Ingresa tus datos de entrega y método de pago para despacho prioritario desde La Granjita Asadero.",
+  title: "Finalizar Pedido | Checkout",
+  description: "Ingresa tus datos de entrega y método de pago para despacho prioritario geolocalizado.",
 };
 
 export default function FinalizarPedidoPage() {

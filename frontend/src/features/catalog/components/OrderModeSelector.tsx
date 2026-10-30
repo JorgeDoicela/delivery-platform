@@ -3,10 +3,16 @@
 import React from "react";
 import { Bike, Store } from "lucide-react";
 import { useCartStore } from "@/features/cart";
+import { useCurrentTenantQuery } from "@/features/tenant";
 
 export function OrderModeSelector() {
   const deliveryType = useCartStore((s) => s.deliveryType);
   const setDeliveryType = useCartStore((s) => s.setDeliveryType);
+  const { data: tenant } = useCurrentTenantQuery();
+
+  const brandName = tenant?.name || "Restaurante";
+  const enableDelivery = tenant?.enableDelivery ?? true;
+  const enableTakeout = tenant?.enableTakeout ?? true;
 
   const handleSelectMode = (type: "delivery" | "takeout") => {
     setDeliveryType(type);
@@ -23,56 +29,60 @@ export function OrderModeSelector() {
           ¿Cómo te gustaría ordenar hoy?
         </h2>
 
-        {/* Grid de 2 Tarjetas Principales estilo KFC (Rojo Fast Food) */}
-        <div className="grid grid-cols-2 gap-4 sm:gap-5 w-full">
-          {/* Opción A Domicilio */}
-          <button
-            type="button"
-            onClick={() => handleSelectMode("delivery")}
-            className={`group relative overflow-hidden py-5 px-4 sm:py-6 sm:px-6 rounded-2xl sm:rounded-3xl flex items-center justify-center gap-3.5 sm:gap-5 text-left transition-all active:scale-95 bg-brand-primary hover:bg-brand-primary-hover text-white ${
-              deliveryType === "delivery"
-                ? "shadow-2xl scale-[1.01]"
-                : "shadow-md opacity-90 hover:opacity-100"
-            }`}
-          >
-            <div className="w-12 h-12 sm:w-14 sm:h-14 rounded-2xl bg-white/20 flex items-center justify-center shrink-0 border border-white/20">
-              <Bike className="w-7 h-7 sm:w-8 sm:h-8 text-white group-hover:scale-110 transition-transform" />
-            </div>
-            <div>
-              <span className="text-xs sm:text-sm font-bold tracking-wider uppercase text-white/90 block leading-tight">
-                La Granjita
-              </span>
-              <span className="text-base sm:text-xl md:text-2xl font-black uppercase tracking-tight block leading-tight text-white font-display">
-                A Domicilio
-              </span>
-            </div>
-          </button>
+        <div
+          className={`grid gap-4 sm:gap-5 w-full ${
+            enableDelivery && enableTakeout ? "grid-cols-2" : "grid-cols-1"
+          }`}
+        >
+          {enableDelivery && (
+            <button
+              type="button"
+              onClick={() => handleSelectMode("delivery")}
+              className={`group relative overflow-hidden py-5 px-4 sm:py-6 sm:px-6 rounded-2xl sm:rounded-3xl flex items-center justify-center gap-3.5 sm:gap-5 text-left transition-all active:scale-95 bg-brand-primary hover:bg-brand-primary-hover text-white ${
+                deliveryType === "delivery"
+                  ? "shadow-2xl scale-[1.01]"
+                  : "shadow-md opacity-90 hover:opacity-100"
+              }`}
+            >
+              <div className="w-12 h-12 sm:w-14 sm:h-14 rounded-2xl bg-white/20 flex items-center justify-center shrink-0 border border-white/20">
+                <Bike className="w-7 h-7 sm:w-8 sm:h-8 text-white group-hover:scale-110 transition-transform" />
+              </div>
+              <div>
+                <span className="text-xs sm:text-sm font-bold tracking-wider uppercase text-white/90 block leading-tight">
+                  {brandName}
+                </span>
+                <span className="text-base sm:text-xl md:text-2xl font-black uppercase tracking-tight block leading-tight text-white font-display">
+                  A Domicilio
+                </span>
+              </div>
+            </button>
+          )}
 
-          {/* Opción Recoge en el Local */}
-          <button
-            type="button"
-            onClick={() => handleSelectMode("takeout")}
-            className={`group relative overflow-hidden py-5 px-4 sm:py-6 sm:px-6 rounded-2xl sm:rounded-3xl flex items-center justify-center gap-3.5 sm:gap-5 text-left transition-all active:scale-95 bg-brand-primary hover:bg-brand-primary-hover text-white ${
-              deliveryType === "takeout"
-                ? "shadow-2xl scale-[1.01]"
-                : "shadow-md opacity-90 hover:opacity-100"
-            }`}
-          >
-            <div className="w-12 h-12 sm:w-14 sm:h-14 rounded-2xl bg-white/20 flex items-center justify-center shrink-0 border border-white/20">
-              <Store className="w-7 h-7 sm:w-8 sm:h-8 text-white group-hover:scale-110 transition-transform" />
-            </div>
-            <div>
-              <span className="text-xs sm:text-sm font-bold tracking-wider uppercase text-white/90 block leading-tight">
-                La Granjita
-              </span>
-              <span className="text-base sm:text-xl md:text-2xl font-black uppercase tracking-tight block leading-tight text-white font-display">
-                Recoge en Local
-              </span>
-            </div>
-          </button>
+          {enableTakeout && (
+            <button
+              type="button"
+              onClick={() => handleSelectMode("takeout")}
+              className={`group relative overflow-hidden py-5 px-4 sm:py-6 sm:px-6 rounded-2xl sm:rounded-3xl flex items-center justify-center gap-3.5 sm:gap-5 text-left transition-all active:scale-95 bg-brand-primary hover:bg-brand-primary-hover text-white ${
+                deliveryType === "takeout"
+                  ? "shadow-2xl scale-[1.01]"
+                  : "shadow-md opacity-90 hover:opacity-100"
+              }`}
+            >
+              <div className="w-12 h-12 sm:w-14 sm:h-14 rounded-2xl bg-white/20 flex items-center justify-center shrink-0 border border-white/20">
+                <Store className="w-7 h-7 sm:w-8 sm:h-8 text-white group-hover:scale-110 transition-transform" />
+              </div>
+              <div>
+                <span className="text-xs sm:text-sm font-bold tracking-wider uppercase text-white/90 block leading-tight">
+                  {brandName}
+                </span>
+                <span className="text-base sm:text-xl md:text-2xl font-black uppercase tracking-tight block leading-tight text-white font-display">
+                  Recoge en Local
+                </span>
+              </div>
+            </button>
+          )}
         </div>
 
-        {/* Píldora de Cupones estilo KFC con el mismo ancho exacto */}
         <button
           type="button"
           onClick={() => {
@@ -85,7 +95,7 @@ export function OrderModeSelector() {
             %
           </span>
           <span className="uppercase tracking-wider font-black text-brand-primary text-xs sm:text-sm">
-            Cupones
+            Promociones Especiales de {brandName}
           </span>
         </button>
       </div>

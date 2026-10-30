@@ -1,21 +1,28 @@
+"use client";
+
+import React from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { Radio } from "lucide-react";
+import { useCurrentTenantQuery } from "@/features/tenant";
 
 export default function DriverLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
+  const { data: tenant } = useCurrentTenantQuery();
+  const brandName = tenant?.name || "La Granjita";
+  const brandLogo = tenant?.logoUrl || "/images/identidad/logo.png";
+
   return (
     <div className="flex flex-col min-h-screen bg-surface-dark text-text-inverse-strong select-none">
-      {/* Top Header Ergonómico con Identidad La Granjita */}
       <header className="h-16 bg-surface-dark-card border-b border-surface-dark-border px-4 sm:px-6 flex items-center justify-between shrink-0">
         <Link href="/" className="flex items-center gap-3 group">
           <div className="relative w-9 h-9 shrink-0">
             <Image
-              src="/images/identidad/logo.png"
-              alt="Logo La Granjita"
+              src={brandLogo}
+              alt={`Logo ${brandName}`}
               width={36}
               height={36}
               priority
@@ -27,10 +34,10 @@ export default function DriverLayout({
               data-display-brand
               className="font-black text-lg tracking-tight text-white block leading-none uppercase font-display"
             >
-              LA GRANJITA
+              {brandName}
             </span>
             <span className="text-[10px] tracking-widest text-brand-accent font-bold uppercase block mt-0.5">
-              Reparto Móvil • ID: driver-01
+              Reparto Móvil • {tenant?.slug}
             </span>
           </div>
         </Link>
@@ -41,10 +48,7 @@ export default function DriverLayout({
         </div>
       </header>
 
-      {/* Contenido Táctil a Ancho Completo */}
-      <main className="flex-1 p-4 flex flex-col w-full">
-        {children}
-      </main>
+      <main className="flex-1 p-4 flex flex-col w-full">{children}</main>
     </div>
   );
 }

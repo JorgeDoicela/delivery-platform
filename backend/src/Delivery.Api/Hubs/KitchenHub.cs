@@ -27,4 +27,23 @@ public class KitchenHub : Hub<IKitchenClient>
     {
         await Groups.RemoveFromGroupAsync(Context.ConnectionId, $"kitchen_branch_{branchId}");
     }
+
+    /// <summary>
+    /// Une al cliente al canal de eventos de stock y catálogo de un tenant específico.
+    /// </summary>
+    public async Task JoinTenantChannel(string tenantSlug)
+    {
+        if (!string.IsNullOrWhiteSpace(tenantSlug))
+        {
+            await Groups.AddToGroupAsync(Context.ConnectionId, $"kitchen_tenant_{tenantSlug.Trim().ToLowerInvariant()}");
+        }
+    }
+
+    public async Task LeaveTenantChannel(string tenantSlug)
+    {
+        if (!string.IsNullOrWhiteSpace(tenantSlug))
+        {
+            await Groups.RemoveFromGroupAsync(Context.ConnectionId, $"kitchen_tenant_{tenantSlug.Trim().ToLowerInvariant()}");
+        }
+    }
 }

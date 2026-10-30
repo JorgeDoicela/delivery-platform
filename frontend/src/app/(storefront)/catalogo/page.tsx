@@ -1,8 +1,8 @@
 import { CatalogSection } from "@/features/catalog";
 
 export const metadata = {
-  title: "Catálogo y Combos | La Granjita Asadero",
-  description: "Menú interactivo de combos, pollo asado al carbón y guarniciones artesanales en La Granjita Asadero.",
+  title: "Catálogo y Menú Interactivo",
+  description: "Menú interactivo de combos, especialidades y guarniciones con personalización en línea.",
 };
 
 export default function CatalogoPage() {
