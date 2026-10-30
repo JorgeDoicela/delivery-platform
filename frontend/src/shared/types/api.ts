@@ -296,6 +296,7 @@ export interface TenantStorefrontConfigDto {
   acceptsBankTransfer: boolean;
   acceptsCard: boolean;
   quickLinksEnabled: boolean;
+  landingLayoutTemplate?: string;
   bankDetails: TenantBankDetailsDto;
   heroSlides: TenantHeroSlide[];
   promotionalBanners: TenantPromoBanner[];
@@ -323,6 +324,7 @@ export interface UpdateTenantStorefrontCommand {
   acceptsBankTransfer: boolean;
   acceptsCard: boolean;
   quickLinksEnabled: boolean;
+  landingLayoutTemplate?: string;
   bankDetails: TenantBankDetailsDto;
   heroSlides: TenantHeroSlide[];
   promotionalBanners: TenantPromoBanner[];

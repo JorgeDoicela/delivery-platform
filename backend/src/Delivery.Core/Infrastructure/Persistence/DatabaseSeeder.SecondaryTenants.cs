@@ -26,6 +26,7 @@ public static partial class DatabaseSeeder
             baseDeliveryFee: 2.00m,
             bankName: "Banco Guayaquil",
             bankAccountNumber: "0045891230",
+            landingLayoutTemplate: "steakhouse-gourmet",
             emailDomain: "brasasdelvalle.com",
             branchName: "Matriz Cumbayá & Quito Norte",
             branchAddress: "Av. Interoceánica y Paseo de los Chícaros",
@@ -106,6 +107,7 @@ public static partial class DatabaseSeeder
         decimal baseDeliveryFee,
         string bankName,
         string bankAccountNumber,
+        string landingLayoutTemplate,
         string emailDomain,
         string branchName,
         string branchAddress,
@@ -158,6 +160,7 @@ public static partial class DatabaseSeeder
             BankAccountNumber = bankAccountNumber,
             BankAccountHolder = businessName,
             BankAccountTaxId = taxId,
+            LandingLayoutTemplate = landingLayoutTemplate,
             QuickLinksEnabled = true,
             HeroSlidesJson = JsonSerializer.Serialize(heroSlides, JsonOptions),
             PromotionalBannersJson = JsonSerializer.Serialize(promos, JsonOptions)

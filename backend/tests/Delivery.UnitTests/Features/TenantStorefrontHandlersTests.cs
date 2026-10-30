@@ -115,6 +115,7 @@ public class TenantStorefrontHandlersTests
             AcceptsBankTransfer: true,
             AcceptsCard: true,
             QuickLinksEnabled: false,
+            LandingLayoutTemplate: "steakhouse-gourmet",
             BankDetails: new UpdateTenantBankDetailsDto(
                 "Banco Guayaquil",
                 "Cuenta Corriente",
@@ -147,6 +148,7 @@ public class TenantStorefrontHandlersTests
         result.Value.BrandPrimaryColor.Should().Be("#059669");
         result.Value.BaseDeliveryFee.Should().Be(2.25m);
         result.Value.QuickLinksEnabled.Should().BeFalse();
+        result.Value.LandingLayoutTemplate.Should().Be("steakhouse-gourmet");
         result.Value.HeroSlides.Should().ContainSingle(s => s.Title == "FESTIVAL DEL BIFE DE CHORIZO");
     }
 

@@ -1256,6 +1256,10 @@ namespace Delivery.Core.Infrastructure.Persistence.Migrations
                         .IsRequired()
                         .HasColumnType("text");
 
+                    b.Property<string>("LandingLayoutTemplate")
+                        .IsRequired()
+                        .HasColumnType("text");
+
                     b.Property<string>("PromotionalBannersJson")
                         .IsRequired()
                         .HasColumnType("text");

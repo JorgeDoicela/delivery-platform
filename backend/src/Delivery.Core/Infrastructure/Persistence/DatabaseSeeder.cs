@@ -205,6 +205,7 @@ public static partial class DatabaseSeeder
                 BankAccountNumber = "2100456789",
                 BankAccountHolder = "Asadero La Granjita Cia. Ltda.",
                 BankAccountTaxId = "1754455341001",
+                LandingLayoutTemplate = "asadero-clasico",
                 QuickLinksEnabled = true,
                 HeroSlidesJson = JsonSerializer.Serialize(defaultHeroSlides, JsonOptions),
                 PromotionalBannersJson = JsonSerializer.Serialize(defaultPromos, JsonOptions)

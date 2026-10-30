@@ -55,6 +55,7 @@ public sealed record UpdatedTenantStorefrontDto(
     bool AcceptsBankTransfer,
     bool AcceptsCard,
     bool QuickLinksEnabled,
+    string LandingLayoutTemplate,
     UpdateTenantBankDetailsDto BankDetails,
     List<TenantHeroSlide> HeroSlides,
     List<TenantPromoBanner> PromotionalBanners,
@@ -82,6 +83,7 @@ public sealed record UpdateTenantStorefrontCommand(
     bool AcceptsBankTransfer,
     bool AcceptsCard,
     bool QuickLinksEnabled,
+    string? LandingLayoutTemplate,
     UpdateTenantBankDetailsDto BankDetails,
     List<TenantHeroSlide> HeroSlides,
     List<TenantPromoBanner> PromotionalBanners
@@ -173,6 +175,10 @@ public sealed class UpdateTenantStorefrontHandler : IHandler<UpdateTenantStorefr
         settings.AcceptsBankTransfer = command.AcceptsBankTransfer;
         settings.AcceptsCard = command.AcceptsCard;
         settings.QuickLinksEnabled = command.QuickLinksEnabled;
+        if (!string.IsNullOrWhiteSpace(command.LandingLayoutTemplate))
+        {
+            settings.LandingLayoutTemplate = command.LandingLayoutTemplate.Trim();
+        }
         settings.BankName = command.BankDetails.BankName.Trim();
         settings.BankAccountType = command.BankDetails.AccountType.Trim();
         settings.BankAccountNumber = command.BankDetails.AccountNumber.Trim();
@@ -227,6 +233,7 @@ public sealed class UpdateTenantStorefrontHandler : IHandler<UpdateTenantStorefr
             settings.AcceptsBankTransfer,
             settings.AcceptsCard,
             settings.QuickLinksEnabled,
+            settings.LandingLayoutTemplate,
             new UpdateTenantBankDetailsDto(
                 settings.BankName ?? "Banco Pichincha",
                 settings.BankAccountType ?? "Cuenta Corriente",

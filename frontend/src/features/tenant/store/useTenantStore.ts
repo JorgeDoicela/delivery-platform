@@ -36,6 +36,7 @@ export const FALLBACK_TENANT_CONFIGS: Record<string, TenantStorefrontConfigDto> 
     acceptsBankTransfer: true,
     acceptsCard: false,
     quickLinksEnabled: true,
+    landingLayoutTemplate: "asadero-clasico",
     bankDetails: {
       bankName: "Banco Pichincha",
       accountType: "Cuenta Corriente",
@@ -160,6 +161,7 @@ export const FALLBACK_TENANT_CONFIGS: Record<string, TenantStorefrontConfigDto> 
     acceptsBankTransfer: true,
     acceptsCard: true,
     quickLinksEnabled: true,
+    landingLayoutTemplate: "steakhouse-gourmet",
     bankDetails: {
       bankName: "Banco Guayaquil",
       accountType: "Cuenta Corriente",

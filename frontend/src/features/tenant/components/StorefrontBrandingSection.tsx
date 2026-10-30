@@ -177,7 +177,27 @@ export function StorefrontBrandingSection({
             </div>
           </div>
 
-          <div className="pt-3 border-t border-surface-dark-border">
+          <div className="pt-3 border-t border-surface-dark-border space-y-3">
+            <div>
+              <label className="block text-[11px] font-bold uppercase tracking-wider text-text-inverse-muted mb-1.5">
+                Plantilla de Estructura de Landing
+              </label>
+              <select
+                value={formState.landingLayoutTemplate ?? "asadero-clasico"}
+                onChange={(e) =>
+                  onFieldChange("landingLayoutTemplate", e.target.value)
+                }
+                className="w-full px-3 py-2 rounded-xl bg-surface-dark border border-surface-dark-border text-text-inverse-strong font-bold text-xs focus:outline-none focus:border-brand-primary cursor-pointer"
+              >
+                <option value="asadero-clasico">
+                  Asadero Clásico (Slider Panorámico + Combos Asador)
+                </option>
+                <option value="steakhouse-gourmet">
+                  Steakhouse Gourmet (Cortes Angus + Cámara de Maduración)
+                </option>
+              </select>
+            </div>
+
             <label className="flex items-center gap-2.5 cursor-pointer text-text-inverse-base">
               <input
                 type="checkbox"

@@ -55,6 +55,7 @@ public sealed record TenantStorefrontConfigDto(
     bool AcceptsBankTransfer,
     bool AcceptsCard,
     bool QuickLinksEnabled,
+    string LandingLayoutTemplate,
     TenantBankDetailsDto BankDetails,
     List<TenantHeroSlide> HeroSlides,
     List<TenantPromoBanner> PromotionalBanners,
@@ -150,6 +151,7 @@ public sealed class GetCurrentTenantHandler : IHandler<GetCurrentTenantQuery, Re
             settings?.AcceptsBankTransfer ?? true,
             settings?.AcceptsCard ?? false,
             settings?.QuickLinksEnabled ?? true,
+            settings?.LandingLayoutTemplate ?? "asadero-clasico",
             new TenantBankDetailsDto(
                 settings?.BankName ?? "Banco Pichincha",
                 settings?.BankAccountType ?? "Cuenta Corriente",

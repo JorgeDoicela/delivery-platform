@@ -30,7 +30,8 @@ public class TenantSetting : IMustHaveTenant
     public string? BankAccountHolder { get; set; }
     public string? BankAccountTaxId { get; set; }
 
-    // Personalización Dinámica de Landing Page (JSON)
+    // Personalización Dinámica de Landing Page (JSON y Plantillas)
+    public string LandingLayoutTemplate { get; set; } = "asadero-clasico";
     public bool QuickLinksEnabled { get; set; } = true;
     public string HeroSlidesJson { get; set; } = "[]";
     public string PromotionalBannersJson { get; set; } = "[]";
