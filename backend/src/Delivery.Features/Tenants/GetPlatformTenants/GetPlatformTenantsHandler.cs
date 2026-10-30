@@ -43,7 +43,7 @@ public sealed class GetPlatformTenantsHandler : IHandler<GetPlatformTenantsQuery
         _context = context;
     }
 
-    public async Task<Result<PlatformTenantsResponse>> Handle(GetPlatformTenantsQuery query, CancellationToken cancellationToken = default)
+    public async Task<Result<PlatformTenantsResponse>> Handle(GetPlatformTenantsQuery request, CancellationToken cancellationToken = default)
     {
         var tenants = await _context.Tenants
             .IgnoreQueryFilters()

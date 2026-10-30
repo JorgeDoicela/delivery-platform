@@ -35,7 +35,7 @@ public sealed class GetPublicTenantsHandler : IHandler<GetPublicTenantsQuery, Re
         _context = context;
     }
 
-    public async Task<Result<PublicTenantsResponse>> Handle(GetPublicTenantsQuery query, CancellationToken cancellationToken = default)
+    public async Task<Result<PublicTenantsResponse>> Handle(GetPublicTenantsQuery request, CancellationToken cancellationToken = default)
     {
         var tenants = await _context.Tenants
             .IgnoreQueryFilters()

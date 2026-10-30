@@ -66,12 +66,12 @@ public sealed class CreateTenantHandler : IHandler<CreateTenantCommand, Result<C
         _passwordHasher = passwordHasher;
     }
 
-    public async Task<Result<CreatedTenantDto>> Handle(CreateTenantCommand command, CancellationToken cancellationToken = default)
+    public async Task<Result<CreatedTenantDto>> Handle(CreateTenantCommand request, CancellationToken cancellationToken = default)
     {
-        var normalizedCommand = command with
+        var normalizedCommand = request with
         {
-            Slug = command.Slug.Trim().ToLowerInvariant(),
-            AdminEmail = command.AdminEmail.Trim().ToLowerInvariant()
+            Slug = request.Slug.Trim().ToLowerInvariant(),
+            AdminEmail = request.AdminEmail.Trim().ToLowerInvariant()
         };
 
         var validationResult = await _validator.ValidateAsync(normalizedCommand, cancellationToken);

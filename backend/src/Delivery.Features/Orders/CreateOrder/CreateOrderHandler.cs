@@ -121,8 +121,9 @@ public sealed class CreateOrderHandler : IHandler<CreateOrderCommand, Result<Cre
         _kitchenNotifier = kitchenNotifier;
     }
 
-    public async Task<Result<CreateOrderResponse>> Handle(CreateOrderCommand command, CancellationToken cancellationToken = default)
+    public async Task<Result<CreateOrderResponse>> Handle(CreateOrderCommand request, CancellationToken cancellationToken = default)
     {
+        var command = request;
         var validation = await _validator.ValidateAsync(command, cancellationToken);
         if (!validation.IsValid)
         {

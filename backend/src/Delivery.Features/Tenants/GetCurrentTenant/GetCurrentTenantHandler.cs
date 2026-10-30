@@ -78,7 +78,7 @@ public sealed class GetCurrentTenantHandler : IHandler<GetCurrentTenantQuery, Re
         _tenantContext = tenantContext;
     }
 
-    public async Task<Result<TenantStorefrontConfigDto>> Handle(GetCurrentTenantQuery query, CancellationToken cancellationToken = default)
+    public async Task<Result<TenantStorefrontConfigDto>> Handle(GetCurrentTenantQuery request, CancellationToken cancellationToken = default)
     {
         var tenantId = _tenantContext.TenantId;
         var tenantQuery = _context.Tenants

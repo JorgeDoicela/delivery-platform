@@ -31,9 +31,9 @@ public sealed class GetActiveKitchenOrdersHandler : IHandler<GetActiveKitchenOrd
         _validator = validator;
     }
 
-    public async Task<Result<List<KitchenOrderTicketDto>>> Handle(GetActiveKitchenOrdersQuery query, CancellationToken cancellationToken = default)
+    public async Task<Result<List<KitchenOrderTicketDto>>> Handle(GetActiveKitchenOrdersQuery request, CancellationToken cancellationToken = default)
     {
-        var validation = await _validator.ValidateAsync(query, cancellationToken);
+        var validation = await _validator.ValidateAsync(request, cancellationToken);
         if (!validation.IsValid)
         {
             var first = validation.Errors[0];
@@ -49,7 +49,7 @@ public sealed class GetActiveKitchenOrdersHandler : IHandler<GetActiveKitchenOrd
 
         var orders = await _context.Orders
             .AsNoTracking()
-            .Where(o => o.BranchId == query.BranchId && activeStatuses.Contains(o.Status))
+            .Where(o => o.BranchId == request.BranchId && activeStatuses.Contains(o.Status))
             .OrderBy(o => o.CreatedAt) // FIFO: Primero en entrar, primero en salir
             .Include(o => o.Items)
                 .ThenInclude(i => i.Modifiers)

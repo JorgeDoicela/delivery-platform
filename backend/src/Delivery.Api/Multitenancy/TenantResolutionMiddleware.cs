@@ -85,6 +85,7 @@ public class TenantResolutionMiddleware
         // 3. Detección por Dominio Personalizado (CustomDomain en TenantSettings)
         if (host != "localhost" && host != "127.0.0.1")
         {
+#pragma warning disable CA1862, CA1304, CA1311
             var customDomainTenant = await dbContext.TenantSettings
                 .IgnoreQueryFilters()
                 .AsNoTracking()
@@ -92,6 +93,7 @@ public class TenantResolutionMiddleware
                 .Where(ts => ts.CustomDomain != null && ts.CustomDomain.ToLower() == host && ts.Tenant.IsActive)
                 .Select(ts => ts.Tenant)
                 .FirstOrDefaultAsync();
+#pragma warning restore CA1862, CA1304, CA1311
 
             if (customDomainTenant != null)
             {

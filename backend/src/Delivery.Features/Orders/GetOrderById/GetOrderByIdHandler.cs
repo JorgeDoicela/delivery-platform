@@ -81,9 +81,9 @@ public sealed class GetOrderByIdHandler : IHandler<GetOrderByIdQuery, Result<Ord
         _validator = validator;
     }
 
-    public async Task<Result<OrderDetailResponse>> Handle(GetOrderByIdQuery query, CancellationToken cancellationToken = default)
+    public async Task<Result<OrderDetailResponse>> Handle(GetOrderByIdQuery request, CancellationToken cancellationToken = default)
     {
-        var validation = await _validator.ValidateAsync(query, cancellationToken);
+        var validation = await _validator.ValidateAsync(request, cancellationToken);
         if (!validation.IsValid)
         {
             var first = validation.Errors[0];
@@ -95,7 +95,7 @@ public sealed class GetOrderByIdHandler : IHandler<GetOrderByIdQuery, Result<Ord
             .Include(o => o.Branch)
             .Include(o => o.Items)
                 .ThenInclude(i => i.Modifiers)
-            .FirstOrDefaultAsync(o => o.Id == query.OrderId, cancellationToken);
+            .FirstOrDefaultAsync(o => o.Id == request.OrderId, cancellationToken);
 
         if (order is null)
         {
