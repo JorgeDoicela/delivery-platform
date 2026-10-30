@@ -2,6 +2,7 @@
 
 import React, { useState, useRef, useEffect } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { ChevronDown } from "lucide-react";
 import {
   useCurrentTenantQuery,
@@ -10,6 +11,7 @@ import {
 import { useTenantStore } from "../store/useTenantStore";
 
 export function TenantSwitcher() {
+  const router = useRouter();
   const [isOpen, setIsOpen] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
 
@@ -38,6 +40,7 @@ export function TenantSwitcher() {
   const handleSelectTenant = (slug: string) => {
     setTenantSlug(slug);
     setIsOpen(false);
+    router.push(`/r/${slug}`);
   };
 
   return (

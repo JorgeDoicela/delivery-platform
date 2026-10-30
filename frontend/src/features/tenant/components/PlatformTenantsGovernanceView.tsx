@@ -347,7 +347,7 @@ export function PlatformTenantsGovernanceView() {
                   </button>
 
                   <Link
-                    href={`/?marca=${tenant.slug}`}
+                    href={`/r/${tenant.slug}`}
                     onClick={() => setTenantSlug(tenant.slug)}
                     className="px-3 py-1.5 rounded-full border border-surface-dark-border hover:border-white/40 text-text-inverse-muted hover:text-white text-[11px] font-bold uppercase tracking-wider transition-colors inline-flex items-center gap-1"
                   >
