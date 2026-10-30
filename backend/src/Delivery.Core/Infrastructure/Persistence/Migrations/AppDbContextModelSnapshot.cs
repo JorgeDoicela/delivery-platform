@@ -1260,6 +1260,9 @@ namespace Delivery.Core.Infrastructure.Persistence.Migrations
                         .IsRequired()
                         .HasColumnType("text");
 
+                    b.Property<string>("PrivacyPolicyMarkdown")
+                        .HasColumnType("text");
+
                     b.Property<string>("PromotionalBannersJson")
                         .IsRequired()
                         .HasColumnType("text");
@@ -1281,6 +1284,9 @@ namespace Delivery.Core.Infrastructure.Persistence.Migrations
 
                     b.Property<Guid>("TenantId")
                         .HasColumnType("uuid");
+
+                    b.Property<string>("TermsAndConditionsMarkdown")
+                        .HasColumnType("text");
 
                     b.HasKey("Id");
 

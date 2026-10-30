@@ -164,7 +164,16 @@ export default function StorefrontLayout({
               Facturación electrónica autorizada SRI ({tenant?.businessName} • RUC{" "}
               {tenant?.taxId}). Despacho monitoreado en tiempo real.
             </p>
-            <span className="text-[11px] text-neutral-400">
+            <div className="flex flex-wrap items-center gap-3 pt-1 text-[11px] font-semibold">
+              <Link href="/terminos" className="text-neutral-600 hover:text-brand-primary underline transition-colors">
+                Términos y Condiciones
+              </Link>
+              <span>•</span>
+              <Link href="/privacidad" className="text-neutral-600 hover:text-brand-primary underline transition-colors">
+                Privacidad
+              </Link>
+            </div>
+            <span className="text-[11px] text-neutral-400 block mt-2">
               © 2026 {brandName}. Todos los derechos reservados.
             </span>
           </div>

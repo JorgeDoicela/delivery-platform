@@ -96,11 +96,11 @@ function LoginContent() {
             </Link>
 
             <Link
-              href="/#sucursales"
+              href="/terminos"
               className="flex items-center gap-3.5 px-4 py-3.5 rounded-2xl hover:bg-neutral-50 text-neutral-800 hover:text-brand-primary text-xs font-bold uppercase tracking-wider font-display transition-colors"
             >
               <FileText className="w-4 h-4 text-neutral-500 shrink-0" />
-              <span>Términos Legales</span>
+              <span>Términos y Condiciones</span>
             </Link>
           </div>
         </div>

@@ -116,6 +116,8 @@ public class TenantStorefrontHandlersTests
             AcceptsCard: true,
             QuickLinksEnabled: false,
             LandingLayoutTemplate: "steakhouse-gourmet",
+            TermsAndConditionsMarkdown: "Términos y condiciones personalizados",
+            PrivacyPolicyMarkdown: "Políticas de privacidad personalizadas",
             BankDetails: new UpdateTenantBankDetailsDto(
                 "Banco Guayaquil",
                 "Cuenta Corriente",

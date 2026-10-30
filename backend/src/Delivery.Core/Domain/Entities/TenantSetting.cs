@@ -35,5 +35,9 @@ public class TenantSetting : IMustHaveTenant
     public bool QuickLinksEnabled { get; set; } = true;
     public string HeroSlidesJson { get; set; } = "[]";
     public string PromotionalBannersJson { get; set; } = "[]";
+
+    // Textos Legales y Políticas por Tenant
+    public string? TermsAndConditionsMarkdown { get; set; }
+    public string? PrivacyPolicyMarkdown { get; set; }
 }
 

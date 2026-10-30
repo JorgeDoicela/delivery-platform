@@ -297,6 +297,8 @@ export interface TenantStorefrontConfigDto {
   acceptsCard: boolean;
   quickLinksEnabled: boolean;
   landingLayoutTemplate?: string;
+  termsAndConditionsMarkdown?: string | null;
+  privacyPolicyMarkdown?: string | null;
   bankDetails: TenantBankDetailsDto;
   heroSlides: TenantHeroSlide[];
   promotionalBanners: TenantPromoBanner[];
@@ -325,6 +327,8 @@ export interface UpdateTenantStorefrontCommand {
   acceptsCard: boolean;
   quickLinksEnabled: boolean;
   landingLayoutTemplate?: string;
+  termsAndConditionsMarkdown?: string | null;
+  privacyPolicyMarkdown?: string | null;
   bankDetails: TenantBankDetailsDto;
   heroSlides: TenantHeroSlide[];
   promotionalBanners: TenantPromoBanner[];
