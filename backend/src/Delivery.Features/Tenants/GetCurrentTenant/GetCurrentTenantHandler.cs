@@ -134,7 +134,7 @@ public sealed class GetCurrentTenantHandler : IHandler<GetCurrentTenantQuery, Re
             string.IsNullOrWhiteSpace(tenant.Tagline) ? "Asadero & Leña" : tenant.Tagline,
             tenant.Description,
             string.IsNullOrWhiteSpace(tenant.HeroSubtitle)
-                ? "Personaliza tu orden con guarniciones calientes, ensalada fresca y salsas de la casa"
+                ? "Personaliza tu orden con guarniciones calientes, ensalada fresca y ají artesanal"
                 : tenant.HeroSubtitle,
             tenant.BusinessName,
             tenant.TaxId,

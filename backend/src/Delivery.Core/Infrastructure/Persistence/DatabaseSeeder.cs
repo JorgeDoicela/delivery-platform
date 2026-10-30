@@ -175,6 +175,8 @@ public static partial class DatabaseSeeder
             if (string.IsNullOrWhiteSpace(tenant.Tagline)) tenant.Tagline = "Asadero & Leña";
             if (string.IsNullOrWhiteSpace(tenant.Description))
                 tenant.Description = "Pollo asado artesanalmente al carbón vegetal y leña seleccionada en La Granjita Asadero. Pedidos directos sin intermediarios.";
+            if (string.IsNullOrWhiteSpace(tenant.HeroSubtitle))
+                tenant.HeroSubtitle = "Personaliza tu orden con guarniciones calientes, ensalada fresca y ají artesanal";
             if (string.IsNullOrWhiteSpace(tenant.BrandPrimaryHoverColor)) tenant.BrandPrimaryHoverColor = "#C40024";
             if (string.IsNullOrWhiteSpace(tenant.BrandAccentColor)) tenant.BrandAccentColor = "#F59E0B";
             if (string.IsNullOrWhiteSpace(tenant.ContactPhone)) tenant.ContactPhone = "0987654321";

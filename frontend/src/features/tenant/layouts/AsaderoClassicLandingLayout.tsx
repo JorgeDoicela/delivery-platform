@@ -44,10 +44,10 @@ export function AsaderoClassicLandingLayout({
               <span className="text-[11px] font-bold uppercase tracking-widest text-brand-primary block mb-1">
                 Especialidades al Carbón
               </span>
-              <h2 className="text-3xl sm:text-4xl font-black text-text-strong uppercase tracking-wide font-display">
+              <h2 className="text-3xl sm:text-4xl font-black text-text-strong uppercase tracking-wide font-display" suppressHydrationWarning>
                 Menú y Combos • {tenant?.name ?? "Asadero"}
               </h2>
-              <p className="text-xs sm:text-sm text-text-muted mt-0.5">
+              <p className="text-xs sm:text-sm text-text-muted mt-0.5" suppressHydrationWarning>
                 {heroSubtitle}
               </p>
             </div>

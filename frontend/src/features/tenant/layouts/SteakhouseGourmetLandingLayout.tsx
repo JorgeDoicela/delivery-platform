@@ -159,10 +159,10 @@ export function SteakhouseGourmetLandingLayout({
               <span className="text-[11px] font-bold uppercase tracking-widest text-emerald-400 block mb-1">
                 La Carta de la Brasa
               </span>
-              <h2 className="text-3xl sm:text-4xl font-black text-white uppercase tracking-tight font-display">
+              <h2 className="text-3xl sm:text-4xl font-black text-white uppercase tracking-tight font-display" suppressHydrationWarning>
                 Cortes, Parrilladas & Entradas
               </h2>
-              <p className="text-xs sm:text-sm text-neutral-400 mt-1">
+              <p className="text-xs sm:text-sm text-neutral-400 mt-1" suppressHydrationWarning>
                 {tenant?.heroSubtitle || "Pide a domicilio con empaque térmico al vacío para conservar el calor de la brasa"}
               </p>
             </div>

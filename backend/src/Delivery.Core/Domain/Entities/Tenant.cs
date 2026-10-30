@@ -7,7 +7,7 @@ public class Tenant
     public string Name { get; set; } = string.Empty;
     public string Tagline { get; set; } = "Asadero & Brasa";
     public string Description { get; set; } = string.Empty;
-    public string HeroSubtitle { get; set; } = "Personaliza tu orden con guarniciones calientes, ensalada fresca y salsas de la casa";
+    public string HeroSubtitle { get; set; } = "Personaliza tu orden con guarniciones calientes, ensalada fresca y ají artesanal";
     public string BusinessName { get; set; } = string.Empty;
     public string TaxId { get; set; } = string.Empty;
     public string? LogoUrl { get; set; }
