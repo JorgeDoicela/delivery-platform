@@ -60,11 +60,6 @@ public class LoginHandler : IHandler<LoginCommand, Result<LoginResponse>>
             return Result.Failure<LoginResponse>(AuthErrors.TenantNotFound);
         }
 
-        if (!tenant.IsActive)
-        {
-            return Result.Failure<LoginResponse>(AuthErrors.TenantInactive);
-        }
-
         // 2. Busqueda del usuario dentro del tenant o global (SuperAdmin)
 #pragma warning disable CA1862, CA1304, CA1311
         var emailLower = request.Email.Trim().ToLower(System.Globalization.CultureInfo.InvariantCulture);
@@ -96,7 +91,8 @@ public class LoginHandler : IHandler<LoginCommand, Result<LoginResponse>>
             return Result.Failure<LoginResponse>(AuthErrors.InvalidCredentials);
         }
 
-        if (!tenant.IsActive)
+        // Si el usuario pertenece a un comercio específico (no es SuperAdmin global con TenantId == null), exigir que el comercio esté activo
+        if (user.TenantId.HasValue && !tenant.IsActive)
         {
             return Result.Failure<LoginResponse>(AuthErrors.TenantInactive);
         }
@@ -117,8 +113,9 @@ public class LoginHandler : IHandler<LoginCommand, Result<LoginResponse>>
         var roles = user.UserRoles.Select(ur => ur.Role).ToList();
         var primaryBranchId = user.UserRoles.FirstOrDefault(ur => ur.BranchId.HasValue)?.BranchId;
 
-        // 6. Generacion criptografica de tokens
-        var (accessToken, accessExpiresAt) = _tokenProvider.GenerateAccessToken(user, roles, tenant.Id, primaryBranchId);
+        // 6. Generacion criptografica de tokens (respetando TenantId nulo para SuperAdmin global)
+        var effectiveTenantId = user.TenantId;
+        var (accessToken, accessExpiresAt) = _tokenProvider.GenerateAccessToken(user, roles, effectiveTenantId, primaryBranchId);
         var (rawRefreshToken, tokenHash, refreshExpiresAt) = _tokenProvider.GenerateRefreshToken();
 
         // 7. Persistencia inmutable del Refresh Token

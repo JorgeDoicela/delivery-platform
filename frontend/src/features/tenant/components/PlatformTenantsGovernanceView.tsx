@@ -67,12 +67,21 @@ export function PlatformTenantsGovernanceView() {
   const totalBranches = tenants.reduce((acc, t) => acc + t.branchesCount, 0);
   const totalProducts = tenants.reduce((acc, t) => acc + t.productsCount, 0);
 
-  const handleToggleStatus = async (tenantId: string, currentActive: boolean, name: string) => {
+  const handleToggleStatus = async (
+    tenantId: string,
+    slug: string,
+    currentActive: boolean,
+    name: string
+  ) => {
     try {
       await toggleStatusMutation.mutateAsync({
         tenantId,
         isActive: !currentActive,
       });
+      if (currentActive && slug === activeTenantSlug) {
+        const fallbackTenant = tenants.find((t) => t.id !== tenantId && t.isActive);
+        setTenantSlug(fallbackTenant?.slug ?? "la-granjita");
+      }
       setBannerNotice(
         `El estado operativo de "${name}" se actualizó a ${!currentActive ? "ACTIVO" : "SUSPENDIDO"}.`
       );
@@ -351,7 +360,12 @@ export function PlatformTenantsGovernanceView() {
                   type="button"
                   disabled={toggleStatusMutation.isPending}
                   onClick={() =>
-                    handleToggleStatus(tenant.id, tenant.isActive, tenant.name)
+                    handleToggleStatus(
+                      tenant.id,
+                      tenant.slug,
+                      tenant.isActive,
+                      tenant.name
+                    )
                   }
                   className={`px-3 py-1.5 rounded-full text-[11px] font-bold uppercase tracking-wider inline-flex items-center gap-1.5 transition-colors cursor-pointer ${
                     tenant.isActive

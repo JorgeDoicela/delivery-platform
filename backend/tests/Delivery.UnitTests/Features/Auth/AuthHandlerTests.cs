@@ -233,5 +233,35 @@ public class AuthHandlerTests
         result.Value.User.TenantSlug.Should().Be("brasas-del-valle");
         result.Value.User.Role.Should().Be("TenantAdmin");
     }
+
+    [Fact]
+    public async Task Login_WhenTenantIsSuspended_ShouldBlockTenantAdminButAllowGlobalSuperAdmin()
+    {
+        var dbName = Guid.NewGuid().ToString();
+        var passwordHasher = new BCryptPasswordHasher();
+        var tokenProvider = new JwtTokenProvider(Options.Create(CreateJwtOptions()));
+
+        await using (var seedCtx = new AppDbContext(CreateInMemoryOptions(dbName)))
+        {
+            await DatabaseSeeder.SeedAsync(seedCtx);
+            var tenant = await seedCtx.Tenants.FirstAsync(t => t.Slug == "brasas-del-valle");
+            tenant.IsActive = false;
+            await seedCtx.SaveChangesAsync();
+        }
+
+        await using var context = new AppDbContext(CreateInMemoryOptions(dbName));
+        var handler = new LoginHandler(context, new FakeTenantContext(), passwordHasher, tokenProvider);
+
+        var tenantAdminResult = await handler.Handle(
+            new LoginCommand("esmeralda@brasasdelvalle.com", "Admin123!", "brasas-del-valle", "127.0.0.1"));
+        tenantAdminResult.IsFailure.Should().BeTrue();
+        tenantAdminResult.Error.Code.Should().Be("Auth.TenantInactive");
+
+        var superAdminResult = await handler.Handle(
+            new LoginCommand("jorge@admin.com", "Admin123!", "brasas-del-valle", "127.0.0.1"));
+        superAdminResult.IsSuccess.Should().BeTrue();
+        superAdminResult.Value.User.Role.Should().Be("SuperAdmin");
+        superAdminResult.Value.User.TenantId.Should().BeNull();
+    }
 }
 

@@ -17,17 +17,58 @@ public class TenantResolutionMiddleware
 
     public async Task InvokeAsync(HttpContext context, TenantContext tenantContext, AppDbContext dbContext)
     {
-        // Bypass para endpoints de sistema o listado global de directorio de tenants
+        // Bypass para endpoints de sistema, autenticación o gobernanza global de plataforma
         var path = context.Request.Path.Value ?? string.Empty;
         if (path.Equals("/health", StringComparison.OrdinalIgnoreCase) ||
             path.StartsWith("/swagger", StringComparison.OrdinalIgnoreCase) ||
-            path.StartsWith("/hangfire", StringComparison.OrdinalIgnoreCase))
+            path.StartsWith("/hangfire", StringComparison.OrdinalIgnoreCase) ||
+            path.StartsWith("/api/v1/auth", StringComparison.OrdinalIgnoreCase) ||
+            path.Equals("/api/tenants", StringComparison.OrdinalIgnoreCase) ||
+            path.Equals("/api/tenants/platform", StringComparison.OrdinalIgnoreCase) ||
+            (path.StartsWith("/api/tenants/", StringComparison.OrdinalIgnoreCase) &&
+             path.EndsWith("/status", StringComparison.OrdinalIgnoreCase)))
         {
             await _next(context);
             return;
         }
 
-        // 1. Prioridad máxima: Header explícito X-Tenant-Slug enviado por el cliente / Storefront
+        var isAuthenticated = context.User.Identity?.IsAuthenticated == true;
+        var isSuperAdmin = isAuthenticated && context.User.IsInRole("SuperAdmin");
+
+        // 1. Aislamiento estricto por JWT para operadores de franquicia (no SuperAdmin):
+        // Imposibilita que un TenantAdmin o operador autenticado falsifique el header X-Tenant-Slug de otra marca.
+        if (isAuthenticated && !isSuperAdmin)
+        {
+            var tenantIdClaim = context.User.FindFirst("tenant_id")?.Value;
+            if (!string.IsNullOrWhiteSpace(tenantIdClaim) && Guid.TryParse(tenantIdClaim, out var claimTenantId))
+            {
+                var jwtTenant = await dbContext.Tenants
+                    .IgnoreQueryFilters()
+                    .AsNoTracking()
+                    .FirstOrDefaultAsync(t => t.Id == claimTenantId && t.IsActive);
+
+                if (jwtTenant == null)
+                {
+                    context.Response.StatusCode = StatusCodes.Status403Forbidden;
+                    context.Response.ContentType = "application/problem+json";
+                    var problem = new ProblemDetails
+                    {
+                        Status = StatusCodes.Status403Forbidden,
+                        Title = "Comercio suspendido o no autorizado",
+                        Detail = "El comercio asociado a tu cuenta operativa no se encuentra activo.",
+                        Type = "https://tools.ietf.org/html/rfc7807"
+                    };
+                    await context.Response.WriteAsJsonAsync(problem);
+                    return;
+                }
+
+                tenantContext.SetTenant(jwtTenant.Id, jwtTenant.Slug);
+                await _next(context);
+                return;
+            }
+        }
+
+        // 2. Header explícito X-Tenant-Slug (permitido para SuperAdmin y navegación de Storefront público)
         if (context.Request.Headers.TryGetValue("X-Tenant-Slug", out var headerSlugValues))
         {
             var explicitSlug = headerSlugValues.ToString().Trim().ToLowerInvariant();
@@ -56,26 +97,6 @@ public class TenantResolutionMiddleware
                 tenantContext.SetTenant(explicitTenant.Id, explicitTenant.Slug);
                 await _next(context);
                 return;
-            }
-        }
-
-        // 2. Detección por Claim en JWT de usuario autenticado (cuando no hay override explícito por Header)
-        if (context.User.Identity?.IsAuthenticated == true)
-        {
-            var tenantIdClaim = context.User.FindFirst("tenant_id")?.Value;
-            if (!string.IsNullOrWhiteSpace(tenantIdClaim) && Guid.TryParse(tenantIdClaim, out var claimTenantId))
-            {
-                var jwtTenant = await dbContext.Tenants
-                    .IgnoreQueryFilters()
-                    .AsNoTracking()
-                    .FirstOrDefaultAsync(t => t.Id == claimTenantId && t.IsActive);
-
-                if (jwtTenant != null)
-                {
-                    tenantContext.SetTenant(jwtTenant.Id, jwtTenant.Slug);
-                    await _next(context);
-                    return;
-                }
             }
         }
 
