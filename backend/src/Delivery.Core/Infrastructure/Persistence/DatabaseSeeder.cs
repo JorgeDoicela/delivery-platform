@@ -372,7 +372,6 @@ public static partial class DatabaseSeeder
     {
         var staffSpecs = new[]
         {
-            (Email: $"jorge@{emailDomain}", Name: "Jorge - Super Administrador", Phone: "0999999999", RoleId: Role.SuperAdmin, BranchScoped: false),
             (Email: $"esmeralda@{emailDomain}", Name: "Esmeralda - Administradora", Phone: "0987654321", RoleId: Role.TenantAdmin, BranchScoped: false),
             (Email: $"cajero@{emailDomain}", Name: "Cajero Principal", Phone: "0987654323", RoleId: Role.Cashier, BranchScoped: true),
             (Email: $"cocina@{emailDomain}", Name: "Maestro Hornero KDS", Phone: "0987654324", RoleId: Role.KitchenStaff, BranchScoped: true),
