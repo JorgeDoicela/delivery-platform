@@ -19,10 +19,10 @@ export function ProductCard({ product }: ProductCardProps) {
 
   return (
     <>
-      <div className="group relative flex flex-col justify-between bg-white rounded-3xl border border-neutral-200 overflow-hidden shadow-sm hover:shadow-xl hover:border-neutral-300 transition-all duration-300">
+      <div className="group relative flex flex-col justify-between bg-surface-card rounded-3xl border border-surface-border overflow-hidden shadow-xs hover:shadow-xl hover:border-brand-primary/40 transition-all duration-300">
         <div>
           {/* Cabecera con Fotografía Gastronómica */}
-          <div className="relative w-full aspect-[16/10] sm:aspect-[4/3] bg-neutral-100 overflow-hidden">
+          <div className="relative w-full aspect-[16/10] sm:aspect-[4/3] bg-surface-canvas overflow-hidden">
             <Image
               src={displayImage}
               alt={product.name}
@@ -48,23 +48,23 @@ export function ProductCard({ product }: ProductCardProps) {
 
           {/* Información del Producto */}
           <div className="p-5 sm:p-6 space-y-2">
-            <h3 className="text-xl font-black text-neutral-900 group-hover:text-brand-primary transition-colors uppercase tracking-tight leading-tight font-display">
+            <h3 className="text-xl font-black text-text-strong group-hover:text-brand-primary transition-colors uppercase tracking-tight leading-tight font-display">
               {product.name}
             </h3>
 
-            <p className="text-xs text-neutral-600 line-clamp-2 leading-relaxed">
+            <p className="text-xs text-text-muted line-clamp-2 leading-relaxed">
               {product.description}
             </p>
           </div>
         </div>
 
         {/* Fila Inferior de Precio y Botón Pedir */}
-        <div className="px-5 pb-5 sm:px-6 sm:pb-6 pt-3 border-t border-neutral-100 flex items-center justify-between mt-auto">
+        <div className="px-5 pb-5 sm:px-6 sm:pb-6 pt-3 border-t border-surface-border flex items-center justify-between mt-auto">
           <div>
-            <span className="text-[10px] text-neutral-600 block uppercase font-bold tracking-wider">
+            <span className="text-[10px] text-text-muted block uppercase font-bold tracking-wider">
               Precio Base
             </span>
-            <span className="text-2xl font-black text-neutral-950 tracking-tight tabular-nums font-mono">
+            <span className="text-2xl font-black text-text-strong tracking-tight tabular-nums font-mono">
               {formatCurrency(product.basePrice)}
             </span>
           </div>
@@ -72,7 +72,7 @@ export function ProductCard({ product }: ProductCardProps) {
           <button
             type="button"
             onClick={() => setIsModalOpen(true)}
-            className="inline-flex items-center gap-1.5 bg-brand-primary hover:bg-brand-primary-hover text-white text-xs font-black uppercase tracking-wider py-3 px-6 rounded-full shadow-md transition-all hover:scale-105 active:scale-95"
+            className="inline-flex items-center gap-1.5 bg-brand-primary hover:bg-brand-primary-hover text-white text-xs font-black uppercase tracking-wider py-3 px-6 rounded-full shadow-md transition-all hover:scale-105 active:scale-95 cursor-pointer"
           >
             <Plus className="w-4 h-4 stroke-[3]" />
             <span>Pedir</span>

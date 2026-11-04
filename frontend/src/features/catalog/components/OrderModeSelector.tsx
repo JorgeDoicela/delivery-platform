@@ -25,7 +25,7 @@ export function OrderModeSelector() {
   return (
     <section className="w-full text-center py-3">
       <div className="max-w-[760px] mx-auto space-y-4">
-        <h2 className="text-2xl sm:text-3xl font-black uppercase tracking-wide text-neutral-900 font-display">
+        <h2 className="text-2xl sm:text-3xl font-black uppercase tracking-wide text-text-strong font-display">
           ¿Cómo te gustaría ordenar hoy?
         </h2>
 

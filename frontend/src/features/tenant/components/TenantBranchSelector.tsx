@@ -51,29 +51,29 @@ export function TenantBranchSelector({ tenant }: TenantBranchSelectorProps) {
         onClick={() => setIsOpen((prev) => !prev)}
         aria-label="Cambiar sucursal de atención"
         aria-expanded={isOpen}
-        className="flex items-center gap-2 px-3 py-1.5 rounded-full border border-neutral-200 bg-neutral-50 hover:bg-neutral-100 text-neutral-800 transition-all text-xs font-bold shadow-2xs active:scale-95"
+        className="flex items-center gap-2 px-3 py-1.5 rounded-full border border-surface-border bg-surface-canvas hover:bg-surface-card-hover text-text-strong transition-all text-xs font-bold shadow-2xs active:scale-95 cursor-pointer"
       >
         <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse shrink-0" />
-        <span className="hidden sm:inline text-[10px] uppercase tracking-wider text-neutral-500 font-semibold">
+        <span className="hidden sm:inline text-[10px] uppercase tracking-wider text-text-muted font-semibold">
           Sucursal:
         </span>
-        <span className="font-display uppercase tracking-wide font-black text-xs text-neutral-900 max-w-[130px] truncate">
+        <span className="font-display uppercase tracking-wide font-black text-xs text-text-strong max-w-[130px] truncate">
           {currentBranch?.name || "Seleccionar"}
         </span>
         <ChevronDown
-          className={`w-3.5 h-3.5 text-neutral-500 transition-transform duration-200 ${
+          className={`w-3.5 h-3.5 text-text-muted transition-transform duration-200 ${
             isOpen ? "rotate-180" : ""
           }`}
         />
       </button>
 
       {isOpen && (
-        <div className="absolute right-0 mt-2 w-80 bg-white rounded-3xl border border-neutral-200 shadow-2xl p-3.5 z-50 space-y-2">
-          <div className="px-2 pt-1 pb-2 border-b border-neutral-100 flex items-center justify-between">
-            <span className="text-[10px] font-bold uppercase tracking-wider text-neutral-500">
+        <div className="absolute right-0 mt-2 w-80 bg-surface-card rounded-3xl border border-surface-border shadow-2xl p-3.5 z-50 space-y-2 text-text-strong">
+          <div className="px-2 pt-1 pb-2 border-b border-surface-border flex items-center justify-between">
+            <span className="text-[10px] font-bold uppercase tracking-wider text-text-muted">
               Sucursales de {tenant?.name || "este local"}
             </span>
-            <span className="text-[10px] font-mono text-emerald-600 font-bold">
+            <span className="text-[10px] font-mono text-emerald-500 font-bold">
               {branches.length} activas
             </span>
           </div>
@@ -86,10 +86,10 @@ export function TenantBranchSelector({ tenant }: TenantBranchSelectorProps) {
                   key={b.id}
                   type="button"
                   onClick={() => handleSelect(b.id, b.name)}
-                  className={`w-full text-left p-3 rounded-2xl transition-all border flex items-start justify-between gap-3 ${
+                  className={`w-full text-left p-3 rounded-2xl transition-all border flex items-start justify-between gap-3 cursor-pointer ${
                     isSelected
-                      ? "bg-neutral-900 text-white border-neutral-900 shadow-sm"
-                      : "bg-white text-neutral-900 border-neutral-200/80 hover:bg-neutral-50"
+                      ? "bg-brand-primary text-white border-brand-primary shadow-sm"
+                      : "bg-surface-canvas text-text-strong border-surface-border hover:bg-surface-card-hover"
                   }`}
                 >
                   <div className="space-y-1">
@@ -100,15 +100,15 @@ export function TenantBranchSelector({ tenant }: TenantBranchSelectorProps) {
                     </div>
                     <p
                       className={`text-[11px] leading-snug flex items-start gap-1.5 ${
-                        isSelected ? "text-neutral-300" : "text-neutral-500"
+                        isSelected ? "text-white/90" : "text-text-muted"
                       }`}
                     >
-                      <MapPin className="w-3.5 h-3.5 shrink-0 mt-0.5 text-brand-primary" />
+                      <MapPin className={`w-3.5 h-3.5 shrink-0 mt-0.5 ${isSelected ? "text-white" : "text-brand-primary"}`} />
                       <span>{b.address}</span>
                     </p>
                     <p
                       className={`text-[10px] font-mono flex items-center gap-1.5 pt-0.5 ${
-                        isSelected ? "text-neutral-400" : "text-neutral-400"
+                        isSelected ? "text-white/80" : "text-text-subtle"
                       }`}
                     >
                       <Clock className="w-3 h-3 shrink-0" />
@@ -119,7 +119,7 @@ export function TenantBranchSelector({ tenant }: TenantBranchSelectorProps) {
                   </div>
 
                   {isSelected && (
-                    <span className="w-5 h-5 rounded-full bg-brand-primary text-white flex items-center justify-center shrink-0 mt-0.5">
+                    <span className="w-5 h-5 rounded-full bg-white text-brand-primary flex items-center justify-center shrink-0 mt-0.5">
                       <Check className="w-3 h-3 stroke-[3]" />
                     </span>
                   )}
@@ -128,11 +128,11 @@ export function TenantBranchSelector({ tenant }: TenantBranchSelectorProps) {
             })}
           </div>
 
-          <div className="pt-2 border-t border-neutral-100 px-2 flex items-center justify-between text-[11px]">
+          <div className="pt-2 border-t border-surface-border px-2 flex items-center justify-between text-[11px]">
             <a
               href="#sucursales"
               onClick={() => setIsOpen(false)}
-              className="font-bold text-brand-primary hover:underline"
+              className="font-bold text-brand-primary hover:underline font-display uppercase tracking-wider"
             >
               Ver mapa y horarios completos →
             </a>
@@ -142,4 +142,3 @@ export function TenantBranchSelector({ tenant }: TenantBranchSelectorProps) {
     </div>
   );
 }
-

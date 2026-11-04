@@ -28,10 +28,10 @@ export function UserNav() {
   };
 
   return (
-    <div className="flex items-center gap-2 pl-3 border-l border-neutral-200">
-      <div className="flex items-center gap-1.5 text-xs text-neutral-700">
+    <div className="flex items-center gap-2 pl-3 border-l border-surface-border">
+      <div className="flex items-center gap-1.5 text-xs text-text-base">
         <UserIcon className="w-3.5 h-3.5 text-brand-primary shrink-0" />
-        <span className="font-semibold text-neutral-900 max-w-[120px] truncate hidden xl:inline">
+        <span className="font-semibold text-text-strong max-w-[120px] truncate hidden xl:inline">
           {user.fullName}
         </span>
         <span className="text-[11px] font-mono text-brand-primary font-bold uppercase">
@@ -44,7 +44,7 @@ export function UserNav() {
         onClick={handleLogout}
         title="Cerrar sesión"
         aria-label="Cerrar sesión"
-        className="p-1.5 rounded-full text-neutral-400 hover:text-red-600 hover:bg-neutral-100 transition-colors cursor-pointer"
+        className="p-1.5 rounded-full text-text-muted hover:text-red-500 hover:bg-surface-card-hover transition-colors cursor-pointer"
       >
         <LogOut className="w-3.5 h-3.5" />
       </button>

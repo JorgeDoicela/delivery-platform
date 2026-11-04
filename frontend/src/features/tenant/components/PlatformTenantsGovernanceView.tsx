@@ -30,10 +30,10 @@ export function PlatformTenantsGovernanceView() {
   if (isRestrictedRole) {
     return (
       <div className="flex-1 flex flex-col items-center justify-center p-12 text-center max-w-lg mx-auto gap-4">
-        <h2 className="text-xl font-black uppercase tracking-tight text-neutral-950 font-display">
+        <h2 className="text-xl font-black uppercase tracking-tight text-text-strong font-display">
           Acceso Restringido a SuperAdmin
         </h2>
-        <p className="text-xs text-neutral-600">
+        <p className="text-xs text-text-muted">
           Tu cuenta actual pertenece al ámbito operativo de franquicia ({user?.email}). El aprovisionamiento global de comercios está reservado para el SuperAdmin de la plataforma.
         </p>
         <Link
@@ -76,7 +76,7 @@ export function PlatformTenantsGovernanceView() {
 
   if (isLoading) {
     return (
-      <div className="flex-1 flex flex-col items-center justify-center p-12 gap-3 text-neutral-500">
+      <div className="flex-1 flex flex-col items-center justify-center p-12 gap-3 text-text-muted">
         <Loader2 className="w-8 h-8 animate-spin text-brand-primary" />
         <p className="text-xs font-bold uppercase tracking-widest font-mono">
           Cargando directorio global de comercios SaaS...
@@ -88,10 +88,10 @@ export function PlatformTenantsGovernanceView() {
   if (isError) {
     return (
       <div className="flex-1 flex flex-col items-center justify-center p-12 text-center max-w-lg mx-auto gap-4">
-        <h2 className="text-xl font-black uppercase tracking-tight text-neutral-950 font-display">
+        <h2 className="text-xl font-black uppercase tracking-tight text-text-strong font-display">
           Error al consultar los comercios de la plataforma
         </h2>
-        <p className="text-xs text-neutral-600">
+        <p className="text-xs text-text-muted">
           {error instanceof Error
             ? error.message
             : "Verifica que el backend .NET 8 esté activo en el puerto 5005."}
@@ -109,16 +109,16 @@ export function PlatformTenantsGovernanceView() {
 
   return (
     <div className="flex-1 overflow-y-auto pr-1 space-y-6 pb-10">
-      {/* Cabecera de Gobernanza Global SaaS (Fondo Blanco Luminoso) */}
-      <div className="bg-white border border-neutral-200/90 rounded-3xl p-6 sm:p-8 flex flex-col lg:flex-row lg:items-center lg:justify-between gap-6 shadow-xs">
+      {/* Cabecera de Gobernanza Global SaaS (Soporte Modo Claro y Oscuro) */}
+      <div className="bg-surface-card border border-surface-border rounded-3xl p-6 sm:p-8 flex flex-col lg:flex-row lg:items-center lg:justify-between gap-6 shadow-xs transition-colors duration-200">
         <div>
           <span className="text-[11px] font-bold uppercase tracking-widest text-brand-primary block mb-1 font-display">
             CONSOLA SUPERADMIN • GOBERNANZA MULTI-MARCA
           </span>
-          <h1 className="text-2xl sm:text-3xl lg:text-4xl font-black uppercase tracking-tight text-neutral-950 font-display">
+          <h1 className="text-2xl sm:text-3xl lg:text-4xl font-black uppercase tracking-tight text-text-strong font-display">
             Restaurantes & Franquicias Afiliadas
           </h1>
-          <p className="text-xs text-neutral-600 mt-1.5 max-w-2xl font-sans leading-relaxed">
+          <p className="text-xs text-text-muted mt-1.5 max-w-2xl font-sans leading-relaxed">
             Administra el ciclo de vida de cada restaurante en la plataforma: afilia nuevos comercios con su propia sucursal matriz, catálogo independiente, colores corporativos y cuenta de administración.
           </p>
         </div>
@@ -127,7 +127,7 @@ export function PlatformTenantsGovernanceView() {
           <button
             type="button"
             onClick={() => refetch()}
-            className="px-4 py-2.5 rounded-full border border-neutral-200 bg-white hover:bg-neutral-50 text-xs font-bold uppercase tracking-wider font-display text-neutral-700 hover:text-neutral-950 transition-colors cursor-pointer shadow-xs"
+            className="px-4 py-2.5 rounded-full border border-surface-border bg-surface-card hover:bg-surface-card-hover text-xs font-bold uppercase tracking-wider font-display text-text-strong transition-colors cursor-pointer shadow-xs"
           >
             Actualizar
           </button>
@@ -143,7 +143,7 @@ export function PlatformTenantsGovernanceView() {
       </div>
 
       {bannerNotice && (
-        <div className="bg-white border border-neutral-200/90 rounded-2xl px-5 py-3.5 flex items-center justify-between text-xs text-neutral-900 font-medium shadow-xs">
+        <div className="bg-surface-card border border-surface-border rounded-2xl px-5 py-3.5 flex items-center justify-between text-xs text-text-strong font-medium shadow-xs">
           <div className="flex items-center gap-2.5">
             <span className="w-2 h-2 rounded-full bg-brand-primary shrink-0" />
             <span>{bannerNotice}</span>
@@ -151,65 +151,65 @@ export function PlatformTenantsGovernanceView() {
           <button
             type="button"
             onClick={() => setBannerNotice(null)}
-            className="text-[11px] uppercase tracking-wider font-bold text-neutral-500 hover:text-neutral-900 cursor-pointer ml-4"
+            className="text-[11px] uppercase tracking-wider font-bold text-text-muted hover:text-text-strong cursor-pointer ml-4"
           >
             Cerrar
           </button>
         </div>
       )}
 
-      {/* Tarjetas de Métricas Globales (Fondo Blanco Luminoso) */}
+      {/* Tarjetas de Métricas Globales */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-        <div className="bg-white border border-neutral-200/90 rounded-2xl p-5 shadow-xs">
-          <span className="text-[10px] sm:text-[11px] font-bold uppercase tracking-wider text-neutral-500 block">
+        <div className="bg-surface-card border border-surface-border rounded-2xl p-5 shadow-xs transition-colors duration-200">
+          <span className="text-[10px] sm:text-[11px] font-bold uppercase tracking-wider text-text-muted block">
             Total Marcas Registradas
           </span>
-          <div className="text-2xl font-black text-neutral-950 font-mono tabular-nums mt-1">
+          <div className="text-2xl font-black text-text-strong font-mono tabular-nums mt-1">
             {tenants.length}
           </div>
-          <span className="text-[11px] text-neutral-500 mt-1 block font-sans">
+          <span className="text-[11px] text-text-muted mt-1 block font-sans">
             {activeCount} activas en tienda pública
           </span>
         </div>
 
-        <div className="bg-white border border-neutral-200/90 rounded-2xl p-5 shadow-xs">
-          <span className="text-[10px] sm:text-[11px] font-bold uppercase tracking-wider text-neutral-500 block">
+        <div className="bg-surface-card border border-surface-border rounded-2xl p-5 shadow-xs transition-colors duration-200">
+          <span className="text-[10px] sm:text-[11px] font-bold uppercase tracking-wider text-text-muted block">
             Sucursales Georreferenciadas
           </span>
-          <div className="text-2xl font-black text-neutral-950 font-mono tabular-nums mt-1">
+          <div className="text-2xl font-black text-text-strong font-mono tabular-nums mt-1">
             {totalBranches}
           </div>
-          <span className="text-[11px] text-neutral-500 mt-1 block font-sans">
+          <span className="text-[11px] text-text-muted mt-1 block font-sans">
             Con geocerca PostGIS activa
           </span>
         </div>
 
-        <div className="bg-white border border-neutral-200/90 rounded-2xl p-5 shadow-xs">
-          <span className="text-[10px] sm:text-[11px] font-bold uppercase tracking-wider text-neutral-500 block">
+        <div className="bg-surface-card border border-surface-border rounded-2xl p-5 shadow-xs transition-colors duration-200">
+          <span className="text-[10px] sm:text-[11px] font-bold uppercase tracking-wider text-text-muted block">
             Productos en Catálogos
           </span>
-          <div className="text-2xl font-black text-neutral-950 font-mono tabular-nums mt-1">
+          <div className="text-2xl font-black text-text-strong font-mono tabular-nums mt-1">
             {totalProducts}
           </div>
-          <span className="text-[11px] text-neutral-500 mt-1 block font-sans">
+          <span className="text-[11px] text-text-muted mt-1 block font-sans">
             Aislados por TenantId
           </span>
         </div>
 
-        <div className="bg-white border border-neutral-200/90 rounded-2xl p-5 shadow-xs">
-          <span className="text-[10px] sm:text-[11px] font-bold uppercase tracking-wider text-neutral-500 block">
+        <div className="bg-surface-card border border-surface-border rounded-2xl p-5 shadow-xs transition-colors duration-200">
+          <span className="text-[10px] sm:text-[11px] font-bold uppercase tracking-wider text-text-muted block">
             Contexto Activo en Consola
           </span>
           <div className="text-lg font-black text-brand-primary font-mono mt-1 truncate">
             {activeTenantSlug}
           </div>
-          <span className="text-[11px] text-neutral-500 mt-1 block font-sans">
+          <span className="text-[11px] text-text-muted mt-1 block font-sans">
             Header X-Tenant-Slug sincronizado
           </span>
         </div>
       </div>
 
-      {/* Grilla de Comercios de la Plataforma (Tarjetas Blancas Puras) */}
+      {/* Grilla de Comercios de la Plataforma */}
       <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-5">
         {tenants.map((tenant) => {
           const isCurrentContext = tenant.slug === activeTenantSlug;
@@ -217,17 +217,17 @@ export function PlatformTenantsGovernanceView() {
           return (
             <article
               key={tenant.id}
-              className={`bg-white rounded-3xl border transition-all flex flex-col justify-between overflow-hidden p-6 sm:p-7 shadow-xs hover:shadow-md ${
+              className={`bg-surface-card rounded-3xl border transition-all flex flex-col justify-between overflow-hidden p-6 sm:p-7 shadow-xs hover:shadow-md ${
                 isCurrentContext
                   ? "border-brand-primary ring-2 ring-brand-primary/20"
-                  : "border-neutral-200/90 hover:border-neutral-300"
+                  : "border-surface-border hover:border-surface-border-subtle"
               }`}
             >
               <div>
                 {/* Cabecera de la Tarjeta */}
                 <div className="flex items-start justify-between gap-3">
                   <div>
-                    <h2 className="text-xl sm:text-2xl font-black uppercase tracking-tight text-neutral-950 font-display leading-tight">
+                    <h2 className="text-xl sm:text-2xl font-black uppercase tracking-tight text-text-strong font-display leading-tight">
                       {tenant.name}
                     </h2>
                     {isCurrentContext && (
@@ -235,8 +235,8 @@ export function PlatformTenantsGovernanceView() {
                         • Contexto Activo
                       </span>
                     )}
-                    <p className="text-xs font-mono text-neutral-500 mt-1">
-                      slug: <strong className="text-neutral-800">{tenant.slug}</strong> • RUC: {tenant.taxId}
+                    <p className="text-xs font-mono text-text-muted mt-1">
+                      slug: <strong className="text-text-strong">{tenant.slug}</strong> • RUC: {tenant.taxId}
                     </p>
                   </div>
 
@@ -249,36 +249,36 @@ export function PlatformTenantsGovernanceView() {
                   </span>
                 </div>
 
-                <p className="text-xs text-neutral-600 mt-3 line-clamp-2 min-h-[2.25rem] font-sans leading-relaxed">
+                <p className="text-xs text-text-muted mt-3 line-clamp-2 min-h-[2.25rem] font-sans leading-relaxed">
                   {tenant.description || tenant.tagline}
                 </p>
 
-                {/* Ficha técnica del tenant (Fondo gris neutro limpio, sin fondos pastel ni iconos saturados) */}
-                <div className="bg-neutral-50 rounded-2xl p-4 border border-neutral-200/80 space-y-2.5 text-xs font-mono my-5">
+                {/* Ficha técnica del tenant */}
+                <div className="bg-surface-canvas rounded-2xl p-4 border border-surface-border space-y-2.5 text-xs font-mono my-5">
                   <div className="flex items-center justify-between">
-                    <span className="text-neutral-500">TenantAdmin:</span>
-                    <span className="text-neutral-900 font-semibold truncate max-w-[200px]">
+                    <span className="text-text-muted">TenantAdmin:</span>
+                    <span className="text-text-strong font-semibold truncate max-w-[200px]">
                       {tenant.adminEmail}
                     </span>
                   </div>
 
                   <div className="flex items-center justify-between">
-                    <span className="text-neutral-500">Sucursales / Menú:</span>
-                    <span className="text-neutral-900 font-semibold">
+                    <span className="text-text-muted">Sucursales / Menú:</span>
+                    <span className="text-text-strong font-semibold">
                       {tenant.branchesCount} {tenant.branchesCount === 1 ? "local" : "locales"} • {tenant.productsCount} ítems
                     </span>
                   </div>
 
                   <div className="flex items-center justify-between">
-                    <span className="text-neutral-500">Tarifa envío base:</span>
-                    <span className="text-neutral-950 font-bold tabular-nums">
+                    <span className="text-text-muted">Tarifa envío base:</span>
+                    <span className="text-text-strong font-bold tabular-nums">
                       ${tenant.baseDeliveryFee.toFixed(2)}
                     </span>
                   </div>
 
                   {tenant.customDomain && (
-                    <div className="flex items-center justify-between pt-2 border-t border-neutral-200">
-                      <span className="text-neutral-500">Dominio propio:</span>
+                    <div className="flex items-center justify-between pt-2 border-t border-surface-border">
+                      <span className="text-text-muted">Dominio propio:</span>
                       <span className="text-brand-accent font-bold truncate max-w-[200px]">
                         {tenant.customDomain}
                       </span>
@@ -288,7 +288,7 @@ export function PlatformTenantsGovernanceView() {
               </div>
 
               {/* Acciones de Gobernanza por Tenant */}
-              <div className="pt-4 border-t border-neutral-100 flex items-center justify-between gap-2">
+              <div className="pt-4 border-t border-surface-border flex items-center justify-between gap-2">
                 <div className="flex items-center gap-2">
                   <button
                     type="button"
@@ -298,7 +298,7 @@ export function PlatformTenantsGovernanceView() {
                         `Contexto operativo cambiado a "${tenant.name}" (${tenant.slug}).`
                       );
                     }}
-                    className="px-4 py-2 rounded-full bg-neutral-100 hover:bg-neutral-200 text-neutral-900 text-xs font-bold uppercase tracking-wider font-display transition-colors cursor-pointer"
+                    className="px-4 py-2 rounded-full bg-surface-canvas hover:bg-surface-card-hover text-text-strong border border-surface-border text-xs font-bold uppercase tracking-wider font-display transition-colors cursor-pointer"
                   >
                     Gestionar Marca
                   </button>
@@ -306,7 +306,7 @@ export function PlatformTenantsGovernanceView() {
                   <Link
                     href={`/${tenant.slug}`}
                     onClick={() => setTenantSlug(tenant.slug)}
-                    className="px-4 py-2 rounded-full border border-neutral-200 bg-white hover:bg-neutral-50 text-neutral-700 hover:text-neutral-900 text-xs font-bold uppercase tracking-wider font-display transition-colors"
+                    className="px-4 py-2 rounded-full border border-surface-border bg-surface-card hover:bg-surface-canvas text-text-strong text-xs font-bold uppercase tracking-wider font-display transition-colors"
                   >
                     Ver Tienda
                   </Link>
@@ -325,8 +325,8 @@ export function PlatformTenantsGovernanceView() {
                   }
                   className={`px-4 py-2 rounded-full text-xs font-bold uppercase tracking-wider font-display transition-colors cursor-pointer border ${
                     tenant.isActive
-                      ? "border-red-200 text-red-600 hover:bg-red-50 hover:border-red-300"
-                      : "border-emerald-200 text-emerald-600 hover:bg-emerald-50 hover:border-emerald-300"
+                      ? "border-red-500/30 text-red-500 hover:bg-red-500/10"
+                      : "border-emerald-500/30 text-emerald-500 hover:bg-emerald-500/10"
                   }`}
                 >
                   {tenant.isActive ? "Suspender" : "Activar"}

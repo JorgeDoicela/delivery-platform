@@ -25,7 +25,7 @@ export function PlatformAffiliationSection() {
         <span className="text-[11px] font-bold uppercase tracking-widest text-brand-primary block mb-1">
           EXPANSIÓN COMERCIAL B2B
         </span>
-        <h2 className="text-3xl sm:text-4xl font-black text-neutral-950 uppercase tracking-tight font-display">
+        <h2 className="text-3xl sm:text-4xl font-black text-text-strong uppercase tracking-tight font-display">
           INTEGRA TU RESTAURANTE A LA PLATAFORMA
         </h2>
       </div>
@@ -44,9 +44,9 @@ export function PlatformAffiliationSection() {
             </p>
           </div>
 
-          <div className="bg-white border border-neutral-200/90 rounded-3xl p-4 shadow-xs divide-y divide-neutral-100 text-xs">
+          <div className="bg-surface-card border border-surface-border rounded-3xl p-4 shadow-xs divide-y divide-surface-border text-xs">
             <div className="py-2.5 flex items-center justify-between">
-              <span className="font-bold uppercase tracking-wider text-neutral-800 font-display">
+              <span className="font-bold uppercase tracking-wider text-text-strong font-display">
                 AISLAMIENTO EN BASE DE DATOS
               </span>
               <span className="font-mono text-[11px] font-bold text-brand-primary">
@@ -54,15 +54,15 @@ export function PlatformAffiliationSection() {
               </span>
             </div>
             <div className="py-2.5 flex items-center justify-between">
-              <span className="font-bold uppercase tracking-wider text-neutral-800 font-display">
+              <span className="font-bold uppercase tracking-wider text-text-strong font-display">
                 PLANTILLAS Y DISEÑO A MEDIDA
               </span>
-              <span className="font-mono text-[11px] font-bold text-neutral-900">
+              <span className="font-mono text-[11px] font-bold text-text-strong">
                 100% Libre
               </span>
             </div>
             <div className="py-2.5 flex items-center justify-between">
-              <span className="font-bold uppercase tracking-wider text-neutral-800 font-display">
+              <span className="font-bold uppercase tracking-wider text-text-strong font-display">
                 ALTA INMEDIATA DESDE CONSOLA
               </span>
               <Link
@@ -75,13 +75,13 @@ export function PlatformAffiliationSection() {
           </div>
         </div>
 
-        <div className="lg:col-span-8 bg-white border border-neutral-200/90 rounded-3xl p-8 sm:p-12 shadow-sm">
+        <div className="lg:col-span-8 bg-surface-card border border-surface-border rounded-3xl p-8 sm:p-12 shadow-sm">
           {leadSubmitted ? (
             <div className="py-8 text-center space-y-4">
-              <h3 className="text-2xl font-black uppercase tracking-tight text-neutral-950 font-display">
+              <h3 className="text-2xl font-black uppercase tracking-tight text-text-strong font-display">
                 SOLICITUD REGISTRADA CORRECTAMENTE
               </h3>
-              <p className="text-xs sm:text-sm text-neutral-600 max-w-md mx-auto">
+              <p className="text-xs sm:text-sm text-text-muted max-w-md mx-auto">
                 También puedes aprovisionar el nuevo restaurante directamente desde la consola de gobernanza multi-marca.
               </p>
               <div className="pt-2">
@@ -95,12 +95,12 @@ export function PlatformAffiliationSection() {
             </div>
           ) : (
             <form onSubmit={handleLeadSubmit} className="space-y-4">
-              <div className="pb-3 border-b border-neutral-100 flex items-center justify-between">
+              <div className="pb-3 border-b border-surface-border flex items-center justify-between">
                 <div>
-                  <h3 className="text-2xl font-black uppercase tracking-tight text-neutral-950 font-display">
+                  <h3 className="text-2xl font-black uppercase tracking-tight text-text-strong font-display">
                     SOLICITAR DEMO O AFILIACIÓN
                   </h3>
-                  <p className="text-xs text-neutral-500 mt-0.5">
+                  <p className="text-xs text-text-muted mt-0.5">
                     Registra los datos de tu establecimiento para configurar tu tienda en la plataforma.
                   </p>
                 </div>
@@ -108,7 +108,7 @@ export function PlatformAffiliationSection() {
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div className="sm:col-span-2">
-                  <label className="block text-[11px] font-bold uppercase tracking-wider text-neutral-700 mb-1.5">
+                  <label className="block text-[11px] font-bold uppercase tracking-wider text-text-muted mb-1.5">
                     NOMBRE COMERCIAL DEL ESTABLECIMIENTO
                   </label>
                   <input
@@ -119,12 +119,12 @@ export function PlatformAffiliationSection() {
                     onChange={(e) =>
                       setLeadForm({ ...leadForm, businessName: e.target.value })
                     }
-                    className="w-full bg-neutral-50 border border-neutral-200 rounded-xl min-h-[48px] px-4 py-2.5 text-sm text-neutral-900 focus:outline-none focus:border-brand-primary"
+                    className="w-full bg-surface-canvas border border-surface-border rounded-xl min-h-[48px] px-4 py-2.5 text-sm text-text-strong focus:outline-none focus:border-brand-primary focus:bg-surface-card transition-colors placeholder:text-text-muted"
                   />
                 </div>
 
                 <div>
-                  <label className="block text-[11px] font-bold uppercase tracking-wider text-neutral-700 mb-1.5">
+                  <label className="block text-[11px] font-bold uppercase tracking-wider text-text-muted mb-1.5">
                     PERSONA DE CONTACTO
                   </label>
                   <input
@@ -135,12 +135,12 @@ export function PlatformAffiliationSection() {
                     onChange={(e) =>
                       setLeadForm({ ...leadForm, contactName: e.target.value })
                     }
-                    className="w-full bg-neutral-50 border border-neutral-200 rounded-xl min-h-[48px] px-4 py-2.5 text-sm text-neutral-900 focus:outline-none focus:border-brand-primary"
+                    className="w-full bg-surface-canvas border border-surface-border rounded-xl min-h-[48px] px-4 py-2.5 text-sm text-text-strong focus:outline-none focus:border-brand-primary focus:bg-surface-card transition-colors placeholder:text-text-muted"
                   />
                 </div>
 
                 <div>
-                  <label className="block text-[11px] font-bold uppercase tracking-wider text-neutral-700 mb-1.5">
+                  <label className="block text-[11px] font-bold uppercase tracking-wider text-text-muted mb-1.5">
                     TELÉFONO / WHATSAPP
                   </label>
                   <input
@@ -151,7 +151,7 @@ export function PlatformAffiliationSection() {
                     onChange={(e) =>
                       setLeadForm({ ...leadForm, phone: e.target.value })
                     }
-                    className="w-full bg-neutral-50 border border-neutral-200 rounded-xl min-h-[48px] px-4 py-2.5 text-sm text-neutral-900 font-mono focus:outline-none focus:border-brand-primary"
+                    className="w-full bg-surface-canvas border border-surface-border rounded-xl min-h-[48px] px-4 py-2.5 text-sm text-text-strong font-mono focus:outline-none focus:border-brand-primary focus:bg-surface-card transition-colors placeholder:text-text-muted"
                   />
                 </div>
               </div>
@@ -171,4 +171,3 @@ export function PlatformAffiliationSection() {
     </section>
   );
 }
-

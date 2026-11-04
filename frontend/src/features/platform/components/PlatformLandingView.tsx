@@ -19,8 +19,8 @@ export function PlatformLandingView() {
   const tenants = data?.tenants ?? [];
 
   return (
-    <div className="w-full pb-16 space-y-14 bg-surface-canvas">
-      {/* 1. Hero Panorámico a Ancho Completo (Principio Canónico 4.2 de delivery-estilos) */}
+    <div className="w-full pb-16 space-y-14 bg-surface-canvas transition-colors duration-200">
+      {/* 1. Hero Panorámico a Ancho Completo */}
       <section className="relative overflow-hidden w-full min-h-[480px] sm:min-h-[530px] md:min-h-[580px] bg-neutral-950 text-white shadow-xl flex items-center py-14 sm:py-18 px-6 sm:px-12 md:px-16 lg:px-20">
         <div className="absolute inset-0 z-0">
           <Image
@@ -40,7 +40,7 @@ export function PlatformLandingView() {
             <span>ECOSISTEMA GASTRONÓMICO MULTI-MARCA</span>
           </div>
 
-          <h1 className="text-4xl sm:text-6xl md:text-7xl font-black uppercase tracking-tight leading-none text-white drop-shadow-md font-display">
+          <h1 className="text-4xl sm:6xl md:text-7xl font-black uppercase tracking-tight leading-none text-white drop-shadow-md font-display">
             PEDIDOS DIRECTOS A TU RESTAURANTE FAVORITO
           </h1>
 
@@ -69,10 +69,10 @@ export function PlatformLandingView() {
       </section>
 
       <div className="w-full px-4 sm:px-8 lg:px-12 space-y-14">
-        {/* 2. Selector Rápido de Acción en Plataforma (Principio Canónico 4.3 de delivery-estilos) */}
+        {/* 2. Selector Rápido de Acción en Plataforma */}
         <section className="w-full text-center py-2">
           <div className="max-w-[760px] mx-auto space-y-4">
-            <h2 className="text-2xl sm:text-3xl font-black uppercase tracking-wide text-neutral-900 font-display">
+            <h2 className="text-2xl sm:text-3xl font-black uppercase tracking-wide text-text-strong font-display">
               ¿QUÉ TE GUSTARÍA HACER HOY?
             </h2>
 
@@ -94,43 +94,43 @@ export function PlatformLandingView() {
 
               <Link
                 href="/superadmin"
-                className="group relative overflow-hidden py-5 px-5 sm:py-6 sm:px-6 rounded-2xl sm:rounded-3xl flex items-center justify-between text-left transition-all active:scale-95 bg-neutral-950 hover:bg-neutral-900 text-white shadow-lg"
+                className="group relative overflow-hidden py-5 px-5 sm:py-6 sm:px-6 rounded-2xl sm:rounded-3xl flex items-center justify-between text-left transition-all active:scale-95 bg-surface-card hover:bg-surface-card-hover text-text-strong border border-surface-border shadow-lg"
               >
                 <div>
-                  <span className="text-xs font-bold tracking-wider uppercase text-amber-400 block leading-tight">
+                  <span className="text-xs font-bold tracking-wider uppercase text-brand-accent block leading-tight">
                     CONSOLA MULTI-TENANT
                   </span>
-                  <span className="text-lg sm:text-2xl font-black uppercase tracking-tight block leading-tight text-white font-display mt-0.5">
+                  <span className="text-lg sm:text-2xl font-black uppercase tracking-tight block leading-tight text-text-strong font-display mt-0.5">
                     GESTIONAR ESTABLECIMIENTOS
                   </span>
                 </div>
-                <ArrowRight className="w-5 h-5 text-white shrink-0 group-hover:translate-x-1 transition-transform" />
+                <ArrowRight className="w-5 h-5 text-text-strong shrink-0 group-hover:translate-x-1 transition-transform" />
               </Link>
             </div>
           </div>
         </section>
 
-        {/* 3. Directorio de Establecimientos Afiliados con Anatomía de ProductCard (Principio Canónico 4.5 y 4.6) */}
+        {/* 3. Directorio de Establecimientos Afiliados */}
         <section
           id="restaurantes"
           className="max-w-[1240px] mx-auto space-y-6 scroll-mt-24 w-full"
         >
-          <div className="flex flex-col sm:flex-row sm:items-end justify-between pb-3 border-b border-neutral-200 gap-3">
+          <div className="flex flex-col sm:flex-row sm:items-end justify-between pb-3 border-b border-surface-border gap-3">
             <div>
               <span className="text-[11px] font-bold uppercase tracking-widest text-brand-primary block mb-1">
                 DIRECTORIO OFICIAL MULTI-TENANT
               </span>
-              <h2 className="text-3xl sm:text-4xl font-black text-neutral-950 uppercase tracking-wide font-display">
+              <h2 className="text-3xl sm:text-4xl font-black text-text-strong uppercase tracking-wide font-display">
                 ESTABLECIMIENTOS AFILIADOS ({tenants.length})
               </h2>
-              <p className="text-xs sm:text-sm text-neutral-600 mt-0.5">
+              <p className="text-xs sm:text-sm text-text-muted mt-0.5">
                 Cada restaurante opera su propio menú en línea, precios, promociones, sucursales y cocina en tiempo real
               </p>
             </div>
 
             <Link
               href="/superadmin"
-              className="inline-flex items-center justify-center bg-white hover:bg-neutral-50 text-neutral-900 border border-neutral-300 text-xs font-black uppercase tracking-wider font-display px-5 py-2.5 rounded-full transition-colors shrink-0"
+              className="inline-flex items-center justify-center bg-surface-card hover:bg-surface-canvas text-text-strong border border-surface-border text-xs font-black uppercase tracking-wider font-display px-5 py-2.5 rounded-full transition-colors shrink-0"
             >
               + AFILIAR NUEVO LOCAL
             </Link>
@@ -145,11 +145,11 @@ export function PlatformLandingView() {
               return (
                 <article
                   key={t.slug}
-                  className="group relative flex flex-col justify-between bg-white rounded-3xl border border-neutral-200 overflow-hidden shadow-sm hover:shadow-xl hover:border-neutral-300 transition-all duration-300"
+                  className="group relative flex flex-col justify-between bg-surface-card rounded-3xl border border-surface-border overflow-hidden shadow-xs hover:shadow-xl hover:border-brand-primary/40 transition-all duration-300"
                 >
                   <div>
-                    {/* Cabecera Fotográfica con Badges Flotantes (Backdrop Blur) */}
-                    <div className="relative w-full aspect-[16/10] bg-neutral-100 overflow-hidden">
+                    {/* Cabecera Fotográfica con Badges Flotantes */}
+                    <div className="relative w-full aspect-[16/10] bg-surface-canvas overflow-hidden">
                       <Image
                         src={coverImage}
                         alt={t.name}
@@ -178,7 +178,7 @@ export function PlatformLandingView() {
                     {/* Información del Establecimiento */}
                     <div className="p-5 sm:p-6 space-y-2">
                       <div className="flex items-center gap-2.5">
-                        <div className="relative w-7 h-7 rounded-lg bg-neutral-50 border border-neutral-200 p-0.5 shrink-0 overflow-hidden">
+                        <div className="relative w-7 h-7 rounded-lg bg-surface-canvas border border-surface-border p-0.5 shrink-0 overflow-hidden">
                           <Image
                             src={t.logoUrl || "/images/shared/placeholders/logo-default.png"}
                             alt={`Logo ${t.name}`}
@@ -187,16 +187,16 @@ export function PlatformLandingView() {
                             className="w-full h-full object-contain"
                           />
                         </div>
-                        <h3 className="text-xl font-black text-neutral-900 group-hover:text-brand-primary transition-colors uppercase tracking-tight leading-tight font-display">
+                        <h3 className="text-xl font-black text-text-strong group-hover:text-brand-primary transition-colors uppercase tracking-tight leading-tight font-display">
                           {t.name}
                         </h3>
                       </div>
 
-                      <p className="text-xs text-neutral-600 line-clamp-2 leading-relaxed">
+                      <p className="text-xs text-text-muted line-clamp-2 leading-relaxed">
                         {t.description}
                       </p>
 
-                      <p className="text-[11px] text-neutral-500 font-medium flex items-center gap-1 pt-1 truncate">
+                      <p className="text-[11px] text-text-muted font-medium flex items-center gap-1 pt-1 truncate">
                         <MapPin className="w-3.5 h-3.5 text-brand-primary shrink-0" />
                         <span className="truncate">{t.primaryBranchAddress}</span>
                       </p>
@@ -204,12 +204,12 @@ export function PlatformLandingView() {
                   </div>
 
                   {/* Fila Inferior de Tarifa Base y Acción Comercial */}
-                  <div className="px-5 pb-5 sm:px-6 sm:pb-6 pt-3 border-t border-neutral-100 flex items-center justify-between mt-auto">
+                  <div className="px-5 pb-5 sm:px-6 sm:pb-6 pt-3 border-t border-surface-border flex items-center justify-between mt-auto">
                     <div>
-                      <span className="text-[10px] text-neutral-500 block uppercase font-bold tracking-wider">
+                      <span className="text-[10px] text-text-muted block uppercase font-bold tracking-wider">
                         ENVÍO BASE
                       </span>
-                      <span className="text-2xl font-black text-neutral-950 tracking-tight tabular-nums font-mono">
+                      <span className="text-2xl font-black text-text-strong tracking-tight tabular-nums font-mono">
                         ${t.baseDeliveryFee.toFixed(2).replace(".", ",")}
                       </span>
                     </div>
@@ -229,7 +229,7 @@ export function PlatformLandingView() {
           </div>
         </section>
 
-        {/* 4. Banners de Arquitectura Operativa a 2 Columnas (Principio Canónico 4.4 de delivery-estilos) */}
+        {/* 4. Banners de Arquitectura Operativa a 2 Columnas */}
         <section className="w-full py-2">
           <div className="max-w-[1240px] mx-auto grid grid-cols-1 md:grid-cols-2 gap-5 sm:gap-6">
             <div className="relative overflow-hidden rounded-3xl p-6 sm:p-8 flex flex-col justify-between text-white shadow-lg min-h-[280px] sm:min-h-[320px] group bg-neutral-950 border border-white/20">
@@ -300,7 +300,7 @@ export function PlatformLandingView() {
           </div>
         </section>
 
-        {/* 5. Portal de Afiliación en Cuadrícula Asimétrica 4/8 */}
+        {/* 5. Portal de Afiliación */}
         <PlatformAffiliationSection />
       </div>
     </div>

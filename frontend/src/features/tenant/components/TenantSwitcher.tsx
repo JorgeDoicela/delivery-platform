@@ -3,7 +3,7 @@
 import React, { useState, useRef, useEffect } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { ChevronDown } from "lucide-react";
+import { ChevronDown, Check, ArrowRight } from "lucide-react";
 import {
   useCurrentTenantQuery,
   usePublicTenantsQuery,
@@ -11,10 +11,10 @@ import {
 import { useTenantStore } from "../store/useTenantStore";
 
 interface TenantSwitcherProps {
-  variant?: "light" | "dark";
+  variant?: "light" | "dark" | "auto";
 }
 
-export function TenantSwitcher({ variant = "dark" }: TenantSwitcherProps) {
+export function TenantSwitcher({ variant = "auto" }: TenantSwitcherProps) {
   const router = useRouter();
   const [isOpen, setIsOpen] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
@@ -25,7 +25,6 @@ export function TenantSwitcher({ variant = "dark" }: TenantSwitcherProps) {
   const { data: publicTenantsData } = usePublicTenantsQuery();
 
   const tenants = publicTenantsData?.tenants ?? [];
-  const isDark = variant === "dark";
 
   useEffect(() => {
     function handleOutsideClick(event: MouseEvent) {
@@ -48,6 +47,21 @@ export function TenantSwitcher({ variant = "dark" }: TenantSwitcherProps) {
     router.push(`/${slug}`);
   };
 
+  const isExplicitDark = variant === "dark";
+  const isExplicitLight = variant === "light";
+
+  const buttonClasses = isExplicitDark
+    ? "flex items-center gap-2 px-3.5 py-1.5 rounded-full border border-surface-dark-border bg-surface-dark-hover hover:bg-surface-dark-hover/80 text-white transition-all text-xs font-bold active:scale-95 cursor-pointer"
+    : isExplicitLight
+    ? "flex items-center gap-2 px-3.5 py-1.5 rounded-full border border-neutral-200 bg-neutral-50 hover:bg-neutral-100 text-neutral-800 transition-all text-xs font-bold shadow-2xs active:scale-95 cursor-pointer"
+    : "flex items-center gap-2 px-3.5 py-1.5 rounded-full border border-surface-border bg-surface-canvas hover:bg-surface-card-hover text-text-strong transition-all text-xs font-bold shadow-2xs active:scale-95 cursor-pointer";
+
+  const dropdownClasses = isExplicitDark
+    ? "bg-surface-dark-card border-surface-dark-border text-white"
+    : isExplicitLight
+    ? "bg-white border-neutral-200 text-neutral-900"
+    : "bg-surface-card border-surface-border text-text-strong";
+
   return (
     <div ref={containerRef} className="relative shrink-0">
       <button
@@ -55,11 +69,7 @@ export function TenantSwitcher({ variant = "dark" }: TenantSwitcherProps) {
         onClick={() => setIsOpen((prev) => !prev)}
         aria-label="Cambiar de restaurante"
         aria-expanded={isOpen}
-        className={
-          isDark
-            ? "flex items-center gap-2 px-3.5 py-1.5 rounded-full border border-surface-dark-border bg-surface-dark-hover hover:bg-surface-dark-hover/80 text-white transition-all text-xs font-bold active:scale-95 cursor-pointer"
-            : "flex items-center gap-2 px-3.5 py-1.5 rounded-full border border-neutral-200 bg-neutral-50 hover:bg-neutral-100 text-neutral-800 transition-all text-xs font-bold shadow-2xs active:scale-95 cursor-pointer"
-        }
+        className={buttonClasses}
       >
         <span
           className="w-2 h-2 rounded-full shrink-0"
@@ -67,45 +77,25 @@ export function TenantSwitcher({ variant = "dark" }: TenantSwitcherProps) {
             backgroundColor: currentTenant?.brandPrimaryColor || "#E4002B",
           }}
         />
-        <span
-          className={`hidden sm:inline text-[10px] uppercase tracking-wider font-semibold ${
-            isDark ? "text-text-inverse-muted" : "text-neutral-500"
-          }`}
-        >
+        <span className="hidden sm:inline text-[10px] uppercase tracking-wider font-semibold text-text-muted">
           Restaurante:
         </span>
-        <span
-          className={`font-display uppercase tracking-wide font-black text-xs max-w-[130px] truncate ${
-            isDark ? "text-white" : "text-neutral-900"
-          }`}
-        >
+        <span className="font-display uppercase tracking-wide font-black text-xs max-w-[130px] truncate text-text-strong">
           {currentTenant?.name || "Seleccionar"}
         </span>
         <ChevronDown
-          className={`w-3.5 h-3.5 transition-transform duration-200 ${
-            isDark ? "text-text-inverse-muted" : "text-neutral-500"
-          } ${isOpen ? "rotate-180" : ""}`}
+          className={`w-3.5 h-3.5 transition-transform duration-200 text-text-muted ${
+            isOpen ? "rotate-180" : ""
+          }`}
         />
       </button>
 
       {isOpen && (
         <div
-          className={`absolute right-0 mt-2 w-80 rounded-3xl border shadow-2xl p-3 z-50 space-y-2 ${
-            isDark
-              ? "bg-surface-dark-card border-surface-dark-border text-white"
-              : "bg-white border-neutral-200 text-neutral-900"
-          }`}
+          className={`absolute right-0 mt-2 w-80 rounded-3xl border shadow-2xl p-3 z-50 space-y-2 ${dropdownClasses}`}
         >
-          <div
-            className={`px-2 pt-1 pb-1.5 border-b flex items-center justify-between ${
-              isDark ? "border-surface-dark-border" : "border-neutral-100"
-            }`}
-          >
-            <span
-              className={`text-[10px] font-bold uppercase tracking-wider ${
-                isDark ? "text-text-inverse-muted" : "text-neutral-500"
-              }`}
-            >
+          <div className="px-2 pt-1 pb-1.5 border-b border-surface-border flex items-center justify-between">
+            <span className="text-[10px] font-bold uppercase tracking-wider text-text-muted">
               Nuestras Marcas & Locales
             </span>
             <Link
@@ -127,69 +117,54 @@ export function TenantSwitcher({ variant = "dark" }: TenantSwitcherProps) {
                   onClick={() => handleSelectTenant(t.slug)}
                   className={`w-full text-left p-2.5 rounded-2xl border transition-all flex items-start gap-3 cursor-pointer ${
                     isSelected
-                      ? isDark
-                        ? "border-brand-primary bg-surface-dark text-white shadow-sm"
-                        : "border-neutral-900 bg-neutral-950 text-white shadow-sm"
-                      : isDark
-                      ? "border-surface-dark-border bg-surface-dark-card hover:bg-surface-dark-hover text-white"
-                      : "border-neutral-200/80 bg-white hover:bg-neutral-50 text-neutral-900"
+                      ? "border-brand-primary bg-brand-primary-light/20 ring-1 ring-brand-primary/30"
+                      : "border-surface-border hover:border-surface-border-subtle bg-surface-canvas hover:bg-surface-card-hover"
                   }`}
                 >
-                  <span
-                    className="w-2.5 h-2.5 rounded-full mt-1 shrink-0"
-                    style={{ backgroundColor: t.brandPrimaryColor }}
-                  />
+                  <div
+                    className="w-8 h-8 rounded-xl flex items-center justify-center shrink-0 text-white font-black text-xs uppercase"
+                    style={{
+                      backgroundColor: t.brandPrimaryColor || "#E4002B",
+                    }}
+                  >
+                    {t.name.slice(0, 2)}
+                  </div>
                   <div className="flex-1 min-w-0">
-                    <div className="flex items-center justify-between gap-2">
-                      <span className="font-display font-black text-sm uppercase tracking-tight truncate">
+                    <div className="flex items-center justify-between gap-1">
+                      <span className="font-bold text-xs uppercase tracking-tight truncate text-text-strong">
                         {t.name}
                       </span>
-                      <span className="text-[10px] font-mono font-bold text-text-inverse-muted">
-                        ${t.baseDeliveryFee.toFixed(2)}
-                      </span>
+                      {isSelected && (
+                        <Check className="w-3.5 h-3.5 text-brand-primary shrink-0" />
+                      )}
                     </div>
-                    <p
-                      className={`text-[11px] font-medium truncate ${
-                        isSelected
-                          ? isDark
-                            ? "text-brand-accent"
-                            : "text-neutral-300"
-                          : isDark
-                          ? "text-text-inverse-muted"
-                          : "text-neutral-500"
-                      }`}
-                    >
-                      {t.tagline} • {t.activeBranchesCount}{" "}
-                      {t.activeBranchesCount === 1 ? "sucursal" : "sucursales"}
-                    </p>
+                    <span className="text-[10px] block truncate text-text-muted">
+                      {t.tagline || t.description}
+                    </span>
+                    <span className="text-[9px] font-mono block mt-0.5 text-text-subtle">
+                      /{t.slug} • {t.activeBranchesCount} local(es)
+                    </span>
                   </div>
                 </button>
               );
             })}
+
+            {tenants.length === 0 && (
+              <div className="py-6 text-center text-xs text-text-muted">
+                No hay otros restaurantes afiliados disponibles.
+              </div>
+            )}
           </div>
 
-          <div
-            className={`pt-2 border-t flex items-center justify-between px-2 ${
-              isDark ? "border-surface-dark-border" : "border-neutral-100"
-            }`}
-          >
+          <div className="pt-2 border-t border-surface-border flex items-center justify-between px-2 text-[11px]">
+            <span className="text-text-muted">Explorar directorio</span>
             <Link
               href="/"
               onClick={() => setIsOpen(false)}
-              className={`text-[11px] font-bold uppercase tracking-wider transition-colors ${
-                isDark
-                  ? "text-text-inverse-muted hover:text-white"
-                  : "text-neutral-600 hover:text-brand-primary"
-              }`}
+              className="text-brand-primary font-bold hover:underline inline-flex items-center gap-1 font-display uppercase tracking-wider"
             >
-              Directorio SaaS
-            </Link>
-            <Link
-              href="/superadmin"
-              onClick={() => setIsOpen(false)}
-              className="text-[11px] font-bold uppercase tracking-wider text-brand-primary hover:underline"
-            >
-              Consola Global
+              <span>Ver todos</span>
+              <ArrowRight className="w-3 h-3" />
             </Link>
           </div>
         </div>
