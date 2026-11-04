@@ -2,8 +2,8 @@
 
 ## 1. Descripcion General y Filosofia Visual
 
-El sistema visual de la plataforma esta concebido bajo estandares de **ingenieria de interfaces premium para fast-food asadero** (estilo KFC y La Granjita), optimizado para dos contextos de operacion opuestos:
-1. **Storefront B2C y Checkout:** Modo claro comercial de alto apetito (`--surface-canvas: #f9fafb`), contraste limpio, tipografia condensada de asador y tarjetas de producto con botones de adicion directa.
+El sistema visual de la plataforma esta concebido bajo estandares de **ingenieria de interfaces premium para gastronomia contemporanea de alta conversion** (pizzerias, hamburgueserias, sushi, asaderos y cocina de autor), con tokens dinamicos por comercio y optimizado para dos contextos de operacion:
+1. **Storefront B2C, Directorio de Plataforma y Checkout:** Modo claro comercial de alto apetito (`--surface-canvas: #f9fafb`), contraste limpio, tipografia display condensada y tarjetas en grid con badges `backdrop-blur`.
 2. **KDS de Cocina y Despacho:** Modo oscuro antirreflejo profundo (`--surface-dark: #09090b`), tarjetas de comanda de alto contraste con semaforo FIFO y legibilidad a distancia sobre terminales tactiles de 1080p.
 
 ---
@@ -100,6 +100,33 @@ export function TenantThemeProvider({ children }: { children: React.ReactNode })
    Scrollbars ultra-delgados con esquinas redondeadas (`scrollbar-width: thin`), sin botones de flechas clasicos de Windows que rompan la estetica moderna.
 3. **Cero Emojis:**
    Toda iconografia operacional y comercial se renderiza vectorialmente mediante iconos sobrios de [`lucide-react`](https://lucide.dev) (ej. `Flame`, `Clock`, `Truck`, `ChefHat`, `ShoppingBag`).
+
+---
+
+## 6. Estructuras Visuales Canonicas del Storefront B2C
+
+La interfaz comercial del cliente esta normalizada bajo cuatro composiciones visuales primarias:
+
+### 6.1. Cabecera Comercial y Hero Panoramico
+* **Cabecera (`StorefrontLayout`):** Altura `h-[70px] sm:h-[76px]`, logotipo dual en `font-display` (`LA GRANJITA ASADERO / ASADERO & LEÑA`), enlaces centrales (`Ordenar`, `Sucursales`, `Rastrear Pedido`, `Personalizar`), conmutador de franquicia con punto pulsante (`TenantSwitcher`), buscador píldora `#f8f7f5` con lupa y bolsa de compras roja con contador reactivo.
+* **Carrusel Hero (`CatalogHero`):** Ancho completo (`w-full`), badge rojo superior (`AHORRO FAMILIAR`), titular gigante condensado (`SUPER COMBO ASADOR / 12 PRESAS`), botones píldora (`ORDENA AQUÍ ->` y `VERIFICAR COBERTURA` con icono de mapa), flechas circulares y paginación con dot activo alargado.
+
+### 6.2. Selector de Modalidad Operativa ("¿Como te gustaria ordenar hoy?")
+* **Selector (`OrderModeSelector`):** Bloque centrado con ancho maximo de 760px, encabezado `¿CÓMO TE GUSTARÍA ORDENAR HOY?` y dos tarjetas grandes en rojo vivo asadero (`bg-brand-primary` con esquinas `rounded-2xl sm:rounded-3xl`):
+  - **A Domicilio:** Icono de motocicleta (`Bike`) en circulo blanco translucido y subtitulo de marca.
+  - **Recoge en Local:** Icono de tienda (`Store`) en circulo blanco translucido y subtitulo de marca.
+  - **Barra Promocional Inferior:** Capsula blanca con borde y porcentaje rojo: `% PROMOCIONES ESPECIALES DE {BRAND}`.
+
+### 6.3. Banners de Especialidad y Vitrina de Catalogo
+* **Banners (`PromotionalBanners`):** Cuadricula de 2 columnas con fotografia gastronomica oscurecida con degradado (`24 HORAS DE MARINADO A FUEGO LENTO` con boton rojo `CONOCE MÁS ->` y `HECHO A LA BRASA` con boton blanco `VER COMBOS ->`).
+* **Catalogo y Filtros:** Eyebrow `ESPECIALIDADES AL CARBÓN`, titulo de seccion y filtros horizontales tipo capsula (`TODOS` en rojo activo, `COMBOS` y `PORCIONES` en blanco con borde).
+* **Tarjetas de Producto (`ProductCard`):** Grid de 3 columnas en blanco puro `rounded-3xl border border-neutral-200`, fotografia con zoom suave, badges flotantes (`COMBOS` en blanco, `PERSONALIZABLE` en negro translucido), titulo en Barlow Condensed mayusculas, descripcion, etiqueta `PRECIO BASE`, importe en `font-mono tabular-nums` y boton pildora rojo `+ PEDIR`.
+
+### 6.4. Pantalla de Perfil y Acceso al Sistema (`/login`)
+* **Miga de Pan y Titular:** `Inicio > Perfil` y encabezado `HOLA, BIENVENIDO/A A {BRAND}` en Barlow Condensed.
+* **Estructura Asimetrica de 2 Columnas:**
+  - **Columna Izquierda:** Tarjeta roja de fidelizacion `PROGRAMA DE CLIENTES / ÚNETE A BENEFICIOS {BRAND}` y menu lateral blanco con iconos limpios (`PEDIDOS & RASTREO`, `CONTACTOS & LOCALES`, `TÉRMINOS Y CONDICIONES`).
+  - **Columna Derecha:** Tarjeta blanca flotante de `INICIAR SESIÓN` con boton `VOLVER`, campos de entrada grises `bg-neutral-50` para correo y contrasena, y boton pildora rojo ancho `ACCEDER AL SISTEMA`.
 
 ---
 

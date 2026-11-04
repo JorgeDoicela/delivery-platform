@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { apiClient, ApiClientError } from './api-client';
+import { apiClient, ApiClientError, getApiClientTenantSlug } from './api-client';
 
 describe('apiClient - RFC 7807 Error Handling', () => {
   beforeEach(() => {
@@ -86,6 +86,33 @@ describe('apiClient - RFC 7807 Error Handling', () => {
         body: JSON.stringify({ productId: 1, isActive: false }),
       })
     );
+  });
+
+  it('correctly appends includeInactive=true when querying complete inventory menu', async () => {
+    const mockMenu = { categories: [], totalProducts: 0 };
+    global.fetch = vi.fn().mockResolvedValue({
+      ok: true,
+      status: 200,
+      json: async () => mockMenu,
+    } as unknown as Response);
+
+    await apiClient.getActiveMenu(true);
+    expect(global.fetch).toHaveBeenCalledWith(
+      expect.stringContaining('/api/catalog/menu?includeInactive=true'),
+      expect.objectContaining({
+        method: 'GET',
+      })
+    );
+  });
+
+  it('resolves tenant slug from dynamic storefront pathname before localStorage', () => {
+    window.localStorage.setItem('delivery_active_tenant_slug', 'la-granjita');
+    window.history.pushState({}, '', '/brasas-del-valle');
+
+    expect(getApiClientTenantSlug()).toBe('brasas-del-valle');
+
+    window.history.pushState({}, '', '/');
+    window.localStorage.setItem('delivery_active_tenant_slug', 'la-granjita');
   });
 });
 

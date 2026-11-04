@@ -22,7 +22,7 @@ export function LoginForm({ redirectUrl, embedded = false }: LoginFormProps) {
   const { data: tenant } = useCurrentTenantQuery();
   const brandName = tenant?.name || "La Granjita";
   const brandTagline = tenant?.tagline || "Asadero";
-  const brandLogo = tenant?.logoUrl || "/images/identidad/logo.png";
+  const brandLogo = tenant?.logoUrl || "/images/shared/placeholders/logo-default.png";
   const [formError, setFormError] = useState<string | null>(null);
 
   const {

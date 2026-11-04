@@ -18,6 +18,7 @@ public sealed record PublicTenantSummaryDto(
     string BrandPrimaryHoverColor,
     string BrandAccentColor,
     decimal BaseDeliveryFee,
+    string? CustomDomain,
     int ActiveBranchesCount,
     string PrimaryBranchAddress
 );
@@ -52,11 +53,12 @@ public sealed class GetPublicTenantsHandler : IHandler<GetPublicTenantsQuery, Re
             t.Name,
             string.IsNullOrWhiteSpace(t.Tagline) ? "Restaurante & Delivery" : t.Tagline,
             t.Description,
-            t.LogoUrl ?? "/images/identidad/logo.png",
+            t.LogoUrl ?? "/images/shared/placeholders/logo-default.png",
             t.BrandPrimaryColor ?? "#E4002B",
             t.BrandPrimaryHoverColor ?? "#C40024",
             t.BrandAccentColor ?? "#F59E0B",
             t.Settings?.BaseDeliveryFee ?? 1.50m,
+            t.Settings?.CustomDomain,
             t.Branches.Count,
             t.Branches.OrderBy(b => b.Id).FirstOrDefault()?.Address ?? "Matriz Principal"
         )).ToList();

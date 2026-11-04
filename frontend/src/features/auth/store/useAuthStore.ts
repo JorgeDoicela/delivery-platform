@@ -10,10 +10,23 @@ import type { LoginFormData } from "../schemas/loginSchema";
 
 const SESSION_STORAGE_KEY = "delivery_has_session";
 
-function normalizeAuthUser(user: AuthUser): AuthUser {
+function normalizeAuthUser(user: AuthUser, forceSyncTenant = false): AuthUser {
   const primaryRole = user.role || user.roles?.[0] || "Customer";
+  const isSuperAdmin =
+    primaryRole === "SuperAdmin" ||
+    Number(primaryRole) === 1 ||
+    user.roles?.includes("SuperAdmin");
+
   if (user.tenantSlug) {
-    setApiClientTenantSlug(user.tenantSlug);
+    const isOperationalPath =
+      typeof window !== "undefined" &&
+      /^\/(cocina|kitchen|admin|repartidor|active-delivery)(\/|$)/i.test(
+        window.location.pathname
+      );
+
+    if (forceSyncTenant || (isOperationalPath && !isSuperAdmin)) {
+      setApiClientTenantSlug(user.tenantSlug);
+    }
   }
   return {
     ...user,
@@ -62,7 +75,7 @@ export const useAuthStore = create<AuthStore>()(
         set({ status: "loading", error: null });
         try {
           const response = await authApi.login(credentials);
-          const normalizedUser = normalizeAuthUser(response.user);
+          const normalizedUser = normalizeAuthUser(response.user, true);
           setApiClientAccessToken(response.accessToken);
 
           if (typeof window !== "undefined") {

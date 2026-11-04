@@ -35,6 +35,7 @@ public partial class AppDbContext
             ts.ToTable("TenantSettings");
             ts.HasKey(x => x.Id);
             ts.Property(x => x.CustomDomain).HasMaxLength(150);
+            ts.HasIndex(x => x.CustomDomain).IsUnique().HasFilter("\"CustomDomain\" IS NOT NULL");
             ts.Property(x => x.CurrencyCode).HasMaxLength(3).IsRequired();
             ts.Property(x => x.SriEnvironment).HasMaxLength(20).IsRequired();
             ts.Property(x => x.SriCertificatePath).HasMaxLength(500);

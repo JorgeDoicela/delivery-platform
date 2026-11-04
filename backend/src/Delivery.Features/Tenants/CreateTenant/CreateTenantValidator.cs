@@ -49,6 +49,11 @@ public sealed class CreateTenantValidator : AbstractValidator<CreateTenantComman
             .NotEmpty().WithMessage("La dirección de la sucursal matriz es obligatoria.")
             .MaximumLength(250);
 
+        RuleFor(x => x.CustomDomain)
+            .Matches(@"^[a-z0-9]+([\-\.]{1}[a-z0-9]+)*\.[a-z]{2,5}(:[0-9]{1,5})?$")
+            .When(x => !string.IsNullOrWhiteSpace(x.CustomDomain))
+            .WithMessage("El formato del dominio personalizado no es válido (ej. pedidos.elrestaurante.com).");
+
         RuleFor(x => x.AdminFullName)
             .NotEmpty().WithMessage("El nombre del administrador del comercio es obligatorio.")
             .MaximumLength(120);

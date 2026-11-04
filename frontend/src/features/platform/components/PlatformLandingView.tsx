@@ -1,343 +1,308 @@
 "use client";
 
-import React, { useState } from "react";
+import React from "react";
 import Link from "next/link";
-import {
-  Flame,
-  ArrowRight,
-  ShieldCheck,
-  CheckCircle2,
-  Store,
-  MapPin,
-  UtensilsCrossed,
-  MessageSquare,
-} from "lucide-react";
+import Image from "next/image";
+import { ArrowRight, MapPin } from "lucide-react";
 import { usePublicTenantsQuery } from "@/features/tenant";
 import { useTenantStore } from "@/features/tenant/store/useTenantStore";
+import { PlatformAffiliationSection } from "./PlatformAffiliationSection";
+
+const TENANT_COVER_IMAGES: Record<string, string> = {
+  "la-granjita": "/images/tenants/la-granjita/banners/hero-combo-familiar.jpg",
+  "brasas-del-valle": "/images/tenants/brasas-del-valle/banners/promo-hecho-a-la-brasa.jpg",
+};
 
 export function PlatformLandingView() {
   const { data } = usePublicTenantsQuery();
   const setTenantSlug = useTenantStore((s) => s.setTenantSlug);
   const tenants = data?.tenants ?? [];
 
-  const [leadForm, setLeadForm] = useState({
-    businessName: "",
-    contactName: "",
-    phone: "",
-    city: "Quito",
-    restaurantType: "Asadero de Pollos",
-  });
-  const [leadSubmitted, setLeadSubmitted] = useState(false);
-
-  const handleLeadSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    setLeadSubmitted(true);
-  };
-
   return (
-    <div className="w-full space-y-20 pb-20">
-      {/* 1. Hero Institucional SaaS B2B */}
-      <section className="relative overflow-hidden bg-neutral-950 text-white py-20 sm:py-28 px-4 sm:px-8 border-b border-white/10">
-        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-amber-950/40 via-neutral-950 to-neutral-950 -z-10" />
+    <div className="w-full pb-16 space-y-14 bg-surface-canvas">
+      {/* 1. Hero Panorámico a Ancho Completo (Principio Canónico 4.2 de delivery-estilos) */}
+      <section className="relative overflow-hidden w-full min-h-[480px] sm:min-h-[530px] md:min-h-[580px] bg-neutral-950 text-white shadow-xl flex items-center py-14 sm:py-18 px-6 sm:px-12 md:px-16 lg:px-20">
+        <div className="absolute inset-0 z-0">
+          <Image
+            src="/images/platform/hero-platform.jpg"
+            alt="Ecosistema de Restaurantes y Delivery en Línea"
+            fill
+            priority
+            sizes="100vw"
+            className="object-cover object-center md:object-right"
+          />
+          <div className="absolute inset-0 bg-gradient-to-r from-black/95 via-black/75 to-transparent sm:from-black/90 sm:via-black/60 md:to-black/25" />
+          <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-black/30" />
+        </div>
 
-        <div className="max-w-5xl mx-auto text-center space-y-6">
-          <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-white/5 border border-white/15 text-amber-400 text-xs font-bold uppercase tracking-widest backdrop-blur-md">
-            <Flame className="w-4 h-4 text-brand-primary" />
-            <span>Infraestructura Gastronómica para Asaderos & Parrillas</span>
+        <div className="relative z-10 w-full max-w-2xl space-y-6">
+          <div className="inline-flex items-center bg-brand-primary text-white px-3.5 py-1 rounded-full text-xs font-bold uppercase tracking-wider shadow-md">
+            <span>ECOSISTEMA GASTRONÓMICO MULTI-MARCA</span>
           </div>
 
-          <h1 className="text-4xl sm:text-6xl md:text-7xl font-black uppercase tracking-tight leading-none font-display">
-            La Plataforma de Pedidos & Cocina que tu Asadero Necesita
+          <h1 className="text-4xl sm:text-6xl md:text-7xl font-black uppercase tracking-tight leading-none text-white drop-shadow-md font-display">
+            PEDIDOS DIRECTOS A TU RESTAURANTE FAVORITO
           </h1>
 
-          <p className="text-neutral-300 text-sm sm:text-lg max-w-3xl mx-auto leading-relaxed font-sans">
-            Menú web propio sin intermediarios, pantallas táctiles KDS en cocina en tiempo real, geocercas satelitales PostGIS y facturación electrónica SRI unificada.
+          <p className="text-white/90 text-sm sm:text-base leading-relaxed font-medium drop-shadow max-w-xl">
+            Selecciona tu restaurante o franquicia favorita, verifica cobertura satelital exacta y recibe tu orden recién preparada en casa o recógela en el local.
           </p>
 
-          <div className="flex flex-wrap items-center justify-center gap-4 pt-4">
+          <div className="flex flex-wrap items-center gap-4 pt-2">
             <a
               href="#restaurantes"
-              className="px-8 py-4 rounded-full bg-brand-primary hover:bg-brand-primary-hover text-white text-xs font-black uppercase tracking-wider font-display shadow-2xl transition-all hover:scale-105 active:scale-95 inline-flex items-center gap-2"
+              className="inline-flex items-center gap-2 bg-brand-primary hover:bg-brand-primary-hover text-white font-black text-xs sm:text-sm uppercase tracking-wider font-display px-8 py-4 rounded-full shadow-2xl transition-all hover:scale-105 active:scale-95"
             >
-              <span>Ver Restaurantes Afiliados</span>
-              <ArrowRight className="w-4 h-4" />
+              <span>ELEGIR RESTAURANTE</span>
+              <ArrowRight className="w-4 h-4 text-white" />
             </a>
 
             <a
               href="#afiliacion"
-              className="px-8 py-4 rounded-full bg-white/10 hover:bg-white/20 text-white text-xs font-bold uppercase tracking-wider border border-white/20 backdrop-blur-md transition-all inline-flex items-center gap-2"
+              className="inline-flex items-center gap-2 bg-black/40 hover:bg-black/60 text-white font-bold text-xs uppercase tracking-wider px-6 py-4 rounded-full border border-white/30 transition-all backdrop-blur-md shadow-md active:scale-95"
             >
-              <MessageSquare className="w-4 h-4 text-amber-300" />
-              <span>Solicitar Demo para mi Negocio</span>
+              <MapPin className="w-4 h-4 text-amber-300" />
+              <span>AFILIAR MI RESTAURANTE</span>
             </a>
           </div>
-
-          <div className="pt-8 grid grid-cols-2 sm:grid-cols-4 gap-4 max-w-3xl mx-auto text-left border-t border-white/10 text-xs">
-            <div>
-              <span className="font-mono text-xl sm:text-2xl font-black text-white block">0%</span>
-              <span className="text-neutral-400 text-[11px] leading-tight">Comisiones por pedido</span>
-            </div>
-            <div>
-              <span className="font-mono text-xl sm:text-2xl font-black text-brand-primary block">&lt; 20m</span>
-              <span className="text-neutral-400 text-[11px] leading-tight">Throttling por capacidad</span>
-            </div>
-            <div>
-              <span className="font-mono text-xl sm:text-2xl font-black text-emerald-400 block">PostGIS</span>
-              <span className="text-neutral-400 text-[11px] leading-tight">Geocercas poligonales</span>
-            </div>
-            <div>
-              <span className="font-mono text-xl sm:text-2xl font-black text-amber-400 block">SRI Web</span>
-              <span className="text-neutral-400 text-[11px] leading-tight">Facturación autorizada</span>
-            </div>
-          </div>
         </div>
       </section>
 
-      {/* 2. Vitrina de Restaurantes Afiliados a la Red */}
-      <section id="restaurantes" className="max-w-[1240px] mx-auto px-4 sm:px-8 space-y-8 scroll-mt-24">
-        <div className="text-center space-y-2 max-w-2xl mx-auto">
-          <span className="text-[11px] font-bold uppercase tracking-widest text-brand-primary block">
-            Red de Asadores & Cortes
-          </span>
-          <h2 className="text-3xl sm:text-4xl font-black uppercase tracking-tight text-neutral-950 font-display">
-            Nuestros Restaurantes Afiliados
-          </h2>
-          <p className="text-xs sm:text-sm text-neutral-600">
-            Cada comercio cuenta con su propia identidad visual, catálogo exclusivo y cobertura de entrega satelital. Selecciona una marca para ordenar:
-          </p>
-        </div>
+      <div className="w-full px-4 sm:px-8 lg:px-12 space-y-14">
+        {/* 2. Selector Rápido de Acción en Plataforma (Principio Canónico 4.3 de delivery-estilos) */}
+        <section className="w-full text-center py-2">
+          <div className="max-w-[760px] mx-auto space-y-4">
+            <h2 className="text-2xl sm:text-3xl font-black uppercase tracking-wide text-neutral-900 font-display">
+              ¿QUÉ TE GUSTARÍA HACER HOY?
+            </h2>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-          {tenants.map((t) => (
-            <article
-              key={t.slug}
-              className="bg-white rounded-3xl border border-neutral-200 shadow-sm overflow-hidden flex flex-col justify-between hover:shadow-xl transition-all duration-300 group"
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-5 w-full">
+              <a
+                href="#restaurantes"
+                className="group relative overflow-hidden py-5 px-5 sm:py-6 sm:px-6 rounded-2xl sm:rounded-3xl flex items-center justify-between text-left transition-all active:scale-95 bg-brand-primary hover:bg-brand-primary-hover text-white shadow-lg"
+              >
+                <div>
+                  <span className="text-xs font-bold tracking-wider uppercase text-white/90 block leading-tight">
+                    DIRECTORIO DE TIENDAS
+                  </span>
+                  <span className="text-lg sm:text-2xl font-black uppercase tracking-tight block leading-tight text-white font-display mt-0.5">
+                    PEDIR EN UN RESTAURANTE
+                  </span>
+                </div>
+                <ArrowRight className="w-5 h-5 text-white shrink-0 group-hover:translate-x-1 transition-transform" />
+              </a>
+
+              <Link
+                href="/superadmin"
+                className="group relative overflow-hidden py-5 px-5 sm:py-6 sm:px-6 rounded-2xl sm:rounded-3xl flex items-center justify-between text-left transition-all active:scale-95 bg-neutral-950 hover:bg-neutral-900 text-white shadow-lg"
+              >
+                <div>
+                  <span className="text-xs font-bold tracking-wider uppercase text-amber-400 block leading-tight">
+                    CONSOLA MULTI-TENANT
+                  </span>
+                  <span className="text-lg sm:text-2xl font-black uppercase tracking-tight block leading-tight text-white font-display mt-0.5">
+                    GESTIONAR ESTABLECIMIENTOS
+                  </span>
+                </div>
+                <ArrowRight className="w-5 h-5 text-white shrink-0 group-hover:translate-x-1 transition-transform" />
+              </Link>
+            </div>
+          </div>
+        </section>
+
+        {/* 3. Directorio de Establecimientos Afiliados con Anatomía de ProductCard (Principio Canónico 4.5 y 4.6) */}
+        <section
+          id="restaurantes"
+          className="max-w-[1240px] mx-auto space-y-6 scroll-mt-24 w-full"
+        >
+          <div className="flex flex-col sm:flex-row sm:items-end justify-between pb-3 border-b border-neutral-200 gap-3">
+            <div>
+              <span className="text-[11px] font-bold uppercase tracking-widest text-brand-primary block mb-1">
+                DIRECTORIO OFICIAL MULTI-TENANT
+              </span>
+              <h2 className="text-3xl sm:text-4xl font-black text-neutral-950 uppercase tracking-wide font-display">
+                ESTABLECIMIENTOS AFILIADOS ({tenants.length})
+              </h2>
+              <p className="text-xs sm:text-sm text-neutral-600 mt-0.5">
+                Cada restaurante opera su propio menú en línea, precios, promociones, sucursales y cocina en tiempo real
+              </p>
+            </div>
+
+            <Link
+              href="/superadmin"
+              className="inline-flex items-center justify-center bg-white hover:bg-neutral-50 text-neutral-900 border border-neutral-300 text-xs font-black uppercase tracking-wider font-display px-5 py-2.5 rounded-full transition-colors shrink-0"
             >
-              <div>
-                <div
-                  className="h-3 w-full"
-                  style={{ backgroundColor: t.brandPrimaryColor }}
-                />
-                <div className="p-6 sm:p-8 space-y-4">
-                  <div className="flex items-start justify-between gap-4">
-                    <div className="flex items-center gap-3">
-                      <span
-                        className="w-12 h-12 rounded-2xl flex items-center justify-center text-white font-black text-base shadow-sm shrink-0"
+              + AFILIAR NUEVO LOCAL
+            </Link>
+          </div>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-7">
+            {tenants.map((t) => {
+              const coverImage =
+                TENANT_COVER_IMAGES[t.slug] ||
+                "/images/shared/placeholders/dish-default.webp";
+
+              return (
+                <article
+                  key={t.slug}
+                  className="group relative flex flex-col justify-between bg-white rounded-3xl border border-neutral-200 overflow-hidden shadow-sm hover:shadow-xl hover:border-neutral-300 transition-all duration-300"
+                >
+                  <div>
+                    {/* Cabecera Fotográfica con Badges Flotantes (Backdrop Blur) */}
+                    <div className="relative w-full aspect-[16/10] bg-neutral-100 overflow-hidden">
+                      <Image
+                        src={coverImage}
+                        alt={t.name}
+                        fill
+                        sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
+                        className="object-cover object-center group-hover:scale-105 transition-transform duration-500 ease-out"
+                      />
+                      <div className="absolute inset-0 bg-gradient-to-t from-black/65 via-transparent to-transparent" />
+
+                      <div className="absolute top-3 left-3 right-3 flex items-center justify-between gap-2 z-10">
+                        <span className="text-[10px] font-bold uppercase tracking-wider text-neutral-900 bg-white/95 backdrop-blur-md px-3 py-1 rounded-full shadow-sm">
+                          {t.tagline}
+                        </span>
+                        <span className="text-[10px] font-bold uppercase tracking-wider text-white bg-black/65 backdrop-blur-md px-2.5 py-1 rounded-full shadow-sm">
+                          {t.activeBranchesCount}{" "}
+                          {t.activeBranchesCount === 1 ? "SUCURSAL" : "SUCURSALES"}
+                        </span>
+                      </div>
+
+                      <div
+                        className="absolute bottom-0 left-0 right-0 h-1.5"
                         style={{ backgroundColor: t.brandPrimaryColor }}
-                      >
-                        <Store className="w-6 h-6" />
-                      </span>
-                      <div>
-                        <h3 className="text-2xl font-black uppercase tracking-tight text-neutral-950 font-display group-hover:text-brand-primary transition-colors">
+                      />
+                    </div>
+
+                    {/* Información del Establecimiento */}
+                    <div className="p-5 sm:p-6 space-y-2">
+                      <div className="flex items-center gap-2.5">
+                        <div className="relative w-7 h-7 rounded-lg bg-neutral-50 border border-neutral-200 p-0.5 shrink-0 overflow-hidden">
+                          <Image
+                            src={t.logoUrl || "/images/shared/placeholders/logo-default.png"}
+                            alt={`Logo ${t.name}`}
+                            width={28}
+                            height={28}
+                            className="w-full h-full object-contain"
+                          />
+                        </div>
+                        <h3 className="text-xl font-black text-neutral-900 group-hover:text-brand-primary transition-colors uppercase tracking-tight leading-tight font-display">
                           {t.name}
                         </h3>
-                        <p className="text-xs font-bold uppercase tracking-wider text-neutral-500 font-sans">
-                          {t.tagline}
-                        </p>
                       </div>
-                    </div>
 
-                    <span className="text-[11px] font-mono font-bold px-3 py-1 rounded-full bg-emerald-50 text-emerald-800 border border-emerald-200">
-                      Envío ${t.baseDeliveryFee.toFixed(2)}
-                    </span>
-                  </div>
+                      <p className="text-xs text-neutral-600 line-clamp-2 leading-relaxed">
+                        {t.description}
+                      </p>
 
-                  <p className="text-xs text-neutral-600 leading-relaxed min-h-[3rem]">
-                    {t.description}
-                  </p>
-
-                  <div className="bg-neutral-50 rounded-2xl p-4 border border-neutral-200 space-y-2 text-xs text-neutral-600">
-                    <div className="flex items-center gap-2">
-                      <MapPin className="w-4 h-4 text-brand-primary shrink-0" />
-                      <span>{t.primaryBranchAddress}</span>
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <UtensilsCrossed className="w-4 h-4 text-amber-500 shrink-0" />
-                      <span>{t.activeBranchesCount} {t.activeBranchesCount === 1 ? "sucursal con cobertura" : "sucursales con cobertura"} PostGIS</span>
+                      <p className="text-[11px] text-neutral-500 font-medium flex items-center gap-1 pt-1 truncate">
+                        <MapPin className="w-3.5 h-3.5 text-brand-primary shrink-0" />
+                        <span className="truncate">{t.primaryBranchAddress}</span>
+                      </p>
                     </div>
                   </div>
-                </div>
-              </div>
 
-              <div className="p-6 sm:p-8 pt-0">
-                <Link
-                  href={`/${t.slug}`}
-                  onClick={() => setTenantSlug(t.slug)}
-                  className="w-full py-4 rounded-full text-white text-xs font-black uppercase tracking-wider font-display flex items-center justify-center gap-2 shadow-md transition-all active:scale-95 hover:opacity-95"
-                  style={{ backgroundColor: t.brandPrimaryColor }}
-                >
-                  <span>Entrar al Menú de {t.name}</span>
-                  <ArrowRight className="w-4 h-4" />
-                </Link>
-              </div>
-            </article>
-          ))}
-        </div>
-      </section>
+                  {/* Fila Inferior de Tarifa Base y Acción Comercial */}
+                  <div className="px-5 pb-5 sm:px-6 sm:pb-6 pt-3 border-t border-neutral-100 flex items-center justify-between mt-auto">
+                    <div>
+                      <span className="text-[10px] text-neutral-500 block uppercase font-bold tracking-wider">
+                        ENVÍO BASE
+                      </span>
+                      <span className="text-2xl font-black text-neutral-950 tracking-tight tabular-nums font-mono">
+                        ${t.baseDeliveryFee.toFixed(2).replace(".", ",")}
+                      </span>
+                    </div>
 
-      {/* 3. Características Técnicas para Dueños de Restaurantes (B2B Showcase) */}
-      <section className="bg-neutral-900 text-white py-16 px-4 sm:px-8 border-y border-neutral-800">
-        <div className="max-w-[1240px] mx-auto space-y-12">
-          <div className="text-center space-y-2 max-w-2xl mx-auto">
-            <span className="text-[11px] font-bold uppercase tracking-widest text-brand-accent block">
-              Tecnología Propietaria
-            </span>
-            <h2 className="text-3xl sm:text-4xl font-black uppercase tracking-tight text-white font-display">
-              ¿Por qué los mejores asaderos usan esta plataforma?
-            </h2>
+                    <Link
+                      href={`/${t.slug}`}
+                      onClick={() => setTenantSlug(t.slug)}
+                      className="inline-flex items-center justify-center bg-brand-primary hover:bg-brand-primary-hover text-white text-xs font-black uppercase tracking-wider font-display py-3 px-6 rounded-full shadow-md transition-all hover:scale-105 active:scale-95"
+                      style={{ backgroundColor: t.brandPrimaryColor }}
+                    >
+                      <span>VER TIENDA</span>
+                    </Link>
+                  </div>
+                </article>
+              );
+            })}
           </div>
+        </section>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-            <div className="bg-neutral-950 border border-neutral-800 rounded-3xl p-6 space-y-3">
-              <div className="w-10 h-10 rounded-xl bg-brand-primary/20 text-brand-primary flex items-center justify-center font-bold">
-                01
+        {/* 4. Banners de Arquitectura Operativa a 2 Columnas (Principio Canónico 4.4 de delivery-estilos) */}
+        <section className="w-full py-2">
+          <div className="max-w-[1240px] mx-auto grid grid-cols-1 md:grid-cols-2 gap-5 sm:gap-6">
+            <div className="relative overflow-hidden rounded-3xl p-6 sm:p-8 flex flex-col justify-between text-white shadow-lg min-h-[280px] sm:min-h-[320px] group bg-neutral-950 border border-white/20">
+              <div className="absolute inset-0 z-0">
+                <Image
+                  src="/images/tenants/la-granjita/banners/promo-receta-tradicional.jpg"
+                  alt="Personalización Multi-Tenant"
+                  fill
+                  sizes="(max-width: 768px) 100vw, 50vw"
+                  className="object-cover object-center group-hover:scale-105 transition-transform duration-700 ease-out"
+                />
+                <div className="absolute inset-0 bg-gradient-to-r from-black/90 via-black/65 to-black/25" />
+                <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent" />
               </div>
-              <h3 className="text-base font-black uppercase tracking-tight text-white font-display">
-                Terminales KDS en Cocina
-              </h3>
-              <p className="text-xs text-neutral-400 leading-relaxed">
-                Pantallas táctiles sincronizadas por SignalR con alerta sonora continua. Cero comandas perdidas o tickets de papel grasosos.
-              </p>
-            </div>
 
-            <div className="bg-neutral-950 border border-neutral-800 rounded-3xl p-6 space-y-3">
-              <div className="w-10 h-10 rounded-xl bg-amber-500/20 text-amber-400 flex items-center justify-center font-bold">
-                02
-              </div>
-              <h3 className="text-base font-black uppercase tracking-tight text-white font-display">
-                Control de Horno en 20 Min
-              </h3>
-              <p className="text-xs text-neutral-400 leading-relaxed">
-                Throttling inteligente por Redis. Si el asador llega a su capacidad de presas, el sistema extiende el tiempo de entrega automáticamente.
-              </p>
-            </div>
-
-            <div className="bg-neutral-950 border border-neutral-800 rounded-3xl p-6 space-y-3">
-              <div className="w-10 h-10 rounded-xl bg-emerald-500/20 text-emerald-400 flex items-center justify-center font-bold">
-                03
-              </div>
-              <h3 className="text-base font-black uppercase tracking-tight text-white font-display">
-                Geocercas Poligonales
-              </h3>
-              <p className="text-xs text-neutral-400 leading-relaxed">
-                Dibujadas con PostGIS exacto. Solo permites pedidos donde tus motorizados realmente llegan a tiempo y la comida llega caliente.
-              </p>
-            </div>
-
-            <div className="bg-neutral-950 border border-neutral-800 rounded-3xl p-6 space-y-3">
-              <div className="w-10 h-10 rounded-xl bg-blue-500/20 text-blue-400 flex items-center justify-center font-bold">
-                04
-              </div>
-              <h3 className="text-base font-black uppercase tracking-tight text-white font-display">
-                Facturación SRI Integrada
-              </h3>
-              <p className="text-xs text-neutral-400 leading-relaxed">
-                Emisión automática de XML autorizados ante el SRI. Compatible con puntos de emisión por local y esquemas de consumidor final o RUC.
-              </p>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* 4. Módulo de Afiliación B2B y Captación */}
-      <section id="afiliacion" className="max-w-[1000px] mx-auto px-4 sm:px-8 scroll-mt-24">
-        <div className="bg-white border border-neutral-200 rounded-3xl p-8 sm:p-12 shadow-sm grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
-          <div className="lg:col-span-7 space-y-4">
-            <span className="text-[11px] font-bold uppercase tracking-widest text-brand-primary block">
-              Digitaliza tu Asadero Hoy
-            </span>
-            <h2 className="text-3xl sm:text-4xl font-black uppercase tracking-tight text-neutral-950 font-display">
-              ¿Administras un asadero o restaurante de carnes? Te ayudamos.
-            </h2>
-            <p className="text-xs sm:text-sm text-neutral-600 leading-relaxed">
-              Únete a la plataforma y obtén tu propia landing page con tus colores, catálogo de combos, geocercas satelitales y panel de cocina KDS listo para operar en menos de 48 horas.
-            </p>
-
-            <div className="space-y-2 pt-2 text-xs font-semibold text-neutral-800">
-              <div className="flex items-center gap-2">
-                <CheckCircle2 className="w-4 h-4 text-emerald-600" />
-                <span>Puesta en marcha con tu personal de cocina y despacho</span>
-              </div>
-              <div className="flex items-center gap-2">
-                <CheckCircle2 className="w-4 h-4 text-emerald-600" />
-                <span>Cobro directo a tu propia cuenta bancaria sin retenciones</span>
-              </div>
-              <div className="flex items-center gap-2">
-                <CheckCircle2 className="w-4 h-4 text-emerald-600" />
-                <span>Soporte técnico continuo y actualizaciones de software</span>
-              </div>
-            </div>
-          </div>
-
-          <div className="lg:col-span-5 bg-neutral-50 border border-neutral-200 rounded-2xl p-6">
-            {leadSubmitted ? (
-              <div className="text-center space-y-3 py-6">
-                <div className="w-12 h-12 rounded-full bg-emerald-100 text-emerald-600 mx-auto flex items-center justify-center">
-                  <ShieldCheck className="w-6 h-6" />
-                </div>
-                <h3 className="text-base font-black uppercase tracking-tight text-neutral-950 font-display">
-                  Solicitud Recibida
+              <div className="space-y-3 relative z-10 max-w-md sm:max-w-lg">
+                <h3 className="text-2xl sm:text-3xl font-black uppercase tracking-tight leading-tight text-white drop-shadow-md font-display">
+                  IDENTIDAD Y CATÁLOGO INDEPENDIENTE POR MARCA
                 </h3>
-                <p className="text-xs text-neutral-600">
-                  Un asesor de operaciones se contactará al número provisto para coordinar la demostración técnica de la plataforma.
+                <p className="text-xs sm:text-sm text-white/90 leading-relaxed font-medium drop-shadow">
+                  Cada establecimiento configura su logotipo, paleta de colores, fotos de productos, banners promocionales y cuentas bancarias de forma aislada.
                 </p>
               </div>
-            ) : (
-              <form onSubmit={handleLeadSubmit} className="space-y-3.5 text-xs">
-                <div>
-                  <label className="block text-[11px] font-bold uppercase tracking-wider text-neutral-600 mb-1">
-                    Nombre del Restaurante / Asadero
-                  </label>
-                  <input
-                    type="text"
-                    required
-                    placeholder="Ej. Asadero Don Pollo"
-                    value={leadForm.businessName}
-                    onChange={(e) => setLeadForm({ ...leadForm, businessName: e.target.value })}
-                    className="w-full px-3 py-2 rounded-xl border border-neutral-300 bg-white text-neutral-900 focus:outline-none focus:border-brand-primary"
-                  />
-                </div>
 
-                <div>
-                  <label className="block text-[11px] font-bold uppercase tracking-wider text-neutral-600 mb-1">
-                    Tu Nombre y Apellido
-                  </label>
-                  <input
-                    type="text"
-                    required
-                    placeholder="Ej. Roberto Paredes"
-                    value={leadForm.contactName}
-                    onChange={(e) => setLeadForm({ ...leadForm, contactName: e.target.value })}
-                    className="w-full px-3 py-2 rounded-xl border border-neutral-300 bg-white text-neutral-900 focus:outline-none focus:border-brand-primary"
-                  />
-                </div>
-
-                <div>
-                  <label className="block text-[11px] font-bold uppercase tracking-wider text-neutral-600 mb-1">
-                    Teléfono Celular / WhatsApp
-                  </label>
-                  <input
-                    type="tel"
-                    required
-                    placeholder="Ej. 0991234567"
-                    value={leadForm.phone}
-                    onChange={(e) => setLeadForm({ ...leadForm, phone: e.target.value })}
-                    className="w-full px-3 py-2 rounded-xl border border-neutral-300 bg-white text-neutral-900 font-mono focus:outline-none focus:border-brand-primary"
-                  />
-                </div>
-
-                <button
-                  type="submit"
-                  className="w-full py-3.5 rounded-full bg-brand-primary hover:bg-brand-primary-hover text-white text-xs font-black uppercase tracking-wider font-display shadow-md transition-all active:scale-95"
+              <div className="pt-6 relative z-10">
+                <Link
+                  href="/admin/personalizacion"
+                  className="inline-flex items-center gap-2 text-xs font-black uppercase tracking-wider font-display px-6 py-3 rounded-full transition-all shadow-md active:scale-95 hover:scale-105 bg-brand-primary hover:bg-brand-primary-hover text-white"
                 >
-                  Solicitar Afiliación / Demo
-                </button>
-              </form>
-            )}
+                  <span>PERSONALIZAR MARCA</span>
+                  <ArrowRight className="w-3.5 h-3.5" />
+                </Link>
+              </div>
+            </div>
+
+            <div className="relative overflow-hidden rounded-3xl p-6 sm:p-8 flex flex-col justify-between text-white shadow-lg min-h-[280px] sm:min-h-[320px] group bg-neutral-950 border border-white/20">
+              <div className="absolute inset-0 z-0">
+                <Image
+                  src="/images/tenants/la-granjita/banners/promo-hecho-a-la-brasa.jpg"
+                  alt="Cocina KDS y Geocercas PostGIS"
+                  fill
+                  sizes="(max-width: 768px) 100vw, 50vw"
+                  className="object-cover object-center group-hover:scale-105 transition-transform duration-700 ease-out"
+                />
+                <div className="absolute inset-0 bg-gradient-to-r from-black/90 via-black/65 to-black/25" />
+                <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent" />
+              </div>
+
+              <div className="space-y-3 relative z-10 max-w-md sm:max-w-lg">
+                <h3 className="text-2xl sm:text-3xl font-black uppercase tracking-tight leading-tight text-white drop-shadow-md font-display">
+                  TERMINALES KDS EN COCINA Y GEOCERCAS POSTGIS
+                </h3>
+                <p className="text-xs sm:text-sm text-white/90 leading-relaxed font-medium drop-shadow">
+                  Control de capacidad de cocina cada 20 minutos en Redis, recepción de comandas en tiempo real por SignalR y validación espacial de cobertura.
+                </p>
+              </div>
+
+              <div className="pt-6 relative z-10">
+                <Link
+                  href="/cocina"
+                  className="inline-flex items-center gap-2 text-xs font-black uppercase tracking-wider font-display px-6 py-3 rounded-full transition-all shadow-md active:scale-95 hover:scale-105 bg-white hover:bg-neutral-100 text-brand-primary"
+                >
+                  <span>ABRIR TERMINAL KDS</span>
+                  <ArrowRight className="w-3.5 h-3.5" />
+                </Link>
+              </div>
+            </div>
           </div>
-        </div>
-      </section>
+        </section>
+
+        {/* 5. Portal de Afiliación en Cuadrícula Asimétrica 4/8 */}
+        <PlatformAffiliationSection />
+      </div>
     </div>
   );
 }
-

@@ -175,7 +175,7 @@ public static partial class DatabaseSeeder
                     Description = "1 Pollo Asado entero al carbón con guarnición grande, ensalada fresca y porciones de ají artesanal.",
                     BasePrice = 22.00m,
                     TaxRate = 0.00m,
-                    ImageUrl = "/images/menu/combo-familiar.webp",
+                    ImageUrl = "/images/tenants/la-granjita/menu/combo-familiar.webp",
                     Category = "Combos",
                     IsKitchen = true,
                     IsActive = true
@@ -190,7 +190,7 @@ public static partial class DatabaseSeeder
                     Description = "Medio pollo asado al carbón con papas fritas y ensalada.",
                     BasePrice = 11.50m,
                     TaxRate = 0.00m,
-                    ImageUrl = "/images/menu/medio-pollo.webp",
+                    ImageUrl = "/images/tenants/la-granjita/menu/medio-pollo.webp",
                     Category = "Porciones",
                     IsKitchen = true,
                     IsActive = true
@@ -205,7 +205,7 @@ public static partial class DatabaseSeeder
                     Description = "1 presa grande (pechuga o pierna) con papas fritas y ensalada personal.",
                     BasePrice = 6.00m,
                     TaxRate = 0.00m,
-                    ImageUrl = "/images/menu/cuarto-pollo.webp",
+                    ImageUrl = "/images/tenants/la-granjita/menu/cuarto-pollo.webp",
                     Category = "Porciones",
                     IsKitchen = true,
                     IsActive = true

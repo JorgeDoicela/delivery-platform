@@ -5,14 +5,14 @@ import Link from "next/link";
 import Image from "next/image";
 import { ArrowRight, ChevronLeft, ChevronRight, MapPin } from "lucide-react";
 import { useCurrentTenantQuery } from "@/features/tenant";
-import { FALLBACK_TENANT_CONFIGS } from "@/features/tenant/store/useTenantStore";
+import { getFallbackTenantConfig } from "@/features/tenant/store/useTenantStore";
 
 export function CatalogHero() {
   const { data: tenant } = useCurrentTenantQuery();
   const slides =
     tenant?.heroSlides && tenant.heroSlides.length > 0
       ? tenant.heroSlides
-      : FALLBACK_TENANT_CONFIGS["la-granjita"].heroSlides;
+      : getFallbackTenantConfig(tenant?.slug || "la-granjita").heroSlides;
 
   const [currentSlideIndex, setCurrentSlideIndex] = useState(0);
   const [isPaused, setIsPaused] = useState(false);
@@ -65,7 +65,7 @@ export function CatalogHero() {
               }`}
             >
               <Image
-                src={s.imageUrl || "/images/banners/hero-pollo-brasa.jpg"}
+                src={s.imageUrl || "/images/tenants/la-granjita/banners/hero-pollo-brasa.jpg"}
                 alt={s.title}
                 fill
                 priority={idx === 0}

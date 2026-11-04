@@ -6,6 +6,8 @@ import { useQueryClient } from "@tanstack/react-query";
 import { useMenuQuery } from "../hooks/useMenuQuery";
 import { apiClient } from "@/shared/lib/api-client";
 import { formatCurrency } from "@/shared/lib/utils";
+import type { MenuProductDto } from "@/shared/types/api";
+import { ProductFormModal } from "./ProductFormModal";
 import {
   Package,
   CheckCircle2,
@@ -14,13 +16,19 @@ import {
   AlertTriangle,
   RefreshCw,
   Search,
+  Plus,
+  Pencil,
 } from "lucide-react";
 
 export function InventoryManagerView() {
   const queryClient = useQueryClient();
-  const { data, isLoading, isError, refetch } = useMenuQuery();
+  const { data, isLoading, isError, refetch } = useMenuQuery(true);
   const [searchTerm, setSearchTerm] = useState("");
   const [togglingId, setTogglingId] = useState<number | null>(null);
+  const [isProductModalOpen, setIsProductModalOpen] = useState(false);
+  const [editingProduct, setEditingProduct] = useState<
+    (MenuProductDto & { categoryName?: string }) | null
+  >(null);
   const [actionMessage, setActionMessage] = useState<{
     text: string;
     type: "success" | "error";
@@ -110,7 +118,7 @@ export function InventoryManagerView() {
           </p>
         </div>
 
-        <div className="flex items-center gap-3">
+        <div className="flex flex-wrap items-center gap-3">
           <div className="bg-surface-dark-card border border-surface-dark-border px-3.5 py-1.5 rounded-full text-xs font-bold uppercase tracking-wider flex items-center gap-2">
             <span className="w-2 h-2 rounded-full bg-status-success animate-pulse" />
             <span className="text-text-inverse-base">{activeCount} Disponibles</span>
@@ -119,6 +127,17 @@ export function InventoryManagerView() {
             <span className="w-2 h-2 rounded-full bg-status-danger" />
             <span className="text-text-inverse-base">{inactiveCount} Agotados</span>
           </div>
+          <button
+            type="button"
+            onClick={() => {
+              setEditingProduct(null);
+              setIsProductModalOpen(true);
+            }}
+            className="inline-flex items-center gap-1.5 px-4 py-2 rounded-full bg-brand-primary hover:bg-brand-primary-hover text-white text-xs font-black uppercase tracking-wider font-display shadow-md transition-all active:scale-95 cursor-pointer"
+          >
+            <Plus className="w-3.5 h-3.5" />
+            <span>Nuevo Producto</span>
+          </button>
         </div>
       </div>
 
@@ -184,7 +203,7 @@ export function InventoryManagerView() {
                       <div className="flex items-center gap-3">
                         <div className="relative w-10 h-10 rounded-xl overflow-hidden bg-surface-dark shrink-0 border border-surface-dark-border">
                           <Image
-                            src={product.imageUrl || "/images/banners/hero-pollo-brasa.jpg"}
+                            src={product.imageUrl || "/images/shared/placeholders/dish-default.webp"}
                             alt={product.name}
                             fill
                             className="object-cover"
@@ -240,27 +259,41 @@ export function InventoryManagerView() {
                     </td>
 
                     <td className="px-5 py-4 text-right">
-                      <button
-                        type="button"
-                        onClick={() => handleToggleStatus(product.id, product.isActive)}
-                        disabled={isPending}
-                        className={`inline-flex items-center gap-1.5 px-4 py-1.5 rounded-full text-xs font-bold uppercase tracking-wider transition-all active:scale-95 disabled:opacity-50 ${
-                          product.isActive
-                            ? "bg-status-danger/20 hover:bg-status-danger/30 text-status-danger border border-status-danger/40"
-                            : "bg-status-success/20 hover:bg-status-success/30 text-status-success border border-status-success/40"
-                        }`}
-                      >
-                        {isPending ? (
-                          <>
-                            <Loader2 className="w-3.5 h-3.5 animate-spin" />
-                            <span>Actualizando...</span>
-                          </>
-                        ) : product.isActive ? (
-                          <span>Pausar Venta</span>
-                        ) : (
-                          <span>Habilitar</span>
-                        )}
-                      </button>
+                      <div className="inline-flex items-center justify-end gap-2">
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setEditingProduct(product);
+                            setIsProductModalOpen(true);
+                          }}
+                          className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full text-xs font-bold uppercase tracking-wider bg-surface-dark hover:bg-surface-dark-hover text-text-inverse-strong border border-surface-dark-border transition-colors cursor-pointer"
+                        >
+                          <Pencil className="w-3.5 h-3.5 text-brand-accent" />
+                          <span>Editar / Imagen</span>
+                        </button>
+
+                        <button
+                          type="button"
+                          onClick={() => handleToggleStatus(product.id, product.isActive)}
+                          disabled={isPending}
+                          className={`inline-flex items-center gap-1.5 px-4 py-1.5 rounded-full text-xs font-bold uppercase tracking-wider transition-all active:scale-95 disabled:opacity-50 cursor-pointer ${
+                            product.isActive
+                              ? "bg-status-danger/20 hover:bg-status-danger/30 text-status-danger border border-status-danger/40"
+                              : "bg-status-success/20 hover:bg-status-success/30 text-status-success border border-status-success/40"
+                          }`}
+                        >
+                          {isPending ? (
+                            <>
+                              <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                              <span>Actualizando...</span>
+                            </>
+                          ) : product.isActive ? (
+                            <span>Pausar Venta</span>
+                          ) : (
+                            <span>Habilitar</span>
+                          )}
+                        </button>
+                      </div>
                     </td>
                   </tr>
                 );
@@ -269,6 +302,18 @@ export function InventoryManagerView() {
           </table>
         </div>
       </div>
+
+      <ProductFormModal
+        key={editingProduct ? `edit-${editingProduct.id}` : `new-${ isProductModalOpen ? "open" : "closed"}`}
+        isOpen={isProductModalOpen}
+        onClose={() => setIsProductModalOpen(false)}
+        productToEdit={editingProduct}
+        existingCategories={data.categories.map((c) => c.categoryName)}
+        onSaved={async (msg) => {
+          await queryClient.invalidateQueries({ queryKey: ["catalog", "menu"] });
+          setActionMessage({ text: msg, type: "success" });
+        }}
+      />
     </div>
   );
 }

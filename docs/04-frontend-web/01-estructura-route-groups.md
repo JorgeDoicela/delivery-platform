@@ -17,8 +17,9 @@ flowchart TD
     App --> Driver["(driver)/ (Smartphone Repartidores)"]
 
     Storefront --> StoreLayout["Storefront Layout (Header reactivo + Footer + Modales)"]
-    StoreLayout --> Home["/ (Vitrina Principal, Banner, Catalogo #catalogo y Sucursales #sucursales)"]
-    StoreLayout --> TenantSlug["/[slug] (Vitrina Branded Dinamica por Comercio)"]
+    StoreLayout --> Home["/ (Landing Principal de Plataforma Multi-Tenant PlatformLandingView)"]
+    StoreLayout --> TenantSlug["/[slug] (Vitrina Branded Dinamica por Comercio RestaurantStorefrontView)"]
+    StoreLayout --> DomainRouter["_domain_router (Resolucion Transparente para Dominios CustomDomain CNAME)"]
     StoreLayout --> CatalogoRoute["/catalogo (Ruta de catalogo directo)"]
     StoreLayout --> SucursalesRoute["/sucursales (Ruta de mapa y sedes)"]
     StoreLayout --> CheckoutRoute["/checkout y /finalizar-pedido (Resolucion de Geocerca + Formulario)"]
@@ -47,7 +48,8 @@ La plataforma implementa un panel de accesos directos en [`src/app/(storefront)/
 
 | Modulo / Dominio | Ruta Externa (Lleva a Otra Pagina) | Ancla en Misma Pagina | Proposito Operativo |
 | :--- | :--- | :--- | :--- |
-| **Tienda & Clientes** | `/` y `/[slug]` | N/A | Vitrina comercial principal o tienda por marca |
+| **Plataforma Global** | `/` | `#restaurantes`, `#afiliacion` | Portal directorio multimarca y flujo B2B de afiliacion de comercios |
+| **Tienda por Comercio** | `/[slug]` o Dominio Propio | `#catalogo`, `#sucursales` | Vitrina comercial y pedidos en linea del restaurante seleccionado |
 | **Tienda & Clientes** | `/catalogo` | `#catalogo` | Catalogo completo de combos y productos |
 | **Tienda & Clientes** | `/sucursales` | `#sucursales` | Informacion de sedes, horarios y telefonos |
 | **Tienda & Clientes** | `/finalizar-pedido` / `/checkout` | N/A | Flujo de seleccion de direccion y confirmacion |

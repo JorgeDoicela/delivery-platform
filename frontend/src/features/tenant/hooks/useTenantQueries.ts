@@ -16,8 +16,9 @@ import {
   useTenantStore,
 } from "../store/useTenantStore";
 
-export function useCurrentTenantQuery() {
-  const tenantSlug = useTenantStore((s) => s.tenantSlug);
+export function useCurrentTenantQuery(slugOverride?: string) {
+  const storeSlug = useTenantStore((s) => s.tenantSlug);
+  const tenantSlug = (slugOverride?.trim().toLowerCase() || storeSlug);
 
   return useQuery<TenantStorefrontConfigDto>({
     queryKey: ["tenant", "current", tenantSlug],

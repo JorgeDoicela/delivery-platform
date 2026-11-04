@@ -325,6 +325,18 @@ export function PlatformTenantsGovernanceView() {
                         ${tenant.baseDeliveryFee.toFixed(2)}
                       </span>
                     </div>
+
+                    {tenant.customDomain && (
+                      <div className="flex items-center justify-between pt-1 border-t border-surface-dark-border/60">
+                        <span className="text-text-inverse-muted flex items-center gap-1.5">
+                          <Globe className="w-3.5 h-3.5 text-brand-accent" />
+                          <span>Dominio propio:</span>
+                        </span>
+                        <span className="font-mono text-brand-accent font-bold text-[11px] truncate max-w-[190px]">
+                          {tenant.customDomain}
+                        </span>
+                      </div>
+                    )}
                   </div>
                 </div>
               </div>

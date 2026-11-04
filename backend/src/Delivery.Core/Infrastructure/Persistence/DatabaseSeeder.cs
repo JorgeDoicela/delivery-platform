@@ -83,7 +83,7 @@ public static partial class DatabaseSeeder
                 Subtitle = "Pollo entero asado lentamente al carbón vegetal con guarniciones calientes, ensalada fresca y ají artesanal.",
                 CtaText = "ORDENA AQUÍ",
                 CtaHref = "/catalogo",
-                ImageUrl = "/images/banners/hero-pollo-brasa.jpg",
+                ImageUrl = "/images/tenants/la-granjita/banners/hero-pollo-brasa.jpg",
                 DisplayOrder = 1,
                 IsActive = true
             },
@@ -95,7 +95,7 @@ public static partial class DatabaseSeeder
                 Subtitle = "Rinde para 5 a 6 personas. Incluye porción doble de papas fritas rústicas, ensalada grande y gaseosa familiar.",
                 CtaText = "ORDENA AQUÍ",
                 CtaHref = "/catalogo",
-                ImageUrl = "/images/banners/hero-combo-familiar.jpg",
+                ImageUrl = "/images/tenants/la-granjita/banners/hero-combo-familiar.jpg",
                 DisplayOrder = 2,
                 IsActive = true
             },
@@ -107,7 +107,7 @@ public static partial class DatabaseSeeder
                 Subtitle = "Presa dorada y jugosa con papas fritas rústicas artesanales, ensalada fresca, ají criollo y bebida personal.",
                 CtaText = "ORDENA AQUÍ",
                 CtaHref = "/catalogo",
-                ImageUrl = "/images/banners/hero-combo-personal.jpg",
+                ImageUrl = "/images/tenants/la-granjita/banners/hero-combo-personal.jpg",
                 DisplayOrder = 3,
                 IsActive = true
             }
@@ -122,7 +122,7 @@ public static partial class DatabaseSeeder
                 Subtitle = "Nuestra receta tradicional combina especias frescas, ajo asado y limón con cocción lenta sobre leña y carbón vegetal.",
                 CtaText = "Conoce Más",
                 CtaHref = "/catalogo",
-                ImageUrl = "/images/banners/promo-receta-tradicional.jpg",
+                ImageUrl = "/images/tenants/la-granjita/banners/promo-receta-tradicional.jpg",
                 ThemeVariant = "slate",
                 DisplayOrder = 1,
                 IsActive = true
@@ -134,7 +134,7 @@ public static partial class DatabaseSeeder
                 Subtitle = "Cada pollo se asa al momento en nuestros hornos ecológicos de alta temperatura para garantizar piel crujiente y carne jugosa.",
                 CtaText = "Ver Combos",
                 CtaHref = "/catalogo",
-                ImageUrl = "/images/banners/promo-hecho-a-la-brasa.jpg",
+                ImageUrl = "/images/tenants/la-granjita/banners/promo-hecho-a-la-brasa.jpg",
                 ThemeVariant = "dark",
                 DisplayOrder = 2,
                 IsActive = true
@@ -162,7 +162,7 @@ public static partial class DatabaseSeeder
                 BrandAccentColor = "#F59E0B",
                 ContactPhone = "0987654321",
                 ContactEmail = "pedidos@lagranjita.com",
-                LogoUrl = "/images/identidad/logo.png",
+                LogoUrl = "/images/tenants/la-granjita/identidad/logo.png",
                 IsActive = true,
                 CreatedAt = DateTime.UtcNow
             };

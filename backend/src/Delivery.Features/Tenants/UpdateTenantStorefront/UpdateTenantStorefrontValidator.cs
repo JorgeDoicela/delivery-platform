@@ -36,6 +36,11 @@ public sealed class UpdateTenantStorefrontValidator : AbstractValidator<UpdateTe
         RuleFor(x => x.BaseDeliveryFee)
             .GreaterThanOrEqualTo(0m)
             .WithMessage("La tarifa base de envío no puede ser negativa.");
+
+        RuleFor(x => x.CustomDomain)
+            .Matches(@"^[a-z0-9]+([\-\.]{1}[a-z0-9]+)*\.[a-z]{2,5}(:[0-9]{1,5})?$")
+            .When(x => !string.IsNullOrWhiteSpace(x.CustomDomain))
+            .WithMessage("El formato del dominio personalizado no es válido (ej. pedidos.elrestaurante.com).");
     }
 }
 

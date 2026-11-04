@@ -13,7 +13,7 @@ export default function DriverLayout({
 }) {
   const { data: tenant } = useCurrentTenantQuery();
   const brandName = tenant?.name || "La Granjita";
-  const brandLogo = tenant?.logoUrl || "/images/identidad/logo.png";
+  const brandLogo = tenant?.logoUrl || "/images/shared/placeholders/logo-default.png";
 
   return (
     <div className="flex flex-col min-h-screen bg-surface-dark text-text-inverse-strong select-none">

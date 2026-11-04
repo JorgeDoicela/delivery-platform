@@ -15,68 +15,32 @@ import type {
   ToggleTenantStatusResponse,
   TenantStorefrontConfigDto,
   UpdateTenantStorefrontCommand,
+  UpsertProductCommand,
+  UpsertProductResponse,
   ApiError,
 } from "@/shared/types/api";
 
 const API_BASE_URL =
   process.env.NEXT_PUBLIC_API_URL || "http://localhost:5005";
 
-export const ACTIVE_TENANT_STORAGE_KEY = "delivery_active_tenant_slug";
-export const DEFAULT_TENANT_SLUG = "la-granjita";
+import {
+  ACTIVE_TENANT_STORAGE_KEY,
+  DEFAULT_TENANT_SLUG,
+  RESERVED_TENANT_SLUGS,
+  getApiClientAccessToken,
+  getApiClientTenantSlug,
+  setApiClientAccessToken,
+  setApiClientTenantSlug,
+} from "./tenant-context";
 
-let currentTenantSlugMemory: string = DEFAULT_TENANT_SLUG;
-let currentAccessTokenMemory: string | null = null;
-
-export function setApiClientTenantSlug(slug: string): void {
-  const normalized = slug.trim().toLowerCase();
-  if (!normalized) return;
-  currentTenantSlugMemory = normalized;
-  if (typeof window !== "undefined") {
-    try {
-      window.localStorage.setItem(ACTIVE_TENANT_STORAGE_KEY, normalized);
-    } catch {
-      // Ignorar errores de almacenamiento privado
-    }
-  }
-}
-
-export function getApiClientTenantSlug(): string {
-  if (typeof window !== "undefined") {
-    try {
-      const params = new URLSearchParams(window.location.search);
-      const queryTenant =
-        params.get("restaurante")?.trim().toLowerCase() ||
-        params.get("marca")?.trim().toLowerCase() ||
-        params.get("tenant")?.trim().toLowerCase();
-
-      if (queryTenant) {
-        currentTenantSlugMemory = queryTenant;
-        window.localStorage.setItem(ACTIVE_TENANT_STORAGE_KEY, queryTenant);
-        return queryTenant;
-      }
-
-      const stored = window.localStorage.getItem(ACTIVE_TENANT_STORAGE_KEY)?.trim().toLowerCase();
-      if (stored) {
-        currentTenantSlugMemory = stored;
-        return stored;
-      }
-
-      const host = window.location.hostname.toLowerCase();
-      const parts = host.split(".");
-      if (parts.length > 2 && parts[0] !== "www" && parts[0] !== "api") {
-        currentTenantSlugMemory = parts[0];
-        return parts[0];
-      }
-    } catch {
-      // Usar fallback en memoria
-    }
-  }
-  return currentTenantSlugMemory || DEFAULT_TENANT_SLUG;
-}
-
-export function setApiClientAccessToken(token: string | null): void {
-  currentAccessTokenMemory = token;
-}
+export {
+  ACTIVE_TENANT_STORAGE_KEY,
+  DEFAULT_TENANT_SLUG,
+  RESERVED_TENANT_SLUGS,
+  getApiClientTenantSlug,
+  setApiClientAccessToken,
+  setApiClientTenantSlug,
+};
 
 function buildHeaders(
   extraHeaders?: Record<string, string>,
@@ -88,8 +52,9 @@ function buildHeaders(
     ...extraHeaders,
   };
 
-  if (currentAccessTokenMemory) {
-    headers["Authorization"] = `Bearer ${currentAccessTokenMemory}`;
+  const token = getApiClientAccessToken();
+  if (token) {
+    headers["Authorization"] = `Bearer ${token}`;
   }
 
   return headers;
@@ -236,8 +201,9 @@ export const apiClient = {
   },
 
   // 2. Catálogo: Menú activo y combos
-  async getActiveMenu(): Promise<ActiveMenuResponse> {
-    const res = await fetch(`${API_BASE_URL}/api/catalog/menu`, {
+  async getActiveMenu(includeInactive = false): Promise<ActiveMenuResponse> {
+    const query = includeInactive ? "?includeInactive=true" : "";
+    const res = await fetch(`${API_BASE_URL}/api/catalog/menu${query}`, {
       method: "GET",
       headers: buildHeaders(),
       cache: "no-store",
@@ -333,5 +299,28 @@ export const apiClient = {
       body: JSON.stringify({ productId, isActive }),
     });
     return handleResponse<{ productId: number; isActive: boolean; productName: string }>(res);
+  },
+
+  // 10. Catálogo: Crear nuevo producto con su imagen personalizada
+  async createProduct(command: UpsertProductCommand): Promise<UpsertProductResponse> {
+    const res = await fetch(`${API_BASE_URL}/api/catalog/products`, {
+      method: "POST",
+      headers: buildHeaders(),
+      body: JSON.stringify(command),
+    });
+    return handleResponse<UpsertProductResponse>(res);
+  },
+
+  // 11. Catálogo: Editar producto existente (nombre, descripción, precio, categoría e imagen)
+  async updateProduct(
+    productId: number,
+    command: UpsertProductCommand
+  ): Promise<UpsertProductResponse> {
+    const res = await fetch(`${API_BASE_URL}/api/catalog/products/${productId}`, {
+      method: "PUT",
+      headers: buildHeaders(),
+      body: JSON.stringify({ ...command, productId }),
+    });
+    return handleResponse<UpsertProductResponse>(res);
   },
 };

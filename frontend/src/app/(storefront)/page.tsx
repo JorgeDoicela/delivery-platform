@@ -12,12 +12,12 @@ function HomePageContent() {
     searchParams.get("restaurante") ||
     searchParams.get("tenant");
 
-  // Si el usuario navegó con parámetro explícito de restaurante, muestra la tienda
+  // Si se navega con parámetro de restaurante explícito (?marca=brasas-del-valle)
   if (explicitBrand) {
     return <RestaurantStorefrontView initialSlug={explicitBrand} />;
   }
 
-  // Por defecto en la raíz: Landing Institucional SaaS B2B
+  // Por defecto en la raíz (http://localhost:3005/): Landing Principal de la Plataforma Multi-Tenant
   return <PlatformLandingView />;
 }
 
@@ -28,5 +28,7 @@ export default function StorefrontHomePage() {
     </Suspense>
   );
 }
+
+
 
 

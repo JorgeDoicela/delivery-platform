@@ -19,22 +19,22 @@ export function AsaderoClassicLandingLayout({
 }: AsaderoClassicLandingLayoutProps) {
   const heroSubtitle =
     tenant?.heroSubtitle ||
-    "Personaliza tu orden con guarniciones calientes, ensalada fresca y ají artesanal";
+    "Personaliza tu orden con acompañamientos y guarniciones recién preparadas";
   const quickLinksEnabled = tenant?.quickLinksEnabled ?? true;
 
   return (
     <div className="w-full pb-12 space-y-12">
-      {/* 1. Hero Slider de Asadero Panorámico */}
+      {/* 1. Hero Slider Panorámico */}
       <CatalogHero />
 
       <div className="w-full px-4 sm:px-8 lg:px-12 space-y-12">
         {/* 2. Selector de Modalidad (Delivery / Salón / Takeout) */}
         <OrderModeSelector />
 
-        {/* 3. Banners Promocionales de Asador y Marinado a la Brasa */}
+        {/* 3. Banners Promocionales del Establecimiento */}
         <PromotionalBanners />
 
-        {/* 4. Menú y Combos del Asadero */}
+        {/* 4. Menú y Combos del Establecimiento */}
         <section
           id="catalogo"
           className="max-w-[1240px] mx-auto space-y-6 pt-6 w-full"
@@ -42,10 +42,10 @@ export function AsaderoClassicLandingLayout({
           <div className="flex items-center justify-between pb-3 border-b border-surface-border">
             <div>
               <span className="text-[11px] font-bold uppercase tracking-widest text-brand-primary block mb-1">
-                Especialidades al Carbón
+                {tenant?.tagline || "Especialidades de la Casa"}
               </span>
               <h2 className="text-3xl sm:text-4xl font-black text-text-strong uppercase tracking-wide font-display" suppressHydrationWarning>
-                Menú y Combos • {tenant?.name ?? "Asadero"}
+                Menú y Combos • {tenant?.name ?? "Restaurante"}
               </h2>
               <p className="text-xs sm:text-sm text-text-muted mt-0.5" suppressHydrationWarning>
                 {heroSubtitle}

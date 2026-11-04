@@ -109,7 +109,7 @@ export function ModifierModal({ product, onClose }: ModifierModalProps) {
                     <div className="flex items-start gap-4">
                         <div className="relative w-16 h-16 sm:w-20 sm:h-20 rounded-2xl overflow-hidden bg-neutral-100 shrink-0 border border-neutral-200">
                             <Image
-                                src={product.imageUrl || "/images/banners/hero-pollo-brasa.jpg"}
+                                src={product.imageUrl || "/images/shared/placeholders/dish-default.webp"}
                                 alt={product.name}
                                 fill
                                 className="object-cover"

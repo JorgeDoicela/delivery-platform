@@ -21,7 +21,7 @@ export function PromoBannersEditor({
       subtitle: "Destaca la preparación artesanal, ingredientes o combos exclusivos de tu negocio.",
       ctaText: "Ver Especialidad",
       ctaHref: "/catalogo",
-      imageUrl: "/images/banners/promo-receta-tradicional.jpg",
+      imageUrl: "/images/tenants/la-granjita/banners/promo-receta-tradicional.jpg",
       themeVariant: "dark",
       displayOrder: nextOrder,
       isActive: true,
@@ -152,22 +152,65 @@ export function PromoBannersEditor({
 
                   <div>
                     <label className="block text-[11px] font-bold uppercase tracking-wider text-text-inverse-muted mb-1">
-                      Imagen de Fondo
+                      Galería Rápida
                     </label>
                     <select
+                      value={
+                        [
+                          "/images/tenants/la-granjita/banners/promo-receta-tradicional.jpg",
+                          "/images/tenants/la-granjita/banners/promo-hecho-a-la-brasa.jpg",
+                          "/images/tenants/la-granjita/banners/hero-pollo-brasa.jpg",
+                          "/images/tenants/la-granjita/banners/hero-combo-familiar.jpg",
+                        ].includes(banner.imageUrl)
+                          ? banner.imageUrl
+                          : "custom"
+                      }
+                      onChange={(e) => {
+                        if (e.target.value !== "custom") {
+                          handleUpdateBanner(idx, { imageUrl: e.target.value });
+                        }
+                      }}
+                      className="w-full px-3 py-2 rounded-xl bg-surface-dark border border-surface-dark-border text-text-inverse-strong focus:outline-none focus:border-brand-primary"
+                    >
+                      <option value="/images/tenants/la-granjita/banners/promo-receta-tradicional.jpg">
+                        Receta Tradicional
+                      </option>
+                      <option value="/images/tenants/la-granjita/banners/promo-hecho-a-la-brasa.jpg">
+                        Fuego y Brasa
+                      </option>
+                      <option value="/images/tenants/la-granjita/banners/hero-pollo-brasa.jpg">
+                        Especialidad al Carbón
+                      </option>
+                      <option value="/images/tenants/la-granjita/banners/hero-combo-familiar.jpg">
+                        Combo Familiar
+                      </option>
+                      <option value="custom">URL Personalizada</option>
+                    </select>
+                  </div>
+                </div>
+
+                <div>
+                  <label className="block text-[11px] font-bold uppercase tracking-wider text-text-inverse-muted mb-1">
+                    URL o Ruta de Imagen de Fondo (admite cualquier URL https:// o /images/...)
+                  </label>
+                  <div className="flex items-center gap-3">
+                    <div className="w-20 h-12 rounded-xl overflow-hidden bg-surface-dark border border-surface-dark-border shrink-0">
+                      {/* eslint-disable-next-line @next/next/no-img-element */}
+                      <img
+                        src={banner.imageUrl || "/images/tenants/la-granjita/banners/promo-receta-tradicional.jpg"}
+                        alt={banner.title}
+                        className="w-full h-full object-cover"
+                      />
+                    </div>
+                    <input
+                      type="text"
                       value={banner.imageUrl}
                       onChange={(e) =>
                         handleUpdateBanner(idx, { imageUrl: e.target.value })
                       }
-                      className="w-full px-3 py-2 rounded-xl bg-surface-dark border border-surface-dark-border text-text-inverse-strong focus:outline-none focus:border-brand-primary"
-                    >
-                      <option value="/images/banners/promo-receta-tradicional.jpg">
-                        Receta Tradicional
-                      </option>
-                      <option value="/images/banners/promo-hecho-a-la-brasa.jpg">
-                        Fuego y Brasa
-                      </option>
-                    </select>
+                      placeholder="https://... o /images/tenants/uploads/mi-promo.jpg"
+                      className="w-full px-3 py-2 rounded-xl bg-surface-dark border border-surface-dark-border text-text-inverse-strong font-mono focus:outline-none focus:border-brand-primary"
+                    />
                   </div>
                 </div>
               </div>

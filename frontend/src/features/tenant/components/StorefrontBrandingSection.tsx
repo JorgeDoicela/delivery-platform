@@ -1,4 +1,6 @@
-import React from "react";
+import React, { useRef, useState } from "react";
+import { Upload, Loader2 } from "lucide-react";
+import { useTenantStore } from "@/features/tenant/store/useTenantStore";
 import type { UpdateTenantStorefrontCommand } from "@/shared/types/api";
 
 interface StorefrontBrandingSectionProps {
@@ -13,6 +15,43 @@ export function StorefrontBrandingSection({
   formState,
   onFieldChange,
 }: StorefrontBrandingSectionProps) {
+  const currentTenantSlug = useTenantStore((s) => s.tenantSlug) || "la-granjita";
+  const fileInputRef = useRef<HTMLInputElement | null>(null);
+  const [isUploading, setIsUploading] = useState(false);
+  const [uploadError, setUploadError] = useState<string | null>(null);
+
+  const handleLogoUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    setUploadError(null);
+    setIsUploading(true);
+
+    try {
+      const data = new FormData();
+      data.append("file", file);
+      data.append("tenantSlug", currentTenantSlug);
+      data.append("category", "identidad");
+
+      const response = await fetch("/api/uploads", {
+        method: "POST",
+        body: data,
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error || "Error al subir el logo.");
+      }
+
+      const result = await response.json();
+      onFieldChange("logoUrl", result.url);
+    } catch (err) {
+      setUploadError(err instanceof Error ? err.message : "Error al subir el logo");
+    } finally {
+      setIsUploading(false);
+      if (fileInputRef.current) fileInputRef.current.value = "";
+    }
+  };
   return (
     <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
       <div className="lg:col-span-2 bg-surface-dark-card border border-surface-dark-border rounded-3xl p-6 space-y-4 text-xs">
@@ -94,6 +133,78 @@ export function StorefrontBrandingSection({
               onChange={(e) => onFieldChange("taxId", e.target.value)}
               className="w-full px-3.5 py-2.5 rounded-xl bg-surface-dark border border-surface-dark-border text-text-inverse-strong font-mono focus:outline-none focus:border-brand-primary"
             />
+          </div>
+
+          <div className="sm:col-span-2">
+            <label className="block text-[11px] font-bold uppercase tracking-wider text-text-inverse-muted mb-1">
+              Dominio Propio Personalizado (Opcional)
+            </label>
+            <input
+              type="text"
+              value={formState.customDomain || ""}
+              onChange={(e) => onFieldChange("customDomain", e.target.value || null)}
+              placeholder="pedidos.mirestaurante.com o elbrasero.com"
+              className="w-full px-3.5 py-2.5 rounded-xl bg-surface-dark border border-surface-dark-border text-text-inverse-strong font-mono text-xs focus:outline-none focus:border-brand-primary"
+            />
+            <p className="text-[11px] text-text-inverse-muted mt-1">
+              Permite que tus clientes ingresen directo a tu tienda desde tu propio dominio mediante un registro CNAME en tu DNS.
+            </p>
+          </div>
+
+          <div className="sm:col-span-2 pt-2 border-t border-surface-dark-border">
+            <label className="block text-[11px] font-bold uppercase tracking-wider text-text-inverse-muted mb-1.5">
+              URL o Ruta del Logotipo de Marca (PNG / SVG / WebP)
+            </label>
+            <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3">
+              <div className="w-14 h-14 rounded-2xl bg-white border border-surface-dark-border flex items-center justify-center p-1.5 shrink-0 overflow-hidden">
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img
+                  src={formState.logoUrl || "/images/shared/placeholders/logo-default.png"}
+                  alt="Vista previa logo"
+                  className="w-full h-full object-contain"
+                />
+              </div>
+              <div className="flex-1 w-full space-y-2">
+                <input
+                  type="text"
+                  value={formState.logoUrl}
+                  onChange={(e) => onFieldChange("logoUrl", e.target.value)}
+                  placeholder="https://... o /images/shared/placeholders/logo-default.png"
+                  className="w-full px-3.5 py-2.5 rounded-xl bg-surface-dark border border-surface-dark-border text-text-inverse-strong font-mono text-xs focus:outline-none focus:border-brand-primary"
+                />
+                <div className="flex flex-wrap items-center gap-3 pt-1">
+                  <input
+                    type="file"
+                    ref={fileInputRef}
+                    accept="image/png,image/jpeg,image/webp,image/svg+xml"
+                    onChange={handleLogoUpload}
+                    className="hidden"
+                  />
+                  <button
+                    type="button"
+                    disabled={isUploading}
+                    onClick={() => fileInputRef.current?.click()}
+                    className="px-3.5 py-1.5 rounded-xl bg-surface-dark-hover hover:bg-brand-primary text-white text-[11px] font-bold uppercase tracking-wider inline-flex items-center gap-2 border border-surface-dark-border transition-colors cursor-pointer disabled:opacity-50"
+                  >
+                    {isUploading ? (
+                      <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                    ) : (
+                      <Upload className="w-3.5 h-3.5" />
+                    )}
+                    <span>{isUploading ? "Subiendo..." : "Subir Logotipo Local"}</span>
+                  </button>
+                  <span className="text-[11px] text-text-inverse-muted">
+                    Destino: <code className="text-brand-accent font-mono">/tenants/{currentTenantSlug}/identidad/</code>
+                  </span>
+                </div>
+                {uploadError && (
+                  <p className="text-[11px] text-red-400 font-semibold">{uploadError}</p>
+                )}
+                <p className="text-[11px] text-text-inverse-muted">
+                  Puedes ingresar cualquier URL externa (HTTPS) o una ruta local dentro de <code className="text-brand-accent">/images/</code>.
+                </p>
+              </div>
+            </div>
           </div>
         </div>
       </div>
@@ -194,6 +305,9 @@ export function StorefrontBrandingSection({
                 </option>
                 <option value="steakhouse-gourmet">
                   Steakhouse Gourmet (Cortes Angus + Cámara de Maduración)
+                </option>
+                <option value="fast-casual-urbano">
+                  Fast-Casual Urbano (Hero Dividido + Vitrina Moderna)
                 </option>
               </select>
             </div>

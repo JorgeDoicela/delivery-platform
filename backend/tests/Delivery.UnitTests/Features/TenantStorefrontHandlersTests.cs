@@ -101,7 +101,7 @@ public class TenantStorefrontHandlersTests
             HeroSubtitle: "Elige tus cortes y guarniciones al fuego",
             BusinessName: "Gastronomía Brasas del Valle S.A.S.",
             TaxId: "1793100200001",
-            LogoUrl: "/images/identidad/logo.png",
+            LogoUrl: "/images/tenants/brasas-del-valle/identidad/logo.png",
             BrandPrimaryColor: "#059669",
             BrandPrimaryHoverColor: "#047857",
             BrandAccentColor: "#F59E0B",
@@ -116,6 +116,7 @@ public class TenantStorefrontHandlersTests
             AcceptsCard: true,
             QuickLinksEnabled: false,
             LandingLayoutTemplate: "steakhouse-gourmet",
+            CustomDomain: "pedidos.brasasdelvalle.com",
             TermsAndConditionsMarkdown: "Términos y condiciones personalizados",
             PrivacyPolicyMarkdown: "Políticas de privacidad personalizadas",
             BankDetails: new UpdateTenantBankDetailsDto(
@@ -135,7 +136,7 @@ public class TenantStorefrontHandlersTests
                     Subtitle = "Doble porción de bife con papas rústicas.",
                     CtaText = "PEDIR AHORA",
                     CtaHref = "/catalogo",
-                    ImageUrl = "/images/banners/hero-combo-personal.jpg",
+                    ImageUrl = "/images/tenants/brasas-del-valle/banners/hero-combo-personal.jpg",
                     DisplayOrder = 1,
                     IsActive = true
                 }
@@ -151,6 +152,7 @@ public class TenantStorefrontHandlersTests
         result.Value.BaseDeliveryFee.Should().Be(2.25m);
         result.Value.QuickLinksEnabled.Should().BeFalse();
         result.Value.LandingLayoutTemplate.Should().Be("steakhouse-gourmet");
+        result.Value.CustomDomain.Should().Be("pedidos.brasasdelvalle.com");
         result.Value.HeroSlides.Should().ContainSingle(s => s.Title == "FESTIVAL DEL BIFE DE CHORIZO");
     }
 

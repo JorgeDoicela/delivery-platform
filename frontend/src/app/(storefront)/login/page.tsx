@@ -46,7 +46,7 @@ function LoginContent() {
     <div className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-12 space-y-6">
       {/* 1. Miga de Pan (Breadcrumb estilo KFC) */}
       <nav aria-label="Miga de pan" className="flex items-center gap-2 text-xs font-semibold text-neutral-500">
-        <Link href="/" className="hover:text-brand-primary transition-colors">
+        <Link href={`/${tenant?.slug || "la-granjita"}`} className="hover:text-brand-primary transition-colors">
           Inicio
         </Link>
         <ChevronRight className="w-3.5 h-3.5 text-neutral-400" />
@@ -88,7 +88,7 @@ function LoginContent() {
             </Link>
 
             <Link
-              href="/#sucursales"
+              href="/sucursales"
               className="flex items-center gap-3.5 px-4 py-3.5 rounded-2xl hover:bg-neutral-50 text-neutral-800 hover:text-brand-primary text-xs font-bold uppercase tracking-wider font-display transition-colors"
             >
               <Headphones className="w-4 h-4 text-brand-primary shrink-0" />

@@ -36,9 +36,26 @@ public class TenantResolutionMiddleware
         var isAuthenticated = context.User.Identity?.IsAuthenticated == true;
         var isSuperAdmin = isAuthenticated && context.User.IsInRole("SuperAdmin");
 
-        // 1. Aislamiento estricto por JWT para operadores de franquicia (no SuperAdmin):
-        // Imposibilita que un TenantAdmin o operador autenticado falsifique el header X-Tenant-Slug de otra marca.
-        if (isAuthenticated && !isSuperAdmin)
+        var method = context.Request.Method;
+        var includeInactive = string.Equals(
+            context.Request.Query["includeInactive"],
+            "true",
+            StringComparison.OrdinalIgnoreCase);
+
+        var isPublicStorefrontRequest =
+            (HttpMethods.IsGet(method) && (
+                path.Equals("/api/tenants/current", StringComparison.OrdinalIgnoreCase) ||
+                path.Equals("/api/branches", StringComparison.OrdinalIgnoreCase) ||
+                (path.Equals("/api/catalog/menu", StringComparison.OrdinalIgnoreCase) && !includeInactive) ||
+                (path.StartsWith("/api/orders/", StringComparison.OrdinalIgnoreCase) &&
+                 !path.EndsWith("/history", StringComparison.OrdinalIgnoreCase)))) ||
+            (HttpMethods.IsPost(method) && (
+                path.Equals("/api/geofencing/resolve", StringComparison.OrdinalIgnoreCase) ||
+                path.Equals("/api/orders", StringComparison.OrdinalIgnoreCase)));
+
+        // 1. Aislamiento estricto por JWT para operadores de franquicia (no SuperAdmin) en endpoints administrativos/operativos:
+        // Imposibilita que un TenantAdmin u operador autenticado falsifique el header X-Tenant-Slug de otra marca en paneles internos.
+        if (isAuthenticated && !isSuperAdmin && !isPublicStorefrontRequest)
         {
             var tenantIdClaim = context.User.FindFirst("tenant_id")?.Value;
             if (!string.IsNullOrWhiteSpace(tenantIdClaim) && Guid.TryParse(tenantIdClaim, out var claimTenantId))

@@ -1,6 +1,6 @@
-# Plataforma de Delivery Directo y Multi-Sucursal
+# Plataforma SaaS Multi-Tenant de Delivery Directo y Multi-Sucursal
 
-Plataforma integral multitenant de venta directa, gestion de cocina (KDS), despacho logistico, telemetria satelital de repartidores, inventario por recetas y facturacion electronica SRI para asaderos de pollos y carnes a la brasa en Quito, Ecuador.
+Plataforma integral multitenant de venta directa, gestion de cocina (KDS), despacho logistico, telemetria satelital de repartidores, inventario por recetas y facturacion electronica SRI para restaurantes, franquicias y marcas gastronomicas de cualquier especialidad en Quito, Ecuador.
 
 ---
 
@@ -27,7 +27,7 @@ La documentacion tecnica detallada del sistema se encuentra organizada bajo taxo
   - [`03-pantalla-repartidor-gps.md`](docs/04-frontend-web/03-pantalla-repartidor-gps.md): Transmision satelital continua, modo de simulacion para desarrollo y deep links a Waze / Google Maps.
   - [`04-sistema-de-diseno-y-temas.md`](docs/04-frontend-web/04-sistema-de-diseno-y-temas.md): Tokens de diseno, paleta fast-food, tipografia dual Barlow/Inter, scrollbars flotantes y proveedor dinamico `TenantThemeProvider`.
   - [`05-flujo-checkout-y-cobertura.md`](docs/04-frontend-web/05-flujo-checkout-y-cobertura.md): Resolucion de geocerca en mapa MapLibre, validacion Zod, seleccion de metodos de cobro e idempotencia.
-  - [`06-personalizacion-storefront-y-plantillas.md`](docs/04-frontend-web/06-personalizacion-storefront-y-plantillas.md): Consola de personalizacion de vitrina, editor de banners y motor de plantillas (`asadero-clasico`, `steakhouse-gourmet`).
+  - [`06-personalizacion-storefront-y-plantillas.md`](docs/04-frontend-web/06-personalizacion-storefront-y-plantillas.md): Consola de personalizacion de vitrina, editor de banners, dominios propios (`CustomDomain`), subida de imagenes por comercio y motor de plantillas (`asadero-clasico`, `steakhouse-gourmet`, `fast-casual-urbano`).
 * **05. Despliegue y Operaciones:**
   - [`01-infraestructura-docker.md`](docs/05-despliegue-y-operaciones/01-infraestructura-docker.md): Especificacion de contenedores PostgreSQL + PostGIS y Redis 7 con healthchecks.
   - [`02-empaquetado-capacitor.md`](docs/05-despliegue-y-operaciones/02-empaquetado-capacitor.md): Configuracion de Capacitor para generacion de la aplicacion movil Android / iOS.

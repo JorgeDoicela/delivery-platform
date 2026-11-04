@@ -19,7 +19,7 @@ export function HeroSlidesEditor({ slides, onChange }: HeroSlidesEditorProps) {
       subtitle: "Describe aquí los ingredientes, acompañantes y beneficios de la promoción.",
       ctaText: "ORDENA AQUÍ",
       ctaHref: "/catalogo",
-      imageUrl: "/images/banners/hero-pollo-brasa.jpg",
+      imageUrl: "/images/tenants/la-granjita/banners/hero-pollo-brasa.jpg",
       displayOrder: nextOrder,
       isActive: true,
     };
@@ -176,25 +176,73 @@ export function HeroSlidesEditor({ slides, onChange }: HeroSlidesEditorProps) {
 
                 <div>
                   <label className="block text-[11px] font-bold uppercase tracking-wider text-text-inverse-muted mb-1">
-                    Imagen Panorámica
+                    Galería Rápida de Portada
                   </label>
                   <select
-                    value={slide.imageUrl}
-                    onChange={(e) =>
-                      handleUpdateSlide(idx, { imageUrl: e.target.value })
+                    value={
+                      [
+                        "/images/tenants/la-granjita/banners/hero-pollo-brasa.jpg",
+                        "/images/tenants/la-granjita/banners/hero-combo-familiar.jpg",
+                        "/images/tenants/la-granjita/banners/hero-combo-personal.jpg",
+                        "/images/tenants/brasas-del-valle/banners/promo-hecho-a-la-brasa.jpg",
+                        "/images/tenants/brasas-del-valle/banners/promo-receta-tradicional.jpg",
+                        "/images/platform/hero-platform.jpg",
+                      ].includes(slide.imageUrl)
+                        ? slide.imageUrl
+                        : "custom"
                     }
+                    onChange={(e) => {
+                      if (e.target.value !== "custom") {
+                        handleUpdateSlide(idx, { imageUrl: e.target.value });
+                      }
+                    }}
                     className="w-full px-3 py-2 rounded-xl bg-surface-dark border border-surface-dark-border text-text-inverse-strong focus:outline-none focus:border-brand-primary"
                   >
-                    <option value="/images/banners/hero-pollo-brasa.jpg">
-                      Brasa & Asador (/images/banners/hero-pollo-brasa.jpg)
+                    <option value="/images/tenants/la-granjita/banners/hero-pollo-brasa.jpg">
+                      Brasa & Asador (/images/tenants/la-granjita/banners/hero-pollo-brasa.jpg)
                     </option>
-                    <option value="/images/banners/hero-combo-familiar.jpg">
-                      Banquete Familiar (/images/banners/hero-combo-familiar.jpg)
+                    <option value="/images/tenants/la-granjita/banners/hero-combo-familiar.jpg">
+                      Banquete Familiar (/images/tenants/la-granjita/banners/hero-combo-familiar.jpg)
                     </option>
-                    <option value="/images/banners/hero-combo-personal.jpg">
-                      Especial Personal (/images/banners/hero-combo-personal.jpg)
+                    <option value="/images/tenants/la-granjita/banners/hero-combo-personal.jpg">
+                      Especial Personal (/images/tenants/la-granjita/banners/hero-combo-personal.jpg)
                     </option>
+                    <option value="/images/tenants/brasas-del-valle/banners/promo-hecho-a-la-brasa.jpg">
+                      Horno & Fuego (/images/tenants/brasas-del-valle/banners/promo-hecho-a-la-brasa.jpg)
+                    </option>
+                    <option value="/images/tenants/brasas-del-valle/banners/promo-receta-tradicional.jpg">
+                      Mesa Familiar (/images/tenants/brasas-del-valle/banners/promo-receta-tradicional.jpg)
+                    </option>
+                    <option value="/images/platform/hero-platform.jpg">
+                      Portada Plataforma (/images/platform/hero-platform.jpg)
+                    </option>
+                    <option value="custom">URL Personalizada Externa / Propia</option>
                   </select>
+                </div>
+
+                <div className="sm:col-span-3">
+                  <label className="block text-[11px] font-bold uppercase tracking-wider text-text-inverse-muted mb-1">
+                    URL o Ruta de Imagen Panorámica (admite cualquier URL https:// o /images/...)
+                  </label>
+                  <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3">
+                    <div className="w-28 h-16 rounded-xl overflow-hidden bg-surface-dark border border-surface-dark-border shrink-0">
+                      {/* eslint-disable-next-line @next/next/no-img-element */}
+                      <img
+                        src={slide.imageUrl || "/images/tenants/la-granjita/banners/hero-pollo-brasa.jpg"}
+                        alt={slide.title}
+                        className="w-full h-full object-cover"
+                      />
+                    </div>
+                    <input
+                      type="text"
+                      value={slide.imageUrl}
+                      onChange={(e) =>
+                        handleUpdateSlide(idx, { imageUrl: e.target.value })
+                      }
+                      placeholder="https://images.unsplash.com/... o /images/tenants/uploads/mi-banner.jpg"
+                      className="w-full px-3 py-2.5 rounded-xl bg-surface-dark border border-surface-dark-border text-text-inverse-strong font-mono focus:outline-none focus:border-brand-primary"
+                    />
+                  </div>
                 </div>
               </div>
             </div>

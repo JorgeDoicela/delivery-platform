@@ -1,7 +1,7 @@
 # 01. Vision General de la Arquitectura
 
 ## 1. Proposito del Sistema
-La plataforma de delivery directo es una solucion integral orientada a eliminar la intermediacion de terceros en pedidos de comida preparada (asaderos de pollos y carnes a la brasa), proporcionando canales directos de venta web, despacho en cocina (KDS), gestion de inventario y recetas, turnos de caja POS, telemetria satelital de repartidores y facturacion electronica SRI para multiples sucursales operativas en Quito, Ecuador.
+La plataforma de delivery directo es una solucion SaaS Multi-Tenant orientada a eliminar la intermediacion de terceros en pedidos de comida preparada para restaurantes y franquicias de cualquier especialidad gastronomica (pizzerias, hamburgueserias, sushi, asaderos, cafeterias y cocina de autor). Proporciona vitrinas comerciales independientes por establecimiento (`/[slug]` o dominio propio `CustomDomain`), portal directorio de plataforma (`/`), despacho en cocina (KDS), gestion de inventario y recetas, turnos de caja POS, telemetria satelital de repartidores y facturacion electronica SRI para multiples sucursales operativas.
 
 ---
 
@@ -50,7 +50,7 @@ flowchart TB
 
 ### 3.1. Multitenancy Discriminador y Filtros Globales
 El sistema esta disenado bajo un modelo SaaS multitenant seguro:
-* **Resolucion de Tenant:** El middleware [`TenantResolutionMiddleware`](../../backend/src/Delivery.Api/Multitenancy/TenantResolutionMiddleware.cs) extrae el `TenantId` a partir del subdominio de cabecera (`Host`), la cabecera `X-Tenant-Slug` o el claim del JWT.
+* **Resolucion de Tenant:** El middleware [`TenantResolutionMiddleware`](../../backend/src/Delivery.Api/Multitenancy/TenantResolutionMiddleware.cs) extrae el `TenantId` a partir del claim JWT en rutas internas, de la cabecera `X-Tenant-Slug` en tienda publica, o de la cabecera `Host` mediante dominio propio configurado (`CustomDomain`) o subdominio.
 * **Inyeccion Automatica:** El metodo `ApplyTenantIds()` en [`AppDbContext`](../../backend/src/Delivery.Core/Infrastructure/Persistence/AppDbContext.cs) asigna automaticamente el `TenantId` a toda entidad que implemente [`IMustHaveTenant`](../../backend/src/Delivery.Core/Domain/Common/IMustHaveTenant.cs) durante `SaveChanges` y `SaveChangesAsync`.
 * **Aislamiento Estricto:** Se configuran `Global Query Filters` (`HasQueryFilter(x => CurrentTenantId == null || x.TenantId == CurrentTenantId)`) en todas las entidades del dominio para garantizar que ningun cliente ni empleado acceda a datos de otra marca.
 
@@ -65,7 +65,7 @@ La seguridad de la plataforma opera bajo un modelo hibrido de alto rendimiento y
 En lugar de capas horizontales tradicionales (N-Tier o Clean clasica), el backend organiza el codigo por caracteristicas funcionales autocontenidas (*Vertical Slices*). Cada caracteristica agrupa su endpoint HTTP, comando/consulta, validador FluentValidation, manejador y DTOs de transporte:
 * `Delivery.Features/Auth`: Autenticacion y ciclo de sesion (`Login`, `RefreshToken`, `GetCurrentUser`, `RevokeToken`).
 * `Delivery.Features/Branches`: Resolucion espacial de cobertura por coordenadas y poligono PostGIS (`ResolveBranch`), listado de sucursales con coordenadas (`GetBranches`) y control de capacidad operativa por slot (`GetBranchCapacity`).
-* `Delivery.Features/Catalog`: Catalogo activo con arbol jerarquico de modificadores (`GetActiveMenu`) y alternancia de estado operativo de productos (`ToggleProductStatus`).
+* `Delivery.Features/Catalog`: Catalogo activo con arbol jerarquico de modificadores (`GetActiveMenu`), alternancia de estado operativo (`ToggleProductStatus`) y creacion/edicion de productos con fotografia propia (`UpsertProduct`).
 * `Delivery.Features/Kitchen`: Obtencion de comandas activas en orden FIFO para terminal KDS con numero de comanda corto (`GetActiveKitchenOrders`).
 * `Delivery.Features/Orders`: Creacion de orden con blindaje de subtotal e idempotencia (`CreateOrder`), consulta detallada por identificador (`GetOrderById`), transicion de estado en maquina de estados (`UpdateOrderStatus`) y validacion/rechazo de transferencias bancarias (`ApproveTransferOrder`).
 * `Delivery.Features/Tenants`: Aprovisionamiento de comercios (`CreateTenant`), directorio publico de comercios (`GetPublicTenants`), configuracion activa de storefront (`GetCurrentTenant`), administracion global de plataforma (`GetPlatformTenants`), activacion/suspension de comercios (`ToggleTenantStatus`) y personalizacion visual, legal y tarifaria de landing page (`UpdateTenantStorefront`).

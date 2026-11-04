@@ -439,7 +439,7 @@ Almacena parametros tecnicos, fiscales, financieros, tarifarios y personalizacio
 | :--- | :--- | :--- | :--- | :--- |
 | `Id` | `uuid` | NO | PK | Identificador unico |
 | `TenantId` | `uuid` | NO | FK (`Tenants.Id`), UK | Enlace obligatorio 1:1 con el Tenant |
-| `CustomDomain` | `varchar(150)` | SI | - | Dominio personalizado DNS opcional |
+| `CustomDomain` | `varchar(150)` | SI | UK (`IS NOT NULL`) | Dominio web propio personalizado (ej. `pedidos.elbrasero.com`) |
 | `CurrencyCode` | `varchar(3)` | NO | Default: `'USD'` | Codigo ISO monetario |
 | `SriEnvironment` | `varchar(20)` | NO | Default: `'PRUEBAS'` | Ambiente SRI (`'PRUEBAS'` o `'PRODUCCION'`) |
 | `SriCertificatePath` | `varchar(500)` | SI | - | Ruta al archivo de firma electronica PKCS#12 (`.p12`) |

@@ -56,6 +56,7 @@ public sealed record UpdatedTenantStorefrontDto(
     bool AcceptsCard,
     bool QuickLinksEnabled,
     string LandingLayoutTemplate,
+    string? CustomDomain,
     string? TermsAndConditionsMarkdown,
     string? PrivacyPolicyMarkdown,
     UpdateTenantBankDetailsDto BankDetails,
@@ -86,6 +87,7 @@ public sealed record UpdateTenantStorefrontCommand(
     bool AcceptsCard,
     bool QuickLinksEnabled,
     string? LandingLayoutTemplate,
+    string? CustomDomain,
     string? TermsAndConditionsMarkdown,
     string? PrivacyPolicyMarkdown,
     UpdateTenantBankDetailsDto BankDetails,
@@ -146,13 +148,32 @@ public sealed class UpdateTenantStorefrontHandler : IHandler<UpdateTenantStorefr
                 new Error("Tenant.NotFound", "El negocio solicitado no existe o se encuentra inactivo."));
         }
 
+        var normalizedCustomDomain = string.IsNullOrWhiteSpace(command.CustomDomain)
+            ? null
+            : command.CustomDomain.Trim().ToLowerInvariant();
+
+        if (normalizedCustomDomain != null)
+        {
+#pragma warning disable CA1862, CA1304, CA1311
+            var domainTaken = await _context.TenantSettings
+                .IgnoreQueryFilters()
+                .AnyAsync(ts => ts.TenantId != tenant.Id && ts.CustomDomain != null && ts.CustomDomain.ToLower() == normalizedCustomDomain, cancellationToken);
+#pragma warning restore CA1862, CA1304, CA1311
+
+            if (domainTaken)
+            {
+                return Result.Failure<UpdatedTenantStorefrontDto>(
+                    new Error("Tenant.DuplicateCustomDomain", $"El dominio personalizado '{normalizedCustomDomain}' ya está vinculado a otro comercio."));
+            }
+        }
+
         tenant.Name = command.Name.Trim();
         tenant.Tagline = command.Tagline.Trim();
         tenant.Description = command.Description.Trim();
         tenant.HeroSubtitle = command.HeroSubtitle.Trim();
         tenant.BusinessName = command.BusinessName.Trim();
         tenant.TaxId = command.TaxId.Trim();
-        tenant.LogoUrl = string.IsNullOrWhiteSpace(command.LogoUrl) ? "/images/identidad/logo.png" : command.LogoUrl.Trim();
+        tenant.LogoUrl = string.IsNullOrWhiteSpace(command.LogoUrl) ? "/images/shared/placeholders/logo-default.png" : command.LogoUrl.Trim();
         tenant.BrandPrimaryColor = command.BrandPrimaryColor.Trim();
         tenant.BrandPrimaryHoverColor = command.BrandPrimaryHoverColor.Trim();
         tenant.BrandAccentColor = command.BrandAccentColor.Trim();
@@ -179,6 +200,7 @@ public sealed class UpdateTenantStorefrontHandler : IHandler<UpdateTenantStorefr
         settings.AcceptsBankTransfer = command.AcceptsBankTransfer;
         settings.AcceptsCard = command.AcceptsCard;
         settings.QuickLinksEnabled = command.QuickLinksEnabled;
+        settings.CustomDomain = normalizedCustomDomain;
         if (!string.IsNullOrWhiteSpace(command.LandingLayoutTemplate))
         {
             settings.LandingLayoutTemplate = command.LandingLayoutTemplate.Trim();
@@ -224,7 +246,7 @@ public sealed class UpdateTenantStorefrontHandler : IHandler<UpdateTenantStorefr
             tenant.HeroSubtitle,
             tenant.BusinessName,
             tenant.TaxId,
-            tenant.LogoUrl ?? "/images/identidad/logo.png",
+            tenant.LogoUrl ?? "/images/shared/placeholders/logo-default.png",
             tenant.BrandPrimaryColor ?? "#E4002B",
             tenant.BrandPrimaryHoverColor ?? "#C40024",
             tenant.BrandAccentColor ?? "#F59E0B",
@@ -240,6 +262,7 @@ public sealed class UpdateTenantStorefrontHandler : IHandler<UpdateTenantStorefr
             settings.AcceptsCard,
             settings.QuickLinksEnabled,
             settings.LandingLayoutTemplate,
+            settings.CustomDomain,
             settings.TermsAndConditionsMarkdown,
             settings.PrivacyPolicyMarkdown,
             new UpdateTenantBankDetailsDto(

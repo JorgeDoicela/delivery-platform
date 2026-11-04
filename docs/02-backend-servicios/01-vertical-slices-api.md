@@ -133,7 +133,8 @@ El backend de la plataforma esta construido en .NET 8 utilizando C# 12 y Minimal
 ---
 
 #### 2.2.1. Catalogo Activo y Modificadores (`GET /api/catalog/menu`)
-* **Descripcion:** Retorna las categorias, combos y productos activos junto con sus grupos de modificadores jerarquicos (guarniciones obligatorias, ajies y bebidas opcionales).
+* **Parametros de Consulta Opcionales:** `?includeInactive=true` (usado por `/admin/inventario` para listar e interactuar con productos tanto activos como agotados; en la vitrina publica se omite o envia `false`).
+* **Descripcion:** Retorna las categorias, combos y productos activos (o la totalidad del catalogo maestro si `includeInactive=true`) junto con sus grupos de modificadores jerarquicos (guarniciones obligatorias, ajies y bebidas opcionales).
 * **Respuesta Exitosa (200 OK):**
   ```json
   {
@@ -187,6 +188,11 @@ El backend de la plataforma esta construido en .NET 8 utilizando C# 12 y Minimal
     "message": "Estado de disponibilidad actualizado correctamente."
   }
   ```
+
+#### 2.2.3. Creacion y Edicion de Producto con Imagen Propia (`POST /api/catalog/products` y `PUT /api/catalog/products/{id}`)
+* **Descripcion:** Registra un nuevo producto o actualiza nombre, descripcion, categoria, precio base e imagen personalizada (`imageUrl`) dentro del catalogo aislado del establecimiento activo.
+* **Payload de Entrada:** `{"name": "Parrillada Especial", "description": "Cortes selectos...", "basePrice": 24.50, "category": "Parrilladas", "imageUrl": "https://.../plato.webp", "isActive": true}`
+* **Respuesta Exitosa (200 OK):** Retorna `UpsertProductResponse`.
 
 ---
 
@@ -336,6 +342,7 @@ El backend de la plataforma esta construido en .NET 8 utilizando C# 12 y Minimal
     "contactPhone": "0987654321",
     "contactEmail": "contacto@lagranjita.com",
     "landingLayoutTemplate": "asadero-clasico",
+    "customDomain": "pedidos.lagranjita.com",
     "baseDeliveryFee": 1.50,
     "enableDelivery": true,
     "enableTakeout": true,
@@ -373,7 +380,8 @@ El backend de la plataforma esta construido en .NET 8 utilizando C# 12 y Minimal
     "adminFullName": "Administrador Brasero",
     "matrixBranchName": "Sucursal Matriz Centro",
     "matrixBranchAddress": "Av. 10 de Agosto y Colon",
-    "brandPrimaryColor": "#D97706"
+    "brandPrimaryColor": "#D97706",
+    "customDomain": "pedidos.elbrasero.com"
   }
   ```
 * **Respuesta Exitosa (200 OK):** Retorna `CreatedTenantDto` con identificadores generados.
@@ -389,7 +397,7 @@ El backend de la plataforma esta construido en .NET 8 utilizando C# 12 y Minimal
 
 #### 2.8.6. Actualizar Storefront y Politicas (`PUT /api/tenants/current/storefront`)
 * **Autorizacion:** Roles `TenantAdmin`, `SuperAdmin`
-* **Descripcion:** Actualiza la identidad visual (colores, logo, textos), plantilla de landing page, banners, tarifas, datos bancarios y textos legales en Markdown del comercio activo.
+* **Descripcion:** Actualiza la identidad visual (colores, logo, textos), dominio personalizado (`CustomDomain`), plantilla de landing page, banners, tarifas, datos bancarios y textos legales en Markdown del comercio activo.
 
 ---
 

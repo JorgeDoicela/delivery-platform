@@ -28,7 +28,11 @@ public sealed record CreateTenantCommand(
     string PrimaryBranchAddress,
     string AdminFullName,
     string AdminEmail,
-    string AdminPassword
+    string AdminPassword,
+    string? LogoUrl = null,
+    string? LandingLayoutTemplate = null,
+    string? HeroBannerImageUrl = null,
+    string? CustomDomain = null
 );
 
 public sealed record CreatedTenantDto(
@@ -125,7 +129,9 @@ public sealed class CreateTenantHandler : IHandler<CreateTenantCommand, Result<C
                     : normalizedCommand.Description,
                 CtaText = "VER MENÚ",
                 CtaHref = "/catalogo",
-                ImageUrl = "/images/banners/hero-pollo-brasa.jpg",
+                ImageUrl = string.IsNullOrWhiteSpace(normalizedCommand.HeroBannerImageUrl)
+                    ? "/images/shared/placeholders/dish-default.webp"
+                    : normalizedCommand.HeroBannerImageUrl.Trim(),
                 DisplayOrder = 1,
                 IsActive = true
             }
@@ -140,12 +146,31 @@ public sealed class CreateTenantHandler : IHandler<CreateTenantCommand, Result<C
                 Subtitle = "Conoce nuestras promociones exclusivas pidiendo directamente en nuestra tienda oficial.",
                 CtaText = "Ordenar Ahora",
                 CtaHref = "/catalogo",
-                ImageUrl = "/images/banners/promo-receta-tradicional.jpg",
+                ImageUrl = "/images/shared/placeholders/dish-default.webp",
                 ThemeVariant = "dark",
                 DisplayOrder = 1,
                 IsActive = true
             }
         };
+
+        var normalizedCustomDomain = string.IsNullOrWhiteSpace(normalizedCommand.CustomDomain)
+            ? null
+            : normalizedCommand.CustomDomain.Trim().ToLowerInvariant();
+
+        if (normalizedCustomDomain != null)
+        {
+#pragma warning disable CA1862, CA1304, CA1311
+            var domainExists = await _context.TenantSettings
+                .IgnoreQueryFilters()
+                .AnyAsync(ts => ts.CustomDomain != null && ts.CustomDomain.ToLower() == normalizedCustomDomain, cancellationToken);
+#pragma warning restore CA1862, CA1304, CA1311
+
+            if (domainExists)
+            {
+                return Result.Failure<CreatedTenantDto>(
+                    new Error("Tenant.DuplicateCustomDomain", $"El dominio personalizado '{normalizedCustomDomain}' ya está vinculado a otro comercio."));
+            }
+        }
 
         var tenant = new Tenant
         {
@@ -157,7 +182,9 @@ public sealed class CreateTenantHandler : IHandler<CreateTenantCommand, Result<C
             HeroSubtitle = "Elige tu especialidad favorita recién preparada",
             BusinessName = normalizedCommand.BusinessName.Trim(),
             TaxId = normalizedCommand.TaxId.Trim(),
-            LogoUrl = "/images/identidad/logo.png",
+            LogoUrl = string.IsNullOrWhiteSpace(normalizedCommand.LogoUrl)
+                ? "/images/shared/placeholders/logo-default.png"
+                : normalizedCommand.LogoUrl.Trim(),
             BrandPrimaryColor = normalizedCommand.BrandPrimaryColor.Trim(),
             BrandPrimaryHoverColor = string.IsNullOrWhiteSpace(normalizedCommand.BrandPrimaryHoverColor)
                 ? normalizedCommand.BrandPrimaryColor.Trim()
@@ -181,6 +208,10 @@ public sealed class CreateTenantHandler : IHandler<CreateTenantCommand, Result<C
                 AcceptsBankTransfer = true,
                 AcceptsCard = true,
                 QuickLinksEnabled = true,
+                CustomDomain = normalizedCustomDomain,
+                LandingLayoutTemplate = string.IsNullOrWhiteSpace(normalizedCommand.LandingLayoutTemplate)
+                    ? "asadero-clasico"
+                    : normalizedCommand.LandingLayoutTemplate.Trim(),
                 BankName = "Banco Pichincha",
                 BankAccountType = "Cuenta Corriente",
                 BankAccountNumber = "2100000000",
@@ -211,36 +242,114 @@ public sealed class CreateTenantHandler : IHandler<CreateTenantCommand, Result<C
             LocationPoint = GeometryFactory.CreatePoint(new Coordinate(-78.4840, -0.1760)),
             CoveragePolygon = defaultPolygon,
             MaxOrdersPerSlot = 15,
+            SriEstablishmentCode = "001",
+            SriEmissionPoint = "001",
+            NextInvoiceSequence = 1,
+            OpeningTime = "10:00",
+            ClosingTime = "22:00",
             IsActive = true
         };
 
         await _context.Branches.AddAsync(branch, cancellationToken);
 
-        var starterCategory = new Category
+        var modGroup = new ModifierGroup
         {
             TenantId = tenant.Id,
-            Name = "Especialidades de la Casa",
+            Name = "Guarnición & Acompañantes",
+            MinSelectable = 1,
+            MaxSelectable = 2,
+            IsRequired = true,
+            Options = new List<ModifierOption>
+            {
+                new() { Name = "Acompañamiento Clásico de la Casa", AdditionalPrice = 0.00m, IsAvailable = true },
+                new() { Name = "Ensalada o Guarnición Fresca", AdditionalPrice = 0.00m, IsAvailable = true },
+                new() { Name = "Porción Extra Salsa de la Casa", AdditionalPrice = 0.75m, IsAvailable = true }
+            }
+        };
+        await _context.ModifierGroups.AddAsync(modGroup, cancellationToken);
+
+        var combosCategory = new Category
+        {
+            TenantId = tenant.Id,
+            Name = "Combos",
             DisplayOrder = 1,
             IsActive = true
         };
-        await _context.Categories.AddAsync(starterCategory, cancellationToken);
-        await _context.SaveChangesAsync(cancellationToken);
-
-        var starterProduct = new Product
+        var porcionesCategory = new Category
         {
             TenantId = tenant.Id,
-            CategoryId = starterCategory.Id,
-            Sku = $"{normalizedCommand.Slug.ToUpperInvariant()}-001",
-            Name = $"Combo Especial {tenant.Name}",
-            Description = "Especialidad principal de la casa acompañada de guarniciones frescas y bebida.",
-            BasePrice = 12.99m,
-            TaxRate = 15.00m,
-            ImageUrl = "/images/menu/1.png",
-            Category = starterCategory.Name,
-            IsKitchen = true,
+            Name = "Especialidades",
+            DisplayOrder = 2,
             IsActive = true
         };
-        await _context.Products.AddAsync(starterProduct, cancellationToken);
+        await _context.Categories.AddRangeAsync(new[] { combosCategory, porcionesCategory }, cancellationToken);
+        await _context.SaveChangesAsync(cancellationToken);
+
+        var skuPrefix = normalizedCommand.Slug.ToUpperInvariant();
+        var starterProducts = new List<Product>
+        {
+            new()
+            {
+                TenantId = tenant.Id,
+                CategoryId = combosCategory.Id,
+                Sku = $"{skuPrefix}-001",
+                Name = $"Combo Familiar {tenant.Name}",
+                Description = "Combinación familiar completa de la casa acompañada de guarniciones, complementos frescos y salsas artesanales.",
+                BasePrice = 21.99m,
+                TaxRate = 15.00m,
+                ImageUrl = "/images/shared/placeholders/dish-default.webp",
+                Category = combosCategory.Name,
+                IsKitchen = true,
+                IsActive = true
+            },
+            new()
+            {
+                TenantId = tenant.Id,
+                CategoryId = combosCategory.Id,
+                Sku = $"{skuPrefix}-002",
+                Name = $"Especialidad Principal {tenant.Name}",
+                Description = "Plato estrella de la casa preparado al momento con ingredientes frescos seleccionados y acompañamiento a elección.",
+                BasePrice = 11.50m,
+                TaxRate = 15.00m,
+                ImageUrl = "/images/shared/placeholders/dish-default.webp",
+                Category = combosCategory.Name,
+                IsKitchen = true,
+                IsActive = true
+            },
+            new()
+            {
+                TenantId = tenant.Id,
+                CategoryId = porcionesCategory.Id,
+                Sku = $"{skuPrefix}-003",
+                Name = $"Menú Individual {tenant.Name}",
+                Description = "Porción personal recién preparada acompañada de guarnición clásica y aderezo artesanal de la casa.",
+                BasePrice = 6.50m,
+                TaxRate = 15.00m,
+                ImageUrl = "/images/shared/placeholders/dish-default.webp",
+                Category = porcionesCategory.Name,
+                IsKitchen = true,
+                IsActive = true
+            }
+        };
+        await _context.Products.AddRangeAsync(starterProducts, cancellationToken);
+        await _context.SaveChangesAsync(cancellationToken);
+
+        foreach (var product in starterProducts)
+        {
+            await _context.BranchProducts.AddAsync(new BranchProduct
+            {
+                TenantId = tenant.Id,
+                BranchId = branch.Id,
+                ProductId = product.Id,
+                IsAvailable = true
+            }, cancellationToken);
+
+            await _context.ProductModifierGroups.AddAsync(new ProductModifierGroup
+            {
+                ProductId = product.Id,
+                ModifierGroupId = modGroup.Id
+            }, cancellationToken);
+        }
 
         var adminUser = new User
         {

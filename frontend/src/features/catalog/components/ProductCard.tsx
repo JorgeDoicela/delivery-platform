@@ -14,8 +14,8 @@ interface ProductCardProps {
 export function ProductCard({ product }: ProductCardProps) {
   const [isModalOpen, setIsModalOpen] = useState(false);
 
-  // Fallback seguro a imagen de asadero si no viene definida
-  const displayImage = product.imageUrl || "/images/banners/hero-pollo-brasa.jpg";
+  // Fallback seguro a imagen de producto por defecto si no viene definida
+  const displayImage = product.imageUrl || "/images/shared/placeholders/dish-default.webp";
 
   return (
     <>

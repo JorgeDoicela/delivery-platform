@@ -32,7 +32,7 @@ flowchart TD
 
 | Componente | Archivo Fuente | Responsabilidad Operativa |
 | :--- | :--- | :--- |
-| **Identidad y Marca** | `StorefrontBrandingSection.tsx` | Selector de color primario, hover y acento en tiempo real, URL del logo, eslogan y subtitulo hero. |
+| **Identidad y Marca** | `StorefrontBrandingSection.tsx` | Selector de color primario, hover y acento en tiempo real, URL del logo, dominio propio (`CustomDomain`), eslogan y subtitulo hero. |
 | **Operaciones y Tarifas** | `StorefrontOperationsSection.tsx` | Tarifa base de delivery (`BaseDeliveryFee`), interruptores de servicio (delivery/takeout/dine-in), metodos de cobro y datos de cuenta bancaria. |
 | **Editor de Hero Slides** | `HeroSlidesEditor.tsx` | Gestion interactiva de carrusel hero: agregar, reordenar y alternar diapositivas con badge, titular, subtitulo y boton de accion. |
 | **Editor de Banners** | `PromoBannersEditor.tsx` | Administracion de banners intermedios para promociones especiales o combos de temporada. |
@@ -63,9 +63,50 @@ La plataforma soporta multiples plantillas visuales intercambiables alojadas en 
   2. Hero centrado con badges de maduracion y terminos de coccion.
   3. Catalogo con fotos de cortes a pantalla completa y detalles de gramaje.
 
+### 3.3. Plantilla Fast-Casual Urbano (`FastCasualUrbanLandingLayout.tsx`)
+* **Identificador:** `fast-casual-urbano`
+* **Estilo Visual:** Disenado para pizzerias artesanales, hamburgueserias smash, sushis y dark kitchens urbanas (fondos blancos ultra limpios, badges redondeados backdrop-blur, botones solidos y presentacion de producto de conversion inmediata).
+* **Estructura de Bloques:**
+  1. Hero fotografico a sangre completa con selector de servicio dual.
+  2. Banners a 2 columnas con promociones y especialidades.
+  3. Catalogo de comida rapida con filtros horizontales tipo capsula.
+  4. Formulario de contacto y sucursales geolocalizadas.
+
 ---
 
-## 4. Persistencia y Contrato de API
+## 4. Almacenamiento y Taxonomía Canónica de Imágenes (`public/images/`)
+
+La carpeta `frontend/public/images/` implementa una separación estricta en tres dominios canónicos para garantizar orden, escalabilidad multi-tenant y cero colisiones:
+
+```
+frontend/public/images/
+├── platform/               # Identidad y banners de la plataforma global SaaS
+│   ├── logo.png
+│   └── hero-platform.jpg
+├── shared/                 # Recursos compartidos y fallbacks genéricos
+│   └── placeholders/
+│       ├── logo-default.png
+│       └── dish-default.webp
+└── tenants/                # Activos aislados por comercio y cargas dinámicas
+    ├── la-granjita/
+    │   ├── identidad/logo.png
+    │   ├── banners/hero-*.jpg, promo-*.jpg
+    │   └── menu/*.webp
+    ├── brasas-del-valle/
+    │   ├── identidad/logo.png
+    │   ├── banners/hero-*.jpg, promo-*.jpg
+    │   └── menu/*.webp
+    └── uploads/            # Cargas dinámicas mediante API
+```
+
+* **Plataforma Global (`platform/`):** Logotipo general del portal multimarca y fotografía del Hero de bienvenida en la raíz `/`.
+* **Recursos Compartidos (`shared/placeholders/`):** Fallbacks predeterminados (`logo-default.png`, `dish-default.webp`) para cualquier comercio o producto nuevo creado sin activos asignados.
+* **Comercios Aislados (`tenants/{slug}/`):** Cada restaurante afiliado dispone de su propio espacio de identidad visual, carrusel y catálogo.
+* **API de Carga (`POST /api/uploads`):** Admite archivos PNG, WebP, JPEG o SVG de hasta 5 MB, sanitiza los nombres de archivo con UUID y los almacena en `public/images/tenants/uploads/` retornando la URL pública lista para asociarse al catálogo o marca.
+
+---
+
+## 5. Persistencia y Contrato de API
 
 Las modificaciones efectuadas en el personalizador se transmiten mediante una llamada unica atomica:
 

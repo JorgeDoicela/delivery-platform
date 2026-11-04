@@ -30,6 +30,10 @@ const INITIAL_FORM: CreateTenantCommand = {
   adminFullName: "",
   adminEmail: "",
   adminPassword: "Admin123!",
+  logoUrl: "/images/shared/placeholders/logo-default.png",
+  landingLayoutTemplate: "asadero-clasico",
+  heroBannerImageUrl: "/images/shared/placeholders/dish-default.webp",
+  customDomain: "",
 };
 
 export function CreateTenantModal({
@@ -186,6 +190,19 @@ export function CreateTenantModal({
                   className="w-full px-3.5 py-2.5 rounded-xl bg-surface-dark border border-surface-dark-border text-sm font-mono text-white focus:outline-none focus:border-brand-primary"
                 />
               </div>
+
+              <div className="sm:col-span-2">
+                <label className="block text-[11px] font-bold uppercase tracking-wider text-text-inverse-muted mb-1">
+                  Dominio Propio Personalizado (Opcional)
+                </label>
+                <input
+                  type="text"
+                  value={form.customDomain || ""}
+                  onChange={(e) => setForm({ ...form, customDomain: e.target.value.toLowerCase() })}
+                  placeholder="ej. pedidos.elgaucho.com o elgaucho.com"
+                  className="w-full px-3.5 py-2.5 rounded-xl bg-surface-dark border border-surface-dark-border text-sm font-mono text-white focus:outline-none focus:border-brand-primary"
+                />
+              </div>
             </div>
           </div>
 
@@ -206,20 +223,14 @@ export function CreateTenantModal({
                     type="color"
                     value={form.brandPrimaryColor}
                     onChange={(e) =>
-                      setForm({
-                        ...form,
-                        brandPrimaryColor: e.target.value,
-                        brandPrimaryHoverColor: e.target.value,
-                      })
+                      setForm({ ...form, brandPrimaryColor: e.target.value, brandPrimaryHoverColor: e.target.value })
                     }
                     className="w-10 h-10 rounded-lg bg-surface-dark border border-surface-dark-border cursor-pointer"
                   />
                   <input
                     type="text"
                     value={form.brandPrimaryColor}
-                    onChange={(e) =>
-                      setForm({ ...form, brandPrimaryColor: e.target.value })
-                    }
+                    onChange={(e) => setForm({ ...form, brandPrimaryColor: e.target.value })}
                     className="w-full px-3 py-2 rounded-xl bg-surface-dark border border-surface-dark-border text-xs font-mono text-white"
                   />
                 </div>
@@ -266,9 +277,7 @@ export function CreateTenantModal({
                   type="text"
                   required
                   value={form.primaryBranchName}
-                  onChange={(e) =>
-                    setForm({ ...form, primaryBranchName: e.target.value })
-                  }
+                  onChange={(e) => setForm({ ...form, primaryBranchName: e.target.value })}
                   className="w-full px-3.5 py-2.5 rounded-xl bg-surface-dark border border-surface-dark-border text-sm text-white"
                 />
               </div>
@@ -281,11 +290,37 @@ export function CreateTenantModal({
                   type="text"
                   required
                   value={form.primaryBranchAddress}
-                  onChange={(e) =>
-                    setForm({ ...form, primaryBranchAddress: e.target.value })
-                  }
+                  onChange={(e) => setForm({ ...form, primaryBranchAddress: e.target.value })}
                   placeholder="Av. República y Eloy Alfaro"
                   className="w-full px-3.5 py-2.5 rounded-xl bg-surface-dark border border-surface-dark-border text-sm text-white"
+                />
+              </div>
+
+              <div>
+                <label className="block text-[11px] font-bold uppercase tracking-wider text-text-inverse-muted mb-1">
+                  Plantilla Visual de Landing
+                </label>
+                <select
+                  value={form.landingLayoutTemplate || "asadero-clasico"}
+                  onChange={(e) => setForm({ ...form, landingLayoutTemplate: e.target.value })}
+                  className="w-full px-3.5 py-2.5 rounded-xl bg-surface-dark border border-surface-dark-border text-xs font-bold text-white"
+                >
+                  <option value="asadero-clasico">Asadero Clásico (Retail Claro)</option>
+                  <option value="steakhouse-gourmet">Steakhouse Gourmet (Parrilla Nocturna)</option>
+                  <option value="fast-casual-urbano">Fast-Casual Urbano (Split Hero Moderno)</option>
+                </select>
+              </div>
+
+              <div>
+                <label className="block text-[11px] font-bold uppercase tracking-wider text-text-inverse-muted mb-1">
+                  URL del Logotipo (Opcional)
+                </label>
+                <input
+                  type="text"
+                  value={form.logoUrl || ""}
+                  onChange={(e) => setForm({ ...form, logoUrl: e.target.value })}
+                  placeholder="/images/shared/placeholders/logo-default.png o https://..."
+                  className="w-full px-3.5 py-2.5 rounded-xl bg-surface-dark border border-surface-dark-border text-xs font-mono text-white"
                 />
               </div>
             </div>

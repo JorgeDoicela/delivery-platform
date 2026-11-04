@@ -136,8 +136,9 @@ flowchart LR
     TenantSettings --> Finanzas[Tarifas & Metodos de Pago]
     TenantSettings --> Legal[Politicas & Terminos]
 
-    Visual --> Template[LandingLayoutTemplate: asadero-clasico / steakhouse-gourmet]
+    Visual --> Template[LandingLayoutTemplate: asadero-clasico / steakhouse-gourmet / fast-casual-urbano]
     Visual --> Colors[Colores: BrandPrimary, Hover, Accent]
+    Visual --> Domain[CustomDomain: Dominio propio CNAME]
     Visual --> Slides[HeroSlidesJson & PromoBannersJson]
 
     Finanzas --> Fees[BaseDeliveryFee & Modalidades: Delivery / Takeout / DineIn]

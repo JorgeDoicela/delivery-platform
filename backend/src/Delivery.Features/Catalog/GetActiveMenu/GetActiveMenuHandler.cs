@@ -5,7 +5,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Delivery.Features.Catalog.GetActiveMenu;
 
-public sealed record GetActiveMenuQuery;
+public sealed record GetActiveMenuQuery(bool IncludeInactive = false);
 
 public sealed record MenuModifierOptionDto(
     int Id,
@@ -55,9 +55,13 @@ public sealed class GetActiveMenuHandler : IHandler<GetActiveMenuQuery, Result<A
 
     public async Task<Result<ActiveMenuResponse>> Handle(GetActiveMenuQuery query, CancellationToken cancellationToken = default)
     {
-        var products = await _context.Products
-            .AsNoTracking()
-            .Where(p => p.IsActive)
+        var productsQuery = _context.Products.AsNoTracking();
+        if (!query.IncludeInactive)
+        {
+            productsQuery = productsQuery.Where(p => p.IsActive);
+        }
+
+        var products = await productsQuery
             .Include(p => p.ProductModifierGroups)
                 .ThenInclude(pmg => pmg.ModifierGroup)
                     .ThenInclude(mg => mg.Options.Where(o => o.IsAvailable))

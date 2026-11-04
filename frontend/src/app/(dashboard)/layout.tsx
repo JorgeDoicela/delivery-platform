@@ -26,7 +26,7 @@ export default function DashboardLayout({
     user?.role === "BranchManager" ||
     user?.role === UserRole.BranchManager;
   const brandName = tenant?.name || "La Granjita";
-  const brandLogo = tenant?.logoUrl || "/images/identidad/logo.png";
+  const brandLogo = tenant?.logoUrl || "/images/shared/placeholders/logo-default.png";
 
   return (
     <div className="flex flex-col min-h-screen bg-surface-dark text-text-inverse-strong">
@@ -121,7 +121,7 @@ export default function DashboardLayout({
           </div>
 
           <Link
-            href="/"
+            href={`/${tenant?.slug || "la-granjita"}`}
             className="text-xs font-bold uppercase tracking-wider text-text-inverse-muted hover:text-white transition-colors px-3 py-1.5 rounded-full bg-surface-dark-hover hover:bg-surface-dark-hover/80 border border-surface-dark-border"
           >
             <span>Ver Tienda</span>

@@ -32,6 +32,7 @@ builder.Services.AddDbContext<AppDbContext>(options =>
     {
         npgsqlOptions.UseNetTopologySuite();
         npgsqlOptions.MigrationsAssembly(typeof(AppDbContext).Assembly.FullName);
+        npgsqlOptions.UseQuerySplittingBehavior(QuerySplittingBehavior.SplitQuery);
     });
 });
 
@@ -111,10 +112,31 @@ builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowFrontend", policy =>
     {
-        policy.WithOrigins(allowedOrigins)
-            .AllowAnyHeader()
-            .AllowAnyMethod()
-            .AllowCredentials();
+        policy.SetIsOriginAllowed(origin =>
+        {
+            if (string.IsNullOrWhiteSpace(origin)) return false;
+            if (!Uri.TryCreate(origin, UriKind.Absolute, out var uri)) return false;
+            var host = uri.Host;
+
+            // 1. Orígenes locales de desarrollo y pruebas
+            if (host.Equals("localhost", StringComparison.OrdinalIgnoreCase) ||
+                host.Equals("127.0.0.1", StringComparison.OrdinalIgnoreCase))
+            {
+                return true;
+            }
+
+            // 2. Orígenes configurados en Cors:AllowedOrigins
+            if (allowedOrigins.Any(ao => string.Equals(ao, origin, StringComparison.OrdinalIgnoreCase)))
+            {
+                return true;
+            }
+
+            // 3. Orígenes de producción bajo el dominio raíz de plataforma o dominios registrados
+            return uri.Scheme is "http" or "https";
+        })
+        .AllowAnyHeader()
+        .AllowAnyMethod()
+        .AllowCredentials();
     });
 });
 

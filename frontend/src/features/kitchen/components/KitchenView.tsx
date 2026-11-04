@@ -7,19 +7,29 @@ import { OrderStatus } from "@/shared/types/api";
 import { RefreshCw, Radio, Volume2, Building2 } from "lucide-react";
 import { kitchenAlertSound } from "../lib/sound";
 import { useBranchesQuery, useCurrentTenantQuery } from "@/features/tenant";
+import { useAuthStore } from "@/features/auth";
 
 export function KitchenView() {
   const { data: tenant } = useCurrentTenantQuery();
   const { data: branchesData } = useBranchesQuery();
+  const rawBranchId = useAuthStore((s) => s.user?.branchId);
+  const userBranchId = useMemo(() => {
+    if (rawBranchId === null || rawBranchId === undefined) return null;
+    const parsed = Number(rawBranchId);
+    return Number.isNaN(parsed) ? null : parsed;
+  }, [rawBranchId]);
+
   const branches = useMemo(
     () => branchesData ?? tenant?.branches ?? [],
     [branchesData, tenant?.branches]
   );
 
-  const [selectedBranchId, setSelectedBranchId] = useState<number>(1);
-  const branchId =
+  const [selectedBranchId, setSelectedBranchId] = useState<number>(userBranchId ?? 1);
+  const branchId: number =
     branches.length > 0 && !branches.some((b) => b.id === selectedBranchId)
-      ? branches[0].id
+      ? (userBranchId && branches.some((b) => b.id === userBranchId)
+          ? userBranchId
+          : branches[0].id)
       : selectedBranchId;
 
   const { orders, loading, error, connectionStatus, refresh, advanceOrderStatus } =

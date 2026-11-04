@@ -35,7 +35,7 @@ export function SteakhouseGourmetLandingLayout({
       <section className="relative w-full min-h-[580px] lg:min-h-[640px] flex items-center overflow-hidden border-b border-white/10">
         <div className="absolute inset-0 z-0">
           <Image
-            src={primarySlide?.imageUrl || "/images/banners/hero-pollo-brasa.jpg"}
+            src={primarySlide?.imageUrl || "/images/tenants/brasas-del-valle/banners/hero-pollo-brasa.jpg"}
             alt={primarySlide?.title || "Cortes Angus Madurados"}
             fill
             priority
@@ -87,9 +87,9 @@ export function SteakhouseGourmetLandingLayout({
             <div className="flex flex-wrap items-center gap-4 pt-2">
               <a
                 href="#catalogo"
-                className="inline-flex items-center gap-2 bg-emerald-600 hover:bg-emerald-500 text-white font-black text-xs uppercase tracking-wider px-8 py-4 rounded-full shadow-2xl transition-all hover:scale-105 active:scale-95"
+                className="inline-flex items-center gap-2 bg-brand-primary hover:bg-brand-primary-hover text-white font-black text-xs uppercase tracking-wider px-8 py-4 rounded-full shadow-2xl transition-all hover:scale-105 active:scale-95"
               >
-                <span>VER CARTA DE CORTES</span>
+                <span>{primarySlide?.ctaText || "VER CARTA DE CORTES"}</span>
                 <ArrowRight className="w-4 h-4" />
               </a>
 
@@ -98,7 +98,7 @@ export function SteakhouseGourmetLandingLayout({
                 className="inline-flex items-center gap-2 bg-white/5 hover:bg-white/10 text-white font-bold text-xs uppercase tracking-wider px-6 py-4 rounded-full border border-white/20 transition-all backdrop-blur-md"
               >
                 <MapPin className="w-4 h-4 text-emerald-400" />
-                <span>Salón & Cava Cumbayá</span>
+                <span>{tenant?.branches?.[0]?.name || "Sucursales & Horarios"}</span>
               </Link>
             </div>
           </div>
@@ -148,7 +148,7 @@ export function SteakhouseGourmetLandingLayout({
 
       {/* 3. Selector de Modalidad y Cobertura */}
       <div className="max-w-[1240px] mx-auto px-6 sm:px-10 lg:px-12 w-full space-y-8">
-        <div className="bg-neutral-900/60 border border-neutral-800 rounded-3xl p-6">
+        <div className="bg-white rounded-3xl p-6 text-neutral-900 shadow-2xl">
           <OrderModeSelector />
         </div>
 

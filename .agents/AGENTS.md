@@ -1,21 +1,24 @@
 # Directrices del Proyecto Delivery Platform (AGENTS.md)
 
-Este documento define las reglas de ingeniería de software, arquitectura técnica, puertos asignados y estándares de calidad profesional obligatorios para cualquier agente o desarrollador que opere en este repositorio.
+Este documento define las reglas de ingeniería de software, arquitectura Multi-Tenant, puertos asignados y estándares de calidad profesional obligatorios para cualquier agente o desarrollador que opere en este repositorio.
 
 ---
 
 ## 1. Identidad del Proyecto y Stack Tecnológico
 
-Plataforma integral de pedidos y delivery en tiempo real para asaderos de pollos y carnes a la brasa, diseñada con un frontend unificado y un backend monolítico modular de alto rendimiento.
+Plataforma SaaS Multi-Tenant de pedidos en línea, gestión de cocina KDS y delivery geolocalizado en tiempo real para restaurantes, franquicias y comercios gastronómicos de cualquier especialidad (pizzerías, hamburgueserías, sushi, cafeterías, parrillas, asaderos y cocina de autor), diseñada con un frontend unificado y un backend monolítico modular de alto rendimiento.
 
+* **Arquitectura Multi-Tenant:**
+  - En Frontend: La raíz `/` (`PlatformLandingView`) es siempre el directorio y portal principal de la plataforma; cada establecimiento afiliado opera su propia tienda aislada en `/[slug]` (`RestaurantStorefrontView`) con su propia paleta de colores, logotipo, fotos, catálogo, sucursales y plantilla (`asadero-clasico`, `steakhouse-gourmet`, `fast-casual-urbano` o layout a medida por código).
+  - En Backend y Base de Datos: Aislamiento estricto por `TenantId` mediante `ITenantEntity`, Global Query Filters en EF Core y `TenantResolutionMiddleware` (`tenant_id` en JWT para operaciones internas y `X-Tenant-Slug` para lectura pública de tiendas).
 * **Backend:** .NET 8 (C# 12) Web API con Vertical Slice Architecture (VSA).
-* **Persistencia:** PostgreSQL 16 + PostGIS (NetTopologySuite) para geocercas poligonales indexadas.
-* **Caché y Concurrencia:** Redis 7 (con throttling de capacidad de horno por ranuras de 20 minutos).
+* **Persistencia:** PostgreSQL 16 + PostGIS (NetTopologySuite) para geocercas poligonales indexadas por sucursal.
+* **Caché y Concurrencia:** Redis 7 (con throttling de capacidad de cocina por ranuras de 20 minutos).
 * **Tiempo Real:** ASP.NET Core SignalR con grupos por sucursal (`kitchen_branch_{branchId}`) y por orden (`order_tracking_{orderId}`).
 * **Frontend:** Next.js (App Router) con React 19, TypeScript estricto y Tailwind CSS.
 * **Mapas:** MapLibre GL JS (renderizado vectorial WebGL sin coste por petición).
 * **Audio Operativo:** Howler.js (reproducción en bucle en terminales de cocina KDS).
-* **Gestión de Estado:** Zustand con persistencia en LocalStorage.
+* **Gestión de Estado:** Zustand con persistencia en LocalStorage aislada por `tenantSlug`.
 * **Validación:** FluentValidation en backend y React Hook Form con Zod en frontend.
 
 ---
@@ -41,9 +44,9 @@ Ante cualquier intervención en el repositorio, el agente debe consultar y ceñi
 
 | Área de Trabajo | Skill Local Primaria | Skill Global Complementaria | Propósito |
 | :--- | :--- | :--- | :--- |
-| **Backend, APIs y Base de Datos** | `delivery-backend` | `desarrollo-backend` | VSA, queries PostGIS, throttling Redis, SignalR y middlewares. |
-| **Frontend, Rutas y Componentes** | `delivery-frontend` | `desarrollo-frontend` | App Router, Feature-Driven design, Zustand, SignalR y MapLibre. |
-| **Diseño Visual, UI/UX y Estilos** | `delivery-estilos` | `desarrollo-frontend` | Tokens de color (carbón/ámbar), tipografía, ergonomía táctil y WCAG. |
+| **Backend, APIs y Base de Datos** | `delivery-backend` | `desarrollo-backend` | VSA, aislamiento Multi-Tenant (`TenantId`), PostGIS, Redis, SignalR y middlewares. |
+| **Frontend, Rutas y Componentes** | `delivery-frontend` | `desarrollo-frontend` | App Router (`/` vs `/[slug]`), Feature-Driven design, Zustand, SignalR y MapLibre. |
+| **Diseño Visual, UI/UX y Estilos** | `delivery-estilos` | `desarrollo-frontend` | Patrones visuales reutilizables, tokens dinámicos por tenant, tipografía dual, ergonomía táctil y WCAG. |
 | **Documentación y Dosieres** | `delivery-documentacion` | `documentacion` | Sincronización proactiva continua ante cambios sustanciales, taxonomía numérica, cero emojis y rutas dinámicas. |
 | **Infraestructura, Docker y SO** | N/A | `sysadmin` | Docker Compose, PostgreSQL, Redis y scripts PowerShell. |
 | **Credenciales y Configuración** | N/A | `datos-seguros` | Secretos JWT, contraseñas de BD y variables de entorno. |

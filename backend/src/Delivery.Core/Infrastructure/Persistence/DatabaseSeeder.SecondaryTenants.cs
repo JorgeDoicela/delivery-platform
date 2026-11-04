@@ -40,7 +40,7 @@ public static partial class DatabaseSeeder
                     Subtitle = "Bife de chorizo, lomo fino, chuleta ahumada, chorizo argentino, morcilla y papas al romero para 4 personas.",
                     CtaText = "PEDIR PARRILLADA",
                     CtaHref = "/catalogo",
-                    ImageUrl = "/images/banners/hero-combo-familiar.jpg",
+                    ImageUrl = "/images/tenants/brasas-del-valle/banners/hero-combo-familiar.jpg",
                     DisplayOrder = 1,
                     IsActive = true
                 },
@@ -52,7 +52,7 @@ public static partial class DatabaseSeeder
                     Subtitle = "Sellado a fuego vivo con sal en escamas, mantequilla de ajo asado, ensalada tibia y papas rústicas.",
                     CtaText = "VER CORTES",
                     CtaHref = "/catalogo",
-                    ImageUrl = "/images/banners/hero-pollo-brasa.jpg",
+                    ImageUrl = "/images/tenants/brasas-del-valle/banners/hero-pollo-brasa.jpg",
                     DisplayOrder = 2,
                     IsActive = true
                 }
@@ -66,7 +66,7 @@ public static partial class DatabaseSeeder
                     Subtitle = "Controlamos humedad y temperatura durante 28 días para lograr terneza superior y sabor concentrado en cada corte.",
                     CtaText = "Explorar Carta",
                     CtaHref = "/catalogo",
-                    ImageUrl = "/images/banners/promo-hecho-a-la-brasa.jpg",
+                    ImageUrl = "/images/tenants/brasas-del-valle/banners/promo-hecho-a-la-brasa.jpg",
                     ThemeVariant = "dark",
                     DisplayOrder = 1,
                     IsActive = true
@@ -78,7 +78,7 @@ public static partial class DatabaseSeeder
                     Subtitle = "Elaboradas diariamente con perejil fresco de huerto, orégano andino, ajo confitado y aceite de oliva extra virgen.",
                     CtaText = "Ordenar Ahora",
                     CtaHref = "/catalogo",
-                    ImageUrl = "/images/banners/promo-receta-tradicional.jpg",
+                    ImageUrl = "/images/tenants/brasas-del-valle/banners/promo-receta-tradicional.jpg",
                     ThemeVariant = "slate",
                     DisplayOrder = 2,
                     IsActive = true
@@ -86,9 +86,9 @@ public static partial class DatabaseSeeder
             },
             productsSpec: new[]
             {
-                ("PAR-IMP-01", "Parrillada Imperial 4 Personas", "Bife de chorizo, lomo fino, pechuga grillada, 2 chorizos argentinos, papas rústicas y chimichurri.", 34.50m, "Parrilladas", "/images/menu/combo-familiar.webp"),
-                ("COR-BIF-01", "Bife de Chorizo Angus 400g", "Corte argentino madurado a la brasa con papas al romero y ensalada fresca.", 18.90m, "Cortes", "/images/menu/medio-pollo.webp"),
-                ("COR-CHU-01", "Costillar & Chorizo Criollo", "Costillar de cerdo braseado lentamente con chorizo artesanal y yuca dorada.", 13.50m, "Cortes", "/images/menu/cuarto-pollo.webp")
+                ("PAR-IMP-01", "Parrillada Imperial 4 Personas", "Bife de chorizo, lomo fino, pechuga grillada, 2 chorizos argentinos, papas rústicas y chimichurri.", 34.50m, "Parrilladas", "/images/tenants/brasas-del-valle/menu/combo-familiar.webp"),
+                ("COR-BIF-01", "Bife de Chorizo Angus 400g", "Corte argentino madurado a la brasa con papas al romero y ensalada fresca.", 18.90m, "Cortes", "/images/tenants/brasas-del-valle/menu/medio-pollo.webp"),
+                ("COR-CHU-01", "Costillar & Chorizo Criollo", "Costillar de cerdo braseado lentamente con chorizo artesanal y yuca dorada.", 13.50m, "Cortes", "/images/tenants/brasas-del-valle/menu/cuarto-pollo.webp")
             });
     }
 
@@ -135,7 +135,7 @@ public static partial class DatabaseSeeder
             BrandAccentColor = accentColor,
             ContactPhone = "0998887766",
             ContactEmail = $"pedidos@{emailDomain}",
-            LogoUrl = "/images/identidad/logo.png",
+            LogoUrl = $"/images/tenants/{slug}/identidad/logo.png",
             IsActive = true,
             CreatedAt = DateTime.UtcNow
         };

@@ -6,6 +6,7 @@ import { useTenantStore } from "@/features/tenant/store/useTenantStore";
 import {
   AsaderoClassicLandingLayout,
   SteakhouseGourmetLandingLayout,
+  FastCasualUrbanLandingLayout,
 } from "@/features/tenant/layouts";
 
 interface RestaurantStorefrontViewProps {
@@ -24,12 +25,14 @@ export function RestaurantStorefrontView({
     }
   }, [initialSlug, currentSlug, setTenantSlug]);
 
-  const { data: tenant } = useCurrentTenantQuery();
+  const { data: tenant } = useCurrentTenantQuery(initialSlug);
   const layoutTemplate = tenant?.landingLayoutTemplate ?? "asadero-clasico";
 
   switch (layoutTemplate) {
     case "steakhouse-gourmet":
       return <SteakhouseGourmetLandingLayout tenant={tenant} />;
+    case "fast-casual-urbano":
+      return <FastCasualUrbanLandingLayout tenant={tenant} />;
     case "asadero-clasico":
     default:
       return <AsaderoClassicLandingLayout tenant={tenant} />;

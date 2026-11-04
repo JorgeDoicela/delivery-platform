@@ -132,6 +132,23 @@ export function TenantSwitcher() {
               );
             })}
           </div>
+
+          <div className="pt-2 border-t border-neutral-100 flex items-center justify-between px-2">
+            <Link
+              href="/"
+              onClick={() => setIsOpen(false)}
+              className="text-[11px] font-bold uppercase tracking-wider text-neutral-600 hover:text-brand-primary transition-colors"
+            >
+              Directorio SaaS (Inicio)
+            </Link>
+            <Link
+              href="/superadmin"
+              onClick={() => setIsOpen(false)}
+              className="text-[11px] font-bold uppercase tracking-wider text-neutral-500 hover:text-neutral-900 transition-colors"
+            >
+              Consola Global
+            </Link>
+          </div>
         </div>
       )}
     </div>

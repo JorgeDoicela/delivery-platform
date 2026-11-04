@@ -24,20 +24,24 @@ export async function generateMetadata({ params }: RestaurantPageProps) {
 
   return {
     title: `${formatted} | Pedidos y Delivery en Línea`,
-    description: `Menú en línea, combos asados a la brasa y despacho a domicilio geolocalizado en ${formatted}.`,
+    description: `Menú en línea, especialidades recién preparadas y despacho a domicilio geolocalizado en ${formatted}.`,
   };
 }
 
-export default async function RestaurantPage({ params }: RestaurantPageProps) {
+async function RestaurantStorefrontLoader({ params }: RestaurantPageProps) {
   const { slug } = await params;
 
   if (RESERVED_TENANT_SLUGS.has(slug.toLowerCase())) {
     notFound();
   }
 
+  return <RestaurantStorefrontView initialSlug={slug} />;
+}
+
+export default function RestaurantPage({ params }: RestaurantPageProps) {
   return (
     <Suspense fallback={<div className="min-h-screen bg-surface-canvas" />}>
-      <RestaurantStorefrontView initialSlug={slug} />
+      <RestaurantStorefrontLoader params={params} />
     </Suspense>
   );
 }

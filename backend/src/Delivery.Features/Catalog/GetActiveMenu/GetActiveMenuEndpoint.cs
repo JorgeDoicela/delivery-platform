@@ -10,9 +10,9 @@ public sealed class GetActiveMenuEndpoint : IEndpoint
 {
     public void MapEndpoint(IEndpointRouteBuilder app)
     {
-        app.MapGet("/api/catalog/menu", async (GetActiveMenuHandler handler, CancellationToken ct) =>
+        app.MapGet("/api/catalog/menu", async (bool? includeInactive, GetActiveMenuHandler handler, CancellationToken ct) =>
         {
-            var result = await handler.Handle(new GetActiveMenuQuery(), ct);
+            var result = await handler.Handle(new GetActiveMenuQuery(includeInactive == true), ct);
             return result.ToHttpResult();
         })
         .WithTags("Catalog")

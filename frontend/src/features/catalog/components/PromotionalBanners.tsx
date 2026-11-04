@@ -5,14 +5,10 @@ import Link from "next/link";
 import Image from "next/image";
 import { ArrowRight } from "lucide-react";
 import { useCurrentTenantQuery } from "@/features/tenant";
-import { FALLBACK_TENANT_CONFIGS } from "@/features/tenant/store/useTenantStore";
 
 export function PromotionalBanners() {
   const { data: tenant } = useCurrentTenantQuery();
-  const banners =
-    tenant?.promotionalBanners && tenant.promotionalBanners.length > 0
-      ? tenant.promotionalBanners
-      : FALLBACK_TENANT_CONFIGS["la-granjita"].promotionalBanners;
+  const banners = tenant?.promotionalBanners ?? [];
 
   if (banners.length === 0) return null;
 
@@ -34,7 +30,7 @@ export function PromotionalBanners() {
                 <Image
                   src={
                     banner.imageUrl ||
-                    "/images/banners/promo-receta-tradicional.jpg"
+                    "/images/tenants/la-granjita/banners/promo-receta-tradicional.jpg"
                   }
                   alt={banner.title}
                   fill

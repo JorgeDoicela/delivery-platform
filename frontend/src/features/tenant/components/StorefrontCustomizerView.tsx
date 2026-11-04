@@ -67,6 +67,7 @@ function StorefrontCustomizerForm({
     acceptsCard: tenant.acceptsCard,
     quickLinksEnabled: tenant.quickLinksEnabled,
     landingLayoutTemplate: tenant.landingLayoutTemplate ?? "asadero-clasico",
+    customDomain: tenant.customDomain ?? null,
     bankDetails: { ...tenant.bankDetails },
     heroSlides: [...tenant.heroSlides],
     promotionalBanners: [...tenant.promotionalBanners],
@@ -118,7 +119,7 @@ function StorefrontCustomizerForm({
 
         <div className="flex flex-wrap items-center gap-3">
           <Link
-            href="/"
+            href={`/${tenant.slug}`}
             className="px-5 py-2.5 rounded-full bg-surface-dark-card hover:bg-surface-dark-hover border border-surface-dark-border text-xs font-bold uppercase tracking-wider text-text-inverse-strong transition-colors"
           >
             Ver Landing en Vivo
