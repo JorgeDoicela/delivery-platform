@@ -127,7 +127,7 @@ export default function DashboardLayout({
           {isSuperAdmin && <TenantSwitcher />}
 
           <div className="flex items-center gap-2 bg-surface-dark-hover/80 px-3 py-1 rounded-full border border-surface-dark-border text-[11px] font-bold uppercase tracking-wider">
-            <span className="w-2 h-2 rounded-full bg-status-success animate-ping"></span>
+            <span className="w-2 h-2 rounded-full bg-status-success shrink-0"></span>
             <span className="text-status-success hidden sm:inline">
               SignalR Activo
             </span>
