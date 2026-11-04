@@ -46,21 +46,24 @@ export function PromoBannersEditor({
     onChange(filtered);
   };
 
+  const inputClass =
+    "w-full px-3 py-2 rounded-xl bg-surface-canvas border border-surface-border text-text-strong focus:outline-none focus:border-brand-primary focus:bg-surface-card transition-colors placeholder:text-text-muted";
+
   return (
     <div className="space-y-4">
       <div className="flex items-center justify-between">
         <div>
-          <h3 className="text-base font-black uppercase tracking-wide text-text-inverse-strong font-display">
+          <h3 className="text-base font-black uppercase tracking-wide text-text-strong font-display">
             Tarjetas Promocionales de Especialidad ({banners.length})
           </h3>
-          <p className="text-xs text-text-inverse-muted">
+          <p className="text-xs text-text-muted">
             Personaliza los bloques destacados intermedios de la página principal.
           </p>
         </div>
         <button
           type="button"
           onClick={handleAddBanner}
-          className="flex items-center gap-1.5 px-4 py-2 rounded-full bg-brand-primary hover:bg-brand-primary-hover text-white text-xs font-black uppercase tracking-wider font-display transition-all active:scale-95"
+          className="flex items-center gap-1.5 px-4 py-2 rounded-full bg-brand-primary hover:bg-brand-primary-hover text-white text-xs font-black uppercase tracking-wider font-display transition-all active:scale-95 cursor-pointer"
         >
           <Plus className="w-3.5 h-3.5" />
           <span>Añadir Tarjeta</span>
@@ -68,7 +71,7 @@ export function PromoBannersEditor({
       </div>
 
       {banners.length === 0 ? (
-        <div className="p-8 rounded-2xl border border-dashed border-surface-dark-border text-center text-xs text-text-inverse-muted">
+        <div className="p-8 rounded-2xl border border-dashed border-surface-border text-center text-xs text-text-muted">
           No hay tarjetas promocionales activas.
         </div>
       ) : (
@@ -76,21 +79,21 @@ export function PromoBannersEditor({
           {banners.map((banner, idx) => (
             <div
               key={banner.id}
-              className="bg-surface-dark-card border border-surface-dark-border rounded-3xl p-5 space-y-4"
+              className="bg-surface-card border border-surface-border rounded-3xl p-5 space-y-4 shadow-xs transition-colors duration-200"
             >
-              <div className="flex items-center justify-between border-b border-surface-dark-border pb-3">
+              <div className="flex items-center justify-between border-b border-surface-border pb-3">
                 <div className="flex items-center gap-3">
-                  <span className="px-2.5 py-0.5 rounded-full bg-surface-dark-hover text-[10px] font-mono font-bold text-brand-accent border border-surface-dark-border">
+                  <span className="px-2.5 py-0.5 rounded-full bg-surface-canvas text-[10px] font-mono font-bold text-brand-accent border border-surface-border">
                     Banner #{idx + 1}
                   </span>
-                  <label className="flex items-center gap-2 text-xs text-text-inverse-base cursor-pointer">
+                  <label className="flex items-center gap-2 text-xs text-text-strong cursor-pointer">
                     <input
                       type="checkbox"
                       checked={banner.isActive}
                       onChange={(e) =>
                         handleUpdateBanner(idx, { isActive: e.target.checked })
                       }
-                      className="rounded border-surface-dark-border"
+                      className="rounded border-surface-border"
                     />
                     <span>Visible</span>
                   </label>
@@ -100,7 +103,7 @@ export function PromoBannersEditor({
                   type="button"
                   onClick={() => handleRemoveBanner(idx)}
                   aria-label={`Eliminar banner ${idx + 1}`}
-                  className="text-status-danger hover:bg-status-danger/15 p-2 rounded-full transition-colors"
+                  className="text-status-danger hover:bg-status-danger/15 p-2 rounded-full transition-colors cursor-pointer"
                 >
                   <Trash2 className="w-4 h-4" />
                 </button>
@@ -108,7 +111,7 @@ export function PromoBannersEditor({
 
               <div className="space-y-3 text-xs">
                 <div>
-                  <label className="block text-[11px] font-bold uppercase tracking-wider text-text-inverse-muted mb-1">
+                  <label className="block text-[11px] font-bold uppercase tracking-wider text-text-muted mb-1">
                     Título de la Tarjeta
                   </label>
                   <input
@@ -117,12 +120,12 @@ export function PromoBannersEditor({
                     onChange={(e) =>
                       handleUpdateBanner(idx, { title: e.target.value })
                     }
-                    className="w-full px-3 py-2 rounded-xl bg-surface-dark border border-surface-dark-border text-text-inverse-strong font-display font-bold uppercase tracking-wide focus:outline-none focus:border-brand-primary"
+                    className={`${inputClass} font-display font-bold uppercase tracking-wide`}
                   />
                 </div>
 
                 <div>
-                  <label className="block text-[11px] font-bold uppercase tracking-wider text-text-inverse-muted mb-1">
+                  <label className="block text-[11px] font-bold uppercase tracking-wider text-text-muted mb-1">
                     Descripción
                   </label>
                   <textarea
@@ -131,13 +134,13 @@ export function PromoBannersEditor({
                     onChange={(e) =>
                       handleUpdateBanner(idx, { subtitle: e.target.value })
                     }
-                    className="w-full px-3 py-2 rounded-xl bg-surface-dark border border-surface-dark-border text-text-inverse-strong focus:outline-none focus:border-brand-primary"
+                    className={inputClass}
                   />
                 </div>
 
                 <div className="grid grid-cols-2 gap-3">
                   <div>
-                    <label className="block text-[11px] font-bold uppercase tracking-wider text-text-inverse-muted mb-1">
+                    <label className="block text-[11px] font-bold uppercase tracking-wider text-text-muted mb-1">
                       Texto Botón
                     </label>
                     <input
@@ -146,12 +149,12 @@ export function PromoBannersEditor({
                       onChange={(e) =>
                         handleUpdateBanner(idx, { ctaText: e.target.value })
                       }
-                      className="w-full px-3 py-2 rounded-xl bg-surface-dark border border-surface-dark-border text-text-inverse-strong focus:outline-none focus:border-brand-primary"
+                      className={inputClass}
                     />
                   </div>
 
                   <div>
-                    <label className="block text-[11px] font-bold uppercase tracking-wider text-text-inverse-muted mb-1">
+                    <label className="block text-[11px] font-bold uppercase tracking-wider text-text-muted mb-1">
                       Galería Rápida
                     </label>
                     <select
@@ -170,7 +173,7 @@ export function PromoBannersEditor({
                           handleUpdateBanner(idx, { imageUrl: e.target.value });
                         }
                       }}
-                      className="w-full px-3 py-2 rounded-xl bg-surface-dark border border-surface-dark-border text-text-inverse-strong focus:outline-none focus:border-brand-primary"
+                      className={inputClass}
                     >
                       <option value="/images/tenants/la-granjita/banners/promo-receta-tradicional.jpg">
                         Receta Tradicional
@@ -190,11 +193,11 @@ export function PromoBannersEditor({
                 </div>
 
                 <div>
-                  <label className="block text-[11px] font-bold uppercase tracking-wider text-text-inverse-muted mb-1">
+                  <label className="block text-[11px] font-bold uppercase tracking-wider text-text-muted mb-1">
                     URL o Ruta de Imagen de Fondo (admite cualquier URL https:// o /images/...)
                   </label>
                   <div className="flex items-center gap-3">
-                    <div className="w-20 h-12 rounded-xl overflow-hidden bg-surface-dark border border-surface-dark-border shrink-0">
+                    <div className="w-20 h-12 rounded-xl overflow-hidden bg-surface-canvas border border-surface-border shrink-0">
                       {/* eslint-disable-next-line @next/next/no-img-element */}
                       <img
                         src={banner.imageUrl || "/images/tenants/la-granjita/banners/promo-receta-tradicional.jpg"}
@@ -209,7 +212,7 @@ export function PromoBannersEditor({
                         handleUpdateBanner(idx, { imageUrl: e.target.value })
                       }
                       placeholder="https://... o /images/tenants/uploads/mi-promo.jpg"
-                      className="w-full px-3 py-2 rounded-xl bg-surface-dark border border-surface-dark-border text-text-inverse-strong font-mono focus:outline-none focus:border-brand-primary"
+                      className={`${inputClass} font-mono`}
                     />
                   </div>
                 </div>
@@ -221,4 +224,3 @@ export function PromoBannersEditor({
     </div>
   );
 }
-

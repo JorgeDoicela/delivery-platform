@@ -59,7 +59,7 @@ export function OrderSearchView() {
 
         <button
           type="submit"
-          className="w-full flex items-center justify-center gap-2 bg-brand-primary hover:bg-brand-primary-hover text-text-inverse-strong font-black text-xs uppercase tracking-wider py-4 px-6 rounded-full shadow-xl transition-all hover:scale-[1.01] active:scale-95"
+          className="w-full flex items-center justify-center gap-2 bg-brand-primary hover:bg-brand-primary-hover text-white font-black text-xs uppercase tracking-wider py-4 px-6 rounded-full shadow-xl transition-all hover:scale-[1.01] active:scale-95 cursor-pointer"
         >
           <span>Consultar Estado</span>
           <ArrowRight className="w-4 h-4" />

@@ -102,21 +102,22 @@ export function ModifierModal({ product, onClose }: ModifierModalProps) {
     };
 
     return (
-        <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center p-0 sm:p-4 bg-surface-dark/75 backdrop-blur-sm animate-in fade-in duration-200">
-            <div className="relative w-full max-w-lg bg-surface-card rounded-t-3xl sm:rounded-2xl shadow-2xl flex flex-col max-h-[90vh] overflow-hidden">
+        <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center p-0 sm:p-4 bg-black/65 backdrop-blur-xs animate-in fade-in duration-200">
+            <div className="relative w-full max-w-lg bg-surface-card rounded-t-3xl sm:rounded-2xl shadow-2xl flex flex-col max-h-[90vh] overflow-hidden text-text-strong">
                 {/* Header Modal */}
                 <div className="p-4 sm:p-6 border-b border-surface-border-subtle flex items-start justify-between gap-4">
                     <div className="flex items-start gap-4">
-                        <div className="relative w-16 h-16 sm:w-20 sm:h-20 rounded-2xl overflow-hidden bg-neutral-100 shrink-0 border border-neutral-200">
+                        <div className="relative w-16 h-16 sm:w-20 sm:h-20 rounded-2xl overflow-hidden bg-surface-canvas shrink-0 border border-surface-border">
                             <Image
                                 src={product.imageUrl || "/images/shared/placeholders/dish-default.webp"}
                                 alt={product.name}
                                 fill
+                                sizes="(max-width: 640px) 64px, 80px"
                                 className="object-cover"
                             />
                         </div>
                         <div>
-                            <span className="text-[10px] font-bold uppercase tracking-wider text-neutral-800 bg-neutral-100 border border-neutral-200 px-2.5 py-0.5 rounded-full">
+                            <span className="text-[10px] font-bold uppercase tracking-wider text-text-strong bg-surface-canvas border border-surface-border px-2.5 py-0.5 rounded-full">
                                 {product.category}
                             </span>
                             <h3 className="text-xl sm:text-2xl font-black uppercase tracking-tight text-text-strong mt-1.5 font-display leading-tight">
@@ -177,14 +178,14 @@ export function ModifierModal({ product, onClose }: ModifierModalProps) {
                                                 type="button"
                                                 onClick={() => handleToggleOption(group, option.id)}
                                                 className={`w-full flex items-center justify-between p-3.5 rounded-xl border text-left text-xs transition-all ${isSelected
-                                                        ? "border-2 border-brand-primary bg-neutral-50 shadow-sm"
+                                                        ? "border-2 border-brand-primary bg-brand-primary-light/20 shadow-sm"
                                                         : "border-surface-border hover:border-surface-border-subtle bg-surface-card"
                                                     }`}
                                             >
                                                 <div className="flex items-center gap-3">
                                                     <div
                                                         className={`w-4 h-4 rounded-full border flex items-center justify-center transition-colors ${isSelected
-                                                                ? "border-brand-primary bg-brand-primary text-text-inverse-strong"
+                                                                ? "border-brand-primary bg-brand-primary text-white"
                                                                 : "border-surface-border bg-surface-card"
                                                             }`}
                                                     >

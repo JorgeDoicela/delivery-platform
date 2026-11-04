@@ -5,7 +5,7 @@
 :root {
   /* ==========================================================================
      Design Tokens Globales - Delivery Platform
-     Centralización de Identidad Visual, Superficies y Estados
+     Superficies y Jerarquía en Modo Claro (Default)
      ========================================================================== */
 
   /* Identidad de Marca (Paleta Fast-Food Asadero: Rojo Vivo estilo KFC y Acento Dorado) */
@@ -19,29 +19,31 @@
   --brand-accent-light: #fef3c7;
   --brand-accent-muted: rgba(245, 158, 11, 0.12);
 
-  /* Superficies en Modo Claro (Storefront / Checkout / Clientes) */
+  /* Superficies en Modo Claro */
   --surface-canvas: #f9fafb;
   --surface-card: #ffffff;
   --surface-card-hover: #f3f4f6;
   --surface-border: #e5e7eb;
   --surface-border-subtle: #f3f4f6;
 
-  /* Superficies en Modo Oscuro (KDS Cocina / Headers / Terminales Operativos) */
-  --surface-dark: #09090b;
-  --surface-dark-card: #18181b;
-  --surface-dark-hover: #27272a;
-  --surface-dark-border: #27272a;
-  --surface-dark-border-subtle: #3f3f46;
+  /* Aliases para compatibilidad reactiva en Modo Claro */
+  --surface-dark: #f3f4f6;
+  --surface-dark-card: #ffffff;
+  --surface-dark-hover: #e5e7eb;
+  --surface-dark-border: #e5e7eb;
+  --surface-dark-border-subtle: #f3f4f6;
 
-  /* Jerarquía Tipográfica y Contraste */
+  /* Jerarquía Tipográfica y Contraste en Modo Claro */
   --text-strong: #0f172a;
   --text-base: #334155;
   --text-muted: #64748b;
   --text-subtle: #94a3b8;
-  --text-inverse-strong: #fafafa;
-  --text-inverse-base: #d4d4d8;
-  --text-inverse-muted: #a1a1aa;
-  --text-inverse-subtle: #71717a;
+
+  /* Aliases de texto reactivos en Modo Claro */
+  --text-inverse-strong: #0f172a;
+  --text-inverse-base: #334155;
+  --text-inverse-muted: #64748b;
+  --text-inverse-subtle: #94a3b8;
 
   /* Estados Semánticos de Operación */
   --status-success: #16a34a;
@@ -83,14 +85,22 @@
   --surface-border: #27272a;
   --surface-border-subtle: #3f3f46;
 
+  /* Aliases para compatibilidad reactiva en Modo Oscuro */
+  --surface-dark: #09090b;
+  --surface-dark-card: #18181b;
+  --surface-dark-hover: #27272a;
+  --surface-dark-border: #27272a;
+  --surface-dark-border-subtle: #3f3f46;
+
   --text-strong: #fafafa;
   --text-base: #d4d4d8;
   --text-muted: #a1a1aa;
   --text-subtle: #71717a;
 
-  --text-inverse-strong: #0f172a;
-  --text-inverse-base: #334155;
-  --text-inverse-muted: #64748b;
+  --text-inverse-strong: #fafafa;
+  --text-inverse-base: #d4d4d8;
+  --text-inverse-muted: #a1a1aa;
+  --text-inverse-subtle: #71717a;
 
   --background: var(--surface-canvas);
   --foreground: var(--text-strong);
@@ -156,246 +166,4 @@ body {
   color: var(--foreground);
   font-family: var(--font-sans);
   font-feature-settings: "cv02", "cv03", "cv04", "cv11";
-}
-
-/* ==========================================================================
-   Jerarquía Tipográfica Unificada (Barlow Condensed + Inter)
-   ========================================================================== */
-
-/* Titulares, Display y Marca: Barlow Condensed en mayúsculas calibradas */
-h1,
-h2,
-h3,
-h4,
-h5,
-h6,
-.font-display,
-[data-display-brand] {
-  font-family: var(--font-display);
-  letter-spacing: 0.025em;
-}
-
-/* Cifras tabulares monoespaciadas para precios e importes sin tercera fuente */
-.tabular-nums,
-.font-mono {
-  font-family: var(--font-sans);
-  font-variant-numeric: tabular-nums;
-  font-feature-settings: "tnum" 1;
-}
-
-/* Formularios y controles interactivos */
-input,
-button,
-select,
-textarea {
-  font-family: inherit;
-}
-
-/* Selección de texto con identidad de marca */
-::selection {
-  background-color: var(--brand-primary);
-  color: #ffffff;
-}
-
-/* Accesibilidad y foco uniforme WCAG 2.1 AA */
-:focus-visible {
-  outline: 2px solid var(--brand-primary);
-  outline-offset: 2px;
-}
-
-/* ==========================================================================
-   Barra de Desplazamiento Minimalista Flotante (Sin selectores/flechas)
-   Píldora oscura sobre track 100% transparente estilo moderno
-   ========================================================================== */
-
-/* 1. Ocultar absolutamente los botones y selectores nativos de arriba y abajo (▲ y ▼) */
-*::-webkit-scrollbar-button,
-::-webkit-scrollbar-button,
-::-webkit-scrollbar-button:single-button,
-::-webkit-scrollbar-button:vertical:decrement,
-::-webkit-scrollbar-button:vertical:increment,
-::-webkit-scrollbar-button:horizontal:decrement,
-::-webkit-scrollbar-button:horizontal:increment {
-  display: none !important;
-  width: 0 !important;
-  height: 0 !important;
-}
-
-/* 2. Barra de desplazamiento global de la ventana y elementos WebKit/Chromium */
-::-webkit-scrollbar {
-  width: 7px;
-  height: 7px;
-}
-
-::-webkit-scrollbar-track,
-::-webkit-scrollbar-track-piece {
-  background: transparent !important;
-}
-
-::-webkit-scrollbar-thumb {
-  background-color: #262329;
-  border-radius: 9999px;
-  transition: background-color 0.2s cubic-bezier(0.4, 0, 0.2, 1);
-}
-
-::-webkit-scrollbar-thumb:hover {
-  background-color: var(--brand-primary);
-}
-
-::-webkit-scrollbar-corner {
-  background: transparent !important;
-}
-
-/* 3. Soporte para Firefox donde scrollbar-width thin elimina flechas nativas */
-@supports not selector(::-webkit-scrollbar) {
-  * {
-    scrollbar-width: thin;
-    scrollbar-color: #262329 transparent;
-  }
-}
-
-/* 4. Clases de utilidad para componentes ScrollArea y contenedores desplazables */
-.custom-scrollbar::-webkit-scrollbar {
-  width: 7px;
-  height: 7px;
-}
-
-.custom-scrollbar::-webkit-scrollbar-button {
-  display: none !important;
-  width: 0 !important;
-  height: 0 !important;
-}
-
-.custom-scrollbar::-webkit-scrollbar-track {
-  background: transparent !important;
-}
-
-.custom-scrollbar::-webkit-scrollbar-thumb {
-  background-color: #262329;
-  border-radius: 9999px;
-  transition: background-color 0.2s ease;
-}
-
-.custom-scrollbar::-webkit-scrollbar-thumb:hover {
-  background-color: var(--brand-primary);
-}
-
-/* Variante Marca (Rojo Asadero) */
-.scrollbar-brand::-webkit-scrollbar {
-  width: 7px;
-  height: 7px;
-}
-
-.scrollbar-brand::-webkit-scrollbar-button {
-  display: none !important;
-  width: 0 !important;
-  height: 0 !important;
-}
-
-.scrollbar-brand::-webkit-scrollbar-track {
-  background: transparent !important;
-}
-
-.scrollbar-brand::-webkit-scrollbar-thumb {
-  background-color: var(--brand-primary);
-  border-radius: 9999px;
-}
-
-/* Variante Oscura (Para terminales KDS y Repartidor) */
-.scrollbar-dark::-webkit-scrollbar {
-  width: 7px;
-  height: 7px;
-}
-
-.scrollbar-dark::-webkit-scrollbar-button {
-  display: none !important;
-  width: 0 !important;
-  height: 0 !important;
-}
-
-.scrollbar-dark::-webkit-scrollbar-track {
-  background: transparent !important;
-}
-
-.scrollbar-dark::-webkit-scrollbar-thumb {
-  background-color: #262329;
-  border-radius: 9999px;
-  transition: background-color 0.2s ease;
-}
-
-.scrollbar-dark::-webkit-scrollbar-thumb:hover {
-  background-color: var(--brand-primary);
-}
-
-/* Variante Sutil */
-.scrollbar-subtle::-webkit-scrollbar {
-  width: 5px;
-  height: 5px;
-}
-
-.scrollbar-subtle::-webkit-scrollbar-button {
-  display: none !important;
-  width: 0 !important;
-  height: 0 !important;
-}
-
-.scrollbar-subtle::-webkit-scrollbar-thumb {
-  background-color: #94a3b8;
-  border-radius: 9999px;
-}
-
-/* Ocultar barra manteniendo desplazamiento táctil y de rueda */
-.scrollbar-none {
-  scrollbar-width: none;
-  -ms-overflow-style: none;
-}
-
-.scrollbar-none::-webkit-scrollbar {
-  display: none !important;
-}
-
-/* ==========================================================================
-   Animaciones Cinematográficas de Carrusel (Hero Transition Effects)
-   ========================================================================== */
-@keyframes heroSlideInNext {
-  0% {
-    opacity: 0;
-    transform: translate3d(36px, 0, 0);
-  }
-  100% {
-    opacity: 1;
-    transform: translate3d(0, 0, 0);
-  }
-}
-
-@keyframes heroSlideInPrev {
-  0% {
-    opacity: 0;
-    transform: translate3d(-36px, 0, 0);
-  }
-  100% {
-    opacity: 1;
-    transform: translate3d(0, 0, 0);
-  }
-}
-
-@keyframes heroKenBurns {
-  0% {
-    transform: scale(1.08);
-  }
-  100% {
-    transform: scale(1);
-  }
-}
-
-.animate-hero-next {
-  animation: heroSlideInNext 0.55s cubic-bezier(0.16, 1, 0.3, 1) both;
-}
-
-.animate-hero-prev {
-  animation: heroSlideInPrev 0.55s cubic-bezier(0.16, 1, 0.3, 1) both;
-}
-
-.animate-hero-kenburns {
-  animation: heroKenBurns 6s cubic-bezier(0.25, 1, 0.5, 1) forwards;
 }

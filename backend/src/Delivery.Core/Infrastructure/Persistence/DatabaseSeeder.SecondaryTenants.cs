@@ -230,6 +230,13 @@ public static partial class DatabaseSeeder
 
         await SeedOperationalUsersAsync(context, tenant.Id, branch.Id, emailDomain);
 
+        // Prioriza la ingesta declarativa desde el corpus estructurado por marca
+        var seededFromCorpus = await SeedCatalogFromCorpusAsync(context, tenant.Id, slug, new List<Branch> { branch });
+        if (seededFromCorpus)
+        {
+            return;
+        }
+
         var modGroup = new ModifierGroup
         {
             TenantId = tenant.Id,

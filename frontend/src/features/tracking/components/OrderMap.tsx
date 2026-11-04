@@ -187,13 +187,13 @@ export function OrderMap({ destination, driverLocation, className = '' }: OrderM
   };
 
   return (
-    <div className={`relative w-full h-80 sm:h-96 rounded-3xl overflow-hidden border border-surface-dark-border shadow-2xl bg-surface-dark ${className}`}>
+    <div className={`relative w-full h-80 sm:h-96 rounded-3xl overflow-hidden border border-surface-border shadow-xl bg-surface-canvas ${className}`}>
       {/* Contenedor del lienzo MapLibre WebGL */}
       <div ref={mapContainerRef} className="w-full h-full" />
 
       {/* Barra de control flotante */}
       <div className="absolute top-3 left-3 z-10 flex items-center gap-2">
-        <span className="flex items-center gap-1.5 px-3.5 py-1.5 rounded-full bg-surface-dark-card/90 backdrop-blur-md border border-surface-dark-border text-[10px] font-bold uppercase tracking-wider text-text-inverse-base shadow-md">
+        <span className="flex items-center gap-1.5 px-3.5 py-1.5 rounded-full bg-surface-card/90 backdrop-blur-md border border-surface-border text-[10px] font-bold uppercase tracking-wider text-text-strong shadow-md">
           <Layers className="h-3.5 w-3.5 text-brand-primary" />
           Rastreo Vectorial
         </span>
@@ -210,14 +210,14 @@ export function OrderMap({ destination, driverLocation, className = '' }: OrderM
         type="button"
         onClick={handleRecenter}
         title="Centrar mapa en posición activa"
-        className="absolute top-3 right-3 z-10 p-2.5 rounded-full bg-surface-dark-card/90 hover:bg-surface-dark-hover backdrop-blur-md border border-surface-dark-border text-text-inverse-base hover:text-text-inverse-strong shadow-lg transition-all active:scale-95"
+        className="absolute top-3 right-3 z-10 p-2.5 rounded-full bg-surface-card/90 hover:bg-surface-card-hover backdrop-blur-md border border-surface-border text-text-strong shadow-lg transition-all active:scale-95 cursor-pointer"
       >
         <Navigation className="h-4 w-4 text-brand-primary" />
       </button>
 
       {/* Mensaje informativo si aún no hay repartidor transmitiendo */}
       {!driverLocation && (
-        <div className="absolute bottom-3 left-3 right-14 z-10 p-3 rounded-2xl bg-surface-dark-card/90 backdrop-blur-md border border-surface-dark-border text-[11px] text-text-inverse-muted flex items-center gap-2">
+        <div className="absolute bottom-3 left-3 right-14 z-10 p-3 rounded-2xl bg-surface-card/90 backdrop-blur-md border border-surface-border text-[11px] text-text-muted flex items-center gap-2">
           <Compass className="h-4 w-4 text-brand-primary shrink-0" />
           <span>El mapa mostrará el movimiento en vivo en cuanto el repartidor retire la orden.</span>
         </div>

@@ -97,7 +97,7 @@ export function AuthGuard({ children, allowedRoles }: AuthGuardProps) {
     return (
       <div className="flex flex-col items-center justify-center min-h-[60vh] gap-3">
         <Loader2 className="w-8 h-8 animate-spin text-brand-primary" />
-        <p className="text-xs font-semibold text-text-inverse-muted uppercase tracking-wider">
+        <p className="text-xs font-semibold text-text-muted uppercase tracking-wider">
           Verificando credenciales de acceso...
         </p>
       </div>
@@ -115,13 +115,13 @@ export function AuthGuard({ children, allowedRoles }: AuthGuardProps) {
     if (!hasRole) {
       return (
         <div className="flex flex-col items-center justify-center min-h-[60vh] p-6 text-center">
-          <div className="w-12 h-12 rounded-full bg-red-950/40 border border-red-800 flex items-center justify-center mb-4">
-            <ShieldAlert className="w-6 h-6 text-red-400" />
+          <div className="w-12 h-12 rounded-full bg-red-500/15 border border-red-500/30 flex items-center justify-center mb-4">
+            <ShieldAlert className="w-6 h-6 text-red-500" />
           </div>
-          <h2 className="text-lg font-bold text-text-inverse-strong uppercase tracking-tight">
+          <h2 className="text-lg font-bold text-text-strong uppercase tracking-tight">
             Acceso no autorizado
           </h2>
-          <p className="text-xs text-text-inverse-muted mt-2 max-w-md">
+          <p className="text-xs text-text-muted mt-2 max-w-md">
             Tu rol operativo actual no cuenta con los privilegios necesarios para
             acceder a esta vista. Contacta a un administrador.
           </p>

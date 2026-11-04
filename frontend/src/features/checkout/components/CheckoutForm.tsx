@@ -151,7 +151,7 @@ export function CheckoutForm() {
           <button
             type="submit"
             disabled={isSubmitting || items.length === 0}
-            className="w-full flex items-center justify-center gap-2 bg-brand-primary hover:bg-brand-primary-hover disabled:bg-surface-border disabled:text-text-muted text-text-inverse-strong font-black text-sm uppercase tracking-wider py-4 px-8 rounded-full shadow-xl transition-all hover:scale-[1.01] active:scale-95 disabled:active:scale-100 disabled:hover:scale-100"
+            className="w-full flex items-center justify-center gap-2 bg-brand-primary hover:bg-brand-primary-hover disabled:bg-surface-border disabled:text-text-muted text-white font-black text-sm uppercase tracking-wider py-4 px-8 rounded-full shadow-xl transition-all hover:scale-[1.01] active:scale-95 disabled:active:scale-100 disabled:hover:scale-100 cursor-pointer"
           >
             {isSubmitting ? (
               <>

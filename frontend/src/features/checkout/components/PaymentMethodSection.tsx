@@ -113,8 +113,8 @@ export function PaymentMethodSection({
                 onClick={() => setValue("cashAmountPaid", amount)}
                 className={`px-4 py-2 rounded-full border font-bold text-xs transition-colors ${
                   cashAmountPaid === amount
-                    ? "bg-brand-primary text-text-inverse-strong border-brand-primary shadow-sm"
-                    : "bg-surface-card text-text-base border-surface-border hover:bg-surface-canvas"
+                    ? "bg-brand-primary text-white border-brand-primary shadow-sm"
+                    : "bg-surface-card text-text-base border-surface-border hover:bg-surface-canvas cursor-pointer"
                 }`}
               >
                 $ {amount}.00

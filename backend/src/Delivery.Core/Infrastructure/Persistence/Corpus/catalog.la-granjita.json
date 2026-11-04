@@ -1,0 +1,180 @@
+{
+  "tenantSlug": "la-granjita",
+  "categories": [
+    {
+      "name": "Combos",
+      "displayOrder": 1,
+      "isActive": true
+    },
+    {
+      "name": "Porciones",
+      "displayOrder": 2,
+      "isActive": true
+    },
+    {
+      "name": "Extras",
+      "displayOrder": 3,
+      "isActive": true
+    },
+    {
+      "name": "Bebidas",
+      "displayOrder": 4,
+      "isActive": true
+    }
+  ],
+  "modifierGroups": [
+    {
+      "name": "Elección de Guarnición",
+      "minSelectable": 1,
+      "maxSelectable": 1,
+      "isRequired": true,
+      "options": [
+        {
+          "name": "Papas Fritas Grandes",
+          "additionalPrice": 0.00,
+          "isAvailable": true
+        },
+        {
+          "name": "Menestra de Fréjol",
+          "additionalPrice": 0.00,
+          "isAvailable": true
+        },
+        {
+          "name": "Menestra de Lenteja",
+          "additionalPrice": 0.00,
+          "isAvailable": true
+        },
+        {
+          "name": "Yuca Frita Crujiente",
+          "additionalPrice": 0.50,
+          "isAvailable": true
+        }
+      ]
+    },
+    {
+      "name": "Tipo de Ají",
+      "minSelectable": 1,
+      "maxSelectable": 2,
+      "isRequired": true,
+      "options": [
+        {
+          "name": "Ají Casero de la Casa (Picante medio)",
+          "additionalPrice": 0.00,
+          "isAvailable": true
+        },
+        {
+          "name": "Ají Tomate de Árbol (Picante suave)",
+          "additionalPrice": 0.00,
+          "isAvailable": true
+        },
+        {
+          "name": "Sin Ají",
+          "additionalPrice": 0.00,
+          "isAvailable": true
+        }
+      ]
+    },
+    {
+      "name": "Bebidas Opcionales",
+      "minSelectable": 0,
+      "maxSelectable": 3,
+      "isRequired": false,
+      "options": [
+        {
+          "name": "Gaseosa 1.5L (Manzana)",
+          "additionalPrice": 2.50,
+          "isAvailable": true
+        },
+        {
+          "name": "Gaseosa 1.5L (Cola Negra)",
+          "additionalPrice": 2.50,
+          "isAvailable": true
+        },
+        {
+          "name": "Jugo Natural de Maracuyá 1L",
+          "additionalPrice": 3.00,
+          "isAvailable": true
+        }
+      ]
+    }
+  ],
+  "products": [
+    {
+      "sku": "CMB-FAM-01",
+      "name": "Combo Familiar Completo",
+      "description": "1 Pollo Asado entero al carbón con guarnición grande, ensalada fresca y porciones de ají artesanal.",
+      "category": "Combos",
+      "basePrice": 22.00,
+      "taxRate": 0.00,
+      "imageUrl": "/images/tenants/la-granjita/menu/combo-familiar.webp",
+      "isKitchen": true,
+      "isActive": true,
+      "modifierGroups": [
+        "Elección de Guarnición",
+        "Tipo de Ají",
+        "Bebidas Opcionales"
+      ],
+      "recipes": [
+        {
+          "inventorySku": "INS-POLLO-OCT",
+          "quantityUsed": 8.0
+        },
+        {
+          "inventorySku": "INS-CONT-TERM",
+          "quantityUsed": 1.0
+        }
+      ]
+    },
+    {
+      "sku": "POR-MED-01",
+      "name": "Medio Pollo Asado",
+      "description": "Medio pollo asado al carbón con papas fritas y ensalada fresca.",
+      "category": "Porciones",
+      "basePrice": 11.50,
+      "taxRate": 0.00,
+      "imageUrl": "/images/tenants/la-granjita/menu/medio-pollo.webp",
+      "isKitchen": true,
+      "isActive": true,
+      "modifierGroups": [
+        "Elección de Guarnición",
+        "Tipo de Ají"
+      ],
+      "recipes": [
+        {
+          "inventorySku": "INS-POLLO-OCT",
+          "quantityUsed": 4.0
+        },
+        {
+          "inventorySku": "INS-CONT-TERM",
+          "quantityUsed": 1.0
+        }
+      ]
+    },
+    {
+      "sku": "POR-CUA-01",
+      "name": "Cuarto de Pollo Asado",
+      "description": "1 presa grande (pechuga o pierna) con papas fritas y ensalada personal.",
+      "category": "Porciones",
+      "basePrice": 6.00,
+      "taxRate": 0.00,
+      "imageUrl": "/images/tenants/la-granjita/menu/cuarto-pollo.webp",
+      "isKitchen": true,
+      "isActive": true,
+      "modifierGroups": [
+        "Elección de Guarnición",
+        "Tipo de Ají"
+      ],
+      "recipes": [
+        {
+          "inventorySku": "INS-POLLO-OCT",
+          "quantityUsed": 2.0
+        },
+        {
+          "inventorySku": "INS-CONT-TERM",
+          "quantityUsed": 1.0
+        }
+      ]
+    }
+  ]
+}
+

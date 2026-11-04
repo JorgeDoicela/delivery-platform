@@ -25,9 +25,9 @@ export function StorefrontCustomizerView() {
 
   if (isFetching || !tenant) {
     return (
-      <div className="flex flex-col items-center justify-center h-64 gap-3 text-text-inverse-muted">
+      <div className="flex flex-col items-center justify-center h-64 gap-3 text-text-muted">
         <Loader2 className="w-6 h-6 animate-spin text-brand-primary" />
-        <span className="text-xs font-bold uppercase tracking-wider">
+        <span className="text-xs font-bold uppercase tracking-wider font-mono">
           Cargando configuración del Storefront...
         </span>
       </div>
@@ -104,15 +104,15 @@ function StorefrontCustomizerForm({
       className="space-y-6 w-full max-w-6xl mx-auto pb-12 overflow-y-auto max-h-[calc(100vh-95px)] pr-2"
     >
       {/* Cabecera de Personalización */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between pb-4 border-b border-surface-dark-border gap-4">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between pb-4 border-b border-surface-border gap-4">
         <div>
           <span className="text-[10px] font-mono uppercase tracking-widest text-brand-accent block">
             Motor SaaS Multi-Tenant • Slug: {tenant?.slug}
           </span>
-          <h1 className="text-2xl sm:text-3xl font-black uppercase tracking-wide text-text-inverse-strong font-display mt-0.5">
+          <h1 className="text-2xl sm:text-3xl font-black uppercase tracking-wide text-text-strong font-display mt-0.5">
             Personalización de Marca & Landing Page
           </h1>
-          <p className="text-xs text-text-inverse-muted mt-1">
+          <p className="text-xs text-text-muted mt-1">
             Configura colores, logotipo, carrusel Hero, tarjetas promocionales, tarifas y cuenta bancaria de {formState.name}.
           </p>
         </div>
@@ -120,7 +120,7 @@ function StorefrontCustomizerForm({
         <div className="flex flex-wrap items-center gap-3">
           <Link
             href={`/${tenant.slug}`}
-            className="px-5 py-2.5 rounded-full bg-surface-dark-card hover:bg-surface-dark-hover border border-surface-dark-border text-xs font-bold uppercase tracking-wider text-text-inverse-strong transition-colors"
+            className="px-5 py-2.5 rounded-full bg-surface-card hover:bg-surface-card-hover border border-surface-border text-xs font-bold uppercase tracking-wider text-text-strong transition-colors cursor-pointer"
           >
             Ver Landing en Vivo
           </Link>
@@ -128,7 +128,7 @@ function StorefrontCustomizerForm({
           <button
             type="submit"
             disabled={updateMutation.isPending}
-            className="flex items-center gap-2 px-6 py-2.5 rounded-full bg-brand-primary hover:bg-brand-primary-hover text-white text-xs font-black uppercase tracking-wider font-display shadow-lg transition-all active:scale-95 disabled:opacity-50"
+            className="flex items-center gap-2 px-6 py-2.5 rounded-full bg-brand-primary hover:bg-brand-primary-hover text-white text-xs font-black uppercase tracking-wider font-display shadow-lg transition-all active:scale-95 disabled:opacity-50 cursor-pointer"
           >
             {updateMutation.isPending && (
               <Loader2 className="w-4 h-4 animate-spin" />
@@ -158,7 +158,7 @@ function StorefrontCustomizerForm({
       )}
 
       {/* Pestañas de Secciones */}
-      <div className="flex flex-wrap items-center gap-2 border-b border-surface-dark-border pb-3">
+      <div className="flex flex-wrap items-center gap-2 border-b border-surface-border pb-3">
         {(
           [
             ["branding", "1. Identidad & Paleta de Colores"],
@@ -171,10 +171,10 @@ function StorefrontCustomizerForm({
             key={key}
             type="button"
             onClick={() => setActiveTab(key)}
-            className={`px-4 py-2 rounded-full text-xs font-black uppercase tracking-wider font-display transition-all ${
+            className={`px-4 py-2 rounded-full text-xs font-black uppercase tracking-wider font-display transition-all cursor-pointer ${
               activeTab === key
                 ? "bg-brand-primary text-white shadow-md"
-                : "bg-surface-dark-card text-text-inverse-muted hover:text-white border border-surface-dark-border"
+                : "bg-surface-card text-text-muted hover:text-text-strong hover:bg-surface-card-hover border border-surface-border"
             }`}
           >
             {label}

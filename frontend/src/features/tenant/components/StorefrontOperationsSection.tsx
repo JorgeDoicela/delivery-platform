@@ -13,15 +13,18 @@ export function StorefrontOperationsSection({
   formState,
   onFieldChange,
 }: StorefrontOperationsSectionProps) {
+  const inputClass =
+    "w-full px-3.5 py-2.5 rounded-xl bg-surface-canvas border border-surface-border text-text-strong focus:outline-none focus:border-brand-primary focus:bg-surface-card transition-colors placeholder:text-text-muted";
+
   return (
     <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 text-xs">
-      <div className="bg-surface-dark-card border border-surface-dark-border rounded-3xl p-6 space-y-4">
-        <h3 className="text-base font-black uppercase tracking-wide text-text-inverse-strong font-display border-b border-surface-dark-border pb-2">
+      <div className="bg-surface-card border border-surface-border rounded-3xl p-6 space-y-4 shadow-xs transition-colors duration-200">
+        <h3 className="text-base font-black uppercase tracking-wide text-text-strong font-display border-b border-surface-border pb-2">
           Tarifa de Envío y Modalidades de Pedido
         </h3>
 
         <div>
-          <label className="block text-[11px] font-bold uppercase tracking-wider text-text-inverse-muted mb-1">
+          <label className="block text-[11px] font-bold uppercase tracking-wider text-text-muted mb-1">
             Tarifa Base de Envío a Domicilio (USD)
           </label>
           <input
@@ -32,59 +35,63 @@ export function StorefrontOperationsSection({
             onChange={(e) =>
               onFieldChange("baseDeliveryFee", Number(e.target.value))
             }
-            className="w-full px-3.5 py-2.5 rounded-xl bg-surface-dark border border-surface-dark-border text-text-inverse-strong font-mono font-bold focus:outline-none focus:border-brand-primary"
+            className={`${inputClass} font-mono font-bold`}
           />
         </div>
 
         <div className="space-y-2.5 pt-2">
-          <span className="block text-[11px] font-bold uppercase tracking-wider text-text-inverse-muted">
+          <span className="block text-[11px] font-bold uppercase tracking-wider text-text-muted">
             Modalidades y Métodos de Pago Activos
           </span>
-          <label className="flex items-center gap-2.5 cursor-pointer">
+          <label className="flex items-center gap-2.5 cursor-pointer text-text-strong">
             <input
               type="checkbox"
               checked={formState.enableDelivery}
               onChange={(e) => onFieldChange("enableDelivery", e.target.checked)}
+              className="rounded border-surface-border"
             />
             <span>Habilitar Entrega a Domicilio</span>
           </label>
-          <label className="flex items-center gap-2.5 cursor-pointer">
+          <label className="flex items-center gap-2.5 cursor-pointer text-text-strong">
             <input
               type="checkbox"
               checked={formState.enableTakeout}
               onChange={(e) => onFieldChange("enableTakeout", e.target.checked)}
+              className="rounded border-surface-border"
             />
             <span>Habilitar Retiro en Restaurante</span>
           </label>
-          <label className="flex items-center gap-2.5 cursor-pointer">
+          <label className="flex items-center gap-2.5 cursor-pointer text-text-strong">
             <input
               type="checkbox"
               checked={formState.acceptsCash}
               onChange={(e) => onFieldChange("acceptsCash", e.target.checked)}
+              className="rounded border-surface-border"
             />
             <span>Aceptar Efectivo contra Entrega</span>
           </label>
-          <label className="flex items-center gap-2.5 cursor-pointer">
+          <label className="flex items-center gap-2.5 cursor-pointer text-text-strong">
             <input
               type="checkbox"
               checked={formState.acceptsBankTransfer}
               onChange={(e) =>
                 onFieldChange("acceptsBankTransfer", e.target.checked)
               }
+              className="rounded border-surface-border"
             />
             <span>Aceptar Transferencia Bancaria / Deuna</span>
           </label>
         </div>
       </div>
 
-      <div className="bg-surface-dark-card border border-surface-dark-border rounded-3xl p-6 space-y-4">
-        <h3 className="text-base font-black uppercase tracking-wide text-text-inverse-strong font-display border-b border-surface-dark-border pb-2">
+      <div className="bg-surface-card border border-surface-border rounded-3xl p-6 space-y-4 shadow-xs transition-colors duration-200">
+        <h3 className="text-base font-black uppercase tracking-wide text-text-strong font-display border-b border-surface-border pb-2">
           Cuenta Bancaria para Transferencias en Checkout
         </h3>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
           <div>
-            <label className="block text-[11px] font-bold uppercase tracking-wider text-text-inverse-muted mb-1">
+            <label className="block text-[11px] font-bold uppercase tracking-wider text-text-muted mb-1">
               Entidad Bancaria
             </label>
             <input
@@ -96,12 +103,12 @@ export function StorefrontOperationsSection({
                   bankName: e.target.value,
                 })
               }
-              className="w-full px-3 py-2 rounded-xl bg-surface-dark border border-surface-dark-border text-text-inverse-strong"
+              className={inputClass}
             />
           </div>
 
           <div>
-            <label className="block text-[11px] font-bold uppercase tracking-wider text-text-inverse-muted mb-1">
+            <label className="block text-[11px] font-bold uppercase tracking-wider text-text-muted mb-1">
               Tipo de Cuenta
             </label>
             <input
@@ -113,12 +120,12 @@ export function StorefrontOperationsSection({
                   accountType: e.target.value,
                 })
               }
-              className="w-full px-3 py-2 rounded-xl bg-surface-dark border border-surface-dark-border text-text-inverse-strong"
+              className={inputClass}
             />
           </div>
 
           <div>
-            <label className="block text-[11px] font-bold uppercase tracking-wider text-text-inverse-muted mb-1">
+            <label className="block text-[11px] font-bold uppercase tracking-wider text-text-muted mb-1">
               Número de Cuenta
             </label>
             <input
@@ -130,12 +137,12 @@ export function StorefrontOperationsSection({
                   accountNumber: e.target.value,
                 })
               }
-              className="w-full px-3 py-2 rounded-xl bg-surface-dark border border-surface-dark-border text-text-inverse-strong font-mono"
+              className={`${inputClass} font-mono`}
             />
           </div>
 
           <div>
-            <label className="block text-[11px] font-bold uppercase tracking-wider text-text-inverse-muted mb-1">
+            <label className="block text-[11px] font-bold uppercase tracking-wider text-text-muted mb-1">
               RUC / Cédula del Titular
             </label>
             <input
@@ -147,12 +154,12 @@ export function StorefrontOperationsSection({
                   taxId: e.target.value,
                 })
               }
-              className="w-full px-3 py-2 rounded-xl bg-surface-dark border border-surface-dark-border text-text-inverse-strong font-mono"
+              className={`${inputClass} font-mono`}
             />
           </div>
 
           <div className="sm:col-span-2">
-            <label className="block text-[11px] font-bold uppercase tracking-wider text-text-inverse-muted mb-1">
+            <label className="block text-[11px] font-bold uppercase tracking-wider text-text-muted mb-1">
               Nombre del Titular de la Cuenta
             </label>
             <input
@@ -164,7 +171,7 @@ export function StorefrontOperationsSection({
                   accountHolder: e.target.value,
                 })
               }
-              className="w-full px-3 py-2 rounded-xl bg-surface-dark border border-surface-dark-border text-text-inverse-strong"
+              className={inputClass}
             />
           </div>
         </div>
@@ -172,4 +179,3 @@ export function StorefrontOperationsSection({
     </div>
   );
 }
-

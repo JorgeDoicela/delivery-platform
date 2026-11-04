@@ -16,7 +16,7 @@ export default function AdminInventarioPage() {
     >
       <Suspense
         fallback={
-          <div className="flex flex-col items-center justify-center min-h-[50vh] text-text-inverse-muted">
+          <div className="flex flex-col items-center justify-center min-h-[50vh] text-text-muted">
             <RefreshCw className="h-8 w-8 animate-spin text-brand-primary mb-4" />
             <p className="text-sm font-medium">Cargando inventario maestro...</p>
           </div>

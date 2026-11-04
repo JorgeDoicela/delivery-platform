@@ -36,28 +36,28 @@ export function KitchenTicketCard({ order, onAdvance }: KitchenTicketCardProps) 
   };
 
   // Semáforo de tiempos
-  let timerBadgeColor = 'bg-status-success/20 text-status-success border-status-success/40';
+  let timerBadgeColor = 'bg-status-success/15 text-status-success border-status-success/30';
   if (elapsedMinutes >= 25) {
-    timerBadgeColor = 'bg-status-danger/20 text-status-danger border-status-danger/40 animate-pulse';
+    timerBadgeColor = 'bg-status-danger/15 text-status-danger border-status-danger/30 animate-pulse';
   } else if (elapsedMinutes >= 15) {
-    timerBadgeColor = 'bg-status-warning/20 text-status-warning border-status-warning/40';
+    timerBadgeColor = 'bg-status-warning/15 text-status-warning border-status-warning/30';
   }
 
   const isTakeout = order.deliveryType === DeliveryType.Takeout;
 
   return (
-    <div className="bg-surface-dark-card border border-surface-dark-border rounded-2xl shadow-lg flex flex-col justify-between overflow-hidden">
+    <div className="bg-surface-card border border-surface-border rounded-2xl shadow-sm flex flex-col justify-between overflow-hidden transition-colors duration-200">
       {/* Cabecera del Ticket */}
-      <div className="p-3.5 bg-surface-dark/60 border-b border-surface-dark-border flex items-center justify-between">
+      <div className="p-3.5 bg-surface-canvas border-b border-surface-border flex items-center justify-between">
         <div className="flex items-center gap-2">
-          <span className="font-mono text-xs font-bold text-text-inverse-strong bg-surface-dark-hover px-2.5 py-0.5 rounded-full border border-surface-dark-border">
+          <span className="font-mono text-xs font-bold text-text-strong bg-surface-card px-2.5 py-0.5 rounded-full border border-surface-border">
             #{order.orderId.slice(0, 8)}
           </span>
           <span
             className={`inline-flex items-center gap-1 text-[10px] font-bold px-2.5 py-0.5 rounded-full uppercase tracking-wider ${
               isTakeout
-                ? 'bg-status-info/20 text-status-info border border-status-info/40'
-                : 'bg-surface-dark-hover text-text-inverse-base'
+                ? 'bg-status-info/15 text-status-info border border-status-info/30'
+                : 'bg-surface-card border border-surface-border text-text-strong'
             }`}
           >
             {isTakeout ? (
@@ -83,17 +83,17 @@ export function KitchenTicketCard({ order, onAdvance }: KitchenTicketCardProps) 
       </div>
 
       {/* Datos del Cliente */}
-      <div className="px-3.5 pt-2.5 pb-1.5 border-b border-surface-dark-border/60 text-xs">
-        <p className="font-bold text-text-inverse-strong truncate">{order.customerName}</p>
+      <div className="px-3.5 pt-2.5 pb-1.5 border-b border-surface-border text-xs">
+        <p className="font-bold text-text-strong truncate">{order.customerName}</p>
         {!isTakeout && order.addressStreet && (
-          <p className="text-text-inverse-muted text-[11px] truncate mt-0.5">
+          <p className="text-text-muted text-[11px] truncate mt-0.5">
             {order.addressStreet} {order.addressReference && `(${order.addressReference})`}
           </p>
         )}
       </div>
 
       {/* Lista de Items */}
-      <div className="p-3.5 space-y-2.5 flex-1 overflow-y-auto max-h-60 divide-y divide-surface-dark-border/40">
+      <div className="p-3.5 space-y-2.5 flex-1 overflow-y-auto max-h-60 divide-y divide-surface-border">
         {order.items.map((item, idx) => (
           <div key={idx} className="pt-2 first:pt-0">
             <div className="flex items-start gap-2">
@@ -101,13 +101,13 @@ export function KitchenTicketCard({ order, onAdvance }: KitchenTicketCardProps) 
                 {item.quantity}x
               </span>
               <div className="flex-1">
-                <p className="text-text-inverse-strong text-xs font-bold leading-tight">{item.productName}</p>
+                <p className="text-text-strong text-xs font-bold leading-tight">{item.productName}</p>
                 {item.modifiers && item.modifiers.length > 0 && (
                   <ul className="mt-1 space-y-0.5">
                     {item.modifiers.map((m, mIdx) => (
                       <li
                         key={mIdx}
-                        className="text-[10px] font-bold uppercase tracking-wider text-brand-accent-light bg-surface-dark/80 px-2 py-0.5 rounded-full border border-surface-dark-border inline-block mr-1 mb-1"
+                        className="text-[10px] font-bold uppercase tracking-wider text-brand-accent bg-surface-canvas px-2 py-0.5 rounded-full border border-surface-border inline-block mr-1 mb-1"
                       >
                         + {m.modifierName}
                       </li>
@@ -121,12 +121,12 @@ export function KitchenTicketCard({ order, onAdvance }: KitchenTicketCardProps) 
       </div>
 
       {/* Acciones de Flujo de Cocina */}
-      <div className="p-3 bg-surface-dark/80 border-t border-surface-dark-border">
+      <div className="p-3 bg-surface-canvas border-t border-surface-border">
         {order.status === OrderStatus.Confirmed && (
           <button
             onClick={() => handleAdvance(OrderStatus.InKitchen)}
             disabled={isSubmitting}
-            className="w-full flex items-center justify-center gap-2 py-2.5 px-4 bg-brand-primary hover:bg-brand-primary-hover text-white text-xs font-bold uppercase tracking-wider rounded-full shadow-md transition-all active:scale-95 disabled:opacity-50"
+            className="w-full flex items-center justify-center gap-2 py-2.5 px-4 bg-brand-primary hover:bg-brand-primary-hover text-white text-xs font-bold uppercase tracking-wider rounded-full shadow-md transition-all active:scale-95 disabled:opacity-50 cursor-pointer"
           >
             <ChefHat className="h-4 w-4" />
             {isSubmitting ? 'Iniciando...' : 'Iniciar en Cocina'}
@@ -137,7 +137,7 @@ export function KitchenTicketCard({ order, onAdvance }: KitchenTicketCardProps) 
           <button
             onClick={() => handleAdvance(OrderStatus.ReadyForDelivery)}
             disabled={isSubmitting}
-            className="w-full flex items-center justify-center gap-2 py-2.5 px-4 bg-status-info hover:bg-status-info/80 text-text-inverse-strong text-xs font-bold uppercase tracking-wider rounded-full shadow-md transition-all active:scale-95 disabled:opacity-50"
+            className="w-full flex items-center justify-center gap-2 py-2.5 px-4 bg-status-info hover:bg-status-info/80 text-white text-xs font-bold uppercase tracking-wider rounded-full shadow-md transition-all active:scale-95 disabled:opacity-50 cursor-pointer"
           >
             <CheckCircle2 className="h-4 w-4" />
             {isSubmitting ? 'Guardando...' : 'Listo para Reparto'}
@@ -148,7 +148,7 @@ export function KitchenTicketCard({ order, onAdvance }: KitchenTicketCardProps) 
           <button
             onClick={() => handleAdvance(OrderStatus.OnTheWay)}
             disabled={isSubmitting}
-            className="w-full flex items-center justify-center gap-2 py-2.5 px-4 bg-status-success hover:bg-status-success/80 text-text-inverse-strong text-xs font-bold uppercase tracking-wider rounded-full shadow-md transition-all active:scale-95 disabled:opacity-50"
+            className="w-full flex items-center justify-center gap-2 py-2.5 px-4 bg-status-success hover:bg-status-success/80 text-white text-xs font-bold uppercase tracking-wider rounded-full shadow-md transition-all active:scale-95 disabled:opacity-50 cursor-pointer"
           >
             <Bike className="h-4 w-4" />
             {isSubmitting ? 'Despachando...' : 'Despachar / En Camino'}

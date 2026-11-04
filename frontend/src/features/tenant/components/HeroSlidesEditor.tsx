@@ -43,21 +43,24 @@ export function HeroSlidesEditor({ slides, onChange }: HeroSlidesEditorProps) {
     onChange(filtered);
   };
 
+  const inputClass =
+    "w-full px-3 py-2 rounded-xl bg-surface-canvas border border-surface-border text-text-strong focus:outline-none focus:border-brand-primary focus:bg-surface-card transition-colors placeholder:text-text-muted";
+
   return (
     <div className="space-y-4">
       <div className="flex items-center justify-between">
         <div>
-          <h3 className="text-base font-black uppercase tracking-wide text-text-inverse-strong font-display">
+          <h3 className="text-base font-black uppercase tracking-wide text-text-strong font-display">
             Slides del Carrusel Hero Principal ({slides.length})
           </h3>
-          <p className="text-xs text-text-inverse-muted">
+          <p className="text-xs text-text-muted">
             Configura las imágenes panorámicas, titulares y botones de llamada a la acción de la portada.
           </p>
         </div>
         <button
           type="button"
           onClick={handleAddSlide}
-          className="flex items-center gap-1.5 px-4 py-2 rounded-full bg-brand-primary hover:bg-brand-primary-hover text-white text-xs font-black uppercase tracking-wider font-display transition-all active:scale-95"
+          className="flex items-center gap-1.5 px-4 py-2 rounded-full bg-brand-primary hover:bg-brand-primary-hover text-white text-xs font-black uppercase tracking-wider font-display transition-all active:scale-95 cursor-pointer"
         >
           <Plus className="w-3.5 h-3.5" />
           <span>Añadir Slide</span>
@@ -65,7 +68,7 @@ export function HeroSlidesEditor({ slides, onChange }: HeroSlidesEditorProps) {
       </div>
 
       {slides.length === 0 ? (
-        <div className="p-8 rounded-2xl border border-dashed border-surface-dark-border text-center text-xs text-text-inverse-muted">
+        <div className="p-8 rounded-2xl border border-dashed border-surface-border text-center text-xs text-text-muted">
           No hay slides configurados. Añade un slide para personalizar el carrusel principal.
         </div>
       ) : (
@@ -73,21 +76,21 @@ export function HeroSlidesEditor({ slides, onChange }: HeroSlidesEditorProps) {
           {slides.map((slide, idx) => (
             <div
               key={slide.id}
-              className="bg-surface-dark-card border border-surface-dark-border rounded-3xl p-5 space-y-4"
+              className="bg-surface-card border border-surface-border rounded-3xl p-5 space-y-4 shadow-xs transition-colors duration-200"
             >
-              <div className="flex items-center justify-between border-b border-surface-dark-border pb-3">
+              <div className="flex items-center justify-between border-b border-surface-border pb-3">
                 <div className="flex items-center gap-3">
-                  <span className="px-2.5 py-0.5 rounded-full bg-surface-dark-hover text-[10px] font-mono font-bold text-brand-accent border border-surface-dark-border">
+                  <span className="px-2.5 py-0.5 rounded-full bg-surface-canvas text-[10px] font-mono font-bold text-brand-accent border border-surface-border">
                     Slide #{idx + 1}
                   </span>
-                  <label className="flex items-center gap-2 text-xs text-text-inverse-base cursor-pointer">
+                  <label className="flex items-center gap-2 text-xs text-text-strong cursor-pointer">
                     <input
                       type="checkbox"
                       checked={slide.isActive}
                       onChange={(e) =>
                         handleUpdateSlide(idx, { isActive: e.target.checked })
                       }
-                      className="rounded border-surface-dark-border"
+                      className="rounded border-surface-border"
                     />
                     <span>Visible en portada</span>
                   </label>
@@ -97,7 +100,7 @@ export function HeroSlidesEditor({ slides, onChange }: HeroSlidesEditorProps) {
                   type="button"
                   onClick={() => handleRemoveSlide(idx)}
                   aria-label={`Eliminar slide ${idx + 1}`}
-                  className="text-status-danger hover:bg-status-danger/15 p-2 rounded-full transition-colors"
+                  className="text-status-danger hover:bg-status-danger/15 p-2 rounded-full transition-colors cursor-pointer"
                 >
                   <Trash2 className="w-4 h-4" />
                 </button>
@@ -105,7 +108,7 @@ export function HeroSlidesEditor({ slides, onChange }: HeroSlidesEditorProps) {
 
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 text-xs">
                 <div>
-                  <label className="block text-[11px] font-bold uppercase tracking-wider text-text-inverse-muted mb-1">
+                  <label className="block text-[11px] font-bold uppercase tracking-wider text-text-muted mb-1">
                     Badge Superior
                   </label>
                   <input
@@ -114,12 +117,12 @@ export function HeroSlidesEditor({ slides, onChange }: HeroSlidesEditorProps) {
                     onChange={(e) =>
                       handleUpdateSlide(idx, { badge: e.target.value })
                     }
-                    className="w-full px-3 py-2 rounded-xl bg-surface-dark border border-surface-dark-border text-text-inverse-strong focus:outline-none focus:border-brand-primary"
+                    className={inputClass}
                   />
                 </div>
 
                 <div className="sm:col-span-2">
-                  <label className="block text-[11px] font-bold uppercase tracking-wider text-text-inverse-muted mb-1">
+                  <label className="block text-[11px] font-bold uppercase tracking-wider text-text-muted mb-1">
                     Titular de Impacto (H1)
                   </label>
                   <input
@@ -128,12 +131,12 @@ export function HeroSlidesEditor({ slides, onChange }: HeroSlidesEditorProps) {
                     onChange={(e) =>
                       handleUpdateSlide(idx, { title: e.target.value })
                     }
-                    className="w-full px-3 py-2 rounded-xl bg-surface-dark border border-surface-dark-border text-text-inverse-strong font-display font-bold uppercase tracking-wide focus:outline-none focus:border-brand-primary"
+                    className={`${inputClass} font-display font-bold uppercase tracking-wide`}
                   />
                 </div>
 
                 <div className="sm:col-span-3">
-                  <label className="block text-[11px] font-bold uppercase tracking-wider text-text-inverse-muted mb-1">
+                  <label className="block text-[11px] font-bold uppercase tracking-wider text-text-muted mb-1">
                     Subtítulo Descriptivo
                   </label>
                   <input
@@ -142,12 +145,12 @@ export function HeroSlidesEditor({ slides, onChange }: HeroSlidesEditorProps) {
                     onChange={(e) =>
                       handleUpdateSlide(idx, { subtitle: e.target.value })
                     }
-                    className="w-full px-3 py-2 rounded-xl bg-surface-dark border border-surface-dark-border text-text-inverse-strong focus:outline-none focus:border-brand-primary"
+                    className={inputClass}
                   />
                 </div>
 
                 <div>
-                  <label className="block text-[11px] font-bold uppercase tracking-wider text-text-inverse-muted mb-1">
+                  <label className="block text-[11px] font-bold uppercase tracking-wider text-text-muted mb-1">
                     Texto Botón CTA
                   </label>
                   <input
@@ -156,12 +159,12 @@ export function HeroSlidesEditor({ slides, onChange }: HeroSlidesEditorProps) {
                     onChange={(e) =>
                       handleUpdateSlide(idx, { ctaText: e.target.value })
                     }
-                    className="w-full px-3 py-2 rounded-xl bg-surface-dark border border-surface-dark-border text-text-inverse-strong focus:outline-none focus:border-brand-primary"
+                    className={inputClass}
                   />
                 </div>
 
                 <div>
-                  <label className="block text-[11px] font-bold uppercase tracking-wider text-text-inverse-muted mb-1">
+                  <label className="block text-[11px] font-bold uppercase tracking-wider text-text-muted mb-1">
                     Ruta Destino CTA
                   </label>
                   <input
@@ -170,12 +173,12 @@ export function HeroSlidesEditor({ slides, onChange }: HeroSlidesEditorProps) {
                     onChange={(e) =>
                       handleUpdateSlide(idx, { ctaHref: e.target.value })
                     }
-                    className="w-full px-3 py-2 rounded-xl bg-surface-dark border border-surface-dark-border text-text-inverse-strong font-mono focus:outline-none focus:border-brand-primary"
+                    className={`${inputClass} font-mono`}
                   />
                 </div>
 
                 <div>
-                  <label className="block text-[11px] font-bold uppercase tracking-wider text-text-inverse-muted mb-1">
+                  <label className="block text-[11px] font-bold uppercase tracking-wider text-text-muted mb-1">
                     Galería Rápida de Portada
                   </label>
                   <select
@@ -196,7 +199,7 @@ export function HeroSlidesEditor({ slides, onChange }: HeroSlidesEditorProps) {
                         handleUpdateSlide(idx, { imageUrl: e.target.value });
                       }
                     }}
-                    className="w-full px-3 py-2 rounded-xl bg-surface-dark border border-surface-dark-border text-text-inverse-strong focus:outline-none focus:border-brand-primary"
+                    className={inputClass}
                   >
                     <option value="/images/tenants/la-granjita/banners/hero-pollo-brasa.jpg">
                       Brasa & Asador (/images/tenants/la-granjita/banners/hero-pollo-brasa.jpg)
@@ -221,11 +224,11 @@ export function HeroSlidesEditor({ slides, onChange }: HeroSlidesEditorProps) {
                 </div>
 
                 <div className="sm:col-span-3">
-                  <label className="block text-[11px] font-bold uppercase tracking-wider text-text-inverse-muted mb-1">
+                  <label className="block text-[11px] font-bold uppercase tracking-wider text-text-muted mb-1">
                     URL o Ruta de Imagen Panorámica (admite cualquier URL https:// o /images/...)
                   </label>
                   <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3">
-                    <div className="w-28 h-16 rounded-xl overflow-hidden bg-surface-dark border border-surface-dark-border shrink-0">
+                    <div className="w-28 h-16 rounded-xl overflow-hidden bg-surface-canvas border border-surface-border shrink-0">
                       {/* eslint-disable-next-line @next/next/no-img-element */}
                       <img
                         src={slide.imageUrl || "/images/tenants/la-granjita/banners/hero-pollo-brasa.jpg"}
@@ -240,7 +243,7 @@ export function HeroSlidesEditor({ slides, onChange }: HeroSlidesEditorProps) {
                         handleUpdateSlide(idx, { imageUrl: e.target.value })
                       }
                       placeholder="https://images.unsplash.com/... o /images/tenants/uploads/mi-banner.jpg"
-                      className="w-full px-3 py-2.5 rounded-xl bg-surface-dark border border-surface-dark-border text-text-inverse-strong font-mono focus:outline-none focus:border-brand-primary"
+                      className={`${inputClass} font-mono`}
                     />
                   </div>
                 </div>
@@ -252,4 +255,3 @@ export function HeroSlidesEditor({ slides, onChange }: HeroSlidesEditorProps) {
     </div>
   );
 }
-

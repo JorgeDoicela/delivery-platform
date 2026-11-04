@@ -111,12 +111,12 @@ export function ProductFormModal({
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setErrorMsg(null);
     setIsSubmitting(true);
+    setErrorMsg(null);
 
     try {
-      if (isEditing && productToEdit) {
-        const updated = await apiClient.updateProduct(productToEdit.id, form);
+      if (isEditing && form.productId) {
+        const updated = await apiClient.updateProduct(form.productId, form);
         onSaved(`Producto "${updated.name}" e imagen actualizados correctamente.`);
       } else {
         const created = await apiClient.createProduct(form);
@@ -134,6 +134,9 @@ export function ProductFormModal({
     }
   };
 
+  const inputClass =
+    "w-full px-3.5 py-2.5 rounded-xl bg-surface-canvas border border-surface-border text-sm text-text-strong focus:outline-none focus:border-brand-primary focus:bg-surface-card transition-colors placeholder:text-text-muted";
+
   return (
     <div
       className="fixed inset-0 z-50 flex items-center justify-center bg-black/75 backdrop-blur-xs p-4 overflow-y-auto"
@@ -141,15 +144,15 @@ export function ProductFormModal({
       aria-modal="true"
       aria-labelledby="modal-product-form-title"
     >
-      <div className="w-full max-w-xl bg-surface-dark-card border border-surface-dark-border rounded-3xl shadow-2xl overflow-hidden my-8">
-        <div className="px-6 py-4 border-b border-surface-dark-border flex items-center justify-between bg-surface-dark/60">
+      <div className="w-full max-w-xl bg-surface-card border border-surface-border rounded-3xl shadow-2xl overflow-hidden my-8 text-text-strong">
+        <div className="px-6 py-4 border-b border-surface-border flex items-center justify-between bg-surface-canvas">
           <div>
-            <span className="text-[10px] font-bold uppercase tracking-widest text-brand-accent block">
-              Catálogo Multi-Tenant • Imagen yFicha de Producto
+            <span className="text-[10px] font-bold uppercase tracking-widest text-brand-primary block font-display">
+              Catálogo Multi-Tenant • Imagen y Ficha de Producto
             </span>
             <h2
               id="modal-product-form-title"
-              className="text-xl font-black uppercase tracking-tight text-white font-display"
+              className="text-xl font-black uppercase tracking-tight text-text-strong font-display"
             >
               {isEditing ? `Editar Producto #${productToEdit?.id}` : "Crear Nuevo Producto"}
             </h2>
@@ -158,7 +161,7 @@ export function ProductFormModal({
             type="button"
             onClick={onClose}
             aria-label="Cerrar modal"
-            className="p-2 rounded-full text-text-inverse-muted hover:text-white hover:bg-surface-dark-hover transition-colors"
+            className="p-2 rounded-full text-text-muted hover:text-text-strong hover:bg-surface-card-hover transition-colors cursor-pointer"
           >
             <X className="w-5 h-5" />
           </button>
@@ -173,7 +176,7 @@ export function ProductFormModal({
 
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
             <div className="sm:col-span-2">
-              <label className="block text-[11px] font-bold uppercase tracking-wider text-text-inverse-muted mb-1">
+              <label className="block text-[11px] font-bold uppercase tracking-wider text-text-muted mb-1">
                 Nombre del Plato o Combo *
               </label>
               <input
@@ -182,12 +185,12 @@ export function ProductFormModal({
                 value={form.name}
                 onChange={(e) => setForm({ ...form, name: e.target.value })}
                 placeholder="Ej. Parrillada Especial de la Casa"
-                className="w-full px-3.5 py-2.5 rounded-xl bg-surface-dark border border-surface-dark-border text-sm text-white font-bold focus:outline-none focus:border-brand-primary"
+                className={`${inputClass} font-bold`}
               />
             </div>
 
             <div>
-              <label className="block text-[11px] font-bold uppercase tracking-wider text-text-inverse-muted mb-1">
+              <label className="block text-[11px] font-bold uppercase tracking-wider text-text-muted mb-1">
                 Categoría del Menú *
               </label>
               <input
@@ -197,7 +200,7 @@ export function ProductFormModal({
                 value={form.category}
                 onChange={(e) => setForm({ ...form, category: e.target.value })}
                 placeholder="Ej. Combos, Cortes, Bebidas"
-                className="w-full px-3.5 py-2.5 rounded-xl bg-surface-dark border border-surface-dark-border text-sm text-white focus:outline-none focus:border-brand-primary"
+                className={inputClass}
               />
               <datalist id="tenant-categories-list">
                 {existingCategories.map((cat) => (
@@ -207,7 +210,7 @@ export function ProductFormModal({
             </div>
 
             <div>
-              <label className="block text-[11px] font-bold uppercase tracking-wider text-text-inverse-muted mb-1">
+              <label className="block text-[11px] font-bold uppercase tracking-wider text-text-muted mb-1">
                 Precio Base (USD) *
               </label>
               <input
@@ -219,12 +222,12 @@ export function ProductFormModal({
                 onChange={(e) =>
                   setForm({ ...form, basePrice: Number(e.target.value) })
                 }
-                className="w-full px-3.5 py-2.5 rounded-xl bg-surface-dark border border-surface-dark-border text-sm font-mono text-brand-accent font-bold focus:outline-none focus:border-brand-primary"
+                className={`${inputClass} font-mono font-bold`}
               />
             </div>
 
             <div className="sm:col-span-2">
-              <label className="block text-[11px] font-bold uppercase tracking-wider text-text-inverse-muted mb-1">
+              <label className="block text-[11px] font-bold uppercase tracking-wider text-text-muted mb-1">
                 Descripción Gastronómica *
               </label>
               <textarea
@@ -235,21 +238,21 @@ export function ProductFormModal({
                   setForm({ ...form, description: e.target.value })
                 }
                 placeholder="Detalla cortes, porciones, guarniciones y salsas incluidas..."
-                className="w-full px-3.5 py-2.5 rounded-xl bg-surface-dark border border-surface-dark-border text-white focus:outline-none focus:border-brand-primary"
+                className={inputClass}
               />
             </div>
           </div>
 
           {/* Sección de Fotografía Personalizada del Producto */}
-          <div className="pt-3 border-t border-surface-dark-border space-y-3">
-            <div className="flex items-center gap-2 text-brand-accent font-bold uppercase tracking-wider text-[11px]">
+          <div className="pt-3 border-t border-surface-border space-y-3">
+            <div className="flex items-center gap-2 text-brand-primary font-bold uppercase tracking-wider text-[11px]">
               <ImageIcon className="w-4 h-4" />
               <span>Fotografía del Producto (Propia por Establecimiento)</span>
             </div>
 
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
               <div>
-                <label className="block text-[11px] font-bold uppercase tracking-wider text-text-inverse-muted mb-1">
+                <label className="block text-[11px] font-bold uppercase tracking-wider text-text-muted mb-1">
                   Subir Foto desde tu Equipo (Multi-Tenant Aislado)
                 </label>
                 <input
@@ -263,25 +266,25 @@ export function ProductFormModal({
                   type="button"
                   disabled={isUploading}
                   onClick={() => fileInputRef.current?.click()}
-                  className="px-4 py-2 rounded-xl bg-surface-dark-hover hover:bg-brand-primary text-white text-xs font-bold uppercase tracking-wider inline-flex items-center gap-2 border border-surface-dark-border transition-colors cursor-pointer disabled:opacity-50"
+                  className="px-4 py-2 rounded-xl bg-surface-canvas hover:bg-surface-card-hover text-text-strong text-xs font-bold uppercase tracking-wider inline-flex items-center gap-2 border border-surface-border transition-colors cursor-pointer disabled:opacity-50"
                 >
                   {isUploading ? (
                     <Loader2 className="w-3.5 h-3.5 animate-spin" />
                   ) : (
-                    <Upload className="w-3.5 h-3.5" />
+                    <Upload className="w-3.5 h-3.5 text-brand-primary" />
                   )}
                   <span>{isUploading ? "Subiendo imagen..." : "Seleccionar Archivo Local"}</span>
                 </button>
               </div>
 
-              <div className="text-[11px] text-text-inverse-muted sm:text-right">
+              <div className="text-[11px] text-text-muted sm:text-right">
                 <span>Destino aislado: </span>
-                <code className="text-brand-accent font-mono">/tenants/{currentTenantSlug}/menu/</code>
+                <code className="text-brand-primary font-mono">/tenants/{currentTenantSlug}/menu/</code>
               </div>
             </div>
 
             <div>
-              <label className="block text-[11px] font-bold uppercase tracking-wider text-text-inverse-muted mb-1">
+              <label className="block text-[11px] font-bold uppercase tracking-wider text-text-muted mb-1">
                 Seleccionar de Galería Local o Usar URL Propia
               </label>
               <select
@@ -291,7 +294,7 @@ export function ProductFormModal({
                     setForm({ ...form, imageUrl: e.target.value });
                   }
                 }}
-                className="w-full px-3.5 py-2 rounded-xl bg-surface-dark border border-surface-dark-border text-white focus:outline-none focus:border-brand-primary"
+                className={inputClass}
               >
                 {PRESET_PRODUCT_IMAGES.map((item) => (
                   <option key={item.value} value={item.value}>
@@ -303,11 +306,11 @@ export function ProductFormModal({
             </div>
 
             <div>
-              <label className="block text-[11px] font-bold uppercase tracking-wider text-text-inverse-muted mb-1">
+              <label className="block text-[11px] font-bold uppercase tracking-wider text-text-muted mb-1">
                 URL o Ruta de la Imagen (https://... o /images/...) *
               </label>
               <div className="flex items-center gap-3">
-                <div className="w-16 h-16 rounded-2xl overflow-hidden bg-surface-dark border border-surface-dark-border shrink-0">
+                <div className="w-16 h-16 rounded-2xl overflow-hidden bg-surface-canvas border border-surface-border shrink-0">
                   {/* eslint-disable-next-line @next/next/no-img-element */}
                   <img
                     src={form.imageUrl || "/images/shared/placeholders/dish-default.webp"}
@@ -323,21 +326,21 @@ export function ProductFormModal({
                     setForm({ ...form, imageUrl: e.target.value })
                   }
                   placeholder="https://images.unsplash.com/... o /images/tenants/uploads/mi-plato.webp"
-                  className="w-full px-3.5 py-2.5 rounded-xl bg-surface-dark border border-surface-dark-border text-white font-mono text-xs focus:outline-none focus:border-brand-primary"
+                  className={`${inputClass} font-mono text-xs`}
                 />
               </div>
             </div>
           </div>
 
-          <div className="pt-3 border-t border-surface-dark-border flex items-center justify-between gap-3">
-            <label className="flex items-center gap-2 text-text-inverse-base cursor-pointer">
+          <div className="pt-3 border-t border-surface-border flex items-center justify-between gap-3">
+            <label className="flex items-center gap-2 text-text-strong cursor-pointer">
               <input
                 type="checkbox"
                 checked={form.isActive}
                 onChange={(e) =>
                   setForm({ ...form, isActive: e.target.checked })
                 }
-                className="rounded border-surface-dark-border"
+                className="rounded border-surface-border"
               />
               <span>Disponible inmediatamente en el menú</span>
             </label>
@@ -346,14 +349,14 @@ export function ProductFormModal({
               <button
                 type="button"
                 onClick={onClose}
-                className="px-4 py-2 rounded-full border border-surface-dark-border text-text-inverse-muted hover:text-white font-bold uppercase tracking-wider transition-colors"
+                className="px-4 py-2 rounded-full border border-surface-border text-text-muted hover:text-text-strong font-bold uppercase tracking-wider transition-colors cursor-pointer"
               >
                 Cancelar
               </button>
               <button
                 type="submit"
                 disabled={isSubmitting}
-                className="px-5 py-2 rounded-full bg-brand-primary hover:bg-brand-primary-hover text-white font-black uppercase tracking-wider font-display inline-flex items-center gap-2 transition-all disabled:opacity-50 cursor-pointer"
+                className="px-5 py-2 rounded-full bg-brand-primary hover:bg-brand-primary-hover text-white font-black uppercase tracking-wider font-display inline-flex items-center gap-2 transition-all disabled:opacity-50 cursor-pointer shadow-md active:scale-95"
               >
                 {isSubmitting && <Loader2 className="w-3.5 h-3.5 animate-spin" />}
                 <span>{isEditing ? "Guardar Cambios" : "Crear Producto"}</span>
@@ -365,4 +368,3 @@ export function ProductFormModal({
     </div>
   );
 }
-

@@ -127,13 +127,6 @@ export default function DashboardLayout({
           <div className="flex items-center gap-2.5 sm:gap-3 text-xs">
             {isSuperAdmin && <TenantSwitcher variant="auto" />}
 
-            <div className="hidden sm:flex items-center gap-2 bg-surface-canvas px-3 py-1 rounded-full border border-surface-border text-[11px] font-bold uppercase tracking-wider">
-              <span className="w-2 h-2 rounded-full bg-status-success shrink-0" />
-              <span className="text-status-success">
-                SignalR Activo
-              </span>
-            </div>
-
             <div className="hidden lg:flex items-center gap-1.5 text-text-muted bg-surface-canvas px-3 py-1 rounded-full border border-surface-border text-[11px] font-bold uppercase tracking-wider">
               <Volume2 className="w-3.5 h-3.5 text-brand-accent" />
               <span>Alarma</span>

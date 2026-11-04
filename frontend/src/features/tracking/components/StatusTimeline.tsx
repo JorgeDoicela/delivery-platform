@@ -49,7 +49,7 @@ export function StatusTimeline({ status }: StatusTimelineProps) {
               <div
                 className={`h-9 w-9 rounded-full flex items-center justify-center font-bold text-xs mb-2 transition-all shadow-sm ${
                   isCompleted
-                    ? 'bg-status-success text-text-inverse-strong'
+                    ? 'bg-status-success text-white'
                     : isCurrent
                     ? 'bg-brand-primary text-white scale-110 shadow-lg'
                     : 'bg-surface-canvas border border-surface-border text-text-muted'

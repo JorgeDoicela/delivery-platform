@@ -34,7 +34,7 @@ export function OrderSummary() {
         </div>
         <Link
           href="/catalogo"
-          className="inline-flex items-center justify-center bg-brand-primary hover:bg-brand-primary-hover text-text-inverse-strong text-xs font-black uppercase tracking-wider py-3.5 px-7 rounded-full shadow-md transition-all active:scale-95"
+          className="inline-flex items-center justify-center bg-brand-primary hover:bg-brand-primary-hover text-white text-xs font-black uppercase tracking-wider py-3.5 px-7 rounded-full shadow-md transition-all active:scale-95 cursor-pointer"
         >
           Explorar el Menú
         </Link>

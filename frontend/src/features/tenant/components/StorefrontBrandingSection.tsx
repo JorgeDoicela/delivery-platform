@@ -52,16 +52,20 @@ export function StorefrontBrandingSection({
       if (fileInputRef.current) fileInputRef.current.value = "";
     }
   };
+
+  const inputClass =
+    "w-full px-3.5 py-2.5 rounded-xl bg-surface-canvas border border-surface-border text-text-strong focus:outline-none focus:border-brand-primary focus:bg-surface-card transition-colors placeholder:text-text-muted";
+
   return (
     <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-      <div className="lg:col-span-2 bg-surface-dark-card border border-surface-dark-border rounded-3xl p-6 space-y-4 text-xs">
-        <h3 className="text-base font-black uppercase tracking-wide text-text-inverse-strong font-display border-b border-surface-dark-border pb-2">
+      <div className="lg:col-span-2 bg-surface-card border border-surface-border rounded-3xl p-6 space-y-4 text-xs shadow-xs transition-colors duration-200">
+        <h3 className="text-base font-black uppercase tracking-wide text-text-strong font-display border-b border-surface-border pb-2">
           Datos de Marca y Textos de Landing
         </h3>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <div>
-            <label className="block text-[11px] font-bold uppercase tracking-wider text-text-inverse-muted mb-1">
+            <label className="block text-[11px] font-bold uppercase tracking-wider text-text-muted mb-1">
               Nombre Comercial (Storefront)
             </label>
             <input
@@ -69,12 +73,12 @@ export function StorefrontBrandingSection({
               required
               value={formState.name}
               onChange={(e) => onFieldChange("name", e.target.value)}
-              className="w-full px-3.5 py-2.5 rounded-xl bg-surface-dark border border-surface-dark-border text-text-inverse-strong font-bold focus:outline-none focus:border-brand-primary"
+              className={`${inputClass} font-bold`}
             />
           </div>
 
           <div>
-            <label className="block text-[11px] font-bold uppercase tracking-wider text-text-inverse-muted mb-1">
+            <label className="block text-[11px] font-bold uppercase tracking-wider text-text-muted mb-1">
               Subtítulo / Tagline
             </label>
             <input
@@ -82,24 +86,24 @@ export function StorefrontBrandingSection({
               required
               value={formState.tagline}
               onChange={(e) => onFieldChange("tagline", e.target.value)}
-              className="w-full px-3.5 py-2.5 rounded-xl bg-surface-dark border border-surface-dark-border text-text-inverse-strong focus:outline-none focus:border-brand-primary"
+              className={inputClass}
             />
           </div>
 
           <div className="sm:col-span-2">
-            <label className="block text-[11px] font-bold uppercase tracking-wider text-text-inverse-muted mb-1">
+            <label className="block text-[11px] font-bold uppercase tracking-wider text-text-muted mb-1">
               Subtítulo de la Vitrina de Menú
             </label>
             <input
               type="text"
               value={formState.heroSubtitle}
               onChange={(e) => onFieldChange("heroSubtitle", e.target.value)}
-              className="w-full px-3.5 py-2.5 rounded-xl bg-surface-dark border border-surface-dark-border text-text-inverse-strong focus:outline-none focus:border-brand-primary"
+              className={inputClass}
             />
           </div>
 
           <div className="sm:col-span-2">
-            <label className="block text-[11px] font-bold uppercase tracking-wider text-text-inverse-muted mb-1">
+            <label className="block text-[11px] font-bold uppercase tracking-wider text-text-muted mb-1">
               Descripción Institucional (Pie de Página y SEO)
             </label>
             <textarea
@@ -107,36 +111,36 @@ export function StorefrontBrandingSection({
               required
               value={formState.description}
               onChange={(e) => onFieldChange("description", e.target.value)}
-              className="w-full px-3.5 py-2.5 rounded-xl bg-surface-dark border border-surface-dark-border text-text-inverse-strong focus:outline-none focus:border-brand-primary"
+              className={inputClass}
             />
           </div>
 
           <div>
-            <label className="block text-[11px] font-bold uppercase tracking-wider text-text-inverse-muted mb-1">
+            <label className="block text-[11px] font-bold uppercase tracking-wider text-text-muted mb-1">
               Razón Social Legal (SRI)
             </label>
             <input
               type="text"
               value={formState.businessName}
               onChange={(e) => onFieldChange("businessName", e.target.value)}
-              className="w-full px-3.5 py-2.5 rounded-xl bg-surface-dark border border-surface-dark-border text-text-inverse-strong focus:outline-none focus:border-brand-primary"
+              className={inputClass}
             />
           </div>
 
           <div>
-            <label className="block text-[11px] font-bold uppercase tracking-wider text-text-inverse-muted mb-1">
+            <label className="block text-[11px] font-bold uppercase tracking-wider text-text-muted mb-1">
               RUC / Identificación Tributaria
             </label>
             <input
               type="text"
               value={formState.taxId}
               onChange={(e) => onFieldChange("taxId", e.target.value)}
-              className="w-full px-3.5 py-2.5 rounded-xl bg-surface-dark border border-surface-dark-border text-text-inverse-strong font-mono focus:outline-none focus:border-brand-primary"
+              className={`${inputClass} font-mono`}
             />
           </div>
 
           <div className="sm:col-span-2">
-            <label className="block text-[11px] font-bold uppercase tracking-wider text-text-inverse-muted mb-1">
+            <label className="block text-[11px] font-bold uppercase tracking-wider text-text-muted mb-1">
               Dominio Propio Personalizado (Opcional)
             </label>
             <input
@@ -144,35 +148,37 @@ export function StorefrontBrandingSection({
               value={formState.customDomain || ""}
               onChange={(e) => onFieldChange("customDomain", e.target.value || null)}
               placeholder="pedidos.mirestaurante.com o elbrasero.com"
-              className="w-full px-3.5 py-2.5 rounded-xl bg-surface-dark border border-surface-dark-border text-text-inverse-strong font-mono text-xs focus:outline-none focus:border-brand-primary"
+              className={`${inputClass} font-mono text-xs`}
             />
-            <p className="text-[11px] text-text-inverse-muted mt-1">
+            <p className="text-[11px] text-text-muted mt-1">
               Permite que tus clientes ingresen directo a tu tienda desde tu propio dominio mediante un registro CNAME en tu DNS.
             </p>
           </div>
 
-          <div className="sm:col-span-2 pt-2 border-t border-surface-dark-border">
-            <label className="block text-[11px] font-bold uppercase tracking-wider text-text-inverse-muted mb-1.5">
+          <div className="sm:col-span-2 pt-2 border-t border-surface-border">
+            <label className="block text-[11px] font-bold uppercase tracking-wider text-text-muted mb-1.5">
               URL o Ruta del Logotipo de Marca (PNG / SVG / WebP)
             </label>
             <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3">
-              <div className="w-14 h-14 rounded-2xl bg-white border border-surface-dark-border flex items-center justify-center p-1.5 shrink-0 overflow-hidden">
+              <div className="w-14 h-14 rounded-2xl bg-surface-canvas border border-surface-border flex items-center justify-center p-1.5 shrink-0 overflow-hidden">
                 {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img
                   src={formState.logoUrl || "/images/shared/placeholders/logo-default.png"}
-                  alt="Vista previa logo"
-                  className="w-full h-full object-contain"
+                  alt="Previsualización Logo"
+                  className="max-w-full max-h-full object-contain"
                 />
               </div>
+
               <div className="flex-1 w-full space-y-2">
-                <input
-                  type="text"
-                  value={formState.logoUrl}
-                  onChange={(e) => onFieldChange("logoUrl", e.target.value)}
-                  placeholder="https://... o /images/shared/placeholders/logo-default.png"
-                  className="w-full px-3.5 py-2.5 rounded-xl bg-surface-dark border border-surface-dark-border text-text-inverse-strong font-mono text-xs focus:outline-none focus:border-brand-primary"
-                />
-                <div className="flex flex-wrap items-center gap-3 pt-1">
+                <div className="flex items-center gap-2">
+                  <input
+                    type="text"
+                    value={formState.logoUrl || ""}
+                    onChange={(e) => onFieldChange("logoUrl", e.target.value)}
+                    placeholder="/images/shared/placeholders/logo-default.png"
+                    className={`${inputClass} font-mono text-xs flex-1`}
+                  />
+
                   <input
                     type="file"
                     ref={fileInputRef}
@@ -180,27 +186,25 @@ export function StorefrontBrandingSection({
                     onChange={handleLogoUpload}
                     className="hidden"
                   />
+
                   <button
                     type="button"
                     disabled={isUploading}
                     onClick={() => fileInputRef.current?.click()}
-                    className="px-3.5 py-1.5 rounded-xl bg-surface-dark-hover hover:bg-brand-primary text-white text-[11px] font-bold uppercase tracking-wider inline-flex items-center gap-2 border border-surface-dark-border transition-colors cursor-pointer disabled:opacity-50"
+                    className="inline-flex items-center gap-1.5 px-3.5 py-2.5 rounded-xl border border-surface-border bg-surface-canvas hover:bg-surface-card-hover text-text-strong font-bold text-xs uppercase tracking-wider transition-colors shrink-0 cursor-pointer disabled:opacity-50"
                   >
                     {isUploading ? (
                       <Loader2 className="w-3.5 h-3.5 animate-spin" />
                     ) : (
-                      <Upload className="w-3.5 h-3.5" />
+                      <Upload className="w-3.5 h-3.5 text-brand-primary" />
                     )}
-                    <span>{isUploading ? "Subiendo..." : "Subir Logotipo Local"}</span>
+                    <span>Subir Logotipo Local</span>
                   </button>
-                  <span className="text-[11px] text-text-inverse-muted">
-                    Destino: <code className="text-brand-accent font-mono">/tenants/{currentTenantSlug}/identidad/</code>
-                  </span>
                 </div>
                 {uploadError && (
-                  <p className="text-[11px] text-red-400 font-semibold">{uploadError}</p>
+                  <p className="text-[11px] text-red-500 font-semibold">{uploadError}</p>
                 )}
-                <p className="text-[11px] text-text-inverse-muted">
+                <p className="text-[11px] text-text-muted">
                   Puedes ingresar cualquier URL externa (HTTPS) o una ruta local dentro de <code className="text-brand-accent">/images/</code>.
                 </p>
               </div>
@@ -210,14 +214,14 @@ export function StorefrontBrandingSection({
       </div>
 
       {/* Panel de Paleta de Colores Dinámica */}
-      <div className="bg-surface-dark-card border border-surface-dark-border rounded-3xl p-6 space-y-5 text-xs">
-        <h3 className="text-base font-black uppercase tracking-wide text-text-inverse-strong font-display border-b border-surface-dark-border pb-2">
+      <div className="bg-surface-card border border-surface-border rounded-3xl p-6 space-y-5 text-xs shadow-xs transition-colors duration-200">
+        <h3 className="text-base font-black uppercase tracking-wide text-text-strong font-display border-b border-surface-border pb-2">
           Tokens de Color de Marca
         </h3>
 
         <div className="space-y-4">
           <div>
-            <label className="block text-[11px] font-bold uppercase tracking-wider text-text-inverse-muted mb-1.5">
+            <label className="block text-[11px] font-bold uppercase tracking-wider text-text-muted mb-1.5">
               Color Primario (--brand-primary)
             </label>
             <div className="flex items-center gap-3">
@@ -227,7 +231,7 @@ export function StorefrontBrandingSection({
                 onChange={(e) =>
                   onFieldChange("brandPrimaryColor", e.target.value)
                 }
-                className="w-11 h-10 rounded-xl bg-transparent border border-surface-dark-border cursor-pointer"
+                className="w-11 h-10 rounded-xl bg-transparent border border-surface-border cursor-pointer"
               />
               <input
                 type="text"
@@ -235,13 +239,13 @@ export function StorefrontBrandingSection({
                 onChange={(e) =>
                   onFieldChange("brandPrimaryColor", e.target.value)
                 }
-                className="flex-1 px-3 py-2 rounded-xl bg-surface-dark border border-surface-dark-border text-text-inverse-strong font-mono uppercase"
+                className="flex-1 px-3 py-2 rounded-xl bg-surface-canvas border border-surface-border text-text-strong font-mono uppercase"
               />
             </div>
           </div>
 
           <div>
-            <label className="block text-[11px] font-bold uppercase tracking-wider text-text-inverse-muted mb-1.5">
+            <label className="block text-[11px] font-bold uppercase tracking-wider text-text-muted mb-1.5">
               Color Hover (--brand-primary-hover)
             </label>
             <div className="flex items-center gap-3">
@@ -251,7 +255,7 @@ export function StorefrontBrandingSection({
                 onChange={(e) =>
                   onFieldChange("brandPrimaryHoverColor", e.target.value)
                 }
-                className="w-11 h-10 rounded-xl bg-transparent border border-surface-dark-border cursor-pointer"
+                className="w-11 h-10 rounded-xl bg-transparent border border-surface-border cursor-pointer"
               />
               <input
                 type="text"
@@ -259,13 +263,13 @@ export function StorefrontBrandingSection({
                 onChange={(e) =>
                   onFieldChange("brandPrimaryHoverColor", e.target.value)
                 }
-                className="flex-1 px-3 py-2 rounded-xl bg-surface-dark border border-surface-dark-border text-text-inverse-strong font-mono uppercase"
+                className="flex-1 px-3 py-2 rounded-xl bg-surface-canvas border border-surface-border text-text-strong font-mono uppercase"
               />
             </div>
           </div>
 
           <div>
-            <label className="block text-[11px] font-bold uppercase tracking-wider text-text-inverse-muted mb-1.5">
+            <label className="block text-[11px] font-bold uppercase tracking-wider text-text-muted mb-1.5">
               Color Acento (--brand-accent)
             </label>
             <div className="flex items-center gap-3">
@@ -275,7 +279,7 @@ export function StorefrontBrandingSection({
                 onChange={(e) =>
                   onFieldChange("brandAccentColor", e.target.value)
                 }
-                className="w-11 h-10 rounded-xl bg-transparent border border-surface-dark-border cursor-pointer"
+                className="w-11 h-10 rounded-xl bg-transparent border border-surface-border cursor-pointer"
               />
               <input
                 type="text"
@@ -283,14 +287,14 @@ export function StorefrontBrandingSection({
                 onChange={(e) =>
                   onFieldChange("brandAccentColor", e.target.value)
                 }
-                className="flex-1 px-3 py-2 rounded-xl bg-surface-dark border border-surface-dark-border text-text-inverse-strong font-mono uppercase"
+                className="flex-1 px-3 py-2 rounded-xl bg-surface-canvas border border-surface-border text-text-strong font-mono uppercase"
               />
             </div>
           </div>
 
-          <div className="pt-3 border-t border-surface-dark-border space-y-3">
+          <div className="pt-3 border-t border-surface-border space-y-3">
             <div>
-              <label className="block text-[11px] font-bold uppercase tracking-wider text-text-inverse-muted mb-1.5">
+              <label className="block text-[11px] font-bold uppercase tracking-wider text-text-muted mb-1.5">
                 Plantilla de Estructura de Landing
               </label>
               <select
@@ -298,7 +302,7 @@ export function StorefrontBrandingSection({
                 onChange={(e) =>
                   onFieldChange("landingLayoutTemplate", e.target.value)
                 }
-                className="w-full px-3 py-2 rounded-xl bg-surface-dark border border-surface-dark-border text-text-inverse-strong font-bold text-xs focus:outline-none focus:border-brand-primary cursor-pointer"
+                className="w-full px-3 py-2 rounded-xl bg-surface-canvas border border-surface-border text-text-strong font-bold text-xs focus:outline-none focus:border-brand-primary cursor-pointer"
               >
                 <option value="asadero-clasico">
                   Asadero Clásico (Slider Panorámico + Combos Asador)
@@ -312,14 +316,14 @@ export function StorefrontBrandingSection({
               </select>
             </div>
 
-            <label className="flex items-center gap-2.5 cursor-pointer text-text-inverse-base">
+            <label className="flex items-center gap-2.5 cursor-pointer text-text-base">
               <input
                 type="checkbox"
                 checked={formState.quickLinksEnabled}
                 onChange={(e) =>
                   onFieldChange("quickLinksEnabled", e.target.checked)
                 }
-                className="rounded border-surface-dark-border"
+                className="rounded border-surface-border"
               />
               <span>Mostrar panel de accesos rápidos en la landing</span>
             </label>
@@ -329,4 +333,3 @@ export function StorefrontBrandingSection({
     </div>
   );
 }
-

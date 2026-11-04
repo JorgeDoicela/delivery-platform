@@ -1,0 +1,123 @@
+{
+  "tenantSlug": "brasas-del-valle",
+  "categories": [
+    {
+      "name": "Parrilladas",
+      "displayOrder": 1,
+      "isActive": true
+    },
+    {
+      "name": "Cortes",
+      "displayOrder": 2,
+      "isActive": true
+    },
+    {
+      "name": "Entradas",
+      "displayOrder": 3,
+      "isActive": true
+    },
+    {
+      "name": "Bebidas",
+      "displayOrder": 4,
+      "isActive": true
+    }
+  ],
+  "modifierGroups": [
+    {
+      "name": "Término de Cocción",
+      "minSelectable": 1,
+      "maxSelectable": 1,
+      "isRequired": true,
+      "options": [
+        {
+          "name": "Término Medio (Jugoso y rosado)",
+          "additionalPrice": 0.00,
+          "isAvailable": true
+        },
+        {
+          "name": "Tres Cuartos (Punto tradicional)",
+          "additionalPrice": 0.00,
+          "isAvailable": true
+        },
+        {
+          "name": "Bien Cocido",
+          "additionalPrice": 0.00,
+          "isAvailable": true
+        }
+      ]
+    },
+    {
+      "name": "Salsa & Chimichurri",
+      "minSelectable": 1,
+      "maxSelectable": 2,
+      "isRequired": true,
+      "options": [
+        {
+          "name": "Chimichurri Clásico de la Casa",
+          "additionalPrice": 0.00,
+          "isAvailable": true
+        },
+        {
+          "name": "Chimichurri Ahumado",
+          "additionalPrice": 0.00,
+          "isAvailable": true
+        },
+        {
+          "name": "Salsa Criolla Tradicional",
+          "additionalPrice": 0.00,
+          "isAvailable": true
+        }
+      ]
+    }
+  ],
+  "products": [
+    {
+      "sku": "PAR-IMP-01",
+      "name": "Parrillada Imperial 4 Personas",
+      "description": "Bife de chorizo, lomo fino, pechuga grillada, 2 chorizos argentinos, papas rústicas y chimichurri.",
+      "category": "Parrilladas",
+      "basePrice": 34.50,
+      "taxRate": 0.00,
+      "imageUrl": "/images/tenants/brasas-del-valle/menu/combo-familiar.webp",
+      "isKitchen": true,
+      "isActive": true,
+      "modifierGroups": [
+        "Término de Cocción",
+        "Salsa & Chimichurri"
+      ],
+      "recipes": []
+    },
+    {
+      "sku": "COR-BIF-01",
+      "name": "Bife de Chorizo Angus 400g",
+      "description": "Corte argentino madurado a la brasa con papas al romero y ensalada fresca.",
+      "category": "Cortes",
+      "basePrice": 18.90,
+      "taxRate": 0.00,
+      "imageUrl": "/images/tenants/brasas-del-valle/menu/medio-pollo.webp",
+      "isKitchen": true,
+      "isActive": true,
+      "modifierGroups": [
+        "Término de Cocción",
+        "Salsa & Chimichurri"
+      ],
+      "recipes": []
+    },
+    {
+      "sku": "COR-CHU-01",
+      "name": "Costillar & Chorizo Criollo",
+      "description": "Costillar de cerdo braseado lentamente con chorizo artesanal y yuca dorada.",
+      "category": "Cortes",
+      "basePrice": 13.50,
+      "taxRate": 0.00,
+      "imageUrl": "/images/tenants/brasas-del-valle/menu/cuarto-pollo.webp",
+      "isKitchen": true,
+      "isActive": true,
+      "modifierGroups": [
+        "Salsa & Chimichurri"
+      ],
+      "recipes": []
+    }
+  ]
+}
+

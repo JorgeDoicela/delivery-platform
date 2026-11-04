@@ -10,14 +10,14 @@ import type { MenuProductDto } from "@/shared/types/api";
 import { ProductFormModal } from "./ProductFormModal";
 import {
   Package,
+  Search,
   CheckCircle2,
   XCircle,
-  Loader2,
   AlertTriangle,
   RefreshCw,
-  Search,
   Plus,
   Pencil,
+  Loader2,
 } from "lucide-react";
 
 export function InventoryManagerView() {
@@ -25,14 +25,15 @@ export function InventoryManagerView() {
   const { data, isLoading, isError, refetch } = useMenuQuery(true);
   const [searchTerm, setSearchTerm] = useState("");
   const [togglingId, setTogglingId] = useState<number | null>(null);
-  const [isProductModalOpen, setIsProductModalOpen] = useState(false);
-  const [editingProduct, setEditingProduct] = useState<
-    (MenuProductDto & { categoryName?: string }) | null
-  >(null);
   const [actionMessage, setActionMessage] = useState<{
     text: string;
     type: "success" | "error";
   } | null>(null);
+
+  const [isProductModalOpen, setIsProductModalOpen] = useState(false);
+  const [editingProduct, setEditingProduct] = useState<MenuProductDto | null>(
+    null
+  );
 
   const handleToggleStatus = async (productId: number, currentStatus: boolean) => {
     setTogglingId(productId);
@@ -40,7 +41,6 @@ export function InventoryManagerView() {
 
     try {
       const updated = await apiClient.toggleProductStatus(productId, !currentStatus);
-      // Actualizar caché de react-query para reflejar el cambio inmediatamente
       await queryClient.invalidateQueries({ queryKey: ["catalog", "menu"] });
       setActionMessage({
         text: `Producto "${updated.productName}" ${
@@ -61,7 +61,7 @@ export function InventoryManagerView() {
 
   if (isLoading) {
     return (
-      <div className="flex flex-col items-center justify-center min-h-[50vh] text-text-inverse-muted">
+      <div className="flex flex-col items-center justify-center min-h-[50vh] text-text-muted">
         <RefreshCw className="h-8 w-8 animate-spin text-brand-primary mb-4" />
         <p className="text-sm font-medium">Cargando inventario maestro de productos...</p>
       </div>
@@ -72,13 +72,13 @@ export function InventoryManagerView() {
     return (
       <div className="max-w-xl mx-auto my-12 p-6 bg-status-danger/20 border border-status-danger/40 rounded-2xl text-center shadow-lg">
         <AlertTriangle className="h-10 w-10 text-status-danger mx-auto mb-3" />
-        <h2 className="text-lg font-bold text-text-inverse-strong mb-2">Error de Sincronización</h2>
-        <p className="text-sm text-text-inverse-muted mb-6">
+        <h2 className="text-lg font-bold text-text-strong mb-2">Error de Sincronización</h2>
+        <p className="text-sm text-text-muted mb-6">
           No se pudo consultar el catálogo operativo desde el backend.
         </p>
         <button
           onClick={() => refetch()}
-          className="inline-flex items-center gap-2 px-4 py-2 bg-surface-dark-card hover:bg-surface-dark-hover text-text-inverse-strong text-xs rounded-xl font-semibold transition-colors"
+          className="inline-flex items-center gap-2 px-4 py-2 bg-surface-card hover:bg-surface-card-hover border border-surface-border text-text-strong text-xs rounded-xl font-semibold transition-colors cursor-pointer"
         >
           <RefreshCw className="h-3.5 w-3.5" />
           Reintentar
@@ -103,29 +103,29 @@ export function InventoryManagerView() {
   return (
     <div className="space-y-6 w-full">
       {/* Cabecera Operativa */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between pb-4 border-b border-surface-dark-border gap-4">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between pb-4 border-b border-surface-border gap-4">
         <div>
           <div className="flex items-center gap-2.5">
             <div className="w-8 h-8 rounded-xl bg-brand-primary flex items-center justify-center text-white">
               <Package className="w-4 h-4" />
             </div>
-            <h1 className="text-2xl sm:text-3xl font-black uppercase tracking-wide text-text-inverse-strong font-display">
+            <h1 className="text-2xl sm:text-3xl font-black uppercase tracking-wide text-text-strong font-display">
               Control de Inventario y Disponibilidad
             </h1>
           </div>
-          <p className="text-xs text-text-inverse-muted mt-1 leading-relaxed">
+          <p className="text-xs text-text-muted mt-1 leading-relaxed">
             Conmutador de stock en tiempo real. Los cambios se sincronizan al KDS y al catálogo cliente al instante.
           </p>
         </div>
 
         <div className="flex flex-wrap items-center gap-3">
-          <div className="bg-surface-dark-card border border-surface-dark-border px-3.5 py-1.5 rounded-full text-xs font-bold uppercase tracking-wider flex items-center gap-2">
+          <div className="bg-surface-card border border-surface-border px-3.5 py-1.5 rounded-full text-xs font-bold uppercase tracking-wider flex items-center gap-2 shadow-xs">
             <span className="w-2 h-2 rounded-full bg-status-success animate-pulse" />
-            <span className="text-text-inverse-base">{activeCount} Disponibles</span>
+            <span className="text-text-strong">{activeCount} Disponibles</span>
           </div>
-          <div className="bg-surface-dark-card border border-surface-dark-border px-3.5 py-1.5 rounded-full text-xs font-bold uppercase tracking-wider flex items-center gap-2">
+          <div className="bg-surface-card border border-surface-border px-3.5 py-1.5 rounded-full text-xs font-bold uppercase tracking-wider flex items-center gap-2 shadow-xs">
             <span className="w-2 h-2 rounded-full bg-status-danger" />
-            <span className="text-text-inverse-base">{inactiveCount} Agotados</span>
+            <span className="text-text-strong">{inactiveCount} Agotados</span>
           </div>
           <button
             type="button"
@@ -160,19 +160,19 @@ export function InventoryManagerView() {
       )}
 
       {/* Barra de Filtro y Búsqueda */}
-      <div className="flex items-center gap-3 bg-surface-dark-card border border-surface-dark-border rounded-full px-5 py-3 shadow-sm">
-        <Search className="w-4 h-4 text-text-inverse-muted shrink-0" />
+      <div className="flex items-center gap-3 bg-surface-card border border-surface-border rounded-full px-5 py-3 shadow-xs">
+        <Search className="w-4 h-4 text-text-muted shrink-0" />
         <input
           type="text"
           value={searchTerm}
           onChange={(e) => setSearchTerm(e.target.value)}
           placeholder="Buscar producto por nombre o categoría..."
-          className="bg-transparent text-xs text-text-inverse-strong placeholder-text-inverse-subtle flex-1 focus:outline-none"
+          className="bg-transparent text-xs text-text-strong placeholder:text-text-muted flex-1 focus:outline-none"
         />
         {searchTerm && (
           <button
             onClick={() => setSearchTerm("")}
-            className="text-xs font-bold uppercase tracking-wider text-text-inverse-muted hover:text-white transition-colors"
+            className="text-xs font-bold uppercase tracking-wider text-text-muted hover:text-text-strong transition-colors cursor-pointer"
           >
             Limpiar
           </button>
@@ -180,10 +180,10 @@ export function InventoryManagerView() {
       </div>
 
       {/* Tabla de Productos */}
-      <div className="bg-surface-dark-card border border-surface-dark-border rounded-3xl overflow-hidden shadow-xl">
+      <div className="bg-surface-card border border-surface-border rounded-3xl overflow-hidden shadow-xs">
         <div className="overflow-x-auto">
           <table className="w-full text-left text-xs">
-            <thead className="bg-surface-dark text-text-inverse-muted uppercase font-mono tracking-wider text-[11px] border-b border-surface-dark-border">
+            <thead className="bg-surface-canvas text-text-muted uppercase font-mono tracking-wider text-[11px] border-b border-surface-border">
               <tr>
                 <th className="px-5 py-3.5">Producto</th>
                 <th className="px-4 py-3.5">Categoría</th>
@@ -193,25 +193,26 @@ export function InventoryManagerView() {
                 <th className="px-5 py-3.5 text-right">Acción</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-surface-dark-border/60">
+            <tbody className="divide-y divide-surface-border">
               {filteredProducts.map((product) => {
                 const isPending = togglingId === product.id;
 
                 return (
-                  <tr key={product.id} className="hover:bg-surface-dark-hover/40 transition-colors">
+                  <tr key={product.id} className="hover:bg-surface-canvas/60 transition-colors">
                     <td className="px-5 py-4">
                       <div className="flex items-center gap-3">
-                        <div className="relative w-10 h-10 rounded-xl overflow-hidden bg-surface-dark shrink-0 border border-surface-dark-border">
+                        <div className="relative w-10 h-10 rounded-xl overflow-hidden bg-surface-canvas shrink-0 border border-surface-border">
                           <Image
                             src={product.imageUrl || "/images/shared/placeholders/dish-default.webp"}
                             alt={product.name}
                             fill
+                            sizes="40px"
                             className="object-cover"
                           />
                         </div>
                         <div>
-                          <p className="font-bold text-text-inverse-strong text-sm">{product.name}</p>
-                          <p className="text-text-inverse-muted text-[11px] line-clamp-1 mt-0.5">
+                          <p className="font-bold text-text-strong text-sm">{product.name}</p>
+                          <p className="text-text-muted text-[11px] line-clamp-1 mt-0.5">
                             {product.description}
                           </p>
                         </div>
@@ -219,7 +220,7 @@ export function InventoryManagerView() {
                     </td>
 
                     <td className="px-4 py-4">
-                      <span className="bg-surface-dark-hover text-text-inverse-base font-mono text-[10px] px-2 py-0.5 rounded border border-surface-dark-border">
+                      <span className="bg-surface-canvas text-text-muted font-mono text-[10px] px-2 py-0.5 rounded border border-surface-border">
                         {product.categoryName}
                       </span>
                     </td>
@@ -228,11 +229,11 @@ export function InventoryManagerView() {
                       {formatCurrency(product.basePrice)}
                     </td>
 
-                    <td className="px-4 py-4 text-text-inverse-muted text-[11px]">
+                    <td className="px-4 py-4 text-text-muted text-[11px]">
                       {product.modifierGroups.length > 0 ? (
                         <span>{product.modifierGroups.length} grupos</span>
                       ) : (
-                        <span className="text-text-inverse-subtle">Ninguno</span>
+                        <span className="text-text-subtle">Ninguno</span>
                       )}
                     </td>
 
@@ -266,7 +267,7 @@ export function InventoryManagerView() {
                             setEditingProduct(product);
                             setIsProductModalOpen(true);
                           }}
-                          className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full text-xs font-bold uppercase tracking-wider bg-surface-dark hover:bg-surface-dark-hover text-text-inverse-strong border border-surface-dark-border transition-colors cursor-pointer"
+                          className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full text-xs font-bold uppercase tracking-wider bg-surface-canvas hover:bg-surface-card-hover text-text-strong border border-surface-border transition-colors cursor-pointer"
                         >
                           <Pencil className="w-3.5 h-3.5 text-brand-accent" />
                           <span>Editar / Imagen</span>
@@ -278,8 +279,8 @@ export function InventoryManagerView() {
                           disabled={isPending}
                           className={`inline-flex items-center gap-1.5 px-4 py-1.5 rounded-full text-xs font-bold uppercase tracking-wider transition-all active:scale-95 disabled:opacity-50 cursor-pointer ${
                             product.isActive
-                              ? "bg-status-danger/20 hover:bg-status-danger/30 text-status-danger border border-status-danger/40"
-                              : "bg-status-success/20 hover:bg-status-success/30 text-status-success border border-status-success/40"
+                              ? "bg-status-danger/15 hover:bg-status-danger/25 text-status-danger border border-status-danger/40"
+                              : "bg-status-success/15 hover:bg-status-success/25 text-status-success border border-status-success/40"
                           }`}
                         >
                           {isPending ? (
@@ -317,4 +318,3 @@ export function InventoryManagerView() {
     </div>
   );
 }
-
