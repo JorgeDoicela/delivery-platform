@@ -30,8 +30,11 @@ public sealed class UpdateOrderStatusEndpoint : IEndpoint
         .WithTags("Orders")
         .WithName("UpdateOrderStatus")
         .WithSummary("Avanza el estado del pedido siguiendo las transiciones válidas de la máquina de estados.")
+        .RequireAuthorization("OperationalStaffOnly")
         .Produces<UpdateOrderStatusResponse>(StatusCodes.Status200OK)
         .ProducesProblem(StatusCodes.Status400BadRequest)
+        .ProducesProblem(StatusCodes.Status401Unauthorized)
+        .ProducesProblem(StatusCodes.Status403Forbidden)
         .ProducesProblem(StatusCodes.Status404NotFound);
     }
 }

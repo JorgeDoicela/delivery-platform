@@ -18,6 +18,7 @@ public sealed class UpsertProductEndpoint : IEndpoint
         .WithTags("Catalog")
         .WithName("CreateProduct")
         .WithSummary("Crea un nuevo producto con su imagen y categoría en el catálogo del comercio actual.")
+        .RequireAuthorization("TenantAdminOnly")
         .Produces<UpsertProductResponse>(StatusCodes.Status200OK)
         .ProducesProblem(StatusCodes.Status400BadRequest);
 
@@ -29,6 +30,7 @@ public sealed class UpsertProductEndpoint : IEndpoint
         .WithTags("Catalog")
         .WithName("UpdateProduct")
         .WithSummary("Actualiza nombre, descripción, precio, categoría e imagen de un producto del comercio actual.")
+        .RequireAuthorization("TenantAdminOnly")
         .Produces<UpsertProductResponse>(StatusCodes.Status200OK)
         .ProducesProblem(StatusCodes.Status400BadRequest)
         .ProducesProblem(StatusCodes.Status404NotFound);

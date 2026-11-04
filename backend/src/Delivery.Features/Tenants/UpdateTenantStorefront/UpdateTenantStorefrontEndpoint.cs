@@ -21,6 +21,7 @@ public sealed class UpdateTenantStorefrontEndpoint : IEndpoint
         .WithTags("Tenants")
         .WithName("UpdateTenantStorefront")
         .WithSummary("Actualiza la identidad visual, landing page, tarifas, métodos de pago y banners del tenant activo.")
+        .RequireAuthorization("TenantAdminOnly")
         .Produces<UpdatedTenantStorefrontDto>(StatusCodes.Status200OK)
         .ProducesProblem(StatusCodes.Status400BadRequest)
         .ProducesProblem(StatusCodes.Status404NotFound);

@@ -4,7 +4,7 @@ import React from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { Utensils, Volume2, Package, Building2, Palette, ShieldCheck } from "lucide-react";
-import { UserNav, useAuthStore, UserRole } from "@/features/auth";
+import { UserNav, useAuthStore, UserRole, AuthGuard } from "@/features/auth";
 import { TenantSwitcher, useCurrentTenantQuery } from "@/features/tenant";
 
 export default function DashboardLayout({
@@ -14,22 +14,40 @@ export default function DashboardLayout({
 }) {
   const { data: tenant } = useCurrentTenantQuery();
   const user = useAuthStore((s) => s.user);
-  const isSuperAdmin =
-    !user ||
-    user.role === "SuperAdmin" ||
-    user.role === UserRole.SuperAdmin ||
-    user.roles?.includes("SuperAdmin");
+  const isSuperAdmin = Boolean(
+    user &&
+      (user.role === "SuperAdmin" ||
+        user.role === UserRole.SuperAdmin ||
+        user.roles?.includes("SuperAdmin") ||
+        Number(user.role) === 1)
+  );
   const canManageFranchise =
     isSuperAdmin ||
-    user?.role === "TenantAdmin" ||
-    user?.role === UserRole.TenantAdmin ||
-    user?.role === "BranchManager" ||
-    user?.role === UserRole.BranchManager;
+    Boolean(
+      user &&
+        (user.role === "TenantAdmin" ||
+          user.role === UserRole.TenantAdmin ||
+          user.role === "BranchManager" ||
+          user.role === UserRole.BranchManager ||
+          user.roles?.includes("TenantAdmin") ||
+          user.roles?.includes("BranchManager") ||
+          Number(user.role) === 2 ||
+          Number(user.role) === 3)
+    );
   const brandName = tenant?.name || "La Granjita";
   const brandLogo = tenant?.logoUrl || "/images/shared/placeholders/logo-default.png";
 
   return (
-    <div className="flex flex-col min-h-screen bg-surface-dark text-text-inverse-strong">
+    <AuthGuard
+      allowedRoles={[
+        UserRole.SuperAdmin,
+        UserRole.TenantAdmin,
+        UserRole.BranchManager,
+        UserRole.Cashier,
+        UserRole.KitchenStaff,
+      ]}
+    >
+      <div className="flex flex-col min-h-screen bg-surface-dark text-text-inverse-strong">
       <header className="h-16 bg-surface-dark-card border-b border-surface-dark-border px-4 sm:px-6 flex items-center justify-between shrink-0">
         <div className="flex items-center gap-6">
           <Link href="/cocina" className="flex items-center gap-3 group">
@@ -135,5 +153,6 @@ export default function DashboardLayout({
         {children}
       </main>
     </div>
+    </AuthGuard>
   );
 }

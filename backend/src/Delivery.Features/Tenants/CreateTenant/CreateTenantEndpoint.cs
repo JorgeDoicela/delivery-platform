@@ -21,6 +21,7 @@ public sealed class CreateTenantEndpoint : IEndpoint
         .WithTags("Tenants")
         .WithName("CreateTenant")
         .WithSummary("Aprovisiona un nuevo comercio (Tenant), sucursal matriz, catálogo base y usuario TenantAdmin.")
+        .RequireAuthorization("SuperAdminOnly")
         .Produces<CreatedTenantDto>(StatusCodes.Status200OK)
         .ProducesProblem(StatusCodes.Status400BadRequest)
         .ProducesProblem(StatusCodes.Status409Conflict);

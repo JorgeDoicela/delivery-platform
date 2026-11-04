@@ -22,6 +22,7 @@ public sealed class ToggleTenantStatusEndpoint : IEndpoint
         .WithTags("Tenants")
         .WithName("ToggleTenantStatus")
         .WithSummary("Activa o suspende operativamente un comercio dentro de la plataforma multi-tenant.")
+        .RequireAuthorization("SuperAdminOnly")
         .Produces<ToggleTenantStatusResponse>(StatusCodes.Status200OK)
         .ProducesProblem(StatusCodes.Status404NotFound);
     }

@@ -289,7 +289,7 @@ public static partial class DatabaseSeeder
                 new()
                 {
                     TenantId = tenant.Id,
-                    Name = "Matriz Guamaní",
+                    Name = "Guamaní",
                     Address = "Clodoveo Carrión, Sector Guamaní (Quito Sur)",
                     Phone = "0987654321",
                     LocationPoint = branch1Location,

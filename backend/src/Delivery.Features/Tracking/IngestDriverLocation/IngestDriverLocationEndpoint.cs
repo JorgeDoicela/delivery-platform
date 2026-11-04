@@ -18,8 +18,11 @@ public sealed class IngestDriverLocationEndpoint : IEndpoint
         .WithTags("Tracking")
         .WithName("IngestDriverLocation")
         .WithSummary("Ingesta las coordenadas GPS del repartidor en Redis GEO y las retransmite al cliente en vivo.")
+        .RequireAuthorization("DriverOnly")
         .Produces<IngestDriverLocationResponse>(StatusCodes.Status200OK)
-        .ProducesProblem(StatusCodes.Status400BadRequest);
+        .ProducesProblem(StatusCodes.Status400BadRequest)
+        .ProducesProblem(StatusCodes.Status401Unauthorized)
+        .ProducesProblem(StatusCodes.Status403Forbidden);
     }
 }
 

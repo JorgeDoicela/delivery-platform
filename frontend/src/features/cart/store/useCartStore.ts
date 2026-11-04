@@ -63,7 +63,7 @@ export const useCartStore = create<CartState>()(
       tenantSlug: DEFAULT_TENANT_SLUG,
       items: [],
       branchId: 1,
-      branchName: "Matriz Quito Norte",
+      branchName: "Guamaní",
       deliveryType: "delivery",
       baseDeliveryFee: 1.5,
       cartsByTenant: {},

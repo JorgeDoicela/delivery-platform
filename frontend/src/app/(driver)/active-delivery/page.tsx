@@ -1,1 +1,1 @@
-export { default, metadata } from "../repartidor/page";
+export { default } from "../repartidor/page";

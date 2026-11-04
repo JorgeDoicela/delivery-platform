@@ -55,10 +55,11 @@ function StorefrontHeader() {
               <span
                 data-display-brand
                 className="font-black text-2xl sm:text-[26px] tracking-tight text-brand-primary block leading-none uppercase font-display"
+                suppressHydrationWarning
               >
                 {brandName}
               </span>
-              <span className="text-[10px] tracking-widest text-text-muted font-bold uppercase block mt-0.5">
+              <span className="text-[10px] tracking-widest text-text-muted font-bold uppercase block mt-0.5" suppressHydrationWarning>
                 {brandTagline}
               </span>
             </div>
@@ -170,30 +171,30 @@ function StorefrontFooter() {
                 className="w-full h-full object-contain"
               />
             </div>
-            <span className="font-black text-xl tracking-tight text-neutral-900 block font-display">
+            <span className="font-black text-xl tracking-tight text-neutral-900 block font-display" suppressHydrationWarning>
               {brandName}
             </span>
           </div>
-          <p className="text-neutral-500 leading-relaxed">
+          <p className="text-neutral-500 leading-relaxed" suppressHydrationWarning>
             {brandDescription}
           </p>
         </div>
 
         <div>
-          <h4 className="font-bold text-neutral-900 uppercase tracking-wider text-[11px] mb-3">
-            Sucursales en Servicio
+          <h4 className="font-bold text-neutral-900 uppercase tracking-wider text-[11px] mb-3" suppressHydrationWarning>
+            {branches.length === 1 ? "Nuestro Local" : "Sucursales en Servicio"}
           </h4>
           <ul className="space-y-2">
             {branches.map((b) => (
               <li key={b.id} className="flex items-start gap-2">
-                <MapPin className="w-3.5 h-3.5 text-brand-primary shrink-0 mt-0.5" />
+                <MapPin className="w-3.5 h-3.5 text-neutral-700 shrink-0 mt-0.5" />
                 <div>
-                  <span className="font-semibold text-neutral-900 block">
+                  <span className="font-semibold text-neutral-900 block" suppressHydrationWarning>
                     {b.name}
                   </span>
-                  <span className="text-neutral-500 block">{b.address}</span>
-                  <span className="text-[11px] text-neutral-400 block">
-                    {b.phone} • {b.openingTime} a {b.closingTime}
+                  <span className="text-neutral-500 block" suppressHydrationWarning>{b.address}</span>
+                  <span className="text-[11px] text-neutral-400 block font-mono" suppressHydrationWarning>
+                    {b.openingTime} a {b.closingTime}
                   </span>
                 </div>
               </li>
@@ -208,12 +209,12 @@ function StorefrontFooter() {
 
         <div>
           <h4 className="font-bold text-neutral-900 uppercase tracking-wider text-[11px] mb-3">
-            {isPlatformRoot ? "Plataforma & Transparencia" : "Garantía & Métodos de Pago"}
+            {isPlatformRoot ? "Plataforma & Transparencia" : "Métodos de Pago"}
           </h4>
           <p className="text-neutral-500 mb-2 leading-relaxed">
             {isPlatformRoot
               ? "Plataforma gastronómica SaaS multi-tenant sin comisiones abusivas por pedido."
-              : `Aceptamos efectivo contra entrega y transferencia bancaria directa. Facturación electrónica SRI autorizada.`}
+              : "Aceptamos efectivo contra entrega y transferencia bancaria directa."}
           </p>
           <div className="flex items-center gap-3 font-semibold text-neutral-800">
             <Link
@@ -231,19 +232,13 @@ function StorefrontFooter() {
             </Link>
           </div>
           <span className="text-[11px] text-neutral-400 block mt-2">
-            © 2026 {brandName}.
-            <Link
-              href="/login"
-              className="hover:text-neutral-600 transition-colors ml-1.5"
-            >
-              Portal Personal
-            </Link>
+            © {new Date().getFullYear()} {brandName}. Todos los derechos reservados.
           </span>
         </div>
 
         <div>
           <h4 className="font-bold text-neutral-900 uppercase tracking-wider text-[11px] mb-3">
-            {isPlatformRoot ? "Accesos Operativos Demo" : "Atención & Pedidos Directos"}
+            {isPlatformRoot ? "Accesos Operativos Demo" : "Atención & Despacho"}
           </h4>
           {isPlatformRoot ? (
             <div className="space-y-2.5">
@@ -271,10 +266,11 @@ function StorefrontFooter() {
               <p className="text-[11px] text-neutral-500 leading-relaxed">
                 Despacho propio geolocalizado en tiempo real sin recargos ocultos de intermediarios.
               </p>
-              <div className="pt-1 text-[11px] font-mono space-y-0.5 text-neutral-600">
-                <p>Teléfono: <span className="font-bold text-neutral-900">{tenant?.contactPhone || "0987654321"}</span></p>
-                <p>Email: <span className="font-bold text-neutral-900">{tenant?.contactEmail || "pedidos@lagranjita.com"}</span></p>
-              </div>
+              {tenant?.contactPhone && tenant.contactPhone !== "0987654321" && (
+                <div className="pt-1 text-[11px] font-mono text-neutral-600">
+                  <p>Teléfono: <span className="font-bold text-neutral-900">{tenant.contactPhone}</span></p>
+                </div>
+              )}
             </div>
           )}
         </div>

@@ -7,6 +7,66 @@ import { UserRole, type UserRoleName } from "../types";
 import { ShieldAlert, Loader2 } from "lucide-react";
 import { useIsMounted } from "@/shared/hooks/useIsMounted";
 
+const ROLE_NAME_TO_ENUM: Record<string, UserRole> = {
+  SuperAdmin: UserRole.SuperAdmin,
+  TenantAdmin: UserRole.TenantAdmin,
+  BranchManager: UserRole.BranchManager,
+  Cashier: UserRole.Cashier,
+  KitchenStaff: UserRole.KitchenStaff,
+  Driver: UserRole.Driver,
+  Customer: UserRole.Customer,
+};
+
+const ENUM_TO_ROLE_NAME: Record<number, UserRoleName> = {
+  [UserRole.SuperAdmin]: "SuperAdmin",
+  [UserRole.TenantAdmin]: "TenantAdmin",
+  [UserRole.BranchManager]: "BranchManager",
+  [UserRole.Cashier]: "Cashier",
+  [UserRole.KitchenStaff]: "KitchenStaff",
+  [UserRole.Driver]: "Driver",
+  [UserRole.Customer]: "Customer",
+};
+
+export function hasRequiredRole(
+  userRole: UserRole | UserRoleName | undefined | null,
+  userRoles: UserRoleName[] | undefined | null,
+  allowedRoles?: (UserRole | UserRoleName)[]
+): boolean {
+  if (!allowedRoles || allowedRoles.length === 0) return true;
+  if (!userRole && (!userRoles || userRoles.length === 0)) return false;
+
+  const userRolesNormalized = new Set<string>();
+
+  const addRole = (r: UserRole | UserRoleName | number | string) => {
+    const str = String(r);
+    userRolesNormalized.add(str);
+    if (typeof r === "number" || /^\d+$/.test(str)) {
+      const name = ENUM_TO_ROLE_NAME[Number(str)];
+      if (name) userRolesNormalized.add(name);
+    } else {
+      const enumVal = ROLE_NAME_TO_ENUM[str];
+      if (enumVal !== undefined) userRolesNormalized.add(String(enumVal));
+    }
+  };
+
+  if (userRole) addRole(userRole);
+  if (Array.isArray(userRoles)) {
+    for (const r of userRoles) addRole(r);
+  }
+
+  return allowedRoles.some((allowed) => {
+    const str = String(allowed);
+    if (userRolesNormalized.has(str)) return true;
+    if (typeof allowed === "number" || /^\d+$/.test(str)) {
+      const name = ENUM_TO_ROLE_NAME[Number(str)];
+      return Boolean(name && userRolesNormalized.has(name));
+    } else {
+      const enumVal = ROLE_NAME_TO_ENUM[str];
+      return Boolean(enumVal !== undefined && userRolesNormalized.has(String(enumVal)));
+    }
+  });
+}
+
 interface AuthGuardProps {
   children: React.ReactNode;
   allowedRoles?: (UserRole | UserRoleName)[];
@@ -50,8 +110,7 @@ export function AuthGuard({ children, allowedRoles }: AuthGuardProps) {
 
   // Comprobación de roles permitidos si se especifican
   if (allowedRoles && allowedRoles.length > 0 && user) {
-    const userRoleStr = String(user.role);
-    const hasRole = allowedRoles.some((role) => String(role) === userRoleStr);
+    const hasRole = hasRequiredRole(user.role, user.roles, allowedRoles);
 
     if (!hasRole) {
       return (

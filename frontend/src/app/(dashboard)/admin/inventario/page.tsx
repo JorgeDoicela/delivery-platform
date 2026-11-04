@@ -1,24 +1,30 @@
+"use client";
+
 import { Suspense } from "react";
 import { RefreshCw } from "lucide-react";
 import { InventoryManagerView } from "@/features/catalog";
-
-export const metadata = {
-  title: "Control de Inventario | Operaciones",
-  description: "Conmutador de disponibilidad inmediata de productos y combos.",
-};
+import { AuthGuard, UserRole } from "@/features/auth";
 
 export default function AdminInventarioPage() {
   return (
-    <Suspense
-      fallback={
-        <div className="flex flex-col items-center justify-center min-h-[50vh] text-text-inverse-muted">
-          <RefreshCw className="h-8 w-8 animate-spin text-brand-primary mb-4" />
-          <p className="text-sm font-medium">Cargando inventario maestro...</p>
-        </div>
-      }
+    <AuthGuard
+      allowedRoles={[
+        UserRole.SuperAdmin,
+        UserRole.TenantAdmin,
+        UserRole.BranchManager,
+      ]}
     >
-      <InventoryManagerView />
-    </Suspense>
+      <Suspense
+        fallback={
+          <div className="flex flex-col items-center justify-center min-h-[50vh] text-text-inverse-muted">
+            <RefreshCw className="h-8 w-8 animate-spin text-brand-primary mb-4" />
+            <p className="text-sm font-medium">Cargando inventario maestro...</p>
+          </div>
+        }
+      >
+        <InventoryManagerView />
+      </Suspense>
+    </AuthGuard>
   );
 }
 

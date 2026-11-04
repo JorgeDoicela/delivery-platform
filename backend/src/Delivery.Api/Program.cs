@@ -88,6 +88,7 @@ builder.Services.AddAuthorization(options =>
     options.AddPolicy("KitchenOnly", p => p.RequireRole("KitchenStaff", "BranchManager", "TenantAdmin", "SuperAdmin"));
     options.AddPolicy("CashierOnly", p => p.RequireRole("Cashier", "BranchManager", "TenantAdmin", "SuperAdmin"));
     options.AddPolicy("DriverOnly", p => p.RequireRole("Driver", "SuperAdmin"));
+    options.AddPolicy("OperationalStaffOnly", p => p.RequireRole("SuperAdmin", "TenantAdmin", "BranchManager", "Cashier", "KitchenStaff", "Driver"));
 });
 
 // 5. Configuración de Tiempo Real (SignalR) y Notificadores Desacoplados

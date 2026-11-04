@@ -18,7 +18,7 @@ La plataforma combina la calidez apetitosa de la gastronomía artesanal y modern
 * **Paleta Dinámica Multi-Tenant:**
   - En la **Landing de la Plataforma (`/`)** y como valor base del sistema: Rojo Vivo Comercial (`#e4002b`) como color primario de acción (`--brand-primary`), acompañado de Dorado/Ámbar (`#f59e0b`) como acento (`--brand-accent`).
   - En cada **Tienda de Restaurante (`/[slug]`)**: Los tokens `--brand-primary` y `--brand-accent` se inyectan dinámicamente en tiempo real desde la configuración de marca del establecimiento (`PrimaryColorHex` y `AccentColorHex`).
-* **Prohibición de Colores Deslavados:** Prohibido el uso de tonos pastel o deslavados (`bg-brand-primary-light`, `#fee2e2`, `bg-brand-primary/10` o `bg-brand-primary/20`) en tarjetas, badges o fondos. Los fondos deben ser blancos puros (`#ffffff`), grises neutros limpios (`#f9fafb`, `neutral-100`) o negro carbón (`#09090b`), manteniendo el color primario exclusivamente en estados sólidos, botones y acentos de marca.
+* **Prohibición de Colores Deslavados en Fondos, Iconos y Palabras:** Prohibido el uso de tonos pastel, rosáceos o deslavados (`bg-brand-primary-light`, `#fee2e2`, `bg-brand-primary/10`, `bg-brand-primary/20`, `bg-red-50`, `bg-emerald-50`) en tarjetas, badges, palabras o detrás de iconos. Queda estrictamente prohibido encerrar iconos o palabras dentro de cajitas o píldoras con fondos desteñidos. Los fondos deben ser blancos puros (`#ffffff`), grises neutros limpios (`#f9fafb`, `neutral-100`) o negro carbón (`#09090b`), manteniendo los iconos y el color primario limpios, directos y con alto contraste.
 
 ---
 
@@ -222,9 +222,13 @@ Para eliminar las barras de desplazamiento toscas y flechas nativas del sistema 
    - Los iconos SVG se limitan a acciones donde el texto no es suficiente (cerrar modal `X`, feedback de carga `Loader2`, flecha de retroceso o pines de mapa). Si un botón ya indica `+ PEDIR`, `VER TIENDA` o `ACCEDER AL SISTEMA`, no debe acompañarse de un SVG redundante.
 4. **Prohibido Badges/Pills de Estado Decorativas con Iconos SVG:**
    - Prohibido utilizar píldoras pastel (ej. verde `bg-status-success/15` con escudos `ShieldCheck`, candados o checks) con palabras obvias como "ABIERTO", "ACTIVO", "OPERATIVA" o "SEGURO".
-5. **Prohibido Fondos Rosáceos o Pastel Deslavados:**
-   - Prohibido el uso de `bg-brand-primary-light` o transparencias bajas (`bg-brand-primary/10`, `bg-emerald-500/20`) en tarjetas y contenedores. Los fondos de tarjetas son blancos sólidos o carbón oscuro.
-6. **Prohibido `!important` y Estilos Inline Aleatorios:**
+5. **Prohibido Fondos Rosáceos, Pastel o Deslavados en Iconos y Palabras:**
+   - Prohibido el uso de `bg-brand-primary-light`, transparencias bajas (`bg-brand-primary/10`, `bg-emerald-500/20`, `bg-red-50`) o cajitas desteñidas detrás de iconos o palabras (ej. encerrar un icono `MapPin`, `Phone` o un texto de badge en un recuadro rosado o pastel).
+   - Los iconos deben colocarse limpios directamente sobre la superficie o con un icono en color directo/neutro sin envoltorios desteñidos. Las palabras y etiquetas nunca deben llevar cajas o fondos con tintes lavados o rosáceos.
+6. **Prohibido Marcos Envolventes Innecesarios en Palabras y Puntos Parpadeantes:**
+   - Prohibido encerrar palabras de estado (ej. "ABIERTO AHORA") dentro de cápsulas, recuadros o píldoras envolventes artificiales (`rounded-full bg-neutral-900`). Los indicadores de estado deben comunicarse con tipografía limpia y directa sin marcos envolventes.
+   - Prohibido el uso de puntos parpadeantes (`animate-ping` o `animate-pulse`) junto a etiquetas de estado o tarjetas.
+7. **Prohibido `!important` y Estilos Inline Aleatorios:**
    - Todo estilo debe resolverse mediante Tailwind CSS y las variables CSS del tema activo.
-7. **Prohibido Desbordamientos Horizontales:**
+8. **Prohibido Desbordamientos Horizontales:**
    - El diseño debe ser 100% responsivo y fluido desde una anchura mínima de 360px hasta monitores ultrapanorámicos.

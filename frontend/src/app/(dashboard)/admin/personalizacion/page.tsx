@@ -1,12 +1,13 @@
-import { StorefrontCustomizerView } from "@/features/tenant/components/StorefrontCustomizerView";
+"use client";
 
-export const metadata = {
-  title: "Personalización de Marca & Landing | Panel Operativo",
-  description:
-    "Configuración multi-tenant de identidad visual, carrusel Hero, promociones, tarifas y datos bancarios.",
-};
+import { StorefrontCustomizerView } from "@/features/tenant/components/StorefrontCustomizerView";
+import { AuthGuard, UserRole } from "@/features/auth";
 
 export default function PersonalizacionStorefrontPage() {
-  return <StorefrontCustomizerView />;
+  return (
+    <AuthGuard allowedRoles={[UserRole.SuperAdmin, UserRole.TenantAdmin]}>
+      <StorefrontCustomizerView />
+    </AuthGuard>
+  );
 }
 

@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.SignalR;
 
 namespace Delivery.Api.Hubs;
@@ -21,6 +22,7 @@ public class TrackingHub : Hub<ITrackingClient>
     /// <summary>
     /// El repartidor transmite sus coordenadas GPS en vivo hacia los clientes de la orden.
     /// </summary>
+    [Authorize(Policy = "DriverOnly")]
     public async Task SendDriverLocation(string orderId, double latitude, double longitude, double? heading)
     {
         await Clients.Group($"order_tracking_{orderId}").ReceiveDriverLocation(latitude, longitude, heading);

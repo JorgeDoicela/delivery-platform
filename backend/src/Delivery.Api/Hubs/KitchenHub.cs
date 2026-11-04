@@ -1,4 +1,5 @@
 using Delivery.Core.Contracts;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.SignalR;
 
 namespace Delivery.Api.Hubs;
@@ -10,6 +11,7 @@ public interface IKitchenClient
     Task OrderStatusChanged(string orderId, string status);
 }
 
+[Authorize(Policy = "KitchenOnly")]
 public class KitchenHub : Hub<IKitchenClient>
 {
     /// <summary>

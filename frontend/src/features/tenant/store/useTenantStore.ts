@@ -111,14 +111,14 @@ export const FALLBACK_TENANT_CONFIGS: Record<string, TenantStorefrontConfigDto> 
     branches: [
       {
         id: 1,
-        name: "Matriz Quito Norte",
-        address: "Av. Amazonas y República (Edif. Sky)",
+        name: "Guamaní",
+        address: "Clodoveo Carrión, Sector Guamaní (Quito Sur)",
         phone: "0987654321",
         openingTime: "10:30",
         closingTime: "21:30",
         maxOrdersPerSlot: 15,
-        latitude: -0.1782,
-        longitude: -78.4845,
+        latitude: -0.33228,
+        longitude: -78.557082,
         isActive: true,
       },
     ],

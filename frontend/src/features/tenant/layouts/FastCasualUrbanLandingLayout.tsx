@@ -37,8 +37,8 @@ export function FastCasualUrbanLandingLayout({
       <section className="w-full bg-white border-b border-neutral-200">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 sm:py-14 lg:py-16 grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-center">
           <div className="lg:col-span-6 space-y-6">
-            <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-brand-primary/10 text-brand-primary text-xs font-black uppercase tracking-widest font-display">
-              <Zap className="w-3.5 h-3.5" />
+            <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-neutral-900 text-white text-xs font-black uppercase tracking-widest font-display shadow-2xs">
+              <Zap className="w-3.5 h-3.5 text-brand-accent" />
               <span>{primarySlide?.badge || tenant?.tagline || "Especialidad Express"}</span>
             </div>
 

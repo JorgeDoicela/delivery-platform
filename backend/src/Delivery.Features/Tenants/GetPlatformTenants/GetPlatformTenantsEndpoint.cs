@@ -18,6 +18,7 @@ public sealed class GetPlatformTenantsEndpoint : IEndpoint
         .WithTags("Tenants")
         .WithName("GetPlatformTenants")
         .WithSummary("Obtiene el listado completo de comercios (activos e inactivos) con métricas operativas para SuperAdmin.")
+        .RequireAuthorization("SuperAdminOnly")
         .Produces<PlatformTenantsResponse>(StatusCodes.Status200OK);
     }
 }

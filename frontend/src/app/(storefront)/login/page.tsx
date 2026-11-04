@@ -1,6 +1,6 @@
 "use client";
 
-import { Suspense, useState, useEffect } from "react";
+import { Suspense, useEffect } from "react";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { LoginForm, useAuthStore } from "@/features/auth";
@@ -9,7 +9,6 @@ import {
   UtensilsCrossed,
   Headphones,
   FileText,
-  UserX,
   UserCheck,
   Loader2,
   LogOut,
@@ -21,7 +20,6 @@ import { useCurrentTenantQuery } from "@/features/tenant";
 function LoginContent() {
   const searchParams = useSearchParams();
   const redirectUrl = searchParams.get("redirect") || "/cocina";
-  const hasExplicitRedirect = Boolean(searchParams.get("redirect"));
 
   const isMounted = useIsMounted();
   const { data: tenant } = useCurrentTenantQuery();
@@ -31,15 +29,12 @@ function LoginContent() {
   const logout = useAuthStore((s) => s.logout);
   const checkAuth = useAuthStore((s) => s.checkAuth);
 
-  const [showForm, setShowForm] = useState(hasExplicitRedirect);
-
   useEffect(() => {
     checkAuth();
   }, [checkAuth]);
 
   const handleLogout = async () => {
     await logout();
-    setShowForm(false);
   };
 
   return (
@@ -171,49 +166,19 @@ function LoginContent() {
                 </button>
               </div>
             </div>
-          ) : showForm || hasExplicitRedirect ? (
-            /* Formulario Desplegado */
+          ) : (
+            /* Formulario de Login Directo */
             <div className="w-full max-w-md mx-auto py-2">
-              <div className="mb-6 flex items-center justify-between pb-3 border-b border-neutral-100">
-                <div>
-                  <h2 className="text-2xl font-black uppercase tracking-tight text-neutral-950 font-display">
-                    Iniciar Sesión
-                  </h2>
-                  <p className="text-xs text-neutral-500 mt-0.5">
-                    Accede a tu cuenta operativa o de cliente.
-                  </p>
-                </div>
-                {!hasExplicitRedirect && (
-                  <button
-                    type="button"
-                    onClick={() => setShowForm(false)}
-                    className="text-xs text-neutral-500 hover:text-brand-primary font-bold uppercase tracking-wider transition-colors px-3 py-1.5 rounded-full hover:bg-neutral-50"
-                  >
-                    Volver
-                  </button>
-                )}
+              <div className="mb-6 pb-3 border-b border-neutral-100">
+                <h2 className="text-2xl font-black uppercase tracking-tight text-neutral-950 font-display">
+                  Iniciar Sesión
+                </h2>
+                <p className="text-xs text-neutral-500 mt-1">
+                  Accede a tu cuenta para gestionar pedidos, cocina o administración.
+                </p>
               </div>
 
               <LoginForm redirectUrl={redirectUrl} embedded={true} />
-            </div>
-          ) : (
-            /* Vista Idéntica a la Captura KFC */
-            <div className="flex flex-col items-center justify-center text-center space-y-6 py-4">
-              <div className="w-16 h-16 rounded-full bg-neutral-100 flex items-center justify-center text-neutral-800">
-                <UserX className="w-8 h-8 stroke-[1.8] text-neutral-700" />
-              </div>
-
-              <h2 className="text-xl sm:text-2xl font-black uppercase tracking-tight text-neutral-950 font-display max-w-md leading-tight">
-                Inicia sesión para disfrutar de los beneficios de tener una cuenta
-              </h2>
-
-              <button
-                type="button"
-                onClick={() => setShowForm(true)}
-                className="bg-brand-primary hover:bg-brand-primary-hover active:scale-95 text-white font-black text-xs uppercase tracking-wider font-display px-8 py-3.5 rounded-full shadow-md shadow-brand-primary/20 transition-all cursor-pointer"
-              >
-                Ingresar
-              </button>
             </div>
           )}
         </div>

@@ -30,6 +30,7 @@ public sealed class ToggleProductStatusEndpoint : IEndpoint
         .WithTags("Catalog")
         .WithName("ToggleProductStatus")
         .WithSummary("Conmuta la disponibilidad de un producto en tiempo real.")
+        .RequireAuthorization("BranchStaffOnly")
         .Produces<ToggleProductStatusResponse>(StatusCodes.Status200OK)
         .ProducesProblem(StatusCodes.Status400BadRequest)
         .ProducesProblem(StatusCodes.Status404NotFound);
