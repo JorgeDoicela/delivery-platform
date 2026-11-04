@@ -1,7 +1,7 @@
-"use client";
-
 import { StorefrontCustomizerView } from "@/features/tenant/components/StorefrontCustomizerView";
 import { AuthGuard, UserRole } from "@/features/auth";
+
+export const instant = false;
 
 export default function PersonalizacionStorefrontPage() {
   return (

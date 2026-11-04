@@ -1,9 +1,9 @@
-"use client";
-
 import { Suspense } from 'react';
 import { RefreshCw } from 'lucide-react';
 import { DriverDeliveryView } from '@/features/tracking';
 import { AuthGuard, UserRole } from '@/features/auth';
+
+export const instant = false;
 
 export default function RepartidorPage() {
   return (

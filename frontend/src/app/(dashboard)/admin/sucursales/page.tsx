@@ -1,9 +1,9 @@
-"use client";
-
 import { Suspense } from "react";
 import { RefreshCw } from "lucide-react";
 import { BranchManagementView } from "@/features/branches";
 import { AuthGuard, UserRole } from "@/features/auth";
+
+export const instant = false;
 
 export default function AdminSucursalesPage() {
   return (

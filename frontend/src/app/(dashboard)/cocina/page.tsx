@@ -6,6 +6,8 @@ export const metadata = {
   description: 'Pantalla operativa de comandas para cocina en tiempo real.',
 };
 
+export const instant = false;
+
 export default function CocinaPage() {
   return (
     <AuthGuard
