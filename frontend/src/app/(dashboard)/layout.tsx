@@ -47,8 +47,8 @@ export default function DashboardLayout({
         UserRole.KitchenStaff,
       ]}
     >
-      <div className="flex flex-col min-h-screen bg-surface-dark text-text-inverse-strong">
-      <header className="h-16 bg-surface-dark-card border-b border-surface-dark-border px-4 sm:px-6 flex items-center justify-between shrink-0">
+      <div className="flex flex-col min-h-screen bg-[#f9fafb] text-neutral-900">
+      <header className="h-16 bg-white border-b border-neutral-200/90 px-4 sm:px-6 flex items-center justify-between shrink-0 shadow-xs">
         <div className="flex items-center gap-6">
           <Link href="/cocina" className="flex items-center gap-3 group">
             <div className="relative w-9 h-9 shrink-0">
@@ -64,20 +64,20 @@ export default function DashboardLayout({
             <div>
               <span
                 data-display-brand
-                className="font-black text-xl tracking-tight text-white block leading-none uppercase font-display"
+                className="font-black text-xl tracking-tight text-neutral-950 block leading-none uppercase font-display"
               >
                 {brandName}
               </span>
-              <span className="text-[10px] tracking-widest text-brand-accent font-bold uppercase block mt-0.5">
+              <span className="text-[10px] tracking-widest text-brand-primary font-bold uppercase block mt-0.5">
                 Operaciones & Cocina
               </span>
             </div>
           </Link>
 
-          <nav className="hidden md:flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider">
+          <nav className="hidden md:flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider font-display">
             <Link
               href="/cocina"
-              className="px-3.5 py-1.5 rounded-full text-text-inverse-muted hover:text-white hover:bg-surface-dark-hover transition-colors flex items-center gap-1.5"
+              className="px-3.5 py-1.5 rounded-full text-neutral-600 hover:text-neutral-900 hover:bg-neutral-100 transition-colors flex items-center gap-1.5"
             >
               <Utensils className="w-3.5 h-3.5 text-brand-primary" />
               <span>Cocina KDS</span>
@@ -87,7 +87,7 @@ export default function DashboardLayout({
               <>
                 <Link
                   href="/admin/inventario"
-                  className="px-3.5 py-1.5 rounded-full text-text-inverse-muted hover:text-white hover:bg-surface-dark-hover transition-colors flex items-center gap-1.5"
+                  className="px-3.5 py-1.5 rounded-full text-neutral-600 hover:text-neutral-900 hover:bg-neutral-100 transition-colors flex items-center gap-1.5"
                 >
                   <Package className="w-3.5 h-3.5 text-brand-accent" />
                   <span>Inventario</span>
@@ -95,7 +95,7 @@ export default function DashboardLayout({
 
                 <Link
                   href="/admin/sucursales"
-                  className="px-3.5 py-1.5 rounded-full text-text-inverse-muted hover:text-white hover:bg-surface-dark-hover transition-colors flex items-center gap-1.5"
+                  className="px-3.5 py-1.5 rounded-full text-neutral-600 hover:text-neutral-900 hover:bg-neutral-100 transition-colors flex items-center gap-1.5"
                 >
                   <Building2 className="w-3.5 h-3.5 text-status-info" />
                   <span>Sucursales</span>
@@ -103,7 +103,7 @@ export default function DashboardLayout({
 
                 <Link
                   href="/admin/personalizacion"
-                  className="px-3.5 py-1.5 rounded-full text-text-inverse-muted hover:text-white hover:bg-surface-dark-hover transition-colors flex items-center gap-1.5"
+                  className="px-3.5 py-1.5 rounded-full text-neutral-600 hover:text-neutral-900 hover:bg-neutral-100 transition-colors flex items-center gap-1.5"
                 >
                   <Palette className="w-3.5 h-3.5 text-brand-primary" />
                   <span>Marca & Landing</span>
@@ -114,9 +114,9 @@ export default function DashboardLayout({
             {isSuperAdmin && (
               <Link
                 href="/superadmin"
-                className="px-3.5 py-1.5 rounded-full text-text-inverse-muted hover:text-white hover:bg-surface-dark-hover transition-colors flex items-center gap-1.5"
+                className="px-3.5 py-1.5 rounded-full text-neutral-600 hover:text-neutral-900 hover:bg-neutral-100 transition-colors flex items-center gap-1.5"
               >
-                <ShieldCheck className="w-3.5 h-3.5 text-emerald-400" />
+                <ShieldCheck className="w-3.5 h-3.5 text-emerald-600" />
                 <span>Gobernanza de Marcas</span>
               </Link>
             )}
@@ -124,23 +124,23 @@ export default function DashboardLayout({
         </div>
 
         <div className="flex items-center gap-3 text-xs">
-          {isSuperAdmin && <TenantSwitcher />}
+          {isSuperAdmin && <TenantSwitcher variant="light" />}
 
-          <div className="flex items-center gap-2 bg-surface-dark-hover/80 px-3 py-1 rounded-full border border-surface-dark-border text-[11px] font-bold uppercase tracking-wider">
+          <div className="flex items-center gap-2 bg-neutral-100 px-3 py-1 rounded-full border border-neutral-200 text-[11px] font-bold uppercase tracking-wider">
             <span className="w-2 h-2 rounded-full bg-status-success shrink-0"></span>
             <span className="text-status-success hidden sm:inline">
               SignalR Activo
             </span>
           </div>
 
-          <div className="flex items-center gap-1.5 text-text-inverse-muted bg-surface-dark-hover px-3 py-1 rounded-full border border-surface-dark-border text-[11px] font-bold uppercase tracking-wider">
+          <div className="flex items-center gap-1.5 text-neutral-600 bg-neutral-100 px-3 py-1 rounded-full border border-neutral-200 text-[11px] font-bold uppercase tracking-wider">
             <Volume2 className="w-3.5 h-3.5 text-brand-accent" />
             <span className="hidden sm:inline">Alarma</span>
           </div>
 
           <Link
             href={`/${tenant?.slug || "la-granjita"}`}
-            className="text-xs font-bold uppercase tracking-wider text-text-inverse-muted hover:text-white transition-colors px-3 py-1.5 rounded-full bg-surface-dark-hover hover:bg-surface-dark-hover/80 border border-surface-dark-border"
+            className="text-xs font-bold uppercase tracking-wider text-neutral-700 hover:text-neutral-900 transition-colors px-3.5 py-1.5 rounded-full bg-neutral-100 hover:bg-neutral-200 border border-neutral-200 font-display"
           >
             <span>Ver Tienda</span>
           </Link>
@@ -149,7 +149,7 @@ export default function DashboardLayout({
         </div>
       </header>
 
-      <main className="flex-1 p-4 overflow-hidden flex flex-col">
+      <main className="flex-1 p-4 sm:p-6 overflow-hidden flex flex-col bg-[#f9fafb]">
         {children}
       </main>
     </div>

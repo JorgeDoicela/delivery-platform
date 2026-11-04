@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState } from "react";
-import { X, Loader2, Building2, Palette, ShieldCheck } from "lucide-react";
+import { X, Loader2 } from "lucide-react";
 import type { CreateTenantCommand } from "@/shared/types/api";
 import { useCreateTenantMutation } from "../hooks/useTenantQueries";
 import { RESERVED_TENANT_SLUGS } from "../constants";
@@ -19,9 +19,9 @@ const INITIAL_FORM: CreateTenantCommand = {
   taxId: "",
   tagline: "Asadero & Parrilla Artesanal",
   description: "Especialidades a la brasa con ingredientes frescos y entrega rápida.",
-  brandPrimaryColor: "#B91C1C",
-  brandPrimaryHoverColor: "#991B1B",
-  brandAccentColor: "#F59E0B",
+  brandPrimaryColor: "#e4002b",
+  brandPrimaryHoverColor: "#c40024",
+  brandAccentColor: "#f59e0b",
   baseDeliveryFee: 1.75,
   contactPhone: "0990001122",
   contactEmail: "",
@@ -89,20 +89,20 @@ export function CreateTenantModal({
 
   return (
     <div
-      className="fixed inset-0 z-50 flex items-center justify-center bg-black/75 backdrop-blur-xs p-4 overflow-y-auto"
+      className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-xs p-4 overflow-y-auto"
       role="dialog"
       aria-modal="true"
       aria-labelledby="modal-create-tenant-title"
     >
-      <div className="w-full max-w-2xl bg-surface-dark-card border border-surface-dark-border rounded-3xl shadow-2xl overflow-hidden my-8">
-        <div className="px-6 py-4 border-b border-surface-dark-border flex items-center justify-between bg-surface-dark/60">
+      <div className="w-full max-w-2xl bg-white border border-neutral-200 rounded-3xl shadow-2xl overflow-hidden my-8 text-neutral-900">
+        <div className="px-6 sm:px-8 py-5 border-b border-neutral-200 flex items-center justify-between bg-neutral-50">
           <div>
-            <span className="text-[10px] font-bold uppercase tracking-widest text-brand-accent block">
+            <span className="text-[10px] font-bold uppercase tracking-widest text-brand-primary block font-display">
               Aprovisionamiento Multi-Tenant SaaS
             </span>
             <h2
               id="modal-create-tenant-title"
-              className="text-xl font-black uppercase tracking-tight text-white font-display"
+              className="text-xl sm:text-2xl font-black uppercase tracking-tight text-neutral-950 font-display"
             >
               Registrar Nuevo Comercio y Administrador
             </h2>
@@ -111,29 +111,28 @@ export function CreateTenantModal({
             type="button"
             onClick={onClose}
             aria-label="Cerrar modal"
-            className="p-2 rounded-full text-text-inverse-muted hover:text-white hover:bg-surface-dark-hover transition-colors"
+            className="p-2 rounded-full text-neutral-400 hover:text-neutral-900 hover:bg-neutral-200 transition-colors cursor-pointer"
           >
             <X className="w-5 h-5" />
           </button>
         </div>
 
-        <form onSubmit={handleSubmit} className="p-6 space-y-5 max-h-[80vh] overflow-y-auto">
+        <form onSubmit={handleSubmit} className="p-6 sm:p-8 space-y-6 max-h-[75vh] overflow-y-auto">
           {formError && (
-            <div className="p-3.5 rounded-2xl bg-status-danger/15 border border-status-danger/40 text-xs text-red-200 font-semibold">
+            <div className="p-4 rounded-2xl bg-red-50 border border-red-200 text-xs text-red-700 font-semibold">
               {formError}
             </div>
           )}
 
           {/* 1. Datos Comerciales y Fiscales */}
-          <div className="space-y-3">
-            <div className="flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-brand-accent">
-              <Building2 className="w-4 h-4" />
-              <span>1. Identidad Comercial y Tributaria</span>
-            </div>
+          <div className="space-y-4">
+            <h3 className="text-xs font-bold uppercase tracking-wider text-brand-primary font-display">
+              1. Identidad Comercial y Tributaria
+            </h3>
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div>
-                <label className="block text-[11px] font-bold uppercase tracking-wider text-text-inverse-muted mb-1">
+                <label className="block text-[11px] font-bold uppercase tracking-wider text-neutral-600 mb-1">
                   Nombre Comercial *
                 </label>
                 <input
@@ -142,12 +141,12 @@ export function CreateTenantModal({
                   value={form.name}
                   onChange={(e) => handleNameChange(e.target.value)}
                   placeholder="Ej. Parrilladas El Gaucho"
-                  className="w-full px-3.5 py-2.5 rounded-xl bg-surface-dark border border-surface-dark-border text-sm text-white focus:outline-none focus:border-brand-primary"
+                  className="w-full px-3.5 py-2.5 rounded-xl bg-neutral-50 border border-neutral-200 text-sm text-neutral-900 focus:outline-none focus:border-brand-primary focus:bg-white"
                 />
               </div>
 
               <div>
-                <label className="block text-[11px] font-bold uppercase tracking-wider text-text-inverse-muted mb-1">
+                <label className="block text-[11px] font-bold uppercase tracking-wider text-neutral-600 mb-1">
                   Slug URL (Subdominio / Identificador) *
                 </label>
                 <input
@@ -159,12 +158,12 @@ export function CreateTenantModal({
                     setForm({ ...form, slug: e.target.value.toLowerCase() })
                   }
                   placeholder="ej. el-gaucho"
-                  className="w-full px-3.5 py-2.5 rounded-xl bg-surface-dark border border-surface-dark-border text-sm font-mono text-brand-accent focus:outline-none focus:border-brand-primary"
+                  className="w-full px-3.5 py-2.5 rounded-xl bg-neutral-50 border border-neutral-200 text-sm font-mono text-brand-primary focus:outline-none focus:border-brand-primary focus:bg-white"
                 />
               </div>
 
               <div>
-                <label className="block text-[11px] font-bold uppercase tracking-wider text-text-inverse-muted mb-1">
+                <label className="block text-[11px] font-bold uppercase tracking-wider text-neutral-600 mb-1">
                   Razón Social (SRI) *
                 </label>
                 <input
@@ -173,12 +172,12 @@ export function CreateTenantModal({
                   value={form.businessName}
                   onChange={(e) => setForm({ ...form, businessName: e.target.value })}
                   placeholder="Ej. Alimentos El Gaucho S.A.S."
-                  className="w-full px-3.5 py-2.5 rounded-xl bg-surface-dark border border-surface-dark-border text-sm text-white focus:outline-none focus:border-brand-primary"
+                  className="w-full px-3.5 py-2.5 rounded-xl bg-neutral-50 border border-neutral-200 text-sm text-neutral-900 focus:outline-none focus:border-brand-primary focus:bg-white"
                 />
               </div>
 
               <div>
-                <label className="block text-[11px] font-bold uppercase tracking-wider text-text-inverse-muted mb-1">
+                <label className="block text-[11px] font-bold uppercase tracking-wider text-neutral-600 mb-1">
                   RUC / Identificación Tributaria *
                 </label>
                 <input
@@ -187,12 +186,12 @@ export function CreateTenantModal({
                   value={form.taxId}
                   onChange={(e) => setForm({ ...form, taxId: e.target.value })}
                   placeholder="1790011223001"
-                  className="w-full px-3.5 py-2.5 rounded-xl bg-surface-dark border border-surface-dark-border text-sm font-mono text-white focus:outline-none focus:border-brand-primary"
+                  className="w-full px-3.5 py-2.5 rounded-xl bg-neutral-50 border border-neutral-200 text-sm font-mono text-neutral-900 focus:outline-none focus:border-brand-primary focus:bg-white"
                 />
               </div>
 
               <div className="sm:col-span-2">
-                <label className="block text-[11px] font-bold uppercase tracking-wider text-text-inverse-muted mb-1">
+                <label className="block text-[11px] font-bold uppercase tracking-wider text-neutral-600 mb-1">
                   Dominio Propio Personalizado (Opcional)
                 </label>
                 <input
@@ -200,22 +199,21 @@ export function CreateTenantModal({
                   value={form.customDomain || ""}
                   onChange={(e) => setForm({ ...form, customDomain: e.target.value.toLowerCase() })}
                   placeholder="ej. pedidos.elgaucho.com o elgaucho.com"
-                  className="w-full px-3.5 py-2.5 rounded-xl bg-surface-dark border border-surface-dark-border text-sm font-mono text-white focus:outline-none focus:border-brand-primary"
+                  className="w-full px-3.5 py-2.5 rounded-xl bg-neutral-50 border border-neutral-200 text-sm font-mono text-neutral-900 focus:outline-none focus:border-brand-primary focus:bg-white"
                 />
               </div>
             </div>
           </div>
 
           {/* 2. Personalización Visual y Sucursal Matriz */}
-          <div className="space-y-3 pt-2 border-t border-surface-dark-border">
-            <div className="flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-brand-accent">
-              <Palette className="w-4 h-4" />
-              <span>2. Tema de Marca y Sucursal Matriz</span>
-            </div>
+          <div className="space-y-4 pt-4 border-t border-neutral-200">
+            <h3 className="text-xs font-bold uppercase tracking-wider text-brand-primary font-display">
+              2. Tema de Marca y Sucursal Matriz
+            </h3>
 
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
               <div>
-                <label className="block text-[11px] font-bold uppercase tracking-wider text-text-inverse-muted mb-1">
+                <label className="block text-[11px] font-bold uppercase tracking-wider text-neutral-600 mb-1">
                   Color Primario (#HEX)
                 </label>
                 <div className="flex items-center gap-2">
@@ -225,19 +223,19 @@ export function CreateTenantModal({
                     onChange={(e) =>
                       setForm({ ...form, brandPrimaryColor: e.target.value, brandPrimaryHoverColor: e.target.value })
                     }
-                    className="w-10 h-10 rounded-lg bg-surface-dark border border-surface-dark-border cursor-pointer"
+                    className="w-10 h-10 rounded-lg border border-neutral-200 cursor-pointer bg-white"
                   />
                   <input
                     type="text"
                     value={form.brandPrimaryColor}
                     onChange={(e) => setForm({ ...form, brandPrimaryColor: e.target.value })}
-                    className="w-full px-3 py-2 rounded-xl bg-surface-dark border border-surface-dark-border text-xs font-mono text-white"
+                    className="w-full px-3 py-2 rounded-xl bg-neutral-50 border border-neutral-200 text-xs font-mono text-neutral-900"
                   />
                 </div>
               </div>
 
               <div>
-                <label className="block text-[11px] font-bold uppercase tracking-wider text-text-inverse-muted mb-1">
+                <label className="block text-[11px] font-bold uppercase tracking-wider text-neutral-600 mb-1">
                   Tarifa Envío Base (USD)
                 </label>
                 <input
@@ -250,12 +248,12 @@ export function CreateTenantModal({
                   onChange={(e) =>
                     setForm({ ...form, baseDeliveryFee: Number(e.target.value) })
                   }
-                  className="w-full px-3.5 py-2.5 rounded-xl bg-surface-dark border border-surface-dark-border text-sm font-mono text-white"
+                  className="w-full px-3.5 py-2.5 rounded-xl bg-neutral-50 border border-neutral-200 text-sm font-mono text-neutral-900 focus:outline-none focus:border-brand-primary focus:bg-white"
                 />
               </div>
 
               <div>
-                <label className="block text-[11px] font-bold uppercase tracking-wider text-text-inverse-muted mb-1">
+                <label className="block text-[11px] font-bold uppercase tracking-wider text-neutral-600 mb-1">
                   Teléfono Comercial
                 </label>
                 <input
@@ -263,14 +261,14 @@ export function CreateTenantModal({
                   required
                   value={form.contactPhone}
                   onChange={(e) => setForm({ ...form, contactPhone: e.target.value })}
-                  className="w-full px-3.5 py-2.5 rounded-xl bg-surface-dark border border-surface-dark-border text-sm text-white"
+                  className="w-full px-3.5 py-2.5 rounded-xl bg-neutral-50 border border-neutral-200 text-sm text-neutral-900 focus:outline-none focus:border-brand-primary focus:bg-white"
                 />
               </div>
             </div>
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div>
-                <label className="block text-[11px] font-bold uppercase tracking-wider text-text-inverse-muted mb-1">
+                <label className="block text-[11px] font-bold uppercase tracking-wider text-neutral-600 mb-1">
                   Nombre de Sucursal Matriz *
                 </label>
                 <input
@@ -278,12 +276,12 @@ export function CreateTenantModal({
                   required
                   value={form.primaryBranchName}
                   onChange={(e) => setForm({ ...form, primaryBranchName: e.target.value })}
-                  className="w-full px-3.5 py-2.5 rounded-xl bg-surface-dark border border-surface-dark-border text-sm text-white"
+                  className="w-full px-3.5 py-2.5 rounded-xl bg-neutral-50 border border-neutral-200 text-sm text-neutral-900 focus:outline-none focus:border-brand-primary focus:bg-white"
                 />
               </div>
 
               <div>
-                <label className="block text-[11px] font-bold uppercase tracking-wider text-text-inverse-muted mb-1">
+                <label className="block text-[11px] font-bold uppercase tracking-wider text-neutral-600 mb-1">
                   Dirección de Sucursal Matriz *
                 </label>
                 <input
@@ -292,18 +290,18 @@ export function CreateTenantModal({
                   value={form.primaryBranchAddress}
                   onChange={(e) => setForm({ ...form, primaryBranchAddress: e.target.value })}
                   placeholder="Av. República y Eloy Alfaro"
-                  className="w-full px-3.5 py-2.5 rounded-xl bg-surface-dark border border-surface-dark-border text-sm text-white"
+                  className="w-full px-3.5 py-2.5 rounded-xl bg-neutral-50 border border-neutral-200 text-sm text-neutral-900 focus:outline-none focus:border-brand-primary focus:bg-white"
                 />
               </div>
 
               <div>
-                <label className="block text-[11px] font-bold uppercase tracking-wider text-text-inverse-muted mb-1">
+                <label className="block text-[11px] font-bold uppercase tracking-wider text-neutral-600 mb-1">
                   Plantilla Visual de Landing
                 </label>
                 <select
                   value={form.landingLayoutTemplate || "asadero-clasico"}
                   onChange={(e) => setForm({ ...form, landingLayoutTemplate: e.target.value })}
-                  className="w-full px-3.5 py-2.5 rounded-xl bg-surface-dark border border-surface-dark-border text-xs font-bold text-white"
+                  className="w-full px-3.5 py-2.5 rounded-xl bg-neutral-50 border border-neutral-200 text-xs font-bold text-neutral-900 focus:outline-none focus:border-brand-primary focus:bg-white"
                 >
                   <option value="asadero-clasico">Asadero Clásico (Retail Claro)</option>
                   <option value="steakhouse-gourmet">Steakhouse Gourmet (Parrilla Nocturna)</option>
@@ -312,7 +310,7 @@ export function CreateTenantModal({
               </div>
 
               <div>
-                <label className="block text-[11px] font-bold uppercase tracking-wider text-text-inverse-muted mb-1">
+                <label className="block text-[11px] font-bold uppercase tracking-wider text-neutral-600 mb-1">
                   URL del Logotipo (Opcional)
                 </label>
                 <input
@@ -320,22 +318,21 @@ export function CreateTenantModal({
                   value={form.logoUrl || ""}
                   onChange={(e) => setForm({ ...form, logoUrl: e.target.value })}
                   placeholder="/images/shared/placeholders/logo-default.png o https://..."
-                  className="w-full px-3.5 py-2.5 rounded-xl bg-surface-dark border border-surface-dark-border text-xs font-mono text-white"
+                  className="w-full px-3.5 py-2.5 rounded-xl bg-neutral-50 border border-neutral-200 text-xs font-mono text-neutral-900 focus:outline-none focus:border-brand-primary focus:bg-white"
                 />
               </div>
             </div>
           </div>
 
           {/* 3. Credenciales del TenantAdmin Inicial */}
-          <div className="space-y-3 pt-2 border-t border-surface-dark-border">
-            <div className="flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-brand-accent">
-              <ShieldCheck className="w-4 h-4" />
-              <span>3. Cuenta Propietaria (TenantAdmin)</span>
-            </div>
+          <div className="space-y-4 pt-4 border-t border-neutral-200">
+            <h3 className="text-xs font-bold uppercase tracking-wider text-brand-primary font-display">
+              3. Cuenta Propietaria (TenantAdmin)
+            </h3>
 
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
               <div>
-                <label className="block text-[11px] font-bold uppercase tracking-wider text-text-inverse-muted mb-1">
+                <label className="block text-[11px] font-bold uppercase tracking-wider text-neutral-600 mb-1">
                   Nombre del Administrador *
                 </label>
                 <input
@@ -344,12 +341,12 @@ export function CreateTenantModal({
                   value={form.adminFullName}
                   onChange={(e) => setForm({ ...form, adminFullName: e.target.value })}
                   placeholder="Ej. Roberto Gómez"
-                  className="w-full px-3.5 py-2.5 rounded-xl bg-surface-dark border border-surface-dark-border text-sm text-white"
+                  className="w-full px-3.5 py-2.5 rounded-xl bg-neutral-50 border border-neutral-200 text-sm text-neutral-900 focus:outline-none focus:border-brand-primary focus:bg-white"
                 />
               </div>
 
               <div>
-                <label className="block text-[11px] font-bold uppercase tracking-wider text-text-inverse-muted mb-1">
+                <label className="block text-[11px] font-bold uppercase tracking-wider text-neutral-600 mb-1">
                   Correo de Acceso *
                 </label>
                 <input
@@ -364,12 +361,12 @@ export function CreateTenantModal({
                     })
                   }
                   placeholder="gerencia@comercio.com"
-                  className="w-full px-3.5 py-2.5 rounded-xl bg-surface-dark border border-surface-dark-border text-sm font-mono text-white"
+                  className="w-full px-3.5 py-2.5 rounded-xl bg-neutral-50 border border-neutral-200 text-sm font-mono text-neutral-900 focus:outline-none focus:border-brand-primary focus:bg-white"
                 />
               </div>
 
               <div>
-                <label className="block text-[11px] font-bold uppercase tracking-wider text-text-inverse-muted mb-1">
+                <label className="block text-[11px] font-bold uppercase tracking-wider text-neutral-600 mb-1">
                   Contraseña Inicial *
                 </label>
                 <input
@@ -378,24 +375,24 @@ export function CreateTenantModal({
                   minLength={6}
                   value={form.adminPassword}
                   onChange={(e) => setForm({ ...form, adminPassword: e.target.value })}
-                  className="w-full px-3.5 py-2.5 rounded-xl bg-surface-dark border border-surface-dark-border text-sm font-mono text-white"
+                  className="w-full px-3.5 py-2.5 rounded-xl bg-neutral-50 border border-neutral-200 text-sm font-mono text-neutral-900 focus:outline-none focus:border-brand-primary focus:bg-white"
                 />
               </div>
             </div>
           </div>
 
-          <div className="pt-4 border-t border-surface-dark-border flex items-center justify-end gap-3">
+          <div className="pt-4 border-t border-neutral-200 flex items-center justify-end gap-3">
             <button
               type="button"
               onClick={onClose}
-              className="px-5 py-2.5 rounded-full border border-surface-dark-border text-xs font-bold uppercase tracking-wider text-text-inverse-muted hover:text-white transition-colors"
+              className="px-5 py-2.5 rounded-full border border-neutral-200 text-xs font-bold uppercase tracking-wider text-neutral-600 hover:text-neutral-900 hover:bg-neutral-50 transition-colors cursor-pointer"
             >
               Cancelar
             </button>
             <button
               type="submit"
               disabled={createMutation.isPending}
-              className="px-6 py-2.5 rounded-full bg-brand-primary hover:bg-brand-primary-hover disabled:opacity-50 text-white text-xs font-black uppercase tracking-wider font-display inline-flex items-center gap-2 transition-all cursor-pointer"
+              className="px-6 py-2.5 rounded-full bg-brand-primary hover:bg-brand-primary-hover disabled:opacity-50 text-white text-xs font-black uppercase tracking-wider font-display inline-flex items-center gap-2 transition-all cursor-pointer shadow-md active:scale-95"
             >
               {createMutation.isPending && <Loader2 className="w-4 h-4 animate-spin" />}
               <span>Aprovisionar Comercio</span>
@@ -406,4 +403,3 @@ export function CreateTenantModal({
     </div>
   );
 }
-
