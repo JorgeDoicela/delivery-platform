@@ -6,11 +6,21 @@ import Image from "next/image";
 import { usePathname } from "next/navigation";
 import { MapPin, Search, User } from "lucide-react";
 import { CartButtonBadge } from "@/features/cart";
-import { TenantSwitcher, useCurrentTenantQuery } from "@/features/tenant";
+import {
+  RESERVED_TENANT_SLUGS,
+  TenantBranchSelector,
+  TenantSwitcher,
+  useCurrentTenantQuery,
+} from "@/features/tenant";
 
 function StorefrontHeader() {
   const pathname = usePathname();
-  const { data: tenant } = useCurrentTenantQuery();
+  const rawSlug = pathname?.split("/").filter(Boolean)[0];
+  const activeSlug =
+    rawSlug && !RESERVED_TENANT_SLUGS.has(rawSlug.toLowerCase())
+      ? rawSlug
+      : undefined;
+  const { data: tenant } = useCurrentTenantQuery(activeSlug);
 
   const isPlatformRoot = pathname === "/";
   const tenantSlug = tenant?.slug || "la-granjita";
@@ -38,7 +48,7 @@ function StorefrontHeader() {
                 width={40}
                 height={40}
                 priority
-                className="w-full h-full object-contain group-hover:scale-105 transition-transform"
+                className="w-full h-full object-contain"
               />
             </div>
             <div>
@@ -59,10 +69,18 @@ function StorefrontHeader() {
               href={catalogHref}
               className="hover:text-brand-primary transition-colors"
             >
-              Ordenar
+              {isPlatformRoot ? "Restaurantes" : "Menú & Combos"}
             </Link>
+            {!isPlatformRoot && (
+              <Link
+                href={`/${tenantSlug}#especialidades`}
+                className="hover:text-brand-primary transition-colors"
+              >
+                Especialidades
+              </Link>
+            )}
             <Link
-              href="/sucursales"
+              href={isPlatformRoot ? "/#sucursales" : `/${tenantSlug}#sucursales`}
               className="hover:text-brand-primary transition-colors"
             >
               Sucursales
@@ -73,17 +91,16 @@ function StorefrontHeader() {
             >
               Rastrear Pedido
             </Link>
-            <Link
-              href="/admin/personalizacion"
-              className="hover:text-brand-primary transition-colors"
-            >
-              Personalizar
-            </Link>
           </nav>
         </div>
 
         <div className="flex items-center gap-2.5 sm:gap-3.5 shrink-0">
-          <TenantSwitcher />
+          {/* El conmutador multi-marca solo se expone en la landing de la plataforma (/); en la tienda del restaurante se ofrece el selector de sucursales del propio establecimiento */}
+          {isPlatformRoot ? (
+            <TenantSwitcher />
+          ) : (
+            <TenantBranchSelector tenant={tenant} />
+          )}
 
           <div className="hidden lg:flex items-center">
             <Link
@@ -91,8 +108,8 @@ function StorefrontHeader() {
               className="flex items-center gap-2.5 px-4 py-2 w-48 xl:w-64 bg-[#f8f7f5] hover:bg-neutral-200/70 rounded-full transition-colors border border-neutral-200/60 text-neutral-500 group"
             >
               <Search className="w-4 h-4 text-neutral-500 group-hover:text-brand-primary transition-colors shrink-0" />
-              <span className="text-xs sm:text-sm text-neutral-400 font-normal">
-                Buscar en menú
+              <span className="text-xs sm:text-sm text-neutral-400 font-normal truncate">
+                {isPlatformRoot ? "Buscar restaurantes..." : `Buscar en ${brandName}...`}
               </span>
             </Link>
           </div>
@@ -117,7 +134,12 @@ function StorefrontHeader() {
 
 function StorefrontFooter() {
   const pathname = usePathname();
-  const { data: tenant } = useCurrentTenantQuery();
+  const rawSlug = pathname?.split("/").filter(Boolean)[0];
+  const activeSlug =
+    rawSlug && !RESERVED_TENANT_SLUGS.has(rawSlug.toLowerCase())
+      ? rawSlug
+      : undefined;
+  const { data: tenant } = useCurrentTenantQuery(activeSlug);
 
   const isPlatformRoot = pathname === "/";
   const brandName = isPlatformRoot
@@ -133,7 +155,7 @@ function StorefrontFooter() {
 
   return (
     <footer
-      id="sucursales"
+      id="footer-info"
       className="bg-neutral-100 text-neutral-600 text-xs border-t border-neutral-200 mt-16 py-12"
     >
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
@@ -152,13 +174,9 @@ function StorefrontFooter() {
               {brandName}
             </span>
           </div>
-          <p className="text-neutral-500 leading-relaxed mb-4">
+          <p className="text-neutral-500 leading-relaxed">
             {brandDescription}
           </p>
-          <div className="flex items-center gap-2 text-neutral-500 font-medium">
-            <span className="w-2 h-2 rounded-full bg-status-success animate-pulse"></span>
-            <span>Sistema Multitienda Operativo</span>
-          </div>
         </div>
 
         <div>
@@ -190,18 +208,19 @@ function StorefrontFooter() {
 
         <div>
           <h4 className="font-bold text-neutral-900 uppercase tracking-wider text-[11px] mb-3">
-            Plataforma & Transparencia
+            {isPlatformRoot ? "Plataforma & Transparencia" : "Garantía & Métodos de Pago"}
           </h4>
           <p className="text-neutral-500 mb-2 leading-relaxed">
-            Plataforma gastronómica SaaS multi-tenant sin comisiones abusivas por
-            pedido.
+            {isPlatformRoot
+              ? "Plataforma gastronómica SaaS multi-tenant sin comisiones abusivas por pedido."
+              : `Aceptamos efectivo contra entrega y transferencia bancaria directa. Facturación electrónica SRI autorizada.`}
           </p>
           <div className="flex items-center gap-3 font-semibold text-neutral-800">
             <Link
               href="/terminos"
               className="text-neutral-600 hover:text-brand-primary underline transition-colors"
             >
-              Términos y Condiciones
+              Términos
             </Link>
             <span>•</span>
             <Link
@@ -212,34 +231,52 @@ function StorefrontFooter() {
             </Link>
           </div>
           <span className="text-[11px] text-neutral-400 block mt-2">
-            © 2026 {brandName}. Todos los derechos reservados.
+            © 2026 {brandName}.
+            <Link
+              href="/login"
+              className="hover:text-neutral-600 transition-colors ml-1.5"
+            >
+              Portal Personal
+            </Link>
           </span>
         </div>
 
         <div>
           <h4 className="font-bold text-neutral-900 uppercase tracking-wider text-[11px] mb-3">
-            Accesos Operativos
+            {isPlatformRoot ? "Accesos Operativos Demo" : "Atención & Pedidos Directos"}
           </h4>
-          <div className="space-y-2.5">
-            <div className="flex items-center gap-2 text-neutral-700 bg-white p-2.5 rounded-xl border border-neutral-200">
-              <span className="w-2 h-2 rounded-full bg-status-success animate-pulse shrink-0"></span>
-              <span className="text-[11px] font-medium leading-tight">
-                Cocina activa: Tomando pedidos
-              </span>
+          {isPlatformRoot ? (
+            <div className="space-y-2.5">
+              <div className="flex items-center gap-2 text-neutral-700 bg-white p-2.5 rounded-xl border border-neutral-200">
+                <span className="w-2 h-2 rounded-full bg-status-success animate-pulse shrink-0"></span>
+                <span className="text-[11px] font-medium leading-tight">
+                  Ecosistema Multi-Tenant Activo
+                </span>
+              </div>
+              <Link
+                href="/superadmin"
+                className="inline-flex items-center justify-center w-full text-xs font-bold uppercase tracking-wider bg-neutral-900 hover:bg-neutral-800 text-white px-4 py-2.5 rounded-full transition-colors shadow-sm"
+              >
+                Consola SuperAdmin
+              </Link>
+              <Link
+                href="/cocina"
+                className="inline-flex items-center justify-center w-full text-xs font-bold uppercase tracking-wider bg-white hover:bg-neutral-50 text-neutral-900 border border-neutral-300 px-4 py-2 rounded-full transition-colors"
+              >
+                Terminal KDS Demo
+              </Link>
             </div>
-            <Link
-              href="/cocina"
-              className="inline-flex items-center justify-center w-full text-xs font-bold uppercase tracking-wider bg-neutral-900 hover:bg-neutral-800 text-white px-4 py-2.5 rounded-full transition-colors shadow-sm"
-            >
-              Terminal KDS • {brandName}
-            </Link>
-            <Link
-              href="/admin/personalizacion"
-              className="inline-flex items-center justify-center w-full text-xs font-bold uppercase tracking-wider bg-white hover:bg-neutral-50 text-neutral-900 border border-neutral-300 px-4 py-2 rounded-full transition-colors"
-            >
-              Personalizar Landing & Marca
-            </Link>
-          </div>
+          ) : (
+            <div className="space-y-2 text-neutral-600">
+              <p className="text-[11px] text-neutral-500 leading-relaxed">
+                Despacho propio geolocalizado en tiempo real sin recargos ocultos de intermediarios.
+              </p>
+              <div className="pt-1 text-[11px] font-mono space-y-0.5 text-neutral-600">
+                <p>Teléfono: <span className="font-bold text-neutral-900">{tenant?.contactPhone || "0987654321"}</span></p>
+                <p>Email: <span className="font-bold text-neutral-900">{tenant?.contactEmail || "pedidos@lagranjita.com"}</span></p>
+              </div>
+            </div>
+          )}
         </div>
       </div>
     </footer>

@@ -119,7 +119,36 @@ public static partial class DatabaseSeeder
             .IgnoreQueryFilters()
             .FirstOrDefaultAsync(t => t.Slug == slug);
 
-        if (existing != null) return;
+        if (existing != null)
+        {
+            var needsSave = false;
+            if (string.IsNullOrWhiteSpace(existing.LogoUrl) || existing.LogoUrl.StartsWith("/images/identidad/", StringComparison.OrdinalIgnoreCase))
+            {
+                existing.LogoUrl = $"/images/tenants/{slug}/identidad/logo.png";
+                needsSave = true;
+            }
+            var secondarySettings = await context.TenantSettings
+                .IgnoreQueryFilters()
+                .FirstOrDefaultAsync(ts => ts.TenantId == existing.Id);
+            if (secondarySettings != null)
+            {
+                if (!string.IsNullOrEmpty(secondarySettings.HeroSlidesJson) && secondarySettings.HeroSlidesJson.Contains("/images/banners/"))
+                {
+                    secondarySettings.HeroSlidesJson = secondarySettings.HeroSlidesJson.Replace("/images/banners/", $"/images/tenants/{slug}/banners/");
+                    needsSave = true;
+                }
+                if (!string.IsNullOrEmpty(secondarySettings.PromotionalBannersJson) && secondarySettings.PromotionalBannersJson.Contains("/images/banners/"))
+                {
+                    secondarySettings.PromotionalBannersJson = secondarySettings.PromotionalBannersJson.Replace("/images/banners/", $"/images/tenants/{slug}/banners/");
+                    needsSave = true;
+                }
+            }
+            if (needsSave)
+            {
+                await context.SaveChangesAsync();
+            }
+            return;
+        }
 
         var tenant = new Tenant
         {

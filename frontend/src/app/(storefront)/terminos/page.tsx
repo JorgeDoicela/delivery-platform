@@ -8,7 +8,7 @@ import { useCurrentTenantQuery } from "@/features/tenant";
 export default function TerminosLegalesPage() {
   const { data: tenant } = useCurrentTenantQuery();
 
-  const brandName = tenant?.name || "La Granjita Asadero";
+  const brandName = tenant?.name || "La Granjita";
   const businessName = tenant?.businessName || "Asadero La Granjita Cia. Ltda.";
   const taxId = tenant?.taxId || "1754455341001";
   const contactEmail = tenant?.contactEmail || "pedidos@lagranjita.com";

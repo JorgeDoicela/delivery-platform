@@ -72,7 +72,7 @@ export default function SucursalesPage() {
               </div>
 
               <Link
-                href="/finalizar-pedido"
+                href={tenant?.slug ? `/${tenant.slug}#catalogo` : "/#catalogo"}
                 onClick={() => setBranch(branch.id, branch.name)}
                 className="inline-flex items-center justify-center w-full bg-brand-primary hover:bg-brand-primary-hover text-white text-xs font-bold uppercase tracking-wider py-3.5 px-6 rounded-full shadow-md transition-all active:scale-95"
               >

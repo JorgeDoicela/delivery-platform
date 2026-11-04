@@ -5,9 +5,17 @@ import Link from "next/link";
 import Image from "next/image";
 import { ArrowRight } from "lucide-react";
 import { useCurrentTenantQuery } from "@/features/tenant";
+import type { TenantStorefrontConfigDto } from "@/shared/types/api";
 
-export function PromotionalBanners() {
-  const { data: tenant } = useCurrentTenantQuery();
+interface PromotionalBannersProps {
+  tenant?: TenantStorefrontConfigDto | null;
+}
+
+export function PromotionalBanners({
+  tenant: tenantProp,
+}: PromotionalBannersProps = {}) {
+  const { data: queryTenant } = useCurrentTenantQuery();
+  const tenant = tenantProp ?? queryTenant;
   const banners = tenant?.promotionalBanners ?? [];
 
   if (banners.length === 0) return null;

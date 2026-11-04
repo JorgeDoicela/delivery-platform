@@ -137,7 +137,7 @@ export function FastCasualUrbanLandingLayout({
           <OrderModeSelector />
         </div>
 
-        <PromotionalBanners />
+        <PromotionalBanners tenant={tenant} />
 
         {/* 3. Catálogo Principal */}
         <section id="catalogo" className="space-y-6 pt-4">
@@ -167,7 +167,7 @@ export function FastCasualUrbanLandingLayout({
             </div>
           </div>
 
-          <CatalogSection />
+          <CatalogSection tenantSlug={tenant?.slug} />
         </section>
       </div>
     </div>

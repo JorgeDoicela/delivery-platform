@@ -5,8 +5,12 @@ import { useMenuQuery } from "../hooks/useMenuQuery";
 import { ProductCard } from "./ProductCard";
 import { AlertTriangle, RefreshCw } from "lucide-react";
 
-export function CatalogSection() {
-  const { data, isLoading, isError, refetch } = useMenuQuery();
+interface CatalogSectionProps {
+  tenantSlug?: string;
+}
+
+export function CatalogSection({ tenantSlug }: CatalogSectionProps = {}) {
+  const { data, isLoading, isError, refetch } = useMenuQuery(false, tenantSlug);
   const [selectedCategory, setSelectedCategory] = useState<string>("TODOS");
 
   if (isLoading) {

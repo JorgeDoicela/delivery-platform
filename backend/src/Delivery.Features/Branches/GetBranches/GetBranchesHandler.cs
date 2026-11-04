@@ -35,6 +35,7 @@ public sealed class GetBranchesHandler : IHandler<GetBranchesQuery, Result<List<
     {
         var branches = await _context.Branches
             .AsNoTracking()
+            .Where(b => b.IsActive)
             .OrderBy(b => b.Id)
             .Select(b => new BranchDetailDto(
                 b.Id,

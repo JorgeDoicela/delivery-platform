@@ -113,6 +113,7 @@ public sealed class GetCurrentTenantHandler : IHandler<GetCurrentTenantQuery, Re
             .ToList();
 
         var branches = tenant.Branches
+            .Where(b => b.IsActive)
             .OrderBy(b => b.Id)
             .Select(b => new TenantBranchSummaryDto(
                 b.Id,

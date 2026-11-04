@@ -151,8 +151,8 @@ public static partial class DatabaseSeeder
             tenant = new Tenant
             {
                 Slug = "la-granjita",
-                Name = "La Granjita Asadero",
-                Tagline = "Asadero & Leña",
+                Name = "La Granjita",
+                Tagline = "Asadero",
                 Description = "Pollo asado artesanalmente al carbón vegetal y leña seleccionada en La Granjita Asadero. Pedidos directos sin intermediarios.",
                 HeroSubtitle = "Personaliza tu orden con guarniciones calientes, ensalada fresca y ají artesanal",
                 BusinessName = "Asadero La Granjita Cia. Ltda.",
@@ -181,6 +181,8 @@ public static partial class DatabaseSeeder
             if (string.IsNullOrWhiteSpace(tenant.BrandAccentColor)) tenant.BrandAccentColor = "#F59E0B";
             if (string.IsNullOrWhiteSpace(tenant.ContactPhone)) tenant.ContactPhone = "0987654321";
             if (string.IsNullOrWhiteSpace(tenant.ContactEmail)) tenant.ContactEmail = "pedidos@lagranjita.com";
+            if (string.IsNullOrWhiteSpace(tenant.LogoUrl) || tenant.LogoUrl.StartsWith("/images/identidad/", StringComparison.OrdinalIgnoreCase))
+                tenant.LogoUrl = "/images/tenants/la-granjita/identidad/logo.png";
             await context.SaveChangesAsync();
         }
 
@@ -216,19 +218,41 @@ public static partial class DatabaseSeeder
             await context.TenantSettings.AddAsync(settings);
             await context.SaveChangesAsync();
         }
-        else if (string.IsNullOrWhiteSpace(settings.HeroSlidesJson) || settings.HeroSlidesJson == "[]")
+        else
         {
-            if (settings.BaseDeliveryFee <= 0m) settings.BaseDeliveryFee = 1.50m;
-            (settings.EnableDelivery, settings.EnableTakeout, settings.EnableDineIn) = (true, true, true);
-            (settings.AcceptsCash, settings.AcceptsBankTransfer, settings.QuickLinksEnabled) = (true, true, true);
-            settings.BankName ??= "Banco Pichincha";
-            settings.BankAccountType ??= "Cuenta Corriente";
-            settings.BankAccountNumber ??= "2100456789";
-            settings.BankAccountHolder ??= "Asadero La Granjita Cia. Ltda.";
-            settings.BankAccountTaxId ??= "1754455341001";
-            settings.HeroSlidesJson = JsonSerializer.Serialize(defaultHeroSlides, JsonOptions);
-            settings.PromotionalBannersJson = JsonSerializer.Serialize(defaultPromos, JsonOptions);
-            await context.SaveChangesAsync();
+            var needsSave = false;
+            if (settings.BaseDeliveryFee <= 0m)
+            {
+                settings.BaseDeliveryFee = 1.50m;
+                needsSave = true;
+            }
+
+            if (string.IsNullOrWhiteSpace(settings.HeroSlidesJson) || settings.HeroSlidesJson == "[]")
+            {
+                settings.HeroSlidesJson = JsonSerializer.Serialize(defaultHeroSlides, JsonOptions);
+                needsSave = true;
+            }
+            else if (settings.HeroSlidesJson.Contains("/images/banners/"))
+            {
+                settings.HeroSlidesJson = settings.HeroSlidesJson.Replace("/images/banners/", "/images/tenants/la-granjita/banners/");
+                needsSave = true;
+            }
+
+            if (string.IsNullOrWhiteSpace(settings.PromotionalBannersJson) || settings.PromotionalBannersJson == "[]")
+            {
+                settings.PromotionalBannersJson = JsonSerializer.Serialize(defaultPromos, JsonOptions);
+                needsSave = true;
+            }
+            else if (settings.PromotionalBannersJson.Contains("/images/banners/"))
+            {
+                settings.PromotionalBannersJson = settings.PromotionalBannersJson.Replace("/images/banners/", "/images/tenants/la-granjita/banners/");
+                needsSave = true;
+            }
+
+            if (needsSave)
+            {
+                await context.SaveChangesAsync();
+            }
         }
 
         // Sucursales y Geocercas PostGIS (establecimientos SRI 001 y 002)
@@ -240,14 +264,14 @@ public static partial class DatabaseSeeder
 
         if (branches.Count == 0)
         {
-            var branch1Location = GeometryFactory.CreatePoint(new Coordinate(-78.4845, -0.1782));
+            var branch1Location = GeometryFactory.CreatePoint(new Coordinate(-78.557082, -0.332280));
             var branch1Polygon = GeometryFactory.CreatePolygon(new[]
             {
-                new Coordinate(-78.5100, -0.1500),
-                new Coordinate(-78.4600, -0.1500),
-                new Coordinate(-78.4600, -0.2000),
-                new Coordinate(-78.5100, -0.2000),
-                new Coordinate(-78.5100, -0.1500)
+                new Coordinate(-78.5900, -0.2900),
+                new Coordinate(-78.5200, -0.2900),
+                new Coordinate(-78.5200, -0.3700),
+                new Coordinate(-78.5900, -0.3700),
+                new Coordinate(-78.5900, -0.2900)
             });
 
             var branch2Location = GeometryFactory.CreatePoint(new Coordinate(-78.5180, -0.2300));
@@ -265,8 +289,8 @@ public static partial class DatabaseSeeder
                 new()
                 {
                     TenantId = tenant.Id,
-                    Name = "Sucursal #1 (Norte)",
-                    Address = "Av. Amazonas y República (Edif. Sky)",
+                    Name = "Matriz Guamaní",
+                    Address = "Clodoveo Carrión, Sector Guamaní (Quito Sur)",
                     Phone = "0987654321",
                     LocationPoint = branch1Location,
                     CoveragePolygon = branch1Polygon,

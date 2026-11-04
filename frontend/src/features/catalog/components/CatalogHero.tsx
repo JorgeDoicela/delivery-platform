@@ -6,9 +6,15 @@ import Image from "next/image";
 import { ArrowRight, ChevronLeft, ChevronRight, MapPin } from "lucide-react";
 import { useCurrentTenantQuery } from "@/features/tenant";
 import { getFallbackTenantConfig } from "@/features/tenant/store/useTenantStore";
+import type { TenantStorefrontConfigDto } from "@/shared/types/api";
 
-export function CatalogHero() {
-  const { data: tenant } = useCurrentTenantQuery();
+interface CatalogHeroProps {
+  tenant?: TenantStorefrontConfigDto | null;
+}
+
+export function CatalogHero({ tenant: tenantProp }: CatalogHeroProps = {}) {
+  const { data: queryTenant } = useCurrentTenantQuery();
+  const tenant = tenantProp ?? queryTenant;
   const slides =
     tenant?.heroSlides && tenant.heroSlides.length > 0
       ? tenant.heroSlides

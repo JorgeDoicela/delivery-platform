@@ -174,7 +174,7 @@ export function SteakhouseGourmetLandingLayout({
           </div>
 
           <div className="bg-white rounded-3xl p-6 text-neutral-900 shadow-2xl">
-            <CatalogSection />
+            <CatalogSection tenantSlug={tenant?.slug} />
           </div>
         </section>
 

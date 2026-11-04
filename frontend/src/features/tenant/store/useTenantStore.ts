@@ -13,8 +13,8 @@ export const FALLBACK_TENANT_CONFIGS: Record<string, TenantStorefrontConfigDto> 
   "la-granjita": {
     id: "00000000-0000-0000-0000-000000000001",
     slug: "la-granjita",
-    name: "La Granjita Asadero",
-    tagline: "Asadero & Leña",
+    name: "La Granjita",
+    tagline: "Asadero",
     description:
       "Pollo asado artesanalmente al carbón vegetal y leña seleccionada en La Granjita Asadero. Pedidos directos sin intermediarios.",
     heroSubtitle:
@@ -111,7 +111,7 @@ export const FALLBACK_TENANT_CONFIGS: Record<string, TenantStorefrontConfigDto> 
     branches: [
       {
         id: 1,
-        name: "Sucursal #1 (Norte)",
+        name: "Matriz Quito Norte",
         address: "Av. Amazonas y República (Edif. Sky)",
         phone: "0987654321",
         openingTime: "10:30",
@@ -119,18 +119,6 @@ export const FALLBACK_TENANT_CONFIGS: Record<string, TenantStorefrontConfigDto> 
         maxOrdersPerSlot: 15,
         latitude: -0.1782,
         longitude: -78.4845,
-        isActive: true,
-      },
-      {
-        id: 2,
-        name: "Sucursal #2 (Sur)",
-        address: "Av. Rodrigo de Chávez y Maldonado",
-        phone: "0987654322",
-        openingTime: "10:30",
-        closingTime: "21:30",
-        maxOrdersPerSlot: 15,
-        latitude: -0.23,
-        longitude: -78.518,
         isActive: true,
       },
     ],

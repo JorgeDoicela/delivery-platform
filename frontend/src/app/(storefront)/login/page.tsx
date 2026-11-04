@@ -25,7 +25,7 @@ function LoginContent() {
 
   const isMounted = useIsMounted();
   const { data: tenant } = useCurrentTenantQuery();
-  const brandName = tenant?.name || "La Granjita Asadero";
+  const brandName = tenant?.name || "La Granjita";
   const user = useAuthStore((s) => s.user);
   const isAuthenticated = useAuthStore((s) => s.isAuthenticated);
   const logout = useAuthStore((s) => s.logout);
