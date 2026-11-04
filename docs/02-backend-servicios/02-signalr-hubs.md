@@ -11,14 +11,17 @@ La comunicacion bidireccional en tiempo real esta provista por ASP.NET Core Sign
 ### 2.1. Metodos Invocables desde el Cliente
 | Metodo | Parametros | Descripcion |
 | :--- | :--- | :--- |
-| `JoinBranchKitchenGroup` | `string branchId` | Agrega la conexion al grupo de la sucursal `branch_{branchId}` |
-| `LeaveBranchKitchenGroup` | `string branchId` | Remueve la conexion del grupo de cocina |
+| `JoinBranchKitchen` | `int branchId` | Agrega la conexion de la terminal KDS al grupo de sucursal `kitchen_branch_{branchId}` |
+| `LeaveBranchKitchen` | `int branchId` | Remueve la conexion del grupo de cocina al finalizar turno |
+| `JoinTenantChannel` | `string tenantSlug` | Une la sesion al canal de eventos de stock y catalogo de una marca `kitchen_tenant_{slug}` |
+| `LeaveTenantChannel`| `string tenantSlug` | Abandona el canal de eventos de catalogo del comercio |
 
-### 2.2. Eventos Emitidos por el Servidor
+### 2.2. Eventos Emitidos por el Servidor (`IKitchenClient`)
 | Evento | Payload | Disparador | Accion en Frontend |
 | :--- | :--- | :--- | :--- |
-| `ReceiveNewOrder` | `KitchenOrderTicketDto` | Pedido confirmado (`Orders.CreateOrder` o aprobacion de transferencia) | Reproduce alarma sonora nativa y agrega la comanda a la columna 'En Espera' |
-| `OrderStatusChanged` | `{ orderId: string, status: OrderStatus }` | Transicion de estado en cocina | Mueve la tarjeta de comanda a la columna correspondiente o la retira si fue despachada |
+| `ReceiveNewOrder` | `KitchenOrderTicketDto` | Pedido confirmado (`CreateOrder` o aprobacion de transferencia) | Reproduce alarma sonora nativa y agrega la comanda a la columna de pendientes |
+| `OrderStatusChanged` | `string orderId, string status` | Transicion de estado de orden | Mueve la tarjeta de comanda a la columna correspondiente en el tablero FIFO |
+| `StockUpdated` | `int productId, bool isAvailable` | Conmutacion operativa de disponibilidad (`ToggleProductStatus`) | Actualiza instantaneamente el estado del plato en cartas y comanderas |
 
 ---
 
@@ -30,14 +33,15 @@ La comunicacion bidireccional en tiempo real esta provista por ASP.NET Core Sign
 ### 3.1. Metodos Invocables desde el Cliente
 | Metodo | Parametros | Descripcion |
 | :--- | :--- | :--- |
-| `JoinOrderGroup` | `string orderId` | Suscribe al cliente a las actualizaciones de su pedido especifico `order_{orderId}` |
-| `LeaveOrderGroup` | `string orderId` | Cancela la suscripcion al pedido |
+| `JoinOrderTracking` | `string orderId` | Suscribe al cliente al canal exclusivo de su pedido activo `order_tracking_{orderId}` |
+| `SendDriverLocation`| `string orderId, double lat, double lng, double? heading` | El repartidor transmite su geolocalizacion en vivo hacia el grupo de la orden |
+| `LeaveOrderTracking`| `string orderId` | Cancela la suscripcion al canal de rastreo de la orden |
 
-### 3.2. Eventos Emitidos por el Servidor
+### 3.2. Eventos Emitidos por el Servidor (`ITrackingClient`)
 | Evento | Payload | Disparador | Accion en Frontend |
 | :--- | :--- | :--- | :--- |
-| `DriverLocationUpdated` | `{ orderId: string, latitude: number, longitude: number, heading: number }` | Ingesta de geoposicion desde la app del repartidor | Actualiza la posicion del repartidor en el mapa del cliente |
-| `OrderStatusChanged` | `{ orderId: string, status: OrderStatus }` | Avance en el ciclo de vida del pedido | Actualiza el stepper visual de progreso en la vista del cliente |
+| `ReceiveDriverLocation` | `double latitude, double longitude, double? heading` | Coordenadas emitidas por el repartidor en ruta | Actualiza en tiempo real la posicion y orientacion del marcador en MapLibre |
+| `OrderStatusChanged` | `string status` | Cambio de estado de la orden (`OnTheWay`, `Delivered`) | Actualiza el stepper visual de progreso en la vista del cliente |
 
 ---
 

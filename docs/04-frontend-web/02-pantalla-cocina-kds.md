@@ -8,11 +8,12 @@ El modulo KDS ubicado en `frontend/src/features/kitchen/` y renderizado en `src/
 ```
 src/features/kitchen/
 ├── components/
-│   └── KitchenTicketCard.tsx       # Tarjeta de comanda individual con semaforo
+│   ├── KitchenView.tsx            # Contenedor maestro KDS, selector de sucursal y conexion
+│   └── KitchenTicketCard.tsx      # Tarjeta de comanda individual con semaforo y acciones
 ├── hooks/
-│   └── useKitchenOrders.ts        # Logica SignalR, polling de respaldo y avance
+│   └── useKitchenOrders.ts        # Logica SignalR, polling de respaldo y avance de estados
 └── lib/
-    └── sound.ts                   # Sintetizador nativo Web Audio API
+    └── sound.ts                   # Sintetizador nativo Web Audio API (chime sin dependencias)
 ```
 
 ## 3. Comportamiento Operativo y Reglas FIFO

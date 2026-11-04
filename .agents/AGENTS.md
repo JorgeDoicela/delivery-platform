@@ -44,7 +44,7 @@ Ante cualquier intervención en el repositorio, el agente debe consultar y ceñi
 | **Backend, APIs y Base de Datos** | `delivery-backend` | `desarrollo-backend` | VSA, queries PostGIS, throttling Redis, SignalR y middlewares. |
 | **Frontend, Rutas y Componentes** | `delivery-frontend` | `desarrollo-frontend` | App Router, Feature-Driven design, Zustand, SignalR y MapLibre. |
 | **Diseño Visual, UI/UX y Estilos** | `delivery-estilos` | `desarrollo-frontend` | Tokens de color (carbón/ámbar), tipografía, ergonomía táctil y WCAG. |
-| **Documentación y Dosieres** | N/A | `documentacion` | Taxonomía numérica, especificaciones técnicas y diagramas Mermaid. |
+| **Documentación y Dosieres** | `delivery-documentacion` | `documentacion` | Sincronización proactiva continua ante cambios sustanciales, taxonomía numérica, cero emojis y rutas dinámicas. |
 | **Infraestructura, Docker y SO** | N/A | `sysadmin` | Docker Compose, PostgreSQL, Redis y scripts PowerShell. |
 | **Credenciales y Configuración** | N/A | `datos-seguros` | Secretos JWT, contraseñas de BD y variables de entorno. |
 

@@ -69,9 +69,10 @@ El backend de la plataforma esta construido en .NET 8 utilizando C# 12 y Minimal
 
 ---
 
-### 2.1. Geofencing (Resolucion Espacial de Cobertura)
-* **Ruta:** `POST /api/geofencing/resolve`
-* **Descripcion:** Evalua si un punto geografico `(latitude, longitude)` esta contenido dentro del poligono de cobertura de alguna sucursal activa.
+### 2.1. Sucursales, Geofencing y Capacidad de Horno
+
+#### 2.1.1. Resolucion Espacial de Cobertura (`POST /api/geofencing/resolve`)
+* **Descripcion:** Evalua si un punto geografico `(latitude, longitude)` esta contenido dentro del poligono de cobertura de alguna sucursal activa mediante PostGIS NetTopologySuite.
 * **Payload de Entrada:**
   ```json
   {
@@ -98,10 +99,40 @@ El backend de la plataforma esta construido en .NET 8 utilizando C# 12 y Minimal
   }
   ```
 
+#### 2.1.2. Listado de Sucursales Operativas (`GET /api/branches`)
+* **Descripcion:** Obtiene el listado de sucursales activas del tenant resuelto con direccion, telefono, capacidad maxima por slot y coordenadas WGS 84.
+* **Respuesta Exitosa (200 OK):**
+  ```json
+  [
+    {
+      "id": 1,
+      "name": "Sucursal 1 - Norte",
+      "address": "Av. Amazonas y Gaspar de Villarroel",
+      "phone": "0987654321",
+      "maxOrdersPerSlot": 12,
+      "isActive": true,
+      "latitude": -0.1782,
+      "longitude": -78.4845
+    }
+  ]
+  ```
+
+#### 2.1.3. Consulta de Capacidad Operativa por Slot (`GET /api/branches/{branchId}/capacity`)
+* **Descripcion:** Retorna la carga de ordenes en la ventana actual de 20 minutos (`currentOrdersInSlot`), capacidad maxima configurada y tiempo de entrega estimado dinamicamente.
+* **Respuesta Exitosa (200 OK):**
+  ```json
+  {
+    "branchId": 1,
+    "currentOrdersInSlot": 4,
+    "maxOrdersPerSlot": 12,
+    "isSlotAvailable": true,
+    "estimatedDeliveryMinutes": 35
+  }
+  ```
+
 ---
 
-### 2.2. Catalogo Activo y Modificadores
-* **Ruta:** `GET /api/catalog/menu`
+#### 2.2.1. Catalogo Activo y Modificadores (`GET /api/catalog/menu`)
 * **Descripcion:** Retorna las categorias, combos y productos activos junto con sus grupos de modificadores jerarquicos (guarniciones obligatorias, ajies y bebidas opcionales).
 * **Respuesta Exitosa (200 OK):**
   ```json
@@ -136,6 +167,24 @@ El backend de la plataforma esta construido en .NET 8 utilizando C# 12 y Minimal
       }
     ],
     "totalProducts": 5
+  }
+  ```
+
+#### 2.2.2. Alternar Disponibilidad de Producto (`PUT /api/catalog/products/{id}/status`)
+* **Descripcion:** Habilita o deshabilita operativamente un producto para suspender temporalmente su venta en cocina o vitrina.
+* **Payload de Entrada:**
+  ```json
+  {
+    "productId": 1,
+    "isActive": false
+  }
+  ```
+* **Respuesta Exitosa (200 OK):**
+  ```json
+  {
+    "productId": 1,
+    "isActive": false,
+    "message": "Estado de disponibilidad actualizado correctamente."
   }
   ```
 
@@ -202,6 +251,28 @@ El backend de la plataforma esta construido en .NET 8 utilizando C# 12 y Minimal
 
 ---
 
+### 2.5.1. Aprobacion o Rechazo de Transferencia Bancaria
+* **Ruta:** `POST /api/orders/{id}/transfer-approval`
+* **Descripcion:** Utilizado por cajeros o supervisores para validar el comprobante de transferencia bancaria de pedidos en estado `PendingPaymentValidation`. Si se aprueba, la orden pasa a `Confirmed` y se emite la alerta a cocina vía SignalR; si se rechaza, pasa a `Cancelled`.
+* **Payload de Entrada:**
+  ```json
+  {
+    "orderId": "3fa85f64-5717-4562-b3fc-2c963f66afa6",
+    "isApproved": true,
+    "rejectionReason": null
+  }
+  ```
+* **Respuesta Exitosa (200 OK):**
+  ```json
+  {
+    "orderId": "3fa85f64-5717-4562-b3fc-2c963f66afa6",
+    "newStatus": 3,
+    "message": "Comprobante validado exitosamente. Orden enviada a cocina."
+  }
+  ```
+
+---
+
 ### 2.6. Comandas de Cocina (KDS)
 * **Ruta:** `GET /api/kitchen/branches/{branchId}/orders`
 * **Descripcion:** Retorna todas las ordenes en estados activos de cocina (`Confirmed`, `InKitchen`, `ReadyForDelivery`) ordenadas estrictamente bajo criterio FIFO (`CreatedAt ASC`).
@@ -223,6 +294,102 @@ El backend de la plataforma esta construido en .NET 8 utilizando C# 12 y Minimal
 
 * **Ruta:** `GET /api/tracking/orders/{orderId}/driver-location`
 * **Descripcion:** Consulta en Redis GEO las coordenadas mas recientes del repartidor para dicha orden.
+
+---
+
+### 2.8. Modulo Multitenant y Personalizacion de Plataforma (Tenants)
+
+#### 2.8.1. Directorio Publico de Comercios (`GET /api/tenants`)
+* **Descripcion:** Retorna el directorio de negocios activos en la plataforma para navegacion publica o seleccion de marca.
+* **Respuesta Exitosa (200 OK):**
+  ```json
+  {
+    "tenants": [
+      {
+        "id": "c3b9e4a1-0000-0000-0000-000000000001",
+        "slug": "la-granjita",
+        "name": "La Granjita Asadero",
+        "tagline": "El mejor pollo al carbon",
+        "logoUrl": "https://.../logo.png",
+        "brandPrimaryColor": "#E4002B",
+        "branchesCount": 2
+      }
+    ]
+  }
+  ```
+
+#### 2.8.2. Configuracion del Tenant Activo (`GET /api/tenants/current`)
+* **Descripcion:** Retorna la identidad de marca, plantilla visual de landing page, tarifas de delivery, metodos de pago y sucursales del tenant resuelto por subdominio o cabecera `X-Tenant-Slug`.
+* **Respuesta Exitosa (200 OK):**
+  ```json
+  {
+    "tenantId": "c3b9e4a1-0000-0000-0000-000000000001",
+    "slug": "la-granjita",
+    "name": "La Granjita Asadero",
+    "tagline": "El mejor pollo al carbon",
+    "description": "Tradicion en carnes y pollos a la brasa desde 1998.",
+    "heroSubtitle": "Personaliza tu orden con guarniciones calientes y aji artesanal",
+    "logoUrl": "https://.../logo.png",
+    "brandPrimaryColor": "#E4002B",
+    "brandPrimaryHoverColor": "#C40024",
+    "brandAccentColor": "#F59E0B",
+    "contactPhone": "0987654321",
+    "contactEmail": "contacto@lagranjita.com",
+    "landingLayoutTemplate": "asadero-clasico",
+    "baseDeliveryFee": 1.50,
+    "enableDelivery": true,
+    "enableTakeout": true,
+    "enableDineIn": false,
+    "acceptsCash": true,
+    "acceptsBankTransfer": true,
+    "acceptsCard": false,
+    "bankInfo": {
+      "bankName": "Banco Pichincha",
+      "accountType": "Corriente",
+      "accountNumber": "2100123456",
+      "accountHolder": "La Granjita S.A.S.",
+      "taxId": "1792345678001"
+    },
+    "heroSlides": [],
+    "promotionalBanners": [],
+    "termsAndConditionsMarkdown": "...",
+    "privacyPolicyMarkdown": "...",
+    "branches": []
+  }
+  ```
+
+#### 2.8.3. Aprovisionamiento de Nuevo Tenant (`POST /api/tenants`)
+* **Autorizacion:** Rol `SuperAdmin`
+* **Descripcion:** Aprovisiona un nuevo comercio en la base de datos, configurando sucursal matriz, catalogo base predeterminado y usuario inicial `TenantAdmin`.
+* **Payload de Entrada:**
+  ```json
+  {
+    "name": "Pollos El Brasero",
+    "slug": "el-brasero",
+    "businessName": "El Brasero Alimentos Cia. Ltda.",
+    "taxId": "1791234567001",
+    "adminEmail": "admin@elbrasero.com",
+    "adminPassword": "Password123!",
+    "adminFullName": "Administrador Brasero",
+    "matrixBranchName": "Sucursal Matriz Centro",
+    "matrixBranchAddress": "Av. 10 de Agosto y Colon",
+    "brandPrimaryColor": "#D97706"
+  }
+  ```
+* **Respuesta Exitosa (200 OK):** Retorna `CreatedTenantDto` con identificadores generados.
+
+#### 2.8.4. Directorio de Plataforma para SuperAdmin (`GET /api/tenants/platform`)
+* **Autorizacion:** Rol `SuperAdmin`
+* **Descripcion:** Lista exhaustiva de todos los comercios registrados (activos e inactivos) con metricas agregadas de sucursales, usuarios y volumen operacional.
+
+#### 2.8.5. Activar o Suspender Comercio (`PATCH /api/tenants/{tenantId}/status`)
+* **Autorizacion:** Rol `SuperAdmin`
+* **Descripcion:** Cambia el estado de actividad de un comercio. Al desactivarse, se impide el acceso a sus canales de venta y dashboards.
+* **Payload de Entrada:** `{"isActive": false}`
+
+#### 2.8.6. Actualizar Storefront y Politicas (`PUT /api/tenants/current/storefront`)
+* **Autorizacion:** Roles `TenantAdmin`, `SuperAdmin`
+* **Descripcion:** Actualiza la identidad visual (colores, logo, textos), plantilla de landing page, banners, tarifas, datos bancarios y textos legales en Markdown del comercio activo.
 
 ---
 

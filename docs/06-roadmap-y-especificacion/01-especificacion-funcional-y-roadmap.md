@@ -50,7 +50,7 @@ flowchart TD
 - [x] Tablero tipo Kanban con estados operativos de órdenes ordenadas bajo criterio FIFO.
 - [x] Alerta sonora continua en bucle ante la entrada de nuevos pedidos hasta su aceptación manual (Web Audio API / Howler).
 - [ ] Impresión desatendida de comandas térmicas de 80mm al momento de confirmar el pedido (ESC/POS vía QZ Tray / RawBT).
-- [ ] Interruptor de inventario rápido para deshabilitar productos o modificadores específicos en la sucursal activa en tiempo real.
+- [x] Interruptor de catálogo rápido para deshabilitar productos en la sucursal activa en tiempo real (`ToggleProductStatus`).
 
 ### 2.3. Herramienta de Repartidores (Driver Operations)
 - [x] Lista de pedidos asignados con dirección, datos del cliente y monto a cobrar.
@@ -59,8 +59,9 @@ flowchart TD
 - [x] Registro de liquidación en entrega (confirmación de cobro en efectivo y cálculo de vuelto).
 
 ### 2.4. Panel de Administración Central
-- [ ] Configuración de polígonos de cobertura (geocercas) y horarios de servicio de cada sucursal en UI administrativa.
-- [ ] Administración centralizada del catálogo base y fijación de precios diferenciados o unificados.
+- [x] Configuración de identidad visual, landing pages, banners, tarifas de delivery y cuentas bancarias por Tenant (`UpdateTenantStorefront`).
+- [x] Administración y aprovisionamiento de comercios en plataforma SaaS (`CreateTenant`, `ToggleTenantStatus`).
+- [ ] Configuración interactiva de polígonos de cobertura (geocercas) y horarios de servicio de cada sucursal en UI administrativa.
 - [ ] Reportes de ventas por sede, métricas de tiempos de preparación y liquidación de efectivo de repartidores al cierre de turno.
 
 ---
@@ -91,7 +92,7 @@ stateDiagram-v2
 | Estado | Origen de Cambio | Efecto Operativo | Notificación | Estado de Verificación |
 |---|---|---|---|---|
 | `CREADO` (1) | Cliente | Valida inventario e idempotencia en backend. | Ninguna | [x] Implementado en `CreateOrder` |
-| `PENDIENTE_VALIDACION` (2) | Cliente (adjunta comprobante) | Notificación visual en caja ("Comprobante por verificar"). | WhatsApp al cliente: "Comprobante en revisión" | [ ] Pendiente carga de adjuntos |
+| `PENDIENTE_VALIDACION` (2) | Cliente (adjunta comprobante) | Notificación visual en caja ("Comprobante por verificar"). | Alerta en caja y aprobación vía `ApproveTransferOrder` | [x] Implementado en `ApproveTransferOrder` |
 | `CONFIRMADO` (3) | Cajero / Sistema (efectivo) | Asigna sucursal definitiva, reserva inventario. Despacha evento a KDS. | Alerta sonora en KDS | [x] Implementado y probado |
 | `EN_COCINA` (4) | Operador KDS | Comanda enviada a producción. Impresión de ticket térmico 80mm. | WhatsApp al cliente: "En preparación" | [x] Transición activa en KDS |
 | `LISTO_PARA_ENTREGA` (5) | Operador KDS | Pedido empaquetado, pasa a zona de despacho. | Alerta a flota de reparto | [x] Transición activa en KDS |

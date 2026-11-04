@@ -11,7 +11,7 @@
 
 ---
 
-## 2. Diagrama Entidad-Relacion Completo (24 Tablas)
+## 2. Diagrama Entidad-Relacion Completo (27 Tablas de Dominio)
 
 ```mermaid
 erDiagram
@@ -69,9 +69,16 @@ erDiagram
         uuid Id PK
         string Slug UK
         string Name
+        string Tagline
+        string Description
+        string HeroSubtitle
         string BusinessName
         string TaxId
         string BrandPrimaryColor
+        string BrandPrimaryHoverColor
+        string BrandAccentColor
+        string ContactPhone
+        string ContactEmail
         string LogoUrl
         boolean IsActive
         timestamptz CreatedAt
@@ -85,6 +92,24 @@ erDiagram
         string SriEnvironment
         string SriCertificatePath
         string SriCertificatePasswordHash
+        decimal BaseDeliveryFee
+        boolean EnableDelivery
+        boolean EnableTakeout
+        boolean EnableDineIn
+        boolean AcceptsCash
+        boolean AcceptsBankTransfer
+        boolean AcceptsCard
+        string BankName
+        string BankAccountType
+        string BankAccountNumber
+        string BankAccountHolder
+        string BankAccountTaxId
+        string LandingLayoutTemplate
+        boolean QuickLinksEnabled
+        string HeroSlidesJson
+        string PromotionalBannersJson
+        string TermsAndConditionsMarkdown
+        string PrivacyPolicyMarkdown
     }
 
     USER {
@@ -394,15 +419,22 @@ Identifica la marca o franquicia en la plataforma SaaS.
 | `Id` | `uuid` | NO | PK | Identificador unico universal del tenant |
 | `Slug` | `varchar(50)` | NO | UK | Identificador URL de la marca (ej. `la-granjita`) |
 | `Name` | `varchar(150)` | NO | - | Nombre comercial visible de la marca |
+| `Tagline` | `varchar(150)` | NO | Default: `'Asadero & Brasa'` | Lema o eslogan comercial corto |
+| `Description` | `text` | NO | - | Descripcion detallada de la propuesta gastronomica |
+| `HeroSubtitle` | `varchar(255)` | NO | - | Subtitulo destacado para la vitrina principal |
 | `BusinessName` | `varchar(200)` | SI | - | Razon social legal para facturacion ante el SRI |
 | `TaxId` | `varchar(20)` | SI | - | RUC tributario en Ecuador (13 digitos) |
 | `LogoUrl` | `varchar(500)` | SI | - | Ruta publica al isotipo/logotipo |
-| `BrandPrimaryColor` | `varchar(10)` | SI | - | Color de acento de marca en formato hexadecimal (ej. `#E4002B`) |
+| `BrandPrimaryColor` | `varchar(10)` | SI | Default: `'#E4002B'` | Color primario de marca en formato hex |
+| `BrandPrimaryHoverColor`| `varchar(10)`| SI | Default: `'#C40024'` | Color primario hover en formato hex |
+| `BrandAccentColor` | `varchar(10)` | SI | Default: `'#F59E0B'` | Color secundario/acento ambar en formato hex |
+| `ContactPhone` | `varchar(30)` | SI | - | Telefono de atencion general al cliente |
+| `ContactEmail` | `varchar(150)` | SI | - | Correo electronico corporativo |
 | `IsActive` | `boolean` | NO | Default: `true` | Estado de acceso y operacion de la marca |
 | `CreatedAt` | `timestamptz` | NO | UtcNow | Fecha y hora de creacion del registro |
 
 #### Tabla `TenantSettings`
-Almacena parametros tecnicos y fiscales por marca.
+Almacena parametros tecnicos, fiscales, financieros, tarifarios y personalizacion visual de storefront por marca.
 | Columna | Tipo de Dato | Nulo | Restriccion | Descripcion |
 | :--- | :--- | :--- | :--- | :--- |
 | `Id` | `uuid` | NO | PK | Identificador unico |
@@ -412,6 +444,24 @@ Almacena parametros tecnicos y fiscales por marca.
 | `SriEnvironment` | `varchar(20)` | NO | Default: `'PRUEBAS'` | Ambiente SRI (`'PRUEBAS'` o `'PRODUCCION'`) |
 | `SriCertificatePath` | `varchar(500)` | SI | - | Ruta al archivo de firma electronica PKCS#12 (`.p12`) |
 | `SriCertificatePasswordHash` | `text` | SI | - | Hash/secreto para desencriptar el certificado |
+| `BaseDeliveryFee` | `numeric(10,2)` | NO | Default: `1.50` | Tarifa base de envio a domicilio |
+| `EnableDelivery` | `boolean` | NO | Default: `true` | Habilita pedidos con envio a domicilio |
+| `EnableTakeout` | `boolean` | NO | Default: `true` | Habilita pedidos para retiro en local |
+| `EnableDineIn` | `boolean` | NO | Default: `false` | Habilita pedidos desde mesa en local |
+| `AcceptsCash` | `boolean` | NO | Default: `true` | Habilita pago en efectivo contra entrega |
+| `AcceptsBankTransfer` | `boolean` | NO | Default: `true` | Habilita pago via transferencia bancaria directa |
+| `AcceptsCard` | `boolean` | NO | Default: `false` | Habilita pasarela de tarjeta de credito/debito |
+| `BankName` | `varchar(100)` | SI | - | Nombre de la entidad bancaria |
+| `BankAccountType` | `varchar(50)` | SI | - | Tipo de cuenta bancaria (`Ahorros`, `Corriente`) |
+| `BankAccountNumber`| `varchar(50)` | SI | - | Numero de cuenta bancaria |
+| `BankAccountHolder`| `varchar(150)`| SI | - | Nombre del titular de la cuenta |
+| `BankAccountTaxId` | `varchar(20)` | SI | - | RUC o Cedula del titular de la cuenta bancaria |
+| `LandingLayoutTemplate` | `varchar(50)` | NO | Default: `'asadero-clasico'` | Plantilla visual activa para la landing page |
+| `QuickLinksEnabled`| `boolean` | NO | Default: `true` | Muestra barra de accesos rapidos operacionales |
+| `HeroSlidesJson` | `text` | NO | Default: `'[]'` | Coleccion JSON de diapositivas promocionales hero |
+| `PromotionalBannersJson`| `text` | NO | Default: `'[]'` | Coleccion JSON de banners de ofertas intermedias |
+| `TermsAndConditionsMarkdown` | `text` | SI | - | Contenido completo de terminos y condiciones |
+| `PrivacyPolicyMarkdown` | `text` | SI | - | Contenido completo de politica de privacidad |
 
 ---
 
@@ -570,10 +620,36 @@ Control de disponibilidad independiente por cada sede fisica.
 | `IsAvailable` | `boolean` | NO | Default: `true` | Si el plato esta disponible o agotado en esa sede |
 | `CustomPrice` | `numeric(18,2)` | SI | - | Precio especial para esa sucursal (opcional) |
 
-#### Tabla `ModifierGroups` y `ModifierOptions`
-Grupos y opciones de configuracion de platos (guarniciones, salsas, ajies, bebidas).
-* `ModifierGroups`: Define reglas de eleccion (`MinSelectable`, `MaxSelectable`, `IsRequired`).
-* `ModifierOptions`: Opciones individuales con recargo opcional (`AdditionalPrice`).
+#### Tabla `ModifierGroups`
+Grupos de personalizacion jerarquica para productos (guarniciones, salsas, ajies, bebidas).
+| Columna | Tipo de Dato | Nulo | Restriccion | Descripcion |
+| :--- | :--- | :--- | :--- | :--- |
+| `Id` | `serial` | NO | PK | Identificador del grupo de modificadores |
+| `TenantId` | `uuid` | NO | FK (`Tenants.Id`) | Marca propietaria |
+| `Name` | `varchar(150)` | NO | - | Titulo visible (ej. `Selecciona tu Guarnicion`, `Elige tu Aji`) |
+| `MinSelectable` | `int` | NO | Default: `0` | Minimo de opciones obligatorias a seleccionar |
+| `MaxSelectable` | `int` | NO | Default: `1` | Maximo de opciones permitidas en el grupo |
+| `IsRequired` | `boolean` | NO | Default: `false`| Si el cliente esta obligado a elegir al menos una opcion |
+| `DisplayOrder` | `int` | NO | Default: `0` | Orden de visualizacion en el modal del producto |
+
+#### Tabla `ProductModifierGroups`
+Tabla de union muchos a muchos entre productos del menu y grupos de modificadores.
+| Columna | Tipo de Dato | Nulo | Restriccion | Descripcion |
+| :--- | :--- | :--- | :--- | :--- |
+| `ProductId` | `int` | NO | PK, FK (`Products.Id`) | Producto comercial que ofrece el grupo |
+| `ModifierGroupId` | `int` | NO | PK, FK (`ModifierGroups.Id`) | Grupo de modificadores vinculado |
+| `DisplayOrder` | `int` | NO | Default: `0` | Orden de despliegue dentro del producto |
+
+#### Tabla `ModifierOptions`
+Opciones individuales seleccionables dentro de cada grupo de modificadores.
+| Columna | Tipo de Dato | Nulo | Restriccion | Descripcion |
+| :--- | :--- | :--- | :--- | :--- |
+| `Id` | `serial` | NO | PK | Identificador de la opcion |
+| `ModifierGroupId` | `int` | NO | FK (`ModifierGroups.Id`) | Grupo al que pertenece la opcion |
+| `Name` | `varchar(150)` | NO | - | Nombre (ej. `Papas Fritas Tradicionales`, `Aji Manaba`) |
+| `AdditionalPrice` | `numeric(18,2)` | NO | Default: `0.00` | Recargo monetario adicional sobre el precio base |
+| `IsAvailable` | `boolean` | NO | Default: `true` | Disponibilidad operativa en cocina y vitrina |
+| `DisplayOrder` | `int` | NO | Default: `0` | Secuencia de presentacion en la lista |
 
 #### Tabla `InventoryItems`
 Insumos crudos y materiales de empaque con stock localizado por sucursal.
@@ -599,12 +675,36 @@ Formula de explosion de materiales para descuento automatizado de inventario.
 | `InventoryItemId`| `int` | NO | FK (`InventoryItems.Id`) | Insumo crudo consumido |
 | `QuantityUsed` | `numeric(18,3)` | NO | - | Unidades consumidas (ej. `8.0` octavos para 1 pollo entero, `4.0` para medio pollo, `1.0` para contenedor) |
 
-#### Tabla `Suppliers` e `InventoryMovements` (Kárdex Inmutable)
-Auditoría estricta de todos los ingresos y egresos de mercadería.
-* `Suppliers`: Directorio de proveedores de materia prima (ej. Avícolas).
-* `InventoryMovements`: Kárdex inmutable equivalente a `stockdiary` en VentaFácil:
-  - Registra `MovementType` (`COMPRA_PROVEEDOR`, `VENTA_PEDIDO`, `DESPERDICIO_MERMA`, `AJUSTE_MANUAL`).
-  - Almacena snapshots exactos: `QuantityDelta`, `StockBefore`, `StockAfter` y `UnitCostSnapshot`.
+#### Tabla `Suppliers`
+Directorio de proveedores mayoristas para aprovisionamiento de insumos y materia prima.
+| Columna | Tipo de Dato | Nulo | Restriccion | Descripcion |
+| :--- | :--- | :--- | :--- | :--- |
+| `Id` | `serial` | NO | PK | Identificador unico del proveedor |
+| `TenantId` | `uuid` | NO | FK (`Tenants.Id`) | Marca comercial asociada |
+| `Name` | `varchar(150)` | NO | - | Razon social o nombre comercial del proveedor |
+| `TaxId` | `varchar(20)` | SI | - | RUC tributario del proveedor |
+| `Phone` | `varchar(30)` | SI | - | Telefono de atencion de pedidos mayoristas |
+| `Email` | `varchar(150)` | SI | - | Correo para ordenes de compra |
+| `Address` | `varchar(300)` | SI | - | Direccion o planta de despacho |
+| `IsActive` | `boolean` | NO | Default: `true` | Estado de vigencia comercial |
+
+#### Tabla `InventoryMovements` (Kardex Inmutable)
+Libro diario de inventario equivalente a `stockdiary` para auditoria fiscal y control de mermas.
+| Columna | Tipo de Dato | Nulo | Restriccion | Descripcion |
+| :--- | :--- | :--- | :--- | :--- |
+| `Id` | `uuid` | NO | PK | Identificador unico del movimiento |
+| `TenantId` | `uuid` | NO | FK (`Tenants.Id`) | Marca |
+| `BranchId` | `int` | NO | FK (`Branches.Id`) | Sede fisica donde ocurre el movimiento |
+| `InventoryItemId`| `int` | NO | FK (`InventoryItems.Id`) | Insumo afectado en el stock |
+| `SupplierId` | `int` | SI | FK (`Suppliers.Id`) | Proveedor de origen (para ingresos por compra) |
+| `OrderId` | `uuid` | SI | FK (`Orders.Id`) | Pedido origen (para salidas por venta/receta) |
+| `MovementType` | `varchar(50)` | NO | - | Tipo (`COMPRA_PROVEEDOR`, `VENTA_PEDIDO`, `DESPERDICIO_MERMA`, `AJUSTE_MANUAL`) |
+| `QuantityDelta`| `numeric(18,3)`| NO | - | Cantidad neta alterada (positiva para compras, negativa para ventas/mermas) |
+| `StockBefore` | `numeric(18,3)` | NO | - | Snapshot exacto del saldo anterior en almacen |
+| `StockAfter` | `numeric(18,3)` | NO | - | Snapshot exacto del saldo resultante |
+| `UnitCostSnapshot`| `numeric(18,2)`| NO| - | Costo unitario de reposicion al momento del movimiento |
+| `Notes` | `varchar(300)` | SI | - | Justificacion u observaciones de auditoria |
+| `CreatedAt` | `timestamptz` | NO | UtcNow | Marca temporal inmutable del registro |
 
 ---
 
@@ -665,10 +765,28 @@ Cabecera central del pedido comercial y operativo.
 | `CreatedAt` | `timestamptz` | NO | UtcNow | Fecha y hora de creacion |
 | `UpdatedAt` | `timestamptz` | SI | - | Ultima actualizacion |
 
-#### Tabla `OrderItems` y `OrderItemModifiers`
-Detalle desglosado con snapshots inmutables de precios y tarifas de IVA:
-* `OrderItems`: Almacena `ProductNameSnapshot`, `UnitPriceSnapshot`, `TaxRateSnapshot`, `Quantity` y `Notes` de cocina.
-* `OrderItemModifiers`: Almacena `ModifierNameSnapshot` y `PriceSnapshot`.
+#### Tabla `OrderItems`
+Detalle de productos incluidos en el pedido con snapshots inmutables de precios al momento de la venta.
+| Columna | Tipo de Dato | Nulo | Restriccion | Descripcion |
+| :--- | :--- | :--- | :--- | :--- |
+| `Id` | `uuid` | NO | PK | Identificador unico del renglon de orden |
+| `OrderId` | `uuid` | NO | FK (`Orders.Id`) | Cabecera de pedido a la que pertenece |
+| `ProductId` | `int` | NO | FK (`Products.Id`) | Producto comercial vendido |
+| `ProductNameSnapshot`| `varchar(150)`| NO | - | Nombre textual congelado del producto al comprar |
+| `UnitPriceSnapshot` | `numeric(18,2)`| NO | - | Precio unitario congelado (inmune a cambios futuros en carta) |
+| `TaxRateSnapshot` | `numeric(5,2)` | NO | Default: `0.00` | Tarifa de IVA congelada al momento de la venta |
+| `Quantity` | `int` | NO | - | Cantidad de unidades solicitadas |
+| `Notes` | `varchar(300)` | SI | - | Instrucciones especificas de preparacion (ej. *"bien dorado"*) |
+
+#### Tabla `OrderItemModifiers`
+Personalizaciones y elecciones aplicadas sobre cada renglon de pedido (guarnicion elegida, aji, bebidas).
+| Columna | Tipo de Dato | Nulo | Restriccion | Descripcion |
+| :--- | :--- | :--- | :--- | :--- |
+| `Id` | `uuid` | NO | PK | Identificador unico del modificador de renglon |
+| `OrderItemId` | `uuid` | NO | FK (`OrderItems.Id`) | Renglon de producto sobre el que aplica |
+| `ModifierOptionId` | `int` | NO | FK (`ModifierOptions.Id`) | Opcion de modificador seleccionada |
+| `ModifierNameSnapshot`|`varchar(150)`| NO| - | Nombre textual congelado de la opcion |
+| `PriceSnapshot` | `numeric(18,2)`| NO | - | Recargo congelado aplicado al momento de ordenar |
 
 #### Tabla `Invoices`
 Documento tributario electronico emitido ante el Servicio de Rentas Internas (SRI Ecuador).
@@ -719,6 +837,22 @@ Ciclo de vida del despacho del pedido.
 | `AssignedAt` | `timestamptz` | NO | UtcNow | Momento de asignacion |
 | `PickedUpAt` | `timestamptz` | SI | - | Momento en que el motorizado retira de cocina |
 | `DeliveredAt` | `timestamptz` | SI | - | Momento de entrega al cliente |
+
+---
+
+### 3.8. Dominio 8: Tablas de Sistema, Metadatos y Extension Espacial PostGIS
+
+#### Tabla `__EFMigrationsHistory`
+Control de versionamiento de esquema gestionado por Entity Framework Core.
+| Columna | Tipo de Dato | Nulo | Restriccion | Descripcion |
+| :--- | :--- | :--- | :--- | :--- |
+| `MigrationId` | `varchar(150)` | NO | PK | Nombre con timestamp de la migracion aplicada |
+| `ProductVersion` | `varchar(32)` | NO | - | Version del ensamblado EF Core ejecutado |
+
+#### Tablas del Motor PostGIS (`spatial_ref_sys`, `geometry_columns`, `geography_columns`)
+Gestionadas internamente por la extension PostGIS:
+* `spatial_ref_sys`: Catalogo de sistemas de coordenadas espaciales (incluye SRID 4326 WGS 84).
+* `geometry_columns` / `geography_columns`: Vistas de catalogo SQL/MM que indexan las columnas espaciales registradas en la base de datos (`LocationPoint`, `CoveragePolygon`, `DefaultLocationPoint`, `DeliveryLocation`, `CurrentLocation`).
 
 ---
 

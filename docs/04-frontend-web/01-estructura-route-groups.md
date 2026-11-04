@@ -12,74 +12,77 @@ flowchart TD
     App["src/app/"]
     RootLayout["Root Layout (app/layout.tsx: Inter Font + React Query Providers)"]
 
-    App --> Storefront["(storefront)/ (Canal Cliente B2C y Vitrina)"]
-    App --> Dashboard["(dashboard)/ (KDS y Operaciones de Sede)"]
+    App --> Storefront["(storefront)/ (Canal Cliente B2C, Vitrina y Multitenancy)"]
+    App --> Dashboard["(dashboard)/ (KDS, Administracion y SuperAdmin)"]
     App --> Driver["(driver)/ (Smartphone Repartidores)"]
-    App --> Auth["(auth)/ (Portal de Acceso y Sesion)"]
 
-    Storefront --> StoreLayout["Storefront Layout (Header con Carrito + Footer)"]
+    Storefront --> StoreLayout["Storefront Layout (Header reactivo + Footer + Modales)"]
     StoreLayout --> Home["/ (Vitrina Principal, Banner, Catalogo #catalogo y Sucursales #sucursales)"]
+    StoreLayout --> TenantSlug["/[slug] (Vitrina Branded Dinamica por Comercio)"]
     StoreLayout --> CatalogoRoute["/catalogo (Ruta de catalogo directo)"]
     StoreLayout --> SucursalesRoute["/sucursales (Ruta de mapa y sedes)"]
     StoreLayout --> CheckoutRoute["/checkout y /finalizar-pedido (Resolucion de Geocerca + Formulario)"]
     StoreLayout --> TrackRoute["/track/[orderId] y /rastreo (Seguimiento Satelital SignalR)"]
+    StoreLayout --> LegalRoutes["/terminos y /privacidad (Politicas y Textos Legales Markdown)"]
+    StoreLayout --> LoginRoute["/login (Formulario de Acceso y Sesion RBAC)"]
 
     Dashboard --> DashLayout["Dashboard Layout (Fullscreen Dark KDS + UserNav)"]
     DashLayout --> Kitchen["/kitchen y /cocina (Tablero Kanban FIFO de Cocina con AuthGuard)"]
-    DashLayout --> AdminInventario["/admin/inventario (Control de Insumos y Kardex)"]
-    DashLayout --> AdminSucursales["/admin/sucursales (Capacidad de Hornos por Slot)"]
+    DashLayout --> AdminInventario["/admin/inventario y /admin/inventory (Control de Insumos y Kardex)"]
+    DashLayout --> AdminSucursales["/admin/sucursales y /admin/branches (Capacidad de Hornos por Slot)"]
+    DashLayout --> AdminPersonalizacion["/admin/personalizacion (Personalizacion Visual de Storefront)"]
+    DashLayout --> AdminTenants["/admin/tenants (Gestion de Comercios para TenantAdmin)"]
+    DashLayout --> SuperAdmin["/superadmin (Dashboard de Plataforma Global)"]
 
     Driver --> DriverLayout["Driver Layout (Mobile Shell 430px Centrado)"]
     DriverLayout --> RepartidorPortal["/repartidor (Portal del Motorizado)"]
     DriverLayout --> ActiveDelivery["/active-delivery (Ruta Activa con Transmision GPS)"]
-
-    Auth --> AuthLayout["Auth Layout (Minimalista Centrado)"]
-    AuthLayout --> LoginRoute["/login (Formulario React Hook Form + Zod)"]
 ```
 
 ---
 
 ## 3. Matriz de Rutas y Accesos Directos
 
-La plataforma implementa un panel de accesos directos en [`src/app/(storefront)/page.tsx`](file:///c:/Users/DESARROLLADOR/Desktop/Proyectos/delivery-platform/frontend/src/app/(storefront)/page.tsx) para navegacion rapida de pruebas y control operacional:
+La plataforma implementa un panel de accesos directos en [`src/app/(storefront)/page.tsx`](../../frontend/src/app/%28storefront%29/page.tsx) para navegacion rapida de pruebas y control operacional:
 
 | Modulo / Dominio | Ruta Externa (Lleva a Otra Pagina) | Ancla en Misma Pagina | Proposito Operativo |
 | :--- | :--- | :--- | :--- |
+| **Tienda & Clientes** | `/` y `/[slug]` | N/A | Vitrina comercial principal o tienda por marca |
 | **Tienda & Clientes** | `/catalogo` | `#catalogo` | Catalogo completo de combos y productos |
 | **Tienda & Clientes** | `/sucursales` | `#sucursales` | Informacion de sedes, horarios y telefonos |
 | **Tienda & Clientes** | `/finalizar-pedido` / `/checkout` | N/A | Flujo de seleccion de direccion y confirmacion |
 | **Tienda & Clientes** | `/rastreo` / `/track/[orderId]` | N/A | Telemetria y seguimiento de motorizado en vivo |
-| **Cocina & Admin** | `/cocina` / `/kitchen` | N/A | Terminal KDS con semaforizacion FIFO y audio |
-| **Cocina & Admin** | `/admin/inventario` | N/A | Gestion de stock de pollo, papas y empaques |
-| **Cocina & Admin** | `/admin/sucursales` | N/A | Throttling de hornos (pedidos por slot de 20 min)|
+| **Tienda & Clientes** | `/terminos` y `/privacidad` | N/A | Politicas de privacidad y terminos de servicio |
+| **Autenticacion** | `/login` | N/A | Inicio de sesion operativo con rotacion HttpOnly y RBAC |
+| **Cocina & KDS** | `/cocina` / `/kitchen` | N/A | Terminal KDS con semaforizacion FIFO y audio |
+| **Operaciones Sede** | `/admin/inventario` (o `/inventory`) | N/A | Gestion de stock de pollo, papas y empaques |
+| **Operaciones Sede** | `/admin/sucursales` (o `/branches`) | N/A | Throttling de hornos (pedidos por slot de 20 min)|
+| **Gestion Tenant** | `/admin/personalizacion` | N/A | Configuracion visual, banners, tarifas y datos bancarios |
+| **Gestion Tenant** | `/admin/tenants` | N/A | Administracion y auditoria de comercios |
+| **SuperAdmin** | `/superadmin` | N/A | Control maestro global de la plataforma multi-tenant |
 | **Repartidor** | `/repartidor` | N/A | Portal y lista de pedidos asignados al conductor|
 | **Repartidor** | `/active-delivery` | N/A | Transmision continua de geolocalizacion GPS |
-| **Autenticacion** | `/login` | N/A | Inicio de sesion operativo con rotacion HttpOnly y RBAC |
 
 > [!NOTE]
-> Las anclas `#catalogo` y `#sucursales` en el encabezado ([`Header.tsx`](file:///c:/Users/DESARROLLADOR/Desktop/Proyectos/delivery-platform/frontend/src/features/catalog/components/Header.tsx)) permiten desplazamiento suave directo a las secciones de la vitrina principal sin recargar la aplicacion.
+> Las anclas `#catalogo` y `#sucursales` en el encabezado ([`layout.tsx`](../../frontend/src/app/%28storefront%29/layout.tsx)) permiten desplazamiento suave directo a las secciones de la vitrina principal sin recargar la aplicacion.
 
 ---
 
 ## 4. Descripcion de Canales y Experiencia de Usuario
 
 ### 4.1. Canal Storefront (`src/app/(storefront)/`)
-* **URL Publica:** `/`, `/checkout`, `/finalizar-pedido`, `/track/[orderId]`
-* **Diseno Visual:** Paleta sobria asadero (fondos neutros oscuros `bg-neutral-950` y acentos ambar/rojo asadero). Cero emojis y cero insignias infladas de garantia.
+* **URL Publica:** `/`, `/[slug]`, `/checkout`, `/finalizar-pedido`, `/track/[orderId]`, `/login`, `/terminos`, `/privacidad`
+* **Diseno Visual:** Paleta sobria asadero (fondos neutros oscuros `bg-neutral-950` y acentos ambar/rojo asadero dinamicamente inyectados segun la marca). Cero emojis y cero insignias infladas de garantia.
 * **Ergonomia Comercial:** Tarjetas de producto con botones de accion directa `+ PEDIR` e insignias de oferta sobrias.
 * **Header Interactivo:** Indicador de carrito reactivo en vivo mediante `CartButtonBadge.tsx`.
 
-### 4.2. Canal Dashboard / KDS (`src/app/(dashboard)/`)
-* **URL Publica:** `/kitchen`, `/cocina`, `/admin/inventario`, `/admin/sucursales`
-* **Diseno Visual:** Diseno optimizado para pantallas tactiles de cocina (1080p en modo horizontal) sin barras de desplazamiento innecesarias y alto contraste.
+### 4.2. Canal Dashboard / KDS y Administracion (`src/app/(dashboard)/`)
+* **URL Publica:** `/kitchen`, `/cocina`, `/admin/inventario`, `/admin/sucursales`, `/admin/personalizacion`, `/admin/tenants`, `/superadmin`
+* **Diseno Visual:** Diseno optimizado para pantallas tactiles de cocina (1080p en modo horizontal) y formularios de gestion administrativa con alto contraste y validacion React Hook Form + Zod.
 
 ### 4.3. Canal Repartidor (`src/app/(driver)/`)
 * **URL Publica:** `/active-delivery`, `/repartidor`
 * **Diseno Visual:** Shell restringido a ancho de smartphone (maximo 512px) con botones de toque amplio para facilitar operacion a una sola mano en motocicleta.
-
-### 4.4. Canal Autenticacion y Acceso (`src/app/(auth)/`)
-* **URL Publica:** `/login`
-* **Diseno Visual:** Layout centrado minimalista sin cabeceras comerciales ni de cocina. Formulario reactivo con React Hook Form + Zod, validacion en tiempo real y gestion de estados `idle`, `loading`, `error` y `success`.
 
 ---
 

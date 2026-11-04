@@ -45,7 +45,7 @@ El sistema opera bajo un pipeline continuo y desacoplado mediante GitHub Actions
 ## 2. Matriz de Secretos en GitHub Actions
 
 Para habilitar el despliegue automático, configure los siguientes secretos en el repositorio de GitHub:  
-**Ruta:** `Configuración del Repositorio` ➔ `Secrets and variables` ➔ `Actions` ➔ `New repository secret`
+**Ruta:** `Configuracion del Repositorio` -> `Secrets and variables` -> `Actions` -> `New repository secret`
 
 | Nombre del Secreto | Descripción | Ejemplo / Formato |
 | :--- | :--- | :--- |

@@ -12,7 +12,7 @@ El sistema implementa autenticacion sin estado (*stateless*) mediante tokens de 
 * **Cero Parches y Cero Almacenamiento Inseguro:** El `refresh_token` nunca se almacena en `localStorage` ni en `sessionStorage` en el cliente. Se transmite exclusivamente a traves de una cookie `HttpOnly`, `Secure` y `SameSite=Strict` acotada a la ruta `/api/v1/auth`.
 * **Hashing Criptografico en Base de Datos:** Los refresh tokens no se guardan en texto plano en la base de datos. Se almacena un resumen criptografico SHA-256 (`TokenHash`) para mitigar el impacto ante una eventual fuga de datos.
 * **Rotacion Estricta y Deteccion de Reutilizacion:** Cada llamada a renovacion invalida el token actual y emite uno nuevo. Si un token revocado intenta ser reutilizado, se detecta un posible compromiso de sesion y se revoca inmediatamente toda la familia de tokens asociada al usuario.
-* **Aislamiento Multitenant en JWT:** El token de acceso incluye el claim `tenant_id` y `branch_id`. El middleware [`TenantResolutionMiddleware`](file:///c:/Users/DESARROLLADOR/Desktop/Proyectos/delivery-platform/backend/src/Delivery.Api/Multitenancy/TenantResolutionMiddleware.cs) prioriza este claim para resolver el contexto de la peticion sin permitir manipulacion por cabeceras del cliente.
+* **Aislamiento Multitenant en JWT:** El token de acceso incluye el claim `tenant_id` y `branch_id`. El middleware `TenantResolutionMiddleware` prioriza este claim para resolver el contexto de la peticion sin permitir manipulacion por cabeceras del cliente.
 
 ---
 
@@ -118,7 +118,7 @@ El token de acceso es firmado mediante el algoritmo **HMAC-SHA256 (HS256)** util
 
 ## 4. Matriz de Roles y Politicas de Autorizacion (RBAC)
 
-El sistema define siete roles operativos estandarizados en el enum [`UserRole`](file:///c:/Users/DESARROLLADOR/Desktop/Proyectos/delivery-platform/backend/src/Delivery.Core/Domain/Enums/UserRole.cs):
+El sistema define siete roles operativos estandarizados en el enum `UserRole`:
 
 | Rol | Alcance de Acceso | Funciones Permitidas |
 | :--- | :--- | :--- |
@@ -132,7 +132,7 @@ El sistema define siete roles operativos estandarizados en el enum [`UserRole`](
 
 ### 4.1. Politicas de Autorizacion en ASP.NET Core
 
-Las politicas estan registradas formalmente en [`Program.cs`](file:///c:/Users/DESARROLLADOR/Desktop/Proyectos/delivery-platform/backend/src/Delivery.Api/Program.cs):
+Las politicas estan registradas formalmente en `Program.cs`:
 
 ```csharp
 builder.Services.AddAuthorization(options =>
@@ -180,16 +180,16 @@ La funcionalidad de seguridad se encuentra dividida en 4 rebanadas verticales in
 
 ### 5.1. Catalogo de Slices
 
-1. **Login:** [`Delivery.Features.Auth.Login`](file:///c:/Users/DESARROLLADOR/Desktop/Proyectos/delivery-platform/backend/src/Delivery.Features/Auth/Login/LoginEndpoint.cs)
+1. **Login:** `Delivery.Features.Auth.Login`
    - Endpoint: `POST /api/v1/auth/login`
    - Validacion de credenciales con BCrypt, emision de JWT y establecimiento de cookie de refresh token.
-2. **RefreshToken:** [`Delivery.Features.Auth.RefreshToken`](file:///c:/Users/DESARROLLADOR/Desktop/Proyectos/delivery-platform/backend/src/Delivery.Features/Auth/RefreshToken/RefreshTokenEndpoint.cs)
+2. **RefreshToken:** `Delivery.Features.Auth.RefreshToken`
    - Endpoint: `POST /api/v1/auth/refresh`
    - Extraccion del token desde cookie o cabecera, rotacion atomica y emision de nuevo par de credenciales.
-3. **GetCurrentUser:** [`Delivery.Features.Auth.GetCurrentUser`](file:///c:/Users/DESARROLLADOR/Desktop/Proyectos/delivery-platform/backend/src/Delivery.Features/Auth/GetCurrentUser/GetCurrentUserEndpoint.cs)
+3. **GetCurrentUser:** `Delivery.Features.Auth.GetCurrentUser`
    - Endpoint: `GET /api/v1/auth/me`
    - Protegido por autenticacion JWT Bearer. Retorna el perfil y los claims del usuario activo.
-4. **RevokeToken (Logout):** [`Delivery.Features.Auth.RevokeToken`](file:///c:/Users/DESARROLLADOR/Desktop/Proyectos/delivery-platform/backend/src/Delivery.Features/Auth/RevokeToken/RevokeTokenEndpoint.cs)
+4. **RevokeToken (Logout):** `Delivery.Features.Auth.RevokeToken`
    - Endpoint: `POST /api/v1/auth/logout`
    - Invalida el refresh token en base de datos y expira inmediatamente la cookie `HttpOnly`.
 
@@ -197,7 +197,7 @@ La funcionalidad de seguridad se encuentra dividida en 4 rebanadas verticales in
 
 ## 6. Pruebas Unitarias y de Integracion Arquitectonica
 
-La suite de pruebas en [`AuthHandlerTests.cs`](file:///c:/Users/DESARROLLADOR/Desktop/Proyectos/delivery-platform/backend/tests/Delivery.UnitTests/Features/Auth/AuthHandlerTests.cs) y las pruebas de arquitectura en [`VerticalSliceArchitectureBoundaryTests.cs`](file:///c:/Users/DESARROLLADOR/Desktop/Proyectos/delivery-platform/backend/tests/Delivery.UnitTests/Architecture/VerticalSliceArchitectureBoundaryTests.cs) garantizan:
+La suite de pruebas en `AuthHandlerTests.cs` y las pruebas de arquitectura en `VerticalSliceArchitectureBoundaryTests.cs` garantizan:
 
 * Autenticacion correcta con hash de contrasena valido y bloqueo ante contrasenas erroneas.
 * Bloqueo de inicio de sesion para usuarios inactivos (`IsActive = false`) o tenants inactivos.
@@ -209,6 +209,6 @@ La suite de pruebas en [`AuthHandlerTests.cs`](file:///c:/Users/DESARROLLADOR/De
 
 ## Navegacion de Documentacion
 * **Anterior:** [02. SignalR Hubs](./02-signalr-hubs.md)
-* **Siguiente:** [01. Modelo de Datos y PostGIS](../03-base-de-datos/01-modelo-datos-postgis.md)
+* **Siguiente:** [04. Motor Multitenant y Personalizacion](./04-multitenancy-y-personalizacion.md)
 * **Indice General:** [README Principal](../../README.md)
 

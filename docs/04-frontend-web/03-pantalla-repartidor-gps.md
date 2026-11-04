@@ -3,12 +3,20 @@
 ## 1. Descripcion General
 La vista `src/app/(driver)/active-delivery/page.tsx` esta optimizada para su uso en smartphones por parte de los motorizados de entrega, ofreciendo transmision GPS en segundo plano y enlaces de navegacion asistida.
 
-## 2. Componentes y Hook de Telemetria
+## 2. Componentes y Hooks del Modulo de Telemetria
 
 ```
 src/features/tracking/
+├── components/
+│   ├── DriverDeliveryView.tsx     # Shell movil para el motorizado con navegacion y cobro
+│   ├── DriverMarker.tsx           # Marcador vectorial animado del motorizado con orientacion
+│   ├── OrderMap.tsx               # Renderizado vectorial WebGL con MapLibre GL JS
+│   ├── OrderSearchView.tsx        # Buscador rapido de pedidos por UUID para clientes
+│   ├── OrderTrackingView.tsx      # Pantalla B2C completa de seguimiento satelital
+│   └── StatusTimeline.tsx         # Stepper visual del avance de la orden en tiempo real
 └── hooks/
-    └── useDriverTracking.ts       # Hook de transmision continua a Redis GEO
+    ├── useDriverTracking.ts       # Hook de transmision continua a Redis GEO y simulacion
+    └── useOrderTracking.ts        # Hook de suscripcion SignalR y actualizacion de mapa
 ```
 
 ## 3. Funcionalidades Principales
