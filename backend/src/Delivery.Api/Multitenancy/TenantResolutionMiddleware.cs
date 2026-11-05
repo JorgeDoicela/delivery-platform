@@ -143,7 +143,12 @@ public class TenantResolutionMiddleware
 
             // 4. Detección por Subdominio ({slug}.dominio.com)
             var parts = host.Split('.');
-            if (parts.Length > 2 && parts[0] != "www" && parts[0] != "api")
+            var reservedSubdomains = new HashSet<string>(StringComparer.OrdinalIgnoreCase)
+            {
+                "www", "api", "mesafy", "platform", "app", "admin", "mail", "cdn", "assets", "static"
+            };
+
+            if (parts.Length > 2 && !reservedSubdomains.Contains(parts[0]))
             {
                 tenantSlug = parts[0];
             }

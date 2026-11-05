@@ -32,6 +32,9 @@ export const RESERVED_TENANT_SLUGS = new Set([
   "favicon",
   "robots",
   "r",
+  "mesafy",
+  "_domain_router",
+  "domain-router",
 ]);
 
 let currentTenantSlugMemory: string | null = null;
@@ -109,7 +112,12 @@ export function getApiClientTenantSlug(): string | null {
 
       const host = window.location.hostname.toLowerCase();
       const parts = host.split(".");
-      if (parts.length > 2 && parts[0] !== "www" && parts[0] !== "api") {
+      if (
+        parts.length > 2 &&
+        parts[0] !== "www" &&
+        parts[0] !== "api" &&
+        !RESERVED_TENANT_SLUGS.has(parts[0])
+      ) {
         currentTenantSlugMemory = parts[0];
         return parts[0];
       }

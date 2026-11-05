@@ -123,6 +123,7 @@ jobs:
           build-args: |
             NEXT_PUBLIC_API_URL=
             NEXT_PUBLIC_WS_URL=
+            NEXT_PUBLIC_PLATFORM_DOMAIN=mesafy.doicela.dev
           tags: |
             ${{ steps.meta.outputs.prefix }}/delivery-frontend:latest
             ${{ steps.meta.outputs.prefix }}/delivery-frontend:${{ github.sha }}
