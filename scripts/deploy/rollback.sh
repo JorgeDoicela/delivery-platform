@@ -76,13 +76,13 @@ docker compose -f "$COMPOSE_FILE" up -d
 log "Comprobando salud del backend tras el rollback..."
 sleep 5
 
-if docker inspect --format='{{.State.Status}}' delivery-backend-prod 2>/dev/null | grep -q "running"; then
+if docker inspect --format='{{.State.Status}}' delivery-backend-prod 2>/dev/null | grep -Eq "running|healthy"; then
   log "Backend recuperado exitosamente."
 else
   die "El backend no pudo recuperarse tras el rollback."
 fi
 
-if docker inspect --format='{{.State.Status}}' delivery-frontend-prod 2>/dev/null | grep -q "running"; then
+if docker inspect --format='{{.State.Status}}' delivery-frontend-prod 2>/dev/null | grep -Eq "running|healthy"; then
   log "Frontend recuperado exitosamente."
 else
   die "El frontend no pudo recuperarse tras el rollback."

@@ -123,6 +123,10 @@ DEPLOYMENT_FAILED=0
 for service_container in "${SERVICES_TO_CHECK[@]}"; do
   if ! wait_for_health "$service_container"; then
     log "FALLO CRITICO: El servicio ${service_container} no supero el healthcheck a tiempo."
+    log "Diagnostico de inspeccion de ${service_container}:"
+    docker inspect --format='{{json .State.Health}}' "$service_container" 2>/dev/null || true
+    log "Ultimos logs de ${service_container}:"
+    docker logs --tail 50 "$service_container" 2>/dev/null || true
     DEPLOYMENT_FAILED=1
     break
   fi

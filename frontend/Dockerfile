@@ -52,17 +52,17 @@ ENV HOSTNAME="0.0.0.0"
 RUN addgroup --system --gid 1001 nodejs && \
     adduser --system --uid 1001 nextjs
 
-# Copiar archivos públicos y el build standalone generado por el monorepo
-COPY --from=builder /app/frontend/public ./public
-COPY --from=builder --chown=nextjs:nodejs /app/frontend/.next/standalone/frontend ./
-COPY --from=builder --chown=nextjs:nodejs /app/frontend/.next/standalone/node_modules ./node_modules
-COPY --from=builder --chown=nextjs:nodejs /app/frontend/.next/static ./.next/static
+# Copiar el build standalone completo preservando la jerarquia del monorepo
+COPY --from=builder --chown=nextjs:nodejs /app/frontend/.next/standalone ./
+COPY --from=builder --chown=nextjs:nodejs /app/frontend/.next/static ./frontend/.next/static
+COPY --from=builder --chown=nextjs:nodejs /app/frontend/public ./frontend/public
+COPY --from=builder --chown=nextjs:nodejs /app/frontend/public ./public
 
 USER nextjs
 
 EXPOSE 3005
 
-HEALTHCHECK --interval=10s --timeout=5s --start-period=15s --retries=3 \
-  CMD wget --no-verbose --tries=1 --spider http://127.0.0.1:3005/api/health || exit 1
+HEALTHCHECK --interval=10s --timeout=5s --start-period=15s --retries=5 \
+  CMD node -e "fetch('http://127.0.0.1:3005/api/health').then(r => process.exit(r.ok ? 0 : 1)).catch(() => process.exit(1))"
 
-CMD ["node", "server.js"]
+CMD ["node", "frontend/server.js"]
