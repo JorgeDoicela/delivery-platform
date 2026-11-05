@@ -45,8 +45,11 @@ export function useKitchenOrders(branchId: number) {
 
     loadOrders();
 
-    const baseUrl = process.env.NEXT_PUBLIC_WS_URL || process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5005';
-    const hubUrl = baseUrl.endsWith('/hubs') ? `${baseUrl}/kitchen` : `${baseUrl}/hubs/kitchen`;
+    const baseUrl =
+      process.env.NEXT_PUBLIC_WS_URL ||
+      process.env.NEXT_PUBLIC_API_URL ||
+      (typeof window !== "undefined" ? window.location.origin : "http://localhost:5005");
+    const hubUrl = baseUrl.endsWith("/hubs") ? `${baseUrl}/kitchen` : `${baseUrl}/hubs/kitchen`;
 
     const connection = new signalR.HubConnectionBuilder()
       .withUrl(hubUrl)

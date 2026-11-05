@@ -22,8 +22,16 @@ import type {
     ApiError,
 } from "@/shared/types/api";
 
-const API_BASE_URL =
-    process.env.NEXT_PUBLIC_API_URL || "http://localhost:5005";
+export function getApiBaseUrl(): string {
+    if (typeof window !== "undefined") {
+        return process.env.NEXT_PUBLIC_API_URL || "";
+    }
+    return (
+        process.env.INTERNAL_API_URL ||
+        process.env.NEXT_PUBLIC_API_URL ||
+        "http://localhost:5005"
+    );
+}
 
 import {
     ACTIVE_TENANT_STORAGE_KEY,
@@ -116,7 +124,7 @@ async function handleResponse<T>(response: Response): Promise<T> {
 export const apiClient = {
     // 0. Multi-Tenant: Directorio público de negocios y configuración de Storefront
     async getPublicTenants(): Promise<PublicTenantsResponse> {
-        const res = await fetch(`${API_BASE_URL}/api/tenants`, {
+        const res = await fetch(`${getApiBaseUrl()}/api/tenants`, {
             method: "GET",
             headers: buildHeaders(),
             cache: "no-store",
@@ -125,7 +133,7 @@ export const apiClient = {
     },
 
     async getPlatformTenants(): Promise<PlatformTenantsResponse> {
-        const res = await fetch(`${API_BASE_URL}/api/tenants/platform`, {
+        const res = await fetch(`${getApiBaseUrl()}/api/tenants/platform`, {
             method: "GET",
             headers: buildHeaders(),
             cache: "no-store",
@@ -134,7 +142,7 @@ export const apiClient = {
     },
 
     async createTenant(command: CreateTenantCommand): Promise<CreatedTenantDto> {
-        const res = await fetch(`${API_BASE_URL}/api/tenants`, {
+        const res = await fetch(`${getApiBaseUrl()}/api/tenants`, {
             method: "POST",
             headers: buildHeaders(),
             body: JSON.stringify(command),
@@ -146,7 +154,7 @@ export const apiClient = {
         tenantId: string,
         isActive: boolean
     ): Promise<ToggleTenantStatusResponse> {
-        const res = await fetch(`${API_BASE_URL}/api/tenants/${tenantId}/status`, {
+        const res = await fetch(`${getApiBaseUrl()}/api/tenants/${tenantId}/status`, {
             method: "PATCH",
             headers: buildHeaders(),
             body: JSON.stringify({ isActive }),
@@ -155,7 +163,7 @@ export const apiClient = {
     },
 
     async getCurrentTenant(tenantSlugOverride?: string): Promise<TenantStorefrontConfigDto> {
-        const res = await fetch(`${API_BASE_URL}/api/tenants/current`, {
+        const res = await fetch(`${getApiBaseUrl()}/api/tenants/current`, {
             method: "GET",
             headers: buildHeaders(undefined, tenantSlugOverride),
             cache: "no-store",
@@ -166,7 +174,7 @@ export const apiClient = {
     async updateTenantStorefront(
         command: UpdateTenantStorefrontCommand
     ): Promise<TenantStorefrontConfigDto> {
-        const res = await fetch(`${API_BASE_URL}/api/tenants/current/storefront`, {
+        const res = await fetch(`${getApiBaseUrl()}/api/tenants/current/storefront`, {
             method: "PUT",
             headers: buildHeaders(),
             body: JSON.stringify(command),
@@ -175,7 +183,7 @@ export const apiClient = {
     },
 
     async getBranches(): Promise<BranchDetailDto[]> {
-        const res = await fetch(`${API_BASE_URL}/api/branches`, {
+        const res = await fetch(`${getApiBaseUrl()}/api/branches`, {
             method: "GET",
             headers: buildHeaders(),
             cache: "no-store",
@@ -187,7 +195,7 @@ export const apiClient = {
         branchId: number,
         data: UpdateBranchHoursRequest
     ): Promise<UpdateBranchHoursResponse> {
-        const res = await fetch(`${API_BASE_URL}/api/branches/${branchId}/schedule`, {
+        const res = await fetch(`${getApiBaseUrl()}/api/branches/${branchId}/schedule`, {
             method: "PUT",
             headers: buildHeaders(),
             body: JSON.stringify(data),
@@ -197,7 +205,7 @@ export const apiClient = {
 
     // 1. Geofencing: Resolución espacial de cobertura
     async resolveBranch(latitude: number, longitude: number): Promise<BranchCoverageDto> {
-        const res = await fetch(`${API_BASE_URL}/api/geofencing/resolve`, {
+        const res = await fetch(`${getApiBaseUrl()}/api/geofencing/resolve`, {
             method: "POST",
             headers: buildHeaders(),
             body: JSON.stringify({ latitude, longitude }),
@@ -207,7 +215,7 @@ export const apiClient = {
 
     // 1.1 Capacidad y Throttling por franja de 20 min en Redis
     async getBranchCapacity(branchId: number): Promise<BranchCapacityResponse> {
-        const res = await fetch(`${API_BASE_URL}/api/branches/${branchId}/capacity`, {
+        const res = await fetch(`${getApiBaseUrl()}/api/branches/${branchId}/capacity`, {
             method: "GET",
             headers: buildHeaders(),
             cache: "no-store",
@@ -221,7 +229,7 @@ export const apiClient = {
         tenantSlugOverride?: string
     ): Promise<ActiveMenuResponse> {
         const query = includeInactive ? "?includeInactive=true" : "";
-        const res = await fetch(`${API_BASE_URL}/api/catalog/menu${query}`, {
+        const res = await fetch(`${getApiBaseUrl()}/api/catalog/menu${query}`, {
             method: "GET",
             headers: buildHeaders(undefined, tenantSlugOverride),
             cache: "no-store",
@@ -239,7 +247,7 @@ export const apiClient = {
             extra["Idempotency-Key"] = idempotencyKey;
         }
 
-        const res = await fetch(`${API_BASE_URL}/api/orders`, {
+        const res = await fetch(`${getApiBaseUrl()}/api/orders`, {
             method: "POST",
             headers: buildHeaders(extra),
             body: JSON.stringify(command),
@@ -249,7 +257,7 @@ export const apiClient = {
 
     // 4. Órdenes: Detalle y tracking
     async getOrderById(orderId: string): Promise<OrderDetailResponse> {
-        const res = await fetch(`${API_BASE_URL}/api/orders/${orderId}`, {
+        const res = await fetch(`${getApiBaseUrl()}/api/orders/${orderId}`, {
             method: "GET",
             headers: buildHeaders(),
             cache: "no-store",
@@ -260,7 +268,7 @@ export const apiClient = {
     // 5. Tracking: Posición del repartidor desde Redis
     async getDriverLocation(orderId: string): Promise<DriverLocationResponse> {
         const res = await fetch(
-            `${API_BASE_URL}/api/tracking/orders/${orderId}/driver-location`,
+            `${getApiBaseUrl()}/api/tracking/orders/${orderId}/driver-location`,
             {
                 method: "GET",
                 headers: buildHeaders(),
@@ -272,7 +280,7 @@ export const apiClient = {
 
     // 6. Cocina: Comandas activas FIFO para KDS
     async getActiveKitchenOrders(branchId: number): Promise<KitchenOrderTicketDto[]> {
-        const res = await fetch(`${API_BASE_URL}/api/kitchen/branches/${branchId}/orders`, {
+        const res = await fetch(`${getApiBaseUrl()}/api/kitchen/branches/${branchId}/orders`, {
             method: "GET",
             headers: buildHeaders(),
             cache: "no-store",
@@ -282,7 +290,7 @@ export const apiClient = {
 
     // 7. Órdenes: Actualización de estado en máquina de estados
     async updateOrderStatus(orderId: string, status: number, reason?: string): Promise<void> {
-        const res = await fetch(`${API_BASE_URL}/api/orders/${orderId}/status`, {
+        const res = await fetch(`${getApiBaseUrl()}/api/orders/${orderId}/status`, {
             method: "PUT",
             headers: buildHeaders(),
             body: JSON.stringify({ orderId, newStatus: status, reason }),
@@ -298,7 +306,7 @@ export const apiClient = {
         longitude: number,
         heading?: number
     ): Promise<void> {
-        const res = await fetch(`${API_BASE_URL}/api/tracking/driver-location`, {
+        const res = await fetch(`${getApiBaseUrl()}/api/tracking/driver-location`, {
             method: "POST",
             headers: buildHeaders(),
             body: JSON.stringify({ driverId, orderId, latitude, longitude, heading }),
@@ -311,7 +319,7 @@ export const apiClient = {
         productId: number,
         isActive: boolean
     ): Promise<{ productId: number; isActive: boolean; productName: string }> {
-        const res = await fetch(`${API_BASE_URL}/api/catalog/products/${productId}/status`, {
+        const res = await fetch(`${getApiBaseUrl()}/api/catalog/products/${productId}/status`, {
             method: "PUT",
             headers: buildHeaders(),
             body: JSON.stringify({ productId, isActive }),
@@ -321,7 +329,7 @@ export const apiClient = {
 
     // 10. Catálogo: Crear nuevo producto con su imagen personalizada
     async createProduct(command: UpsertProductCommand): Promise<UpsertProductResponse> {
-        const res = await fetch(`${API_BASE_URL}/api/catalog/products`, {
+        const res = await fetch(`${getApiBaseUrl()}/api/catalog/products`, {
             method: "POST",
             headers: buildHeaders(),
             body: JSON.stringify(command),
@@ -334,7 +342,7 @@ export const apiClient = {
         productId: number,
         command: UpsertProductCommand
     ): Promise<UpsertProductResponse> {
-        const res = await fetch(`${API_BASE_URL}/api/catalog/products/${productId}`, {
+        const res = await fetch(`${getApiBaseUrl()}/api/catalog/products/${productId}`, {
             method: "PUT",
             headers: buildHeaders(),
             body: JSON.stringify({ ...command, productId }),

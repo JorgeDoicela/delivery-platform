@@ -1,6 +1,7 @@
 import {
   ApiClientError,
   getApiClientTenantSlug,
+  getApiBaseUrl,
 } from "@/shared/lib/api-client";
 import type {
   AuthUser,
@@ -9,8 +10,6 @@ import type {
 } from "../types";
 import type { LoginFormData } from "../schemas/loginSchema";
 
-const API_BASE_URL =
-  process.env.NEXT_PUBLIC_API_URL || "http://localhost:5005";
 
 async function handleAuthResponse<T>(response: Response): Promise<T> {
   if (!response.ok) {
@@ -45,7 +44,7 @@ async function handleAuthResponse<T>(response: Response): Promise<T> {
 export const authApi = {
   async login(credentials: LoginFormData): Promise<LoginResponse> {
     const tenantSlug = getApiClientTenantSlug();
-    const res = await fetch(`${API_BASE_URL}/api/v1/auth/login`, {
+    const res = await fetch(`${getApiBaseUrl()}/api/v1/auth/login`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -59,7 +58,7 @@ export const authApi = {
 
   async refresh(): Promise<RefreshTokenResponse> {
     const tenantSlug = getApiClientTenantSlug();
-    const res = await fetch(`${API_BASE_URL}/api/v1/auth/refresh`, {
+    const res = await fetch(`${getApiBaseUrl()}/api/v1/auth/refresh`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -82,7 +81,7 @@ export const authApi = {
       headers["Authorization"] = `Bearer ${accessToken}`;
     }
 
-    const res = await fetch(`${API_BASE_URL}/api/v1/auth/me`, {
+    const res = await fetch(`${getApiBaseUrl()}/api/v1/auth/me`, {
       method: "GET",
       headers,
       credentials: "include",
@@ -92,7 +91,7 @@ export const authApi = {
 
   async logout(): Promise<void> {
     const tenantSlug = getApiClientTenantSlug();
-    await fetch(`${API_BASE_URL}/api/v1/auth/logout`, {
+    await fetch(`${getApiBaseUrl()}/api/v1/auth/logout`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",

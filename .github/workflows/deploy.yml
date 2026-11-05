@@ -120,6 +120,9 @@ jobs:
           context: .
           file: frontend/Dockerfile
           push: true
+          build-args: |
+            NEXT_PUBLIC_API_URL=
+            NEXT_PUBLIC_WS_URL=
           tags: |
             ${{ steps.meta.outputs.prefix }}/delivery-frontend:latest
             ${{ steps.meta.outputs.prefix }}/delivery-frontend:${{ github.sha }}

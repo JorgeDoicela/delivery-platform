@@ -68,7 +68,10 @@ export function useOrderTracking({ orderId }: UseOrderTrackingProps): UseOrderTr
     void loadInitialOrder();
 
     // Conexión WebSockets SignalR al TrackingHub
-    const baseUrl = process.env.NEXT_PUBLIC_WS_URL || process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5005';
+    const baseUrl =
+      process.env.NEXT_PUBLIC_WS_URL ||
+      process.env.NEXT_PUBLIC_API_URL ||
+      (typeof window !== 'undefined' ? window.location.origin : 'http://localhost:5005');
     const wsUrl = baseUrl.endsWith('/hubs') ? `${baseUrl}/tracking` : `${baseUrl}/hubs/tracking`;
     const connection = new signalR.HubConnectionBuilder()
       .withUrl(wsUrl)

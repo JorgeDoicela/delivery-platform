@@ -26,9 +26,9 @@ COPY frontend/ ./frontend/
 ENV NEXT_TELEMETRY_DISABLED=1
 ENV NODE_ENV=production
 
-# Argumentos de compilación para variables públicas en el bundle cliente
-ARG NEXT_PUBLIC_API_URL=http://localhost:5005
-ARG NEXT_PUBLIC_WS_URL=http://localhost:5005/hubs
+# Argumentos de compilación para variables públicas en el bundle cliente (rutas relativas por defecto en producción)
+ARG NEXT_PUBLIC_API_URL=""
+ARG NEXT_PUBLIC_WS_URL=""
 ARG NEXT_PUBLIC_MAP_STYLE_URL=https://demotiles.maplibre.org/style.json
 ARG NEXT_PUBLIC_PLATFORM_DOMAIN=delivery.com
 ENV NEXT_PUBLIC_API_URL=$NEXT_PUBLIC_API_URL

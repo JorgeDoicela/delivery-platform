@@ -11,7 +11,10 @@ interface DomainRouterProps {
 
 async function resolveTenantSlugByHost(host: string): Promise<string | null> {
   try {
-    const apiUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5005";
+    const apiUrl =
+      process.env.INTERNAL_API_URL ||
+      process.env.NEXT_PUBLIC_API_URL ||
+      "http://localhost:5005";
     const res = await fetch(`${apiUrl}/api/tenants/current`, {
       headers: {
         Host: host,
