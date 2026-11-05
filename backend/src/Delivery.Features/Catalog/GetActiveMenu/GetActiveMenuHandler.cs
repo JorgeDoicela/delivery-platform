@@ -62,11 +62,12 @@ public sealed class GetActiveMenuHandler : IHandler<GetActiveMenuQuery, Result<A
         }
 
         var products = await productsQuery
+            .Include(p => p.CategoryEntity)
             .Include(p => p.ProductModifierGroups)
                 .ThenInclude(pmg => pmg.ModifierGroup)
                     .ThenInclude(mg => mg.Options.Where(o => o.IsAvailable))
-            .OrderBy(p => p.Category)
-            .ThenBy(p => p.BasePrice)
+            .OrderBy(p => p.CategoryEntity != null ? p.CategoryEntity.DisplayOrder : 999)
+            .ThenByDescending(p => p.BasePrice)
             .ToListAsync(cancellationToken);
 
         var productDtos = products.Select(p => new MenuProductDto(

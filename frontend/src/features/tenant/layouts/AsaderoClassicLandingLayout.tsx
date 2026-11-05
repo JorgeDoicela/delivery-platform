@@ -5,7 +5,7 @@ import {
   CatalogHero,
   OrderModeSelector,
   PromotionalBanners,
-  CatalogSection,
+  PopularProductsSection,
 } from "@/features/catalog";
 import { StorefrontBranchShowcase } from "@/features/tenant";
 import type { TenantStorefrontConfigDto } from "@/shared/types/api";
@@ -29,26 +29,12 @@ export function AsaderoClassicLandingLayout({
         {/* 3. Banners Promocionales del Establecimiento */}
         <PromotionalBanners tenant={tenant} />
 
-        {/* 4. Menú y Combos del Establecimiento */}
+        {/* 4. Platos Más Pedidos y Populares de la Landing */}
         <section
           id="catalogo"
-          className="max-w-[1240px] mx-auto space-y-6 pt-4 w-full"
+          className="max-w-[1240px] mx-auto pt-4 w-full"
         >
-          <div className="flex flex-col sm:flex-row sm:items-end justify-between pb-4 border-b border-surface-border gap-2">
-            <div>
-              <span className="text-[11px] font-bold uppercase tracking-widest text-brand-primary block mb-1 font-sans">
-                {tenant?.tagline || "Especialidades del Asador"}
-              </span>
-              <h2 className="text-3xl sm:text-4xl font-black text-text-strong uppercase tracking-wide font-display" suppressHydrationWarning>
-                Nuestra Carta
-              </h2>
-              <p className="text-xs sm:text-sm text-text-muted mt-1 leading-relaxed" suppressHydrationWarning>
-                {tenant?.heroSubtitle || "Personaliza tus porciones con guarniciones calientes, ensalada fresca y ají artesanal."}
-              </p>
-            </div>
-          </div>
-
-          <CatalogSection tenantSlug={tenant?.slug} />
+          <PopularProductsSection tenantSlug={tenant?.slug} limit={6} />
         </section>
 
 

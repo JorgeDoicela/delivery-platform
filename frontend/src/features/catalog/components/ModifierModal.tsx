@@ -5,7 +5,6 @@ import Image from "next/image";
 import type { MenuProductDto, MenuModifierGroupDto } from "@/shared/types/api";
 import { useCartStore, type SelectedModifier } from "@/features/cart";
 import { formatCurrency } from "@/shared/lib/utils";
-import { ScrollArea } from "@/shared/components";
 import { X, Plus, Minus, Check } from "lucide-react";
 
 interface ModifierModalProps {
@@ -105,9 +104,9 @@ export function ModifierModal({ product, onClose }: ModifierModalProps) {
 
     return (
         <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center p-0 sm:p-4 bg-black/65 backdrop-blur-xs animate-in fade-in duration-200">
-            <div className="relative w-full max-w-lg bg-surface-card rounded-t-3xl sm:rounded-2xl shadow-2xl flex flex-col max-h-[90vh] overflow-hidden text-text-strong">
-                {/* Header Modal */}
-                <div className="p-4 sm:p-6 border-b border-surface-border-subtle flex items-start justify-between gap-4">
+            <div className="relative w-full max-w-lg bg-surface-card rounded-t-3xl sm:rounded-2xl shadow-2xl flex flex-col h-[85vh] sm:h-auto sm:max-h-[85vh] overflow-hidden text-text-strong">
+                {/* Header Modal Fijo y Opaco */}
+                <div className="p-4 sm:p-6 border-b border-surface-border flex items-start justify-between gap-4 shrink-0 bg-surface-card z-10">
                     <div className="flex items-start gap-4">
                         <div className="relative w-16 h-16 sm:w-20 sm:h-20 rounded-2xl overflow-hidden bg-surface-canvas shrink-0 border border-surface-border">
                             <Image
@@ -133,14 +132,14 @@ export function ModifierModal({ product, onClose }: ModifierModalProps) {
                     <button
                         onClick={onClose}
                         aria-label="Cerrar modal"
-                        className="p-1.5 rounded-full hover:bg-surface-card-hover text-text-muted hover:text-text-strong transition-colors shrink-0"
+                        className="p-1.5 rounded-full hover:bg-surface-card-hover text-text-muted hover:text-text-strong transition-colors shrink-0 cursor-pointer"
                     >
                         <X className="w-5 h-5" />
                     </button>
                 </div>
 
-                {/* Grupos de Modificadores (ScrollArea Ergonómico con Sombras Progresivas) */}
-                <ScrollArea variant="brand" scrollShadows className="flex-1 min-h-0" viewportClassName="p-4 sm:p-6 space-y-6">
+                {/* Grupos de Modificadores Desplazables (Sin superposición, altura calculada exacta) */}
+                <div className="flex-1 min-h-0 overflow-y-auto p-4 sm:p-6 space-y-6 custom-scrollbar overscroll-contain bg-surface-card">
                     {product.modifierGroups.map((group) => {
                         const selectedIds = selections[group.id] || [];
                         const isGroupValid = !group.isRequired || selectedIds.length >= group.minSelectable;
@@ -149,7 +148,7 @@ export function ModifierModal({ product, onClose }: ModifierModalProps) {
                             <div key={group.id} className="space-y-3">
                                 <div className="flex items-center justify-between pb-1.5 border-b border-surface-border-subtle">
                                     <div>
-                                        <h4 className="text-sm font-bold text-text-strong">
+                                        <h4 className="text-sm font-bold text-text-strong font-display uppercase tracking-wide">
                                             {group.name}
                                         </h4>
                                         <p className="text-[11px] text-text-muted">
@@ -163,7 +162,7 @@ export function ModifierModal({ product, onClose }: ModifierModalProps) {
                                                 ? isGroupValid
                                                     ? "bg-status-success-bg text-status-success"
                                                     : "bg-status-warning-bg text-status-warning"
-                                                : "bg-surface-card-hover text-text-muted"
+                                                : "bg-surface-canvas text-text-muted border border-surface-border"
                                             }`}
                                     >
                                         {group.isRequired ? (isGroupValid ? "Completado" : "Obligatorio") : "Opcional"}
@@ -179,8 +178,8 @@ export function ModifierModal({ product, onClose }: ModifierModalProps) {
                                                 key={option.id}
                                                 type="button"
                                                 onClick={() => handleToggleOption(group, option.id)}
-                                                className={`w-full flex items-center justify-between p-3.5 rounded-xl border text-left text-xs transition-all ${isSelected
-                                                        ? "border-2 border-brand-primary bg-brand-primary-light/20 shadow-sm"
+                                                className={`w-full flex items-center justify-between p-3.5 rounded-xl border text-left text-xs transition-all cursor-pointer ${isSelected
+                                                        ? "border-2 border-brand-primary bg-surface-card shadow-xs ring-1 ring-brand-primary/20"
                                                         : "border-surface-border hover:border-surface-border-subtle bg-surface-card"
                                                     }`}
                                             >
@@ -201,7 +200,7 @@ export function ModifierModal({ product, onClose }: ModifierModalProps) {
                                                     </span>
                                                 </div>
 
-                                                <span className="font-bold text-text-muted tabular-nums">
+                                                <span className="font-bold text-text-muted tabular-nums font-mono">
                                                     {option.additionalPrice > 0
                                                         ? `+ ${formatCurrency(option.additionalPrice)}`
                                                         : "Incluido"}
@@ -213,18 +212,18 @@ export function ModifierModal({ product, onClose }: ModifierModalProps) {
                             </div>
                         );
                     })}
-                </ScrollArea>
+                </div>
 
-                {/* Footer Modal: Cantidad y Botón de Acción */}
-                <div className="p-4 sm:p-6 bg-surface-canvas border-t border-surface-border-subtle flex items-center justify-between gap-4">
+                {/* Footer Modal Fijo y 100% Opaco (Nunca se superpone con las opciones) */}
+                <div className="p-4 sm:p-6 bg-surface-card border-t border-surface-border flex items-center justify-between gap-4 shrink-0 shadow-md z-10">
                     {/* Stepper Cantidad */}
-                    <div className="flex items-center gap-2 bg-surface-card border border-surface-border rounded-full p-1 shadow-sm">
+                    <div className="flex items-center gap-2 bg-surface-canvas border border-surface-border rounded-full p-1 shadow-2xs">
                         <button
                             type="button"
                             onClick={() => setQuantity((q) => Math.max(1, q - 1))}
                             disabled={quantity <= 1}
                             aria-label="Disminuir cantidad"
-                            className="w-8 h-8 rounded-full flex items-center justify-center text-text-base hover:bg-surface-card-hover disabled:opacity-30 disabled:hover:bg-transparent transition-colors"
+                            className="w-8 h-8 rounded-full flex items-center justify-center text-text-base hover:bg-surface-card-hover disabled:opacity-30 disabled:hover:bg-transparent transition-colors cursor-pointer"
                         >
                             <Minus className="w-4 h-4" />
                         </button>
@@ -235,7 +234,7 @@ export function ModifierModal({ product, onClose }: ModifierModalProps) {
                             type="button"
                             onClick={() => setQuantity((q) => Math.min(20, q + 1))}
                             aria-label="Aumentar cantidad"
-                            className="w-8 h-8 rounded-full flex items-center justify-center text-text-base hover:bg-surface-card-hover transition-colors"
+                            className="w-8 h-8 rounded-full flex items-center justify-center text-text-base hover:bg-surface-card-hover transition-colors cursor-pointer"
                         >
                             <Plus className="w-4 h-4" />
                         </button>
@@ -246,7 +245,7 @@ export function ModifierModal({ product, onClose }: ModifierModalProps) {
                         type="button"
                         onClick={handleAddToCart}
                         disabled={!isValid}
-                        className="flex-1 flex items-center justify-between bg-brand-primary hover:bg-brand-primary-hover disabled:bg-neutral-200 disabled:text-neutral-400 text-white text-xs font-black uppercase tracking-wider py-4 px-6 rounded-full shadow-md transition-all hover:scale-[1.01] active:scale-95 disabled:active:scale-100"
+                        className="flex-1 flex items-center justify-between bg-brand-primary hover:bg-brand-primary-hover disabled:bg-neutral-200 disabled:text-neutral-400 text-white text-xs font-black uppercase tracking-wider py-4 px-6 rounded-full shadow-md transition-all hover:scale-[1.01] active:scale-95 disabled:active:scale-100 cursor-pointer font-display"
                     >
                         <span>{isValid ? "Agregar al Pedido" : "Selecciona las opciones requeridas"}</span>
                         <span className="text-sm font-black tracking-tight font-mono tabular-nums">

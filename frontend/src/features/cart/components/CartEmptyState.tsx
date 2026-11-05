@@ -11,7 +11,7 @@ interface CartEmptyStateProps {
 
 export function CartEmptyState({ tenantSlug }: CartEmptyStateProps) {
   const closeCart = useCartStore((s) => s.closeCart);
-  const catalogHref = tenantSlug ? `/${tenantSlug}#catalogo` : "/#restaurantes";
+  const catalogHref = tenantSlug ? `/${tenantSlug}/menu` : "/#restaurantes";
 
   return (
     <div className="flex-1 flex flex-col items-center justify-center p-8 text-center space-y-4">

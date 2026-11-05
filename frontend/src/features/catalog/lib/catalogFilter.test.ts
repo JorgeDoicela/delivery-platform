@@ -3,6 +3,7 @@ import {
   normalizeCatalogText,
   filterProductsBySearch,
   calculateTotalCatalogProducts,
+  getPopularProducts,
 } from "./catalogFilter";
 import type { MenuProductDto, MenuCategoryDto } from "@/shared/types/api";
 
@@ -85,6 +86,20 @@ describe("catalogFilter helper", () => {
     ];
 
     expect(calculateTotalCatalogProducts(mockCategories)).toBe(4);
+  });
+
+  it("getPopularProducts should prioritize flagship dishes and exclude drinks and extras", () => {
+    const mockCategories: MenuCategoryDto[] = [
+      { id: 1, categoryName: "Bebidas", displayOrder: 1, products: [mockProducts[2]] },
+      { id: 2, categoryName: "Combos", displayOrder: 2, products: [mockProducts[0], mockProducts[3]] },
+      { id: 3, categoryName: "Porciones", displayOrder: 3, products: [mockProducts[1]] },
+    ];
+
+    const popular = getPopularProducts(mockCategories, 2);
+    expect(popular).toHaveLength(2);
+    // Debe excluir Bebidas y priorizar los platos fuertes (Combos / Porciones)
+    expect(popular.some((p) => p.category === "Bebidas")).toBe(false);
+    expect(popular[0].name).toMatch(/Pollo|Broaster/);
   });
 });
 

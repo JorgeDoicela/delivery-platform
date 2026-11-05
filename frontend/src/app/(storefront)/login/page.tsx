@@ -55,12 +55,12 @@ function LoginContent() {
         </h1>
       </div>
 
-      {/* 3. Cuadrícula de Dos Columnas estilo KFC */}
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 sm:gap-8 items-start pt-2">
-        {/* Columna Izquierda: Banner Promocional + Navegación Lateral */}
-        <div className="lg:col-span-4 space-y-4">
+      {/* 3. Cuadrícula de Dos Columnas estilo KFC con alineación uniforme */}
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 sm:gap-8 items-stretch pt-2">
+        {/* Columna Izquierda: Banner Promocional + Navegación Lateral alineada abajo */}
+        <div className="lg:col-span-4 flex flex-col justify-between gap-4 h-full">
           {/* Banner de Beneficios */}
-          <div className="bg-brand-primary text-white rounded-3xl p-6 shadow-sm relative overflow-hidden">
+          <div className="bg-brand-primary text-white rounded-3xl p-6 shadow-sm relative overflow-hidden shrink-0">
             <span className="text-[10px] font-bold tracking-widest uppercase text-brand-accent block mb-1">
               Programa de Clientes
             </span>
@@ -72,8 +72,8 @@ function LoginContent() {
             </p>
           </div>
 
-          {/* Menú Lateral con Iconos Limpios */}
-          <div className="bg-white border border-neutral-200/90 rounded-3xl p-3 shadow-xs divide-y divide-neutral-100">
+          {/* Menú Lateral con Iconos Limpios (Alineado al fondo al ras de la tarjeta derecha) */}
+          <div className="bg-white border border-neutral-200/90 rounded-3xl p-3 shadow-xs divide-y divide-neutral-100 mt-auto">
             <Link
               href="/rastreo"
               className="flex items-center gap-3.5 px-4 py-3.5 rounded-2xl hover:bg-neutral-50 text-neutral-800 hover:text-brand-primary text-xs font-bold uppercase tracking-wider font-display transition-colors"

@@ -89,7 +89,10 @@ export function CatalogSection({ tenantSlug }: CatalogSectionProps = {}) {
   return (
     <div className="space-y-8">
       {/* Barra de Control Sticky: Buscador Integrado + Subnav de Categorías */}
-      <div className="sticky top-[70px] sm:top-[76px] z-20 bg-surface-canvas/95 backdrop-blur-md pt-2 pb-4 border-b border-surface-border space-y-3.5 transition-all">
+      <div
+        style={{ top: "var(--storefront-header-offset, 76px)" }}
+        className="sticky z-20 bg-surface-canvas/95 backdrop-blur-md pt-2 pb-4 border-b border-surface-border space-y-3.5 transition-[top] duration-300"
+      >
         {/* Fila Superior: Buscador Gastronómico en Tiempo Real */}
         <div className="relative w-full max-w-md">
           <Search className="w-4 h-4 text-text-muted absolute left-4 top-1/2 -translate-y-1/2 pointer-events-none" />

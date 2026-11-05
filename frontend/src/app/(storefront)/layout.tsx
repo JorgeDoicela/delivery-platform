@@ -13,8 +13,14 @@ import {
   useCurrentTenantQuery,
 } from "@/features/tenant";
 import { ThemeToggle } from "@/shared/components/ThemeToggle";
+import { useSmartScrollHeader } from "@/shared/hooks/useSmartScrollHeader";
 
 function StorefrontHeader() {
+  const { isVisible, isScrolled, setIsVisible } = useSmartScrollHeader({
+    threshold: 15,
+    pinThreshold: 76,
+  });
+
   const pathname = usePathname();
   const rawSlug = pathname?.split("/").filter(Boolean)[0];
   const activeSlug =
@@ -38,7 +44,18 @@ function StorefrontHeader() {
     : tenant?.logoUrl || "/images/shared/placeholders/logo-default.png";
 
   return (
-    <header className="sticky top-0 z-40 bg-surface-card border-b border-surface-border shadow-xs transition-colors duration-200">
+    <header
+      onFocus={() => setIsVisible(true)}
+      className={`sticky top-0 z-40 bg-surface-card border-b border-surface-border will-change-transform transition-all duration-300 ease-in-out ${
+        isVisible
+          ? "translate-y-0 opacity-100"
+          : "-translate-y-full opacity-0 pointer-events-none"
+      } ${
+        isScrolled
+          ? "shadow-md bg-surface-card/95 backdrop-blur-md"
+          : "shadow-xs"
+      }`}
+    >
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-[70px] sm:h-[76px] flex items-center justify-between gap-3 sm:gap-6">
         <div className="flex items-center gap-5 lg:gap-7 shrink-0">
           <Link href={brandHomeHref} className="flex items-center gap-2.5 group shrink-0">

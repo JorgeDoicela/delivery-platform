@@ -340,8 +340,19 @@ body {
   color: #ffffff;
 }
 
-/* Accesibilidad y foco uniforme WCAG 2.1 AA */
+/* Accesibilidad y foco uniforme WCAG 2.1 AA (botones y enlaces) */
 :focus-visible {
   outline: 2px solid var(--brand-primary);
   outline-offset: 2px;
+}
+
+/* Los campos de formulario gestionan su propio borde de foco nítido sin halo doble */
+input:focus,
+input:focus-visible,
+textarea:focus,
+textarea:focus-visible,
+select:focus,
+select:focus-visible {
+  outline: none !important;
+  outline-offset: 0 !important;
 }

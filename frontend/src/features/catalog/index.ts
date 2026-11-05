@@ -1,5 +1,6 @@
 export { CatalogHero } from "./components/CatalogHero";
 export { CatalogSection } from "./components/CatalogSection";
+export { PopularProductsSection } from "./components/PopularProductsSection";
 export { ProductCard } from "./components/ProductCard";
 export { ModifierModal } from "./components/ModifierModal";
 export { InventoryManagerView } from "./components/InventoryManagerView";

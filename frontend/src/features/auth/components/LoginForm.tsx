@@ -5,7 +5,7 @@ import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Loader2, AlertCircle } from "lucide-react";
+import { Loader2, AlertCircle, Eye, EyeOff } from "lucide-react";
 import { loginSchema, type LoginFormData } from "../schemas/loginSchema";
 import { useAuthStore } from "../store/useAuthStore";
 import { UserRole } from "../types";
@@ -24,6 +24,7 @@ export function LoginForm({ redirectUrl, embedded = false }: LoginFormProps) {
   const brandTagline = tenant?.tagline || "Asadero";
   const brandLogo = tenant?.logoUrl || "/images/shared/placeholders/logo-default.png";
   const [formError, setFormError] = useState<string | null>(null);
+  const [showPassword, setShowPassword] = useState(false);
 
   const {
     register,
@@ -141,7 +142,7 @@ export function LoginForm({ redirectUrl, embedded = false }: LoginFormProps) {
           aria-describedby={errors.email ? "email-error" : undefined}
           {...register("email")}
           placeholder="usuario@dominio.com"
-          className="w-full min-h-[48px] px-4 py-2.5 bg-neutral-50 border border-neutral-200 hover:border-neutral-300 focus:bg-white focus:border-brand-primary focus:ring-2 focus:ring-brand-primary/10 rounded-xl text-sm text-neutral-900 placeholder:text-neutral-400 transition-all disabled:opacity-50"
+          className="w-full min-h-[48px] px-4 py-2.5 bg-neutral-50 border border-neutral-200 hover:border-neutral-300 focus:bg-white focus:border-brand-primary focus:ring-1 focus:ring-brand-primary focus:outline-none rounded-xl text-sm text-neutral-900 placeholder:text-neutral-400 transition-all disabled:opacity-50 shadow-2xs outline-none"
         />
         {errors.email && (
           <p id="email-error" className="text-xs text-red-600 font-medium">
@@ -150,7 +151,7 @@ export function LoginForm({ redirectUrl, embedded = false }: LoginFormProps) {
         )}
       </div>
 
-      {/* Campo: Contraseña */}
+      {/* Campo: Contraseña con Visor Interactivo */}
       <div className="space-y-1.5">
         <label
           htmlFor="password"
@@ -158,17 +159,31 @@ export function LoginForm({ redirectUrl, embedded = false }: LoginFormProps) {
         >
           Contraseña
         </label>
-        <input
-          id="password"
-          type="password"
-          autoComplete="current-password"
-          disabled={isSubmitting}
-          aria-invalid={Boolean(errors.password)}
-          aria-describedby={errors.password ? "password-error" : undefined}
-          {...register("password")}
-          placeholder="••••••••"
-          className="w-full min-h-[48px] px-4 py-2.5 bg-neutral-50 border border-neutral-200 hover:border-neutral-300 focus:bg-white focus:border-brand-primary focus:ring-2 focus:ring-brand-primary/10 rounded-xl text-sm text-neutral-900 placeholder:text-neutral-400 transition-all disabled:opacity-50"
-        />
+        <div className="relative">
+          <input
+            id="password"
+            type={showPassword ? "text" : "password"}
+            autoComplete="current-password"
+            disabled={isSubmitting}
+            aria-invalid={Boolean(errors.password)}
+            aria-describedby={errors.password ? "password-error" : undefined}
+            {...register("password")}
+            placeholder="••••••••"
+            className="w-full min-h-[48px] pl-4 pr-11 py-2.5 bg-neutral-50 border border-neutral-200 hover:border-neutral-300 focus:bg-white focus:border-brand-primary focus:ring-1 focus:ring-brand-primary focus:outline-none rounded-xl text-sm text-neutral-900 placeholder:text-neutral-400 transition-all disabled:opacity-50 shadow-2xs outline-none"
+          />
+          <button
+            type="button"
+            onClick={() => setShowPassword((prev) => !prev)}
+            aria-label={showPassword ? "Ocultar contraseña" : "Ver contraseña"}
+            className="absolute right-2.5 top-1/2 -translate-y-1/2 p-1.5 rounded-lg text-neutral-400 hover:text-neutral-700 hover:bg-neutral-100 transition-colors cursor-pointer"
+          >
+            {showPassword ? (
+              <EyeOff className="w-4 h-4 stroke-[1.8]" />
+            ) : (
+              <Eye className="w-4 h-4 stroke-[1.8]" />
+            )}
+          </button>
+        </div>
         {errors.password && (
           <p id="password-error" className="text-xs text-red-600 font-medium">
             {errors.password.message}
