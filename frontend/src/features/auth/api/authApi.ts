@@ -49,7 +49,7 @@ export const authApi = {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
-        "X-Tenant-Slug": tenantSlug,
+        ...(tenantSlug ? { "X-Tenant-Slug": tenantSlug } : {}),
       },
       credentials: "include",
       body: JSON.stringify({ ...credentials, tenantSlug }),
@@ -58,11 +58,12 @@ export const authApi = {
   },
 
   async refresh(): Promise<RefreshTokenResponse> {
+    const tenantSlug = getApiClientTenantSlug();
     const res = await fetch(`${API_BASE_URL}/api/v1/auth/refresh`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
-        "X-Tenant-Slug": getApiClientTenantSlug(),
+        ...(tenantSlug ? { "X-Tenant-Slug": tenantSlug } : {}),
       },
       credentials: "include",
       body: JSON.stringify({}),
@@ -71,9 +72,10 @@ export const authApi = {
   },
 
   async getCurrentUser(accessToken?: string | null): Promise<AuthUser> {
+    const tenantSlug = getApiClientTenantSlug();
     const headers: Record<string, string> = {
       "Content-Type": "application/json",
-      "X-Tenant-Slug": getApiClientTenantSlug(),
+      ...(tenantSlug ? { "X-Tenant-Slug": tenantSlug } : {}),
     };
 
     if (accessToken) {
@@ -89,11 +91,12 @@ export const authApi = {
   },
 
   async logout(): Promise<void> {
+    const tenantSlug = getApiClientTenantSlug();
     await fetch(`${API_BASE_URL}/api/v1/auth/logout`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
-        "X-Tenant-Slug": getApiClientTenantSlug(),
+        ...(tenantSlug ? { "X-Tenant-Slug": tenantSlug } : {}),
       },
       credentials: "include",
       body: JSON.stringify({}),

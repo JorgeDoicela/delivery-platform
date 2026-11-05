@@ -15,7 +15,7 @@ const mockProducts: MenuProductDto[] = [
     category: "Combos",
     basePrice: 13.0,
     imageUrl: "/images/pollo.png",
-    isAvailable: true,
+    isActive: true,
     modifierGroups: [],
   },
   {
@@ -25,7 +25,7 @@ const mockProducts: MenuProductDto[] = [
     category: "Porciones",
     basePrice: 7.5,
     imageUrl: "/images/medio.png",
-    isAvailable: true,
+    isActive: true,
     modifierGroups: [],
   },
   {
@@ -35,7 +35,7 @@ const mockProducts: MenuProductDto[] = [
     category: "Bebidas",
     basePrice: 1.5,
     imageUrl: "/images/gaseosa.png",
-    isAvailable: true,
+    isActive: true,
     modifierGroups: [],
   },
   {
@@ -45,7 +45,7 @@ const mockProducts: MenuProductDto[] = [
     category: "Broaster",
     basePrice: 15.0,
     imageUrl: "/images/broaster.png",
-    isAvailable: true,
+    isActive: true,
     modifierGroups: [],
   },
 ];
@@ -80,9 +80,9 @@ describe("catalogFilter helper", () => {
 
   it("calculateTotalCatalogProducts should sum products across categories", () => {
     const mockCategories: MenuCategoryDto[] = [
-      { id: 1, categoryName: "Combos", displayOrder: 1, products: [mockProducts[0]] },
-      { id: 2, categoryName: "Porciones", displayOrder: 2, products: [mockProducts[1]] },
-      { id: 3, categoryName: "Bebidas", displayOrder: 3, products: [mockProducts[2], mockProducts[3]] },
+      { categoryName: "Combos", products: [mockProducts[0]] },
+      { categoryName: "Porciones", products: [mockProducts[1]] },
+      { categoryName: "Bebidas", products: [mockProducts[2], mockProducts[3]] },
     ];
 
     expect(calculateTotalCatalogProducts(mockCategories)).toBe(4);
@@ -90,9 +90,9 @@ describe("catalogFilter helper", () => {
 
   it("getPopularProducts should prioritize flagship dishes and exclude drinks and extras", () => {
     const mockCategories: MenuCategoryDto[] = [
-      { id: 1, categoryName: "Bebidas", displayOrder: 1, products: [mockProducts[2]] },
-      { id: 2, categoryName: "Combos", displayOrder: 2, products: [mockProducts[0], mockProducts[3]] },
-      { id: 3, categoryName: "Porciones", displayOrder: 3, products: [mockProducts[1]] },
+      { categoryName: "Bebidas", products: [mockProducts[2]] },
+      { categoryName: "Combos", products: [mockProducts[0], mockProducts[3]] },
+      { categoryName: "Porciones", products: [mockProducts[1]] },
     ];
 
     const popular = getPopularProducts(mockCategories, 2);
