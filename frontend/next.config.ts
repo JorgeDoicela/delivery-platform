@@ -28,24 +28,23 @@ const nextConfig: NextConfig = {
   // Desactivar generacion automatica de AGENTS.md en la subcarpeta frontend
   agentRules: false,
   async rewrites() {
-    const backendUrl =
-      process.env.INTERNAL_API_URL ||
-      (process.env.NODE_ENV === "production" ? "http://backend:5005" : "http://localhost:5005");
+    // En produccion el enrutamiento de API y SignalR lo gestiona Nginx perimetralmente
+    if (process.env.NODE_ENV === "production") {
+      return [];
+    }
 
-    return {
-      beforeFiles: [],
-      afterFiles: [],
-      fallback: [
-        {
-          source: "/api/:path*",
-          destination: `${backendUrl}/api/:path*`,
-        },
-        {
-          source: "/hubs/:path*",
-          destination: `${backendUrl}/hubs/:path*`,
-        },
-      ],
-    };
+    // Soporte exclusivo para desarrollo local (pnpm dev sin Nginx en la maquina del programador)
+    const backendDevUrl = process.env.INTERNAL_API_URL || "http://localhost:5005";
+    return [
+      {
+        source: "/api/:path*",
+        destination: `${backendDevUrl}/api/:path*`,
+      },
+      {
+        source: "/hubs/:path*",
+        destination: `${backendDevUrl}/hubs/:path*`,
+      },
+    ];
   },
   async redirects() {
     return [
