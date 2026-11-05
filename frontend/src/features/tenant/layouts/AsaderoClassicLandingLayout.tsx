@@ -17,10 +17,6 @@ interface AsaderoClassicLandingLayoutProps {
 export function AsaderoClassicLandingLayout({
   tenant,
 }: AsaderoClassicLandingLayoutProps) {
-  const heroSubtitle =
-    tenant?.heroSubtitle ||
-    "Personaliza tu orden con acompañamientos y guarniciones recién preparadas";
-
   return (
     <div className="w-full pb-12 space-y-12">
       {/* 1. Hero Slider Panorámico */}
@@ -36,18 +32,18 @@ export function AsaderoClassicLandingLayout({
         {/* 4. Menú y Combos del Establecimiento */}
         <section
           id="catalogo"
-          className="max-w-[1240px] mx-auto space-y-6 pt-6 w-full"
+          className="max-w-[1240px] mx-auto space-y-6 pt-4 w-full"
         >
-          <div className="flex items-center justify-between pb-3 border-b border-surface-border">
+          <div className="flex flex-col sm:flex-row sm:items-end justify-between pb-4 border-b border-surface-border gap-2">
             <div>
-              <span className="text-[11px] font-bold uppercase tracking-widest text-brand-primary block mb-1">
-                {tenant?.tagline || "Especialidades de la Casa"}
+              <span className="text-[11px] font-bold uppercase tracking-widest text-brand-primary block mb-1 font-sans">
+                {tenant?.tagline || "Especialidades del Asador"}
               </span>
               <h2 className="text-3xl sm:text-4xl font-black text-text-strong uppercase tracking-wide font-display" suppressHydrationWarning>
-                Menú y Combos • {tenant?.name ?? "Restaurante"}
+                Nuestra Carta
               </h2>
-              <p className="text-xs sm:text-sm text-text-muted mt-0.5" suppressHydrationWarning>
-                {heroSubtitle}
+              <p className="text-xs sm:text-sm text-text-muted mt-1 leading-relaxed" suppressHydrationWarning>
+                {tenant?.heroSubtitle || "Personaliza tus porciones con guarniciones calientes, ensalada fresca y ají artesanal."}
               </p>
             </div>
           </div>

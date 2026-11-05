@@ -23,7 +23,7 @@ function LoginContent() {
 
   const isMounted = useIsMounted();
   const { data: tenant } = useCurrentTenantQuery();
-  const brandName = tenant?.name || "La Granjita";
+  const brandName = tenant?.name || "Mesafy";
   const user = useAuthStore((s) => s.user);
   const isAuthenticated = useAuthStore((s) => s.isAuthenticated);
   const logout = useAuthStore((s) => s.logout);
@@ -41,7 +41,7 @@ function LoginContent() {
     <div className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-12 space-y-6">
       {/* 1. Miga de Pan (Breadcrumb estilo KFC) */}
       <nav aria-label="Miga de pan" className="flex items-center gap-2 text-xs font-semibold text-neutral-500">
-        <Link href={`/${tenant?.slug || "la-granjita"}`} className="hover:text-brand-primary transition-colors">
+        <Link href={tenant?.slug ? `/${tenant.slug}` : "/"} className="hover:text-brand-primary transition-colors">
           Inicio
         </Link>
         <ChevronRight className="w-3.5 h-3.5 text-neutral-400" />

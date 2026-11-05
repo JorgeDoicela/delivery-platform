@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { apiClient, ApiClientError, getApiClientTenantSlug } from './api-client';
+import { apiClient, ApiClientError, getApiClientTenantSlug, setApiClientTenantSlug } from './api-client';
 
 describe('apiClient - RFC 7807 Error Handling', () => {
   beforeEach(() => {
@@ -61,6 +61,8 @@ describe('apiClient - RFC 7807 Error Handling', () => {
   });
 
   it('correctly executes toggleProductStatus with PUT request', async () => {
+    window.history.pushState({}, '', '/admin/inventario');
+    setApiClientTenantSlug('la-granjita');
     const mockResponse = {
       productId: 1,
       isActive: false,
@@ -105,14 +107,14 @@ describe('apiClient - RFC 7807 Error Handling', () => {
     );
   });
 
-  it('resolves tenant slug from dynamic storefront pathname before localStorage', () => {
+  it('resolves tenant slug from dynamic storefront pathname before localStorage and returns null on platform root', () => {
     window.localStorage.setItem('delivery_active_tenant_slug', 'la-granjita');
     window.history.pushState({}, '', '/brasas-del-valle');
 
     expect(getApiClientTenantSlug()).toBe('brasas-del-valle');
 
     window.history.pushState({}, '', '/');
-    window.localStorage.setItem('delivery_active_tenant_slug', 'la-granjita');
+    expect(getApiClientTenantSlug()).toBeNull();
   });
 });
 

@@ -52,6 +52,7 @@ public class VerticalSliceArchitectureRegistrationTests
         registeredServiceTypes.Should().Contain(typeof(ApproveTransferOrderHandler));
         registeredServiceTypes.Should().Contain(typeof(IngestDriverLocationHandler));
         registeredServiceTypes.Should().Contain(typeof(GetDriverLocationHandler));
+        registeredServiceTypes.Should().Contain(typeof(Delivery.Features.Branches.UpdateBranchOperatingHours.UpdateBranchOperatingHoursHandler));
 
         // Verificar registro de interfaces IHandler<,>
         registeredServiceTypes.Should().Contain(typeof(Delivery.Features.Common.Handlers.IHandler<CreateOrderCommand, Result<CreateOrderResponse>>));
@@ -68,14 +69,15 @@ public class VerticalSliceArchitectureRegistrationTests
         // Act
         services.AddDeliveryFeatures();
 
-        // Assert: Deben registrarse exactamente 23 endpoints autónomos (12 operativos + 4 de autenticación + 7 de tenants y sucursales)
+        // Assert: Deben registrarse exactamente 24 endpoints autónomos (13 operativos + 4 de autenticación + 7 de tenants y sucursales)
         var endpointDescriptors = services.Where(s => s.ServiceType == typeof(IEndpoint)).ToList();
-        endpointDescriptors.Should().HaveCount(23);
+        endpointDescriptors.Should().HaveCount(24);
 
         var endpointImplementationTypes = endpointDescriptors.Select(d => d.ImplementationType).ToHashSet();
         endpointImplementationTypes.Should().Contain(typeof(ResolveBranchEndpoint));
         endpointImplementationTypes.Should().Contain(typeof(GetBranchCapacityEndpoint));
         endpointImplementationTypes.Should().Contain(typeof(Delivery.Features.Branches.GetBranches.GetBranchesEndpoint));
+        endpointImplementationTypes.Should().Contain(typeof(Delivery.Features.Branches.UpdateBranchOperatingHours.UpdateBranchOperatingHoursEndpoint));
         endpointImplementationTypes.Should().Contain(typeof(GetActiveMenuEndpoint));
         endpointImplementationTypes.Should().Contain(typeof(ToggleProductStatusEndpoint));
         endpointImplementationTypes.Should().Contain(typeof(UpsertProductEndpoint));

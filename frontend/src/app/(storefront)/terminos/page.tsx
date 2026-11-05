@@ -8,11 +8,11 @@ import { useCurrentTenantQuery } from "@/features/tenant";
 export default function TerminosLegalesPage() {
   const { data: tenant } = useCurrentTenantQuery();
 
-  const brandName = tenant?.name || "La Granjita";
-  const businessName = tenant?.businessName || "Asadero La Granjita Cia. Ltda.";
-  const taxId = tenant?.taxId || "1754455341001";
-  const contactEmail = tenant?.contactEmail || "pedidos@lagranjita.com";
-  const contactPhone = tenant?.contactPhone || "0987654321";
+  const brandName = tenant?.name || "Mesafy";
+  const businessName = tenant?.businessName || "Mesafy Technologies S.A.S.";
+  const taxId = tenant?.taxId || "1790000000001";
+  const contactEmail = tenant?.contactEmail || "soporte@mesafy.app";
+  const contactPhone = tenant?.contactPhone || "0990000000";
   const fee = (tenant?.baseDeliveryFee ?? 1.5).toFixed(2);
 
   const customContent = tenant?.termsAndConditionsMarkdown;

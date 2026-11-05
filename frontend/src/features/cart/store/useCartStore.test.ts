@@ -203,4 +203,54 @@ describe("useCartStore", () => {
     expect(useCartStore.getState().items[0].productId).toBe(10);
     expect(useCartStore.getState().getDeliveryFee()).toBe(1.5);
   });
+
+  it("debe abrir, cerrar y conmutar el estado del drawer lateral", () => {
+    expect(useCartStore.getState().isCartOpen).toBe(false);
+
+    useCartStore.getState().openCart();
+    expect(useCartStore.getState().isCartOpen).toBe(true);
+
+    useCartStore.getState().closeCart();
+    expect(useCartStore.getState().isCartOpen).toBe(false);
+
+    useCartStore.getState().toggleCart();
+    expect(useCartStore.getState().isCartOpen).toBe(true);
+  });
+
+  it("debe aplicar y remover cupones de descuento recalculando el total", () => {
+    useCartStore.getState().addItem({
+      productId: 10,
+      name: "Pollo Entero",
+      unitPrice: 20.0,
+      imageUrl: "/images/pollo.webp",
+      quantity: 1,
+      selectedModifiers: [],
+    });
+
+    // Subtotal 20 + envio 1.5 = 21.5
+    expect(useCartStore.getState().getTotal()).toBe(21.5);
+
+    // Cupón MESAFY10: 10% de subtotal = $2.00
+    const applied = useCartStore.getState().applyCoupon("MESAFY10");
+    expect(applied).toBe(true);
+    expect(useCartStore.getState().couponCode).toBe("MESAFY10");
+    expect(useCartStore.getState().discountAmount).toBe(2.0);
+    expect(useCartStore.getState().getTotal()).toBe(19.5); // 21.5 - 2.0
+
+    // Remover cupón
+    useCartStore.getState().removeCoupon();
+    expect(useCartStore.getState().couponCode).toBeNull();
+    expect(useCartStore.getState().discountAmount).toBe(0);
+    expect(useCartStore.getState().getTotal()).toBe(21.5);
+  });
+
+  it("debe gestionar la configuracion de utensilios y salsas de cortesia", () => {
+    expect(useCartStore.getState().utensils.enabled).toBe(true);
+
+    useCartStore.getState().setUtensilsEnabled(false);
+    expect(useCartStore.getState().utensils.enabled).toBe(false);
+
+    useCartStore.getState().setUtensilOption("sauces", false);
+    expect(useCartStore.getState().utensils.sauces).toBe(false);
+  });
 });

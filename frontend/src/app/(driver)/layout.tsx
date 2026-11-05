@@ -1,11 +1,11 @@
 "use client";
 
-import React from "react";
+import React, { useEffect } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { Radio } from "lucide-react";
-import { useCurrentTenantQuery } from "@/features/tenant";
-import { AuthGuard, UserRole } from "@/features/auth";
+import { useCurrentTenantQuery, useTenantStore } from "@/features/tenant";
+import { AuthGuard, UserRole, useAuthStore } from "@/features/auth";
 import { ThemeToggle } from "@/shared/components/ThemeToggle";
 
 export default function DriverLayout({
@@ -13,7 +13,17 @@ export default function DriverLayout({
 }: {
   children: React.ReactNode;
 }) {
-  const { data: tenant } = useCurrentTenantQuery();
+  const tenantSlug = useTenantStore((s) => s.tenantSlug);
+  const setTenantSlug = useTenantStore((s) => s.setTenantSlug);
+  const user = useAuthStore((s) => s.user);
+
+  useEffect(() => {
+    if (!tenantSlug) {
+      setTenantSlug(user?.tenantSlug || "la-granjita");
+    }
+  }, [tenantSlug, user?.tenantSlug, setTenantSlug]);
+
+  const { data: tenant } = useCurrentTenantQuery(tenantSlug || undefined);
   const brandName = tenant?.name || "La Granjita";
   const brandLogo = tenant?.logoUrl || "/images/shared/placeholders/logo-default.png";
 

@@ -64,7 +64,7 @@ export function CatalogSection({ tenantSlug }: CatalogSectionProps = {}) {
 
   return (
     <div className="space-y-6">
-      {/* Selector de Categorías */}
+      {/* Selector de Categorías Ergonómico */}
       <div className="flex items-center gap-2 overflow-x-auto pb-1 scrollbar-none">
         {allCategories.map((category) => {
           const isSelected = selectedCategory === category;
@@ -72,11 +72,12 @@ export function CatalogSection({ tenantSlug }: CatalogSectionProps = {}) {
           return (
             <button
               key={category}
+              type="button"
               onClick={() => setSelectedCategory(category)}
-              className={`px-6 py-2.5 rounded-full text-xs font-bold uppercase tracking-wider transition-all whitespace-nowrap shadow-sm ${
+              className={`px-5 py-2 rounded-full text-xs font-black uppercase tracking-wider font-display transition-all whitespace-nowrap cursor-pointer ${
                 isSelected
-                  ? "bg-brand-primary text-white shadow-md scale-105"
-                  : "bg-white text-neutral-800 hover:bg-neutral-50 border border-neutral-300 hover:border-neutral-400"
+                  ? "bg-brand-primary text-white shadow-xs scale-[1.02]"
+                  : "bg-surface-card text-text-strong hover:bg-surface-card-hover border border-surface-border hover:border-surface-border-subtle"
               }`}
             >
               {category}
@@ -85,12 +86,18 @@ export function CatalogSection({ tenantSlug }: CatalogSectionProps = {}) {
         })}
       </div>
 
-      {/* Grid de Productos Adaptado a Ancho Completo */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-7">
-        {filteredProducts.map((product) => (
-          <ProductCard key={product.id} product={product} />
-        ))}
-      </div>
+      {/* Grid de Productos Gastronómicos */}
+      {filteredProducts.length === 0 ? (
+        <div className="bg-surface-card border border-surface-border rounded-2xl p-8 text-center text-text-muted text-xs font-medium">
+          No hay productos disponibles en esta categoría en este momento.
+        </div>
+      ) : (
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-7">
+          {filteredProducts.map((product) => (
+            <ProductCard key={product.id} product={product} />
+          ))}
+        </div>
+      )}
     </div>
   );
 }

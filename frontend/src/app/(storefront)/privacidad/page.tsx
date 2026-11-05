@@ -8,10 +8,10 @@ import { useCurrentTenantQuery } from "@/features/tenant";
 export default function PoliticaPrivacidadPage() {
   const { data: tenant } = useCurrentTenantQuery();
 
-  const brandName = tenant?.name || "La Granjita";
-  const businessName = tenant?.businessName || "Asadero La Granjita Cia. Ltda.";
-  const taxId = tenant?.taxId || "1754455341001";
-  const contactEmail = tenant?.contactEmail || "pedidos@lagranjita.com";
+  const brandName = tenant?.name || "Mesafy";
+  const businessName = tenant?.businessName || "Mesafy Technologies S.A.S.";
+  const taxId = tenant?.taxId || "1790000000001";
+  const contactEmail = tenant?.contactEmail || "soporte@mesafy.app";
 
   const customContent = tenant?.privacyPolicyMarkdown;
 

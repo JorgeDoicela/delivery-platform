@@ -1,7 +1,7 @@
 {
-  "name": "Delivery Platform",
-  "short_name": "Delivery",
-  "description": "Pedidos directos y entrega a domicilio en tiempo real",
+  "name": "Mesafy",
+  "short_name": "Mesafy",
+  "description": "Gestión integral para restaurantes, POS, cocina, facturación y pedidos en tiempo real",
   "start_url": "/",
   "display": "standalone",
   "background_color": "#0f172a",

@@ -16,7 +16,7 @@ export const FALLBACK_TENANT_CONFIGS: Record<string, TenantStorefrontConfigDto> 
     name: "La Granjita",
     tagline: "Asadero",
     description:
-      "Pollo asado artesanalmente al carbón vegetal y leña seleccionada en La Granjita Asadero. Pedidos directos sin intermediarios.",
+      "Pollo asado artesanalmente al carbón vegetal y leña seleccionada. Guarniciones tradicionales, ensalada fresca y ají de la casa.",
     heroSubtitle:
       "Personaliza tu orden con guarniciones calientes, ensalada fresca y ají artesanal",
     businessName: "Asadero La Granjita Cia. Ltda.",
@@ -52,7 +52,7 @@ export const FALLBACK_TENANT_CONFIGS: Record<string, TenantStorefrontConfigDto> 
         subtitle:
           "Pollo entero asado lentamente al carbón vegetal con guarniciones calientes, ensalada fresca y ají artesanal.",
         ctaText: "ORDENA AQUÍ",
-        ctaHref: "/catalogo",
+        ctaHref: "#catalogo",
         imageUrl: "/images/tenants/la-granjita/banners/hero-pollo-brasa.jpg",
         displayOrder: 1,
         isActive: true,
@@ -64,7 +64,7 @@ export const FALLBACK_TENANT_CONFIGS: Record<string, TenantStorefrontConfigDto> 
         subtitle:
           "Rinde para 5 a 6 personas. Incluye porción doble de papas fritas rústicas, ensalada grande y gaseosa familiar.",
         ctaText: "ORDENA AQUÍ",
-        ctaHref: "/catalogo",
+        ctaHref: "#catalogo",
         imageUrl: "/images/tenants/la-granjita/banners/hero-combo-familiar.jpg",
         displayOrder: 2,
         isActive: true,
@@ -76,7 +76,7 @@ export const FALLBACK_TENANT_CONFIGS: Record<string, TenantStorefrontConfigDto> 
         subtitle:
           "Presa dorada y jugosa con papas fritas rústicas artesanales, ensalada fresca, ají criollo y bebida personal.",
         ctaText: "ORDENA AQUÍ",
-        ctaHref: "/catalogo",
+        ctaHref: "#catalogo",
         imageUrl: "/images/tenants/la-granjita/banners/hero-combo-personal.jpg",
         displayOrder: 3,
         isActive: true,
@@ -89,7 +89,7 @@ export const FALLBACK_TENANT_CONFIGS: Record<string, TenantStorefrontConfigDto> 
         subtitle:
           "Nuestra receta tradicional combina especias frescas, ajo asado y limón con cocción lenta sobre leña y carbón vegetal.",
         ctaText: "Conoce Más",
-        ctaHref: "/catalogo",
+        ctaHref: "#catalogo",
         imageUrl: "/images/tenants/la-granjita/banners/promo-receta-tradicional.jpg",
         themeVariant: "slate",
         displayOrder: 1,
@@ -101,7 +101,7 @@ export const FALLBACK_TENANT_CONFIGS: Record<string, TenantStorefrontConfigDto> 
         subtitle:
           "Cada pollo se asa al momento en nuestros hornos ecológicos de alta temperatura para garantizar piel crujiente y carne jugosa.",
         ctaText: "Ver Combos",
-        ctaHref: "/catalogo",
+        ctaHref: "#catalogo",
         imageUrl: "/images/tenants/la-granjita/banners/promo-hecho-a-la-brasa.jpg",
         themeVariant: "dark",
         displayOrder: 2,
@@ -165,7 +165,7 @@ export const FALLBACK_TENANT_CONFIGS: Record<string, TenantStorefrontConfigDto> 
         subtitle:
           "Bife de chorizo, lomo fino, chuleta ahumada, chorizo argentino, morcilla y papas al romero para 4 personas.",
         ctaText: "PEDIR PARRILLADA",
-        ctaHref: "/catalogo",
+        ctaHref: "#catalogo",
         imageUrl: "/images/tenants/brasas-del-valle/banners/hero-combo-familiar.jpg",
         displayOrder: 1,
         isActive: true,
@@ -177,7 +177,7 @@ export const FALLBACK_TENANT_CONFIGS: Record<string, TenantStorefrontConfigDto> 
         subtitle:
           "Sellado a fuego vivo con sal en escamas, mantequilla de ajo asado, ensalada tibia y papas rústicas.",
         ctaText: "VER CORTES",
-        ctaHref: "/catalogo",
+        ctaHref: "#catalogo",
         imageUrl: "/images/tenants/brasas-del-valle/banners/hero-pollo-brasa.jpg",
         displayOrder: 2,
         isActive: true,
@@ -190,7 +190,7 @@ export const FALLBACK_TENANT_CONFIGS: Record<string, TenantStorefrontConfigDto> 
         subtitle:
           "Controlamos humedad y temperatura durante 28 días para lograr terneza superior y sabor concentrado en cada corte.",
         ctaText: "Explorar Carta",
-        ctaHref: "/catalogo",
+        ctaHref: "#catalogo",
         imageUrl: "/images/tenants/brasas-del-valle/banners/promo-hecho-a-la-brasa.jpg",
         themeVariant: "dark",
         displayOrder: 1,
@@ -202,7 +202,7 @@ export const FALLBACK_TENANT_CONFIGS: Record<string, TenantStorefrontConfigDto> 
         subtitle:
           "Elaboradas diariamente con perejil fresco de huerto, orégano andino, ajo confitado y aceite de oliva extra virgen.",
         ctaText: "Ordenar Ahora",
-        ctaHref: "/catalogo",
+        ctaHref: "#catalogo",
         imageUrl: "/images/tenants/brasas-del-valle/banners/promo-receta-tradicional.jpg",
         themeVariant: "slate",
         displayOrder: 2,
@@ -307,14 +307,19 @@ export function getFallbackTenantConfig(slug: string): TenantStorefrontConfigDto
 }
 
 interface TenantStoreState {
-  tenantSlug: string;
-  setTenantSlug: (slug: string) => void;
+  tenantSlug: string | null;
+  setTenantSlug: (slug: string | null) => void;
   hydrateTenantSlug: () => void;
 }
 
 export const useTenantStore = create<TenantStoreState>((set) => ({
-  tenantSlug: DEFAULT_TENANT_SLUG,
-  setTenantSlug: (slug: string) => {
+  tenantSlug: null,
+  setTenantSlug: (slug: string | null) => {
+    if (!slug) {
+      setApiClientTenantSlug(null);
+      set({ tenantSlug: null });
+      return;
+    }
     const normalized = slug.trim().toLowerCase();
     if (!normalized) return;
     setApiClientTenantSlug(normalized);

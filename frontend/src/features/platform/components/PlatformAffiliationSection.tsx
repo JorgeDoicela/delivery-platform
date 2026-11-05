@@ -1,7 +1,6 @@
 "use client";
 
 import React, { useState } from "react";
-import Link from "next/link";
 
 export function PlatformAffiliationSection() {
   const [leadForm, setLeadForm] = useState({
@@ -63,14 +62,11 @@ export function PlatformAffiliationSection() {
             </div>
             <div className="py-2.5 flex items-center justify-between">
               <span className="font-bold uppercase tracking-wider text-text-strong font-display">
-                ALTA INMEDIATA DESDE CONSOLA
+                ACTIVACIÓN DE MARCA
               </span>
-              <Link
-                href="/superadmin"
-                className="font-mono text-[11px] font-bold text-brand-primary hover:underline"
-              >
-                /superadmin
-              </Link>
+              <span className="font-mono text-[11px] font-bold text-brand-primary">
+                Inmediata
+              </span>
             </div>
           </div>
         </div>
@@ -82,15 +78,16 @@ export function PlatformAffiliationSection() {
                 SOLICITUD REGISTRADA CORRECTAMENTE
               </h3>
               <p className="text-xs sm:text-sm text-text-muted max-w-md mx-auto">
-                También puedes aprovisionar el nuevo restaurante directamente desde la consola de gobernanza multi-marca.
+                Hemos recibido los datos de tu establecimiento. Nuestro equipo comercial se comunicará contigo en breve para coordinar la activación de tu tienda.
               </p>
               <div className="pt-2">
-                <Link
-                  href="/superadmin"
-                  className="inline-flex items-center justify-center bg-brand-primary hover:bg-brand-primary-hover text-white font-black text-xs uppercase tracking-wider font-display px-8 py-3.5 rounded-full shadow-md transition-all"
+                <button
+                  type="button"
+                  onClick={() => setLeadSubmitted(false)}
+                  className="inline-flex items-center justify-center bg-brand-primary hover:bg-brand-primary-hover text-white font-black text-xs uppercase tracking-wider font-display px-8 py-3.5 rounded-full shadow-md transition-all cursor-pointer"
                 >
-                  IR A CONSOLA SUPERADMIN
-                </Link>
+                  ENVIAR OTRA CONSULTA
+                </button>
               </div>
             </div>
           ) : (

@@ -20,12 +20,22 @@ export interface CartItem {
   itemPrice: number; // unitPrice + modificadores con costo
 }
 
+export interface CartUtensilsConfig {
+  enabled: boolean;
+  sauces: boolean;
+  cutlery: boolean;
+  napkins: boolean;
+}
+
 export interface TenantCartSnapshot {
   items: CartItem[];
   branchId: number | null;
   branchName: string | null;
   deliveryType: "delivery" | "takeout";
   baseDeliveryFee: number;
+  utensils?: CartUtensilsConfig;
+  couponCode?: string | null;
+  discountAmount?: number;
 }
 
 interface CartState {
@@ -36,6 +46,23 @@ interface CartState {
   deliveryType: "delivery" | "takeout";
   baseDeliveryFee: number;
   cartsByTenant: Record<string, TenantCartSnapshot>;
+
+  // Estado del Drawer Lateral
+  isCartOpen: boolean;
+  openCart: () => void;
+  closeCart: () => void;
+  toggleCart: () => void;
+
+  // Utensilios y Cortesía
+  utensils: CartUtensilsConfig;
+  setUtensilsEnabled: (enabled: boolean) => void;
+  setUtensilOption: (option: "sauces" | "cutlery" | "napkins", value: boolean) => void;
+
+  // Cupones y Descuentos
+  couponCode: string | null;
+  discountAmount: number;
+  applyCoupon: (code: string) => boolean;
+  removeCoupon: () => void;
 
   // Acciones
   syncTenantContext: (
@@ -67,6 +94,44 @@ export const useCartStore = create<CartState>()(
       deliveryType: "delivery",
       baseDeliveryFee: 1.5,
       cartsByTenant: {},
+
+      // Estado del Drawer Lateral
+      isCartOpen: false,
+      openCart: () => set({ isCartOpen: true }),
+      closeCart: () => set({ isCartOpen: false }),
+      toggleCart: () => set((state) => ({ isCartOpen: !state.isCartOpen })),
+
+      // Utensilios y Cortesía
+      utensils: {
+        enabled: true,
+        sauces: true,
+        cutlery: true,
+        napkins: true,
+      },
+      setUtensilsEnabled: (enabled) =>
+        set((s) => ({ utensils: { ...s.utensils, enabled } })),
+      setUtensilOption: (option, value) =>
+        set((s) => ({ utensils: { ...s.utensils, [option]: value } })),
+
+      // Cupones y Descuentos
+      couponCode: null,
+      discountAmount: 0,
+      applyCoupon: (code: string) => {
+        const clean = code.trim().toUpperCase();
+        if (clean === "MESAFY10" || clean === "DESCUENTO10") {
+          const subtotal = get().getSubtotal();
+          const discount = Math.round(subtotal * 0.1 * 100) / 100;
+          set({ couponCode: clean, discountAmount: discount });
+          return true;
+        }
+        if (clean === "GRANJITA" || clean === "ENVIOGRATIS") {
+          const deliveryFee = get().getDeliveryFee();
+          set({ couponCode: clean, discountAmount: deliveryFee });
+          return true;
+        }
+        return false;
+      },
+      removeCoupon: () => set({ couponCode: null, discountAmount: 0 }),
 
       syncTenantContext: (nextSlug, nextFee, defaultBranch) => {
         const normalizedSlug = nextSlug.trim().toLowerCase();
@@ -307,7 +372,8 @@ export const useCartStore = create<CartState>()(
       getTotal: () => {
         const subtotal = get().getSubtotal();
         if (subtotal === 0) return 0;
-        return subtotal + get().getDeliveryFee();
+        const total = subtotal + get().getDeliveryFee() - (get().discountAmount || 0);
+        return Math.max(0, Math.round(total * 100) / 100);
       },
 
       getItemCount: () => {

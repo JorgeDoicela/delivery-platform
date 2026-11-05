@@ -8,6 +8,7 @@ import type {
   PlatformTenantsResponse,
   PublicTenantsResponse,
   TenantStorefrontConfigDto,
+  UpdateBranchHoursRequest,
   UpdateTenantStorefrontCommand,
 } from "@/shared/types/api";
 import {
@@ -16,20 +17,23 @@ import {
   useTenantStore,
 } from "../store/useTenantStore";
 
-export function useCurrentTenantQuery(slugOverride?: string) {
+export function useCurrentTenantQuery(slugOverride?: string | null) {
   const storeSlug = useTenantStore((s) => s.tenantSlug);
-  const tenantSlug = (slugOverride?.trim().toLowerCase() || storeSlug);
+  const targetSlug = slugOverride !== undefined ? slugOverride : storeSlug;
+  const normalizedSlug = targetSlug?.trim().toLowerCase() || null;
 
-  return useQuery<TenantStorefrontConfigDto>({
-    queryKey: ["tenant", "current", tenantSlug],
+  return useQuery<TenantStorefrontConfigDto | null>({
+    queryKey: ["tenant", "current", normalizedSlug],
     queryFn: async () => {
+      if (!normalizedSlug) return null;
       try {
-        return await apiClient.getCurrentTenant(tenantSlug);
+        return await apiClient.getCurrentTenant(normalizedSlug);
       } catch {
-        return getFallbackTenantConfig(tenantSlug);
+        return getFallbackTenantConfig(normalizedSlug);
       }
     },
-    placeholderData: () => getFallbackTenantConfig(tenantSlug),
+    enabled: Boolean(normalizedSlug),
+    placeholderData: normalizedSlug ? () => getFallbackTenantConfig(normalizedSlug) : undefined,
     staleTime: 1000 * 60 * 2,
   });
 }
@@ -49,16 +53,19 @@ export function usePublicTenantsQuery() {
   });
 }
 
-export function useBranchesQuery() {
-  const tenantSlug = useTenantStore((s) => s.tenantSlug);
+export function useBranchesQuery(slugOverride?: string | null) {
+  const storeSlug = useTenantStore((s) => s.tenantSlug);
+  const targetSlug = slugOverride !== undefined ? slugOverride : storeSlug;
+  const normalizedSlug = targetSlug?.trim().toLowerCase() || null;
 
   return useQuery<BranchDetailDto[]>({
-    queryKey: ["branches", tenantSlug],
+    queryKey: ["branches", normalizedSlug],
     queryFn: async () => {
+      if (!normalizedSlug) return [];
       try {
         return await apiClient.getBranches();
       } catch {
-        const fallback = getFallbackTenantConfig(tenantSlug);
+        const fallback = getFallbackTenantConfig(normalizedSlug);
         return fallback.branches.map((b) => ({
           ...b,
           sriEstablishmentCode: "001",
@@ -66,6 +73,7 @@ export function useBranchesQuery() {
         }));
       }
     },
+    enabled: Boolean(normalizedSlug),
     staleTime: 1000 * 60 * 2,
   });
 }
@@ -118,4 +126,25 @@ export function useToggleTenantStatusMutation() {
     },
   });
 }
+
+export function useUpdateBranchHoursMutation() {
+  const queryClient = useQueryClient();
+  const tenantSlug = useTenantStore((s) => s.tenantSlug);
+
+  return useMutation({
+    mutationFn: ({
+      branchId,
+      data,
+    }: {
+      branchId: number;
+      data: UpdateBranchHoursRequest;
+    }) => apiClient.updateBranchOperatingHours(branchId, data),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["branches"] });
+      queryClient.invalidateQueries({ queryKey: ["tenant", "current", tenantSlug] });
+      queryClient.invalidateQueries({ queryKey: ["branch-capacities"] });
+    },
+  });
+}
+
 

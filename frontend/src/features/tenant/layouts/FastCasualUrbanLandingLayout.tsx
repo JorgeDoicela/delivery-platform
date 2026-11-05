@@ -8,7 +8,6 @@ import {
   Zap,
   MapPin,
   Clock,
-  ShieldCheck,
   Sparkles,
 } from "lucide-react";
 import {
@@ -150,20 +149,15 @@ export function FastCasualUrbanLandingLayout({
                 className="text-3xl sm:text-4xl font-black text-neutral-950 uppercase tracking-tight font-display"
                 suppressHydrationWarning
               >
-                Especialidades & Combos • {brandName}
+                Nuestra Carta
               </h2>
               <p
-                className="text-xs sm:text-sm text-neutral-500 mt-1"
+                className="text-xs sm:text-sm text-neutral-500 mt-1 leading-relaxed"
                 suppressHydrationWarning
               >
                 {tenant?.heroSubtitle ||
-                  "Personaliza cada plato a tu gusto y recibe tu orden recién preparada"}
+                  "Personaliza cada plato a tu gusto y recibe tu orden recién preparada."}
               </p>
-            </div>
-
-            <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-white border border-neutral-200 text-[11px] text-neutral-600 font-mono">
-              <ShieldCheck className="w-3.5 h-3.5 text-brand-primary" />
-              <span>Plantilla: Fast-Casual Urbano</span>
             </div>
           </div>
 

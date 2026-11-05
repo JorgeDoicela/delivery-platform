@@ -1,4 +1,4 @@
-# Memoria Local del Proyecto — Delivery Platform
+# Memoria Local del Proyecto — Mesafy
 
 ## 1. Arquitectura Backend: Vertical Slice Architecture (VSA) Estricta
 * **Autonomía por Slice:** Cada funcionalidad en `backend/src/Delivery.Features/` encapsula su propio `*Endpoint.cs` (implementando `IEndpoint`), `*Handler.cs`, comandos/consultas, validadores FluentValidation y DTOs. Queda prohibido que un slice referencie tipos de otro slice.

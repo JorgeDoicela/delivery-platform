@@ -15,6 +15,7 @@ interface ModifierModalProps {
 
 export function ModifierModal({ product, onClose }: ModifierModalProps) {
     const addItem = useCartStore((s) => s.addItem);
+    const openCart = useCartStore((s) => s.openCart);
     const [quantity, setQuantity] = useState(1);
 
     // Mapa de selecciones: [groupId]: Set<optionId>
@@ -99,6 +100,7 @@ export function ModifierModal({ product, onClose }: ModifierModalProps) {
         });
 
         onClose();
+        openCart();
     };
 
     return (

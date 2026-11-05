@@ -15,30 +15,30 @@ function TenantThemeEffect() {
       ? rawSlug
       : undefined;
 
-  const hydrateTenantSlug = useTenantStore((s) => s.hydrateTenantSlug);
   const setTenantSlug = useTenantStore((s) => s.setTenantSlug);
   const syncTenantContext = useCartStore((s) => s.syncTenantContext);
   const { data: tenant } = useCurrentTenantQuery(activeSlug);
 
   useEffect(() => {
-    hydrateTenantSlug();
     if (activeSlug) {
       setTenantSlug(activeSlug);
+    } else if (pathname === "/") {
+      setTenantSlug(null);
     }
-  }, [hydrateTenantSlug, activeSlug, setTenantSlug]);
+  }, [activeSlug, pathname, setTenantSlug]);
 
   useEffect(() => {
-    if (!tenant) return;
+    if (typeof document === "undefined") return;
+    const root = document.documentElement;
 
-    const firstBranch = tenant.branches?.[0];
-    syncTenantContext(
-      tenant.slug,
-      tenant.baseDeliveryFee ?? 1.5,
-      firstBranch ? { id: firstBranch.id, name: firstBranch.name } : undefined
-    );
+    if (tenant && activeSlug) {
+      const firstBranch = tenant.branches?.[0];
+      syncTenantContext(
+        tenant.slug,
+        tenant.baseDeliveryFee ?? 1.5,
+        firstBranch ? { id: firstBranch.id, name: firstBranch.name } : undefined
+      );
 
-    if (typeof document !== "undefined") {
-      const root = document.documentElement;
       if (tenant.brandPrimaryColor) {
         root.style.setProperty("--brand-primary", tenant.brandPrimaryColor);
       }
@@ -53,8 +53,13 @@ function TenantThemeEffect() {
       }
 
       document.title = `${tenant.name} | ${tenant.tagline}`;
+    } else if (pathname === "/") {
+      root.style.setProperty("--brand-primary", "#E4002B");
+      root.style.setProperty("--brand-primary-hover", "#C40024");
+      root.style.setProperty("--brand-accent", "#F59E0B");
+      document.title = "Mesafy | Gestión Gastronómica, Salón & Pedidos";
     }
-  }, [tenant, syncTenantContext]);
+  }, [tenant, activeSlug, pathname, syncTenantContext]);
 
   return null;
 }

@@ -3,7 +3,7 @@
 import React, { useState, useRef, useEffect } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { ChevronDown, Check, ArrowRight } from "lucide-react";
+import { ChevronDown, Check, ArrowRight, Store } from "lucide-react";
 import {
   useCurrentTenantQuery,
   usePublicTenantsQuery,
@@ -21,7 +21,7 @@ export function TenantSwitcher({ variant = "auto" }: TenantSwitcherProps) {
 
   const tenantSlug = useTenantStore((s) => s.tenantSlug);
   const setTenantSlug = useTenantStore((s) => s.setTenantSlug);
-  const { data: currentTenant } = useCurrentTenantQuery();
+  const { data: currentTenant } = useCurrentTenantQuery(tenantSlug);
   const { data: publicTenantsData } = usePublicTenantsQuery();
 
   const tenants = publicTenantsData?.tenants ?? [];
@@ -67,22 +67,33 @@ export function TenantSwitcher({ variant = "auto" }: TenantSwitcherProps) {
       <button
         type="button"
         onClick={() => setIsOpen((prev) => !prev)}
-        aria-label="Cambiar de restaurante"
+        aria-label="Explorar o cambiar de restaurante"
         aria-expanded={isOpen}
         className={buttonClasses}
       >
-        <span
-          className="w-2 h-2 rounded-full shrink-0"
-          style={{
-            backgroundColor: currentTenant?.brandPrimaryColor || "#E4002B",
-          }}
-        />
-        <span className="hidden sm:inline text-[10px] uppercase tracking-wider font-semibold text-text-muted">
-          Restaurante:
-        </span>
-        <span className="font-display uppercase tracking-wide font-black text-xs max-w-[130px] truncate text-text-strong">
-          {currentTenant?.name || "Seleccionar"}
-        </span>
+        {currentTenant ? (
+          <>
+            <span
+              className="w-2 h-2 rounded-full shrink-0"
+              style={{
+                backgroundColor: currentTenant.brandPrimaryColor || "#E4002B",
+              }}
+            />
+            <span className="hidden sm:inline text-[10px] uppercase tracking-wider font-semibold text-text-muted">
+              Restaurante:
+            </span>
+            <span className="font-display uppercase tracking-wide font-black text-xs max-w-[130px] truncate text-text-strong">
+              {currentTenant.name}
+            </span>
+          </>
+        ) : (
+          <>
+            <Store className="w-3.5 h-3.5 text-brand-primary shrink-0" />
+            <span className="font-display uppercase tracking-wide font-black text-xs text-text-strong">
+              Nuestras Marcas
+            </span>
+          </>
+        )}
         <ChevronDown
           className={`w-3.5 h-3.5 transition-transform duration-200 text-text-muted ${
             isOpen ? "rotate-180" : ""
@@ -94,22 +105,15 @@ export function TenantSwitcher({ variant = "auto" }: TenantSwitcherProps) {
         <div
           className={`absolute right-0 mt-2 w-80 rounded-3xl border shadow-2xl p-3 z-50 space-y-2 ${dropdownClasses}`}
         >
-          <div className="px-2 pt-1 pb-1.5 border-b border-surface-border flex items-center justify-between">
+          <div className="px-2 pt-1 pb-1.5 border-b border-surface-border">
             <span className="text-[10px] font-bold uppercase tracking-wider text-text-muted">
               Nuestras Marcas & Locales
             </span>
-            <Link
-              href="/admin/personalizacion"
-              onClick={() => setIsOpen(false)}
-              className="text-[10px] font-bold uppercase tracking-wider text-brand-primary hover:underline font-display"
-            >
-              Gestionar Marca
-            </Link>
           </div>
 
           <div className="space-y-1.5 max-h-72 overflow-y-auto">
             {tenants.map((t) => {
-              const isSelected = t.slug === tenantSlug;
+              const isSelected = Boolean(tenantSlug && t.slug === tenantSlug);
               return (
                 <button
                   key={t.slug}
@@ -159,7 +163,7 @@ export function TenantSwitcher({ variant = "auto" }: TenantSwitcherProps) {
           <div className="pt-2 border-t border-surface-border flex items-center justify-between px-2 text-[11px]">
             <span className="text-text-muted">Explorar directorio</span>
             <Link
-              href="/"
+              href="/#restaurantes"
               onClick={() => setIsOpen(false)}
               className="text-brand-primary font-bold hover:underline inline-flex items-center gap-1 font-display uppercase tracking-wider"
             >

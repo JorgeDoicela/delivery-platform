@@ -1,4 +1,4 @@
-# Directrices del Proyecto Delivery Platform (AGENTS.md)
+# Directrices del Proyecto Mesafy (AGENTS.md)
 
 Este documento define las reglas de ingeniería de software, arquitectura Multi-Tenant, puertos asignados y estándares de calidad profesional obligatorios para cualquier agente o desarrollador que opere en este repositorio.
 
@@ -6,7 +6,7 @@ Este documento define las reglas de ingeniería de software, arquitectura Multi-
 
 ## 1. Identidad del Proyecto y Stack Tecnológico
 
-Plataforma SaaS Multi-Tenant de pedidos en línea, gestión de cocina KDS y delivery geolocalizado en tiempo real para restaurantes, franquicias y comercios gastronómicos de cualquier especialidad (pizzerías, hamburgueserías, sushi, cafeterías, parrillas, asaderos y cocina de autor), diseñada con un frontend unificado y un backend monolítico modular de alto rendimiento.
+Plataforma integral de gestión para restaurantes y solución Multi-Tenant (Mesafy) de pedidos en línea, terminales de salón/POS, gestión de cocina KDS, facturación electrónica y delivery geolocalizado en tiempo real para restaurantes, franquicias y comercios gastronómicos de cualquier especialidad (pizzerías, hamburgueserías, sushi, cafeterías, parrillas, asaderos y cocina de autor), diseñada con un frontend unificado y un backend monolítico modular de alto rendimiento.
 
 * **Arquitectura Multi-Tenant:**
   - En Frontend: La raíz `/` (`PlatformLandingView`) es siempre el directorio y portal principal de la plataforma; cada establecimiento afiliado opera su propia tienda aislada en `/[slug]` (`RestaurantStorefrontView`) con su propia paleta de colores, logotipo, fotos, catálogo, sucursales y plantilla (`asadero-clasico`, `steakhouse-gourmet`, `fast-casual-urbano` o layout a medida por código).

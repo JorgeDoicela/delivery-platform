@@ -2,7 +2,6 @@
 
 import { useCartStore } from "../store/useCartStore";
 import { ShoppingBag } from "lucide-react";
-import Link from "next/link";
 import { useSyncExternalStore } from "react";
 
 const emptySubscribe = () => () => {};
@@ -16,14 +15,16 @@ export function CartButtonBadge() {
 
   const items = useCartStore((s) => s.items);
   const total = useCartStore((s) => s.getTotal());
+  const openCart = useCartStore((s) => s.openCart);
 
   const count = items.reduce((acc, i) => acc + i.quantity, 0);
 
   return (
-    <Link
-      href="/finalizar-pedido"
-      className="relative flex items-center justify-center p-1.5 text-text-strong hover:text-brand-primary transition-colors group shrink-0"
-      aria-label="Ver bolsa de compras"
+    <button
+      type="button"
+      onClick={openCart}
+      className="relative flex items-center justify-center p-1.5 text-text-strong hover:text-brand-primary transition-colors group shrink-0 cursor-pointer"
+      aria-label={`Ver carrito de compras, ${isClient ? count : 0} productos`}
     >
       <div className="relative">
         <ShoppingBag className="w-6 h-6 text-text-strong group-hover:text-brand-primary transition-colors stroke-[1.8]" />
@@ -36,6 +37,6 @@ export function CartButtonBadge() {
           ${total.toFixed(2)}
         </span>
       )}
-    </Link>
+    </button>
   );
 }

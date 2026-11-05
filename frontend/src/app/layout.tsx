@@ -28,9 +28,9 @@ export const viewport: Viewport = {
 };
 
 export const metadata: Metadata = {
-  title: "Pedidos Directos y Delivery en Vivo",
+  title: "Mesafy | Gestión Gastronómica, Salón & Pedidos",
   description:
-    "Plataforma gastronómica multi-tenant de pedidos directos, despacho geolocalizado y seguimiento en tiempo real.",
+    "Gestión integral para restaurantes: punto de venta, atención en salón y cocina, facturación electrónica y pedidos directos en tiempo real.",
   manifest: "/manifest.json",
 };
 

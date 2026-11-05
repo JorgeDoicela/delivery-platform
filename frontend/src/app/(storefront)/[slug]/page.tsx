@@ -13,7 +13,7 @@ export async function generateMetadata({ params }: RestaurantPageProps) {
   const { slug } = await params;
   if (RESERVED_TENANT_SLUGS.has(slug.toLowerCase())) {
     return {
-      title: "No Encontrado | Delivery Platform",
+      title: "No Encontrado | Mesafy",
     };
   }
 

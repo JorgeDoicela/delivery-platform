@@ -64,7 +64,7 @@ public sealed class ToggleProductStatusHandler : IHandler<ToggleProductStatusCom
         product.IsActive = command.IsActive;
         await _context.SaveChangesAsync(cancellationToken);
 
-        // Notificación en tiempo real al ecosistema operativo
+        // Notificación en tiempo real a las terminales operativas
         await _kitchenNotifier.NotifyStockUpdatedAsync(product.Id, product.IsActive, cancellationToken);
 
         return Result.Success(new ToggleProductStatusResponse(product.Id, product.IsActive, product.Name));

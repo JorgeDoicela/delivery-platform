@@ -130,6 +130,29 @@ El backend de la plataforma esta construido en .NET 8 utilizando C# 12 y Minimal
   }
   ```
 
+#### 2.1.4. Modificacion de Horarios y Disponibilidad Operativa (`PUT /api/branches/{id}/schedule`)
+* **Autorizacion Requerida:** Politica `BranchStaffOnly` (`TenantAdmin`, `BranchManager`, `SuperAdmin`).
+* **Descripcion:** Actualiza la hora de apertura, hora de cierre (en formato militar 24h `HH:mm`) y el estado operativo activo/pausa de una sucursal del establecimiento autenticado.
+* **Cuerpo de Solicitud (Payload):**
+  ```json
+  {
+    "openingTime": "10:30",
+    "closingTime": "21:30",
+    "isActive": true
+  }
+  ```
+* **Respuesta Exitosa (200 OK):**
+  ```json
+  {
+    "branchId": 1,
+    "name": "Guamaní",
+    "openingTime": "10:30",
+    "closingTime": "21:30",
+    "isActive": true
+  }
+  ```
+* **Errores Controlados:** `400 Bad Request` ante formato no válido o si `openingTime == closingTime`, `404 Not Found` si la sucursal no pertenece al tenant activo.
+
 ---
 
 #### 2.2.1. Catalogo Activo y Modificadores (`GET /api/catalog/menu`)

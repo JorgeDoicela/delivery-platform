@@ -3,6 +3,8 @@ import type {
     BranchCoverageDto,
     BranchCapacityResponse,
     BranchDetailDto,
+    UpdateBranchHoursRequest,
+    UpdateBranchHoursResponse,
     CreateOrderCommand,
     CreateOrderResponse,
     OrderDetailResponse,
@@ -46,9 +48,10 @@ function buildHeaders(
     extraHeaders?: Record<string, string>,
     tenantSlugOverride?: string
 ): Record<string, string> {
+    const slug = tenantSlugOverride || getApiClientTenantSlug();
     const headers: Record<string, string> = {
         "Content-Type": "application/json",
-        "X-Tenant-Slug": tenantSlugOverride || getApiClientTenantSlug(),
+        ...(slug ? { "X-Tenant-Slug": slug } : {}),
         ...extraHeaders,
     };
 
@@ -178,6 +181,18 @@ export const apiClient = {
             cache: "no-store",
         });
         return handleResponse<BranchDetailDto[]>(res);
+    },
+
+    async updateBranchOperatingHours(
+        branchId: number,
+        data: UpdateBranchHoursRequest
+    ): Promise<UpdateBranchHoursResponse> {
+        const res = await fetch(`${API_BASE_URL}/api/branches/${branchId}/schedule`, {
+            method: "PUT",
+            headers: buildHeaders(),
+            body: JSON.stringify(data),
+        });
+        return handleResponse<UpdateBranchHoursResponse>(res);
     },
 
     // 1. Geofencing: Resolución espacial de cobertura

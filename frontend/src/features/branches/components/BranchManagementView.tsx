@@ -1,10 +1,12 @@
 "use client";
 
-import { useMemo } from "react";
+import { useMemo, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { apiClient } from "@/shared/lib/api-client";
-import type { BranchCapacityResponse } from "@/shared/types/api";
+import type { BranchCapacityResponse, BranchDetailDto } from "@/shared/types/api";
 import { useCurrentTenantQuery, useBranchesQuery } from "@/features/tenant";
+import { getBranchOperatingStatus } from "@/shared/lib/schedule";
+import { BranchScheduleEditorModal } from "./BranchScheduleEditorModal";
 import {
     Building2,
     MapPin,
@@ -13,9 +15,11 @@ import {
     Clock,
     AlertTriangle,
     Layers,
+    CalendarClock,
 } from "lucide-react";
 
 export function BranchManagementView() {
+    const [editingBranch, setEditingBranch] = useState<BranchDetailDto | null>(null);
     const { data: tenant } = useCurrentTenantQuery();
     const { data: branchesData } = useBranchesQuery();
     const branches = useMemo(
@@ -88,6 +92,7 @@ export function BranchManagementView() {
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 {branches.map((branch) => {
                     const cap = capacities[branch.id];
+                    const opStatus = getBranchOperatingStatus(branch.openingTime, branch.closingTime);
 
                     return (
                         <div
@@ -95,18 +100,42 @@ export function BranchManagementView() {
                             className="bg-surface-card border border-surface-border rounded-3xl p-6 sm:p-7 space-y-5 shadow-xs flex flex-col justify-between transition-colors duration-200"
                         >
                             <div className="space-y-4">
-                                <div className="flex items-start justify-between">
+                                <div className="flex items-start justify-between gap-3">
                                     <div>
-                                        <span className="text-[10px] font-bold uppercase tracking-wider text-text-strong bg-surface-canvas border border-surface-border px-2.5 py-0.5 rounded-full font-mono">
-                                            ID Sucursal #{branch.id}
-                                        </span>
+                                        <div className="flex items-center gap-2">
+                                            <span className="text-[10px] font-bold uppercase tracking-wider text-text-strong bg-surface-canvas border border-surface-border px-2.5 py-0.5 rounded-full font-mono">
+                                                ID #{branch.id}
+                                            </span>
+                                            <span
+                                                className={`text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full font-mono ${
+                                                    !branch.isActive
+                                                        ? "bg-neutral-200 text-neutral-700 dark:bg-neutral-800 dark:text-neutral-300"
+                                                        : opStatus.isOpen
+                                                        ? "bg-status-success/20 text-status-success border border-status-success/40"
+                                                        : "bg-surface-canvas text-text-muted border border-surface-border"
+                                                }`}
+                                            >
+                                                {!branch.isActive ? "Pausada" : opStatus.statusLabel}
+                                            </span>
+                                        </div>
                                         <h3 className="text-xl font-black uppercase tracking-tight text-text-strong font-display mt-2">
                                             {branch.name}
                                         </h3>
                                         <p className="text-xs text-text-muted mt-0.5">
-                                            Horario: {branch.openingTime} - {branch.closingTime}
+                                            Horario: <strong className="text-text-strong font-mono">{branch.openingTime} - {branch.closingTime}</strong>
+                                            {" • "}{opStatus.detailLabel}
                                         </p>
                                     </div>
+
+                                    <button
+                                        type="button"
+                                        onClick={() => setEditingBranch(branch as BranchDetailDto)}
+                                        className="flex items-center gap-1.5 px-3 py-1.5 bg-surface-canvas hover:bg-surface-card-hover border border-surface-border rounded-full text-xs font-bold font-display uppercase tracking-wider text-brand-primary transition-all active:scale-95 cursor-pointer shrink-0"
+                                        title="Modificar horario y disponibilidad de la sucursal"
+                                    >
+                                        <CalendarClock className="w-3.5 h-3.5" />
+                                        <span>Editar Horario</span>
+                                    </button>
                                 </div>
 
                                 <div className="space-y-2 text-xs text-text-base bg-surface-canvas border border-surface-border rounded-2xl p-4">
@@ -187,6 +216,12 @@ export function BranchManagementView() {
                     );
                 })}
             </div>
+
+            <BranchScheduleEditorModal
+                branch={editingBranch}
+                isOpen={Boolean(editingBranch)}
+                onClose={() => setEditingBranch(null)}
+            />
         </div>
     );
 }

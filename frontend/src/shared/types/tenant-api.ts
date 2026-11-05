@@ -60,6 +60,20 @@ export interface BranchDetailDto {
   isActive: boolean;
 }
 
+export interface UpdateBranchHoursRequest {
+  openingTime: string;
+  closingTime: string;
+  isActive?: boolean;
+}
+
+export interface UpdateBranchHoursResponse {
+  branchId: number;
+  name: string;
+  openingTime: string;
+  closingTime: string;
+  isActive: boolean;
+}
+
 export interface PublicTenantSummaryDto {
   id: string;
   slug: string;

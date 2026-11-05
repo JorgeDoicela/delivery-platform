@@ -144,7 +144,7 @@ builder.Services.AddCors(options =>
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(c =>
 {
-    c.SwaggerDoc("v1", new OpenApiInfo { Title = "Delivery Platform API", Version = "v1" });
+    c.SwaggerDoc("v1", new OpenApiInfo { Title = "Mesafy API", Version = "v1" });
 
     c.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
     {

@@ -9,7 +9,6 @@ import {
   Award,
   Clock,
   Sparkles,
-  ShieldCheck,
   MapPin,
   UtensilsCrossed,
 } from "lucide-react";
@@ -162,14 +161,9 @@ export function SteakhouseGourmetLandingLayout({
               <h2 className="text-3xl sm:text-4xl font-black text-white uppercase tracking-tight font-display" suppressHydrationWarning>
                 Cortes, Parrilladas & Entradas
               </h2>
-              <p className="text-xs sm:text-sm text-neutral-400 mt-1" suppressHydrationWarning>
+              <p className="text-xs sm:text-sm text-neutral-400 mt-1 leading-relaxed" suppressHydrationWarning>
                 {tenant?.heroSubtitle || "Pide a domicilio con empaque térmico al vacío para conservar el calor de la brasa"}
               </p>
-            </div>
-
-            <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-neutral-900 border border-neutral-800 text-[11px] text-neutral-400 font-mono">
-              <ShieldCheck className="w-3.5 h-3.5 text-emerald-400" />
-              <span>Plantilla: Steakhouse Gourmet</span>
             </div>
           </div>
 
@@ -191,17 +185,17 @@ export function SteakhouseGourmetLandingLayout({
           </div>
 
           <div className="flex items-center gap-4">
-            <Link
-              href="/admin/personalizacion"
+            <a
+              href="#catalogo"
               className="px-4 py-2 rounded-full bg-neutral-800 hover:bg-neutral-700 text-white font-bold uppercase tracking-wider text-[11px] transition-colors"
             >
-              Configurar Marca
-            </Link>
+              Ver Menú & Cortes
+            </a>
             <Link
               href="/login"
               className="px-4 py-2 rounded-full bg-emerald-600 hover:bg-emerald-500 text-white font-bold uppercase tracking-wider text-[11px] transition-colors"
             >
-              Acceso Staff
+              Acceso Clientes / Staff
             </Link>
           </div>
         </div>

@@ -34,10 +34,21 @@ export const RESERVED_TENANT_SLUGS = new Set([
   "r",
 ]);
 
-let currentTenantSlugMemory: string = DEFAULT_TENANT_SLUG;
+let currentTenantSlugMemory: string | null = null;
 let currentAccessTokenMemory: string | null = null;
 
-export function setApiClientTenantSlug(slug: string): void {
+export function setApiClientTenantSlug(slug: string | null): void {
+  if (!slug) {
+    currentTenantSlugMemory = null;
+    if (typeof window !== "undefined") {
+      try {
+        window.localStorage.removeItem(ACTIVE_TENANT_STORAGE_KEY);
+      } catch {
+        // Ignorar errores de almacenamiento privado
+      }
+    }
+    return;
+  }
   const normalized = slug.trim().toLowerCase();
   if (!normalized || RESERVED_TENANT_SLUGS.has(normalized)) return;
   currentTenantSlugMemory = normalized;
@@ -50,9 +61,14 @@ export function setApiClientTenantSlug(slug: string): void {
   }
 }
 
-export function getApiClientTenantSlug(): string {
+export function getApiClientTenantSlug(): string | null {
   if (typeof window !== "undefined") {
     try {
+      const pathname = window.location.pathname;
+      if (pathname === "/") {
+        return null;
+      }
+
       const params = new URLSearchParams(window.location.search);
       const queryTenant =
         params.get("restaurante")?.trim().toLowerCase() ||
@@ -65,7 +81,7 @@ export function getApiClientTenantSlug(): string {
         return queryTenant;
       }
 
-      const pathSegments = window.location.pathname
+      const pathSegments = pathname
         .split("/")
         .map((s) => s.trim().toLowerCase())
         .filter(Boolean);
@@ -79,6 +95,10 @@ export function getApiClientTenantSlug(): string {
         currentTenantSlugMemory = pathSlug;
         window.localStorage.setItem(ACTIVE_TENANT_STORAGE_KEY, pathSlug);
         return pathSlug;
+      }
+
+      if (pathSegments.length > 0 && RESERVED_TENANT_SLUGS.has(pathSegments[0])) {
+        return currentTenantSlugMemory;
       }
 
       const stored = window.localStorage.getItem(ACTIVE_TENANT_STORAGE_KEY)?.trim().toLowerCase();
@@ -97,7 +117,7 @@ export function getApiClientTenantSlug(): string {
       // Usar fallback en memoria
     }
   }
-  return currentTenantSlugMemory || DEFAULT_TENANT_SLUG;
+  return currentTenantSlugMemory;
 }
 
 export function setApiClientAccessToken(token: string | null): void {

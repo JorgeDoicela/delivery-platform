@@ -25,7 +25,7 @@ export function PlatformLandingView() {
         <div className="absolute inset-0 z-0">
           <Image
             src="/images/platform/hero-platform.jpg"
-            alt="Ecosistema de Restaurantes y Delivery en Línea"
+            alt="Restaurantes, Salón y Pedidos en Línea"
             fill
             priority
             sizes="100vw"
@@ -37,7 +37,7 @@ export function PlatformLandingView() {
 
         <div className="relative z-10 w-full max-w-2xl space-y-6">
           <div className="inline-flex items-center bg-brand-primary text-white px-3.5 py-1 rounded-full text-xs font-bold uppercase tracking-wider shadow-md">
-            <span>ECOSISTEMA GASTRONÓMICO MULTI-MARCA</span>
+            <span>RED GASTRONÓMICA MULTI-MARCA</span>
           </div>
 
           <h1 className="text-4xl sm:6xl md:text-7xl font-black uppercase tracking-tight leading-none text-white drop-shadow-md font-display">
@@ -92,20 +92,20 @@ export function PlatformLandingView() {
                 <ArrowRight className="w-5 h-5 text-white shrink-0 group-hover:translate-x-1 transition-transform" />
               </a>
 
-              <Link
-                href="/superadmin"
+              <a
+                href="#afiliacion"
                 className="group relative overflow-hidden py-5 px-5 sm:py-6 sm:px-6 rounded-2xl sm:rounded-3xl flex items-center justify-between text-left transition-all active:scale-95 bg-surface-card hover:bg-surface-card-hover text-text-strong border border-surface-border shadow-lg"
               >
                 <div>
                   <span className="text-xs font-bold tracking-wider uppercase text-brand-accent block leading-tight">
-                    CONSOLA MULTI-TENANT
+                    PROGRAMA DE AFILIACIÓN
                   </span>
                   <span className="text-lg sm:text-2xl font-black uppercase tracking-tight block leading-tight text-text-strong font-display mt-0.5">
-                    GESTIONAR ESTABLECIMIENTOS
+                    REGISTRAR MI RESTAURANTE
                   </span>
                 </div>
                 <ArrowRight className="w-5 h-5 text-text-strong shrink-0 group-hover:translate-x-1 transition-transform" />
-              </Link>
+              </a>
             </div>
           </div>
         </section>
@@ -128,12 +128,12 @@ export function PlatformLandingView() {
               </p>
             </div>
 
-            <Link
-              href="/superadmin"
+            <a
+              href="#afiliacion"
               className="inline-flex items-center justify-center bg-surface-card hover:bg-surface-canvas text-text-strong border border-surface-border text-xs font-black uppercase tracking-wider font-display px-5 py-2.5 rounded-full transition-colors shrink-0"
             >
               + AFILIAR NUEVO LOCAL
-            </Link>
+            </a>
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-7">
@@ -255,13 +255,13 @@ export function PlatformLandingView() {
               </div>
 
               <div className="pt-6 relative z-10">
-                <Link
-                  href="/admin/personalizacion"
+                <a
+                  href="#afiliacion"
                   className="inline-flex items-center gap-2 text-xs font-black uppercase tracking-wider font-display px-6 py-3 rounded-full transition-all shadow-md active:scale-95 hover:scale-105 bg-brand-primary hover:bg-brand-primary-hover text-white"
                 >
-                  <span>PERSONALIZAR MARCA</span>
+                  <span>CONOCER MÁS</span>
                   <ArrowRight className="w-3.5 h-3.5" />
-                </Link>
+                </a>
               </div>
             </div>
 
@@ -288,13 +288,13 @@ export function PlatformLandingView() {
               </div>
 
               <div className="pt-6 relative z-10">
-                <Link
-                  href="/cocina"
+                <a
+                  href="#restaurantes"
                   className="inline-flex items-center gap-2 text-xs font-black uppercase tracking-wider font-display px-6 py-3 rounded-full transition-all shadow-md active:scale-95 hover:scale-105 bg-white hover:bg-neutral-100 text-brand-primary"
                 >
-                  <span>ABRIR TERMINAL KDS</span>
+                  <span>VER RESTAURANTES</span>
                   <ArrowRight className="w-3.5 h-3.5" />
-                </Link>
+                </a>
               </div>
             </div>
           </div>
