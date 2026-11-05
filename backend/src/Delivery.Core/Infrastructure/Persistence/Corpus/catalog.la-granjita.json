@@ -12,13 +12,18 @@
       "isActive": true
     },
     {
-      "name": "Extras",
+      "name": "Broaster",
       "displayOrder": 3,
       "isActive": true
     },
     {
-      "name": "Bebidas",
+      "name": "Extras",
       "displayOrder": 4,
+      "isActive": true
+    },
+    {
+      "name": "Bebidas",
+      "displayOrder": 5,
       "isActive": true
     }
   ],
@@ -30,7 +35,7 @@
       "isRequired": true,
       "options": [
         {
-          "name": "Papas Fritas Grandes",
+          "name": "Papas Fritas Artesanales",
           "additionalPrice": 0.00,
           "isAvailable": true
         },
@@ -41,6 +46,11 @@
         },
         {
           "name": "Menestra de Lenteja",
+          "additionalPrice": 0.00,
+          "isAvailable": true
+        },
+        {
+          "name": "Arroz Blanco Caliente",
           "additionalPrice": 0.00,
           "isAvailable": true
         },
@@ -81,18 +91,23 @@
       "isRequired": false,
       "options": [
         {
-          "name": "Gaseosa 1.5L (Manzana)",
-          "additionalPrice": 2.50,
+          "name": "Gaseosa Familiar 2L",
+          "additionalPrice": 1.50,
           "isAvailable": true
         },
         {
-          "name": "Gaseosa 1.5L (Cola Negra)",
-          "additionalPrice": 2.50,
+          "name": "Coca-Cola 1L",
+          "additionalPrice": 1.75,
           "isAvailable": true
         },
         {
-          "name": "Jugo Natural de Maracuyá 1L",
-          "additionalPrice": 3.00,
+          "name": "Gaseosa Personal",
+          "additionalPrice": 0.50,
+          "isAvailable": true
+        },
+        {
+          "name": "Agua Purificada",
+          "additionalPrice": 0.50,
           "isAvailable": true
         }
       ]
@@ -106,7 +121,7 @@
       "category": "Combos",
       "basePrice": 22.00,
       "taxRate": 0.00,
-      "imageUrl": "/images/tenants/la-granjita/menu/combo-familiar.webp",
+      "imageUrl": "/images/tenants/la-granjita/catalogo/pollo-completo.png",
       "isKitchen": true,
       "isActive": true,
       "modifierGroups": [
@@ -126,13 +141,189 @@
       ]
     },
     {
-      "sku": "POR-MED-01",
-      "name": "Medio Pollo Asado",
-      "description": "Medio pollo asado al carbón con papas fritas y ensalada fresca.",
-      "category": "Porciones",
+      "sku": "POL-COMP-01",
+      "name": "Pollo Completo Asado",
+      "description": "Pollo entero asado a la brasa lentamente sobre carbón vegetal con guarnición y ensalada de la casa.",
+      "category": "Combos",
+      "basePrice": 13.00,
+      "taxRate": 0.00,
+      "imageUrl": "/images/tenants/la-granjita/catalogo/pollo-completo.png",
+      "isKitchen": true,
+      "isActive": true,
+      "modifierGroups": [
+        "Elección de Guarnición",
+        "Tipo de Ají",
+        "Bebidas Opcionales"
+      ],
+      "recipes": [
+        {
+          "inventorySku": "INS-POLLO-OCT",
+          "quantityUsed": 8.0
+        },
+        {
+          "inventorySku": "INS-CONT-TERM",
+          "quantityUsed": 1.0
+        }
+      ]
+    },
+    {
+      "sku": "POL-MED-COMP-01",
+      "name": "Pollo + 1/2 Completo",
+      "description": "Un pollo y medio asado a la brasa con papas fritas rústicas, ensalada fresca y ají casero.",
+      "category": "Combos",
+      "basePrice": 17.50,
+      "taxRate": 0.00,
+      "imageUrl": "/images/tenants/la-granjita/catalogo/pollo-mas-medio-completo.png",
+      "isKitchen": true,
+      "isActive": true,
+      "modifierGroups": [
+        "Elección de Guarnición",
+        "Tipo de Ají",
+        "Bebidas Opcionales"
+      ],
+      "recipes": [
+        {
+          "inventorySku": "INS-POLLO-OCT",
+          "quantityUsed": 12.0
+        },
+        {
+          "inventorySku": "INS-CONT-TERM",
+          "quantityUsed": 2.0
+        }
+      ]
+    },
+    {
+      "sku": "POL-2X1-01",
+      "name": "Promo 2x1 2 Pollos + Papas",
+      "description": "Súper combo promocional de 2 pollos asados enteros acompañados de porción doble de papas fritas.",
+      "category": "Combos",
+      "basePrice": 20.50,
+      "taxRate": 0.00,
+      "imageUrl": "/images/tenants/la-granjita/catalogo/promo-2x1-2pollos-mas-papas.png",
+      "isKitchen": true,
+      "isActive": true,
+      "modifierGroups": [
+        "Elección de Guarnición",
+        "Tipo de Ají",
+        "Bebidas Opcionales"
+      ],
+      "recipes": [
+        {
+          "inventorySku": "INS-POLLO-OCT",
+          "quantityUsed": 16.0
+        },
+        {
+          "inventorySku": "INS-CONT-TERM",
+          "quantityUsed": 2.0
+        }
+      ]
+    },
+    {
+      "sku": "POL-PAP-01",
+      "name": "Pollo Asado + Papas",
+      "description": "Pollo asado entero a la leña acompañado de generosa porción de papas fritas artesanales.",
+      "category": "Combos",
       "basePrice": 11.50,
       "taxRate": 0.00,
-      "imageUrl": "/images/tenants/la-granjita/menu/medio-pollo.webp",
+      "imageUrl": "/images/tenants/la-granjita/catalogo/pollo-mas-papas.png",
+      "isKitchen": true,
+      "isActive": true,
+      "modifierGroups": [
+        "Tipo de Ají",
+        "Bebidas Opcionales"
+      ],
+      "recipes": [
+        {
+          "inventorySku": "INS-POLLO-OCT",
+          "quantityUsed": 8.0
+        },
+        {
+          "inventorySku": "INS-CONT-TERM",
+          "quantityUsed": 1.0
+        }
+      ]
+    },
+    {
+      "sku": "POL-MED-PAP-01",
+      "name": "Pollo + 1/2 + Papas",
+      "description": "1 pollo y medio asado al carbón con papas fritas doradas al momento.",
+      "category": "Combos",
+      "basePrice": 16.00,
+      "taxRate": 0.00,
+      "imageUrl": "/images/tenants/la-granjita/catalogo/pollo-mas-medio-mas-papas.png",
+      "isKitchen": true,
+      "isActive": true,
+      "modifierGroups": [
+        "Tipo de Ají",
+        "Bebidas Opcionales"
+      ],
+      "recipes": [
+        {
+          "inventorySku": "INS-POLLO-OCT",
+          "quantityUsed": 12.0
+        },
+        {
+          "inventorySku": "INS-CONT-TERM",
+          "quantityUsed": 2.0
+        }
+      ]
+    },
+    {
+      "sku": "POL-VAC-01",
+      "name": "Pollo Entero Vacío",
+      "description": "Pollo entero asado a la brasa solo presas recién salidas del asador (sin acompañamientos).",
+      "category": "Combos",
+      "basePrice": 10.50,
+      "taxRate": 0.00,
+      "imageUrl": "/images/tenants/la-granjita/catalogo/pollo-vacio.png",
+      "isKitchen": true,
+      "isActive": true,
+      "modifierGroups": [
+        "Tipo de Ají"
+      ],
+      "recipes": [
+        {
+          "inventorySku": "INS-POLLO-OCT",
+          "quantityUsed": 8.0
+        },
+        {
+          "inventorySku": "INS-CONT-TERM",
+          "quantityUsed": 1.0
+        }
+      ]
+    },
+    {
+      "sku": "POL-MED-VAC-01",
+      "name": "Pollo + 1/2 Vacío",
+      "description": "Un pollo y medio asado solo presas al carbón (sin acompañamientos).",
+      "category": "Combos",
+      "basePrice": 15.50,
+      "taxRate": 0.00,
+      "imageUrl": "/images/tenants/la-granjita/catalogo/pollo-mas-medio-vacio.png",
+      "isKitchen": true,
+      "isActive": true,
+      "modifierGroups": [
+        "Tipo de Ají"
+      ],
+      "recipes": [
+        {
+          "inventorySku": "INS-POLLO-OCT",
+          "quantityUsed": 12.0
+        },
+        {
+          "inventorySku": "INS-CONT-TERM",
+          "quantityUsed": 2.0
+        }
+      ]
+    },
+    {
+      "sku": "POR-MED-01",
+      "name": "Medio Pollo Asado Completo",
+      "description": "Medio pollo asado al carbón con papas fritas, ensalada fresca y salsas tradicionales.",
+      "category": "Porciones",
+      "basePrice": 7.50,
+      "taxRate": 0.00,
+      "imageUrl": "/images/tenants/la-granjita/catalogo/medio-completo.png",
       "isKitchen": true,
       "isActive": true,
       "modifierGroups": [
@@ -151,13 +342,86 @@
       ]
     },
     {
-      "sku": "POR-CUA-01",
-      "name": "Cuarto de Pollo Asado",
-      "description": "1 presa grande (pechuga o pierna) con papas fritas y ensalada personal.",
+      "sku": "MED-CUA-01",
+      "name": "Medio + 1/4 Pollo Completo",
+      "description": "Tres cuartos de pollo asado (3 presas grandes) con papas fritas, menestra y ensalada fresca.",
       "category": "Porciones",
-      "basePrice": 6.00,
+      "basePrice": 10.00,
       "taxRate": 0.00,
-      "imageUrl": "/images/tenants/la-granjita/menu/cuarto-pollo.webp",
+      "imageUrl": "/images/tenants/la-granjita/catalogo/medio-mas-cuarto-completo.png",
+      "isKitchen": true,
+      "isActive": true,
+      "modifierGroups": [
+        "Elección de Guarnición",
+        "Tipo de Ají"
+      ],
+      "recipes": [
+        {
+          "inventorySku": "INS-POLLO-OCT",
+          "quantityUsed": 6.0
+        },
+        {
+          "inventorySku": "INS-CONT-TERM",
+          "quantityUsed": 1.0
+        }
+      ]
+    },
+    {
+      "sku": "MED-PAP-01",
+      "name": "Medio Pollo + Papas",
+      "description": "Medio pollo dorado a la brasa acompañado de porción de papas fritas crocantes.",
+      "category": "Porciones",
+      "basePrice": 6.50,
+      "taxRate": 0.00,
+      "imageUrl": "/images/tenants/la-granjita/catalogo/medio-mas-papas.png",
+      "isKitchen": true,
+      "isActive": true,
+      "modifierGroups": [
+        "Tipo de Ají"
+      ],
+      "recipes": [
+        {
+          "inventorySku": "INS-POLLO-OCT",
+          "quantityUsed": 4.0
+        },
+        {
+          "inventorySku": "INS-CONT-TERM",
+          "quantityUsed": 1.0
+        }
+      ]
+    },
+    {
+      "sku": "MED-VAC-01",
+      "name": "Medio Pollo Vacío",
+      "description": "Medio pollo asado a la brasa solo presas recién salidas del asador (sin acompañamientos).",
+      "category": "Porciones",
+      "basePrice": 5.50,
+      "taxRate": 0.00,
+      "imageUrl": "/images/tenants/la-granjita/catalogo/medio-vacio.png",
+      "isKitchen": true,
+      "isActive": true,
+      "modifierGroups": [
+        "Tipo de Ají"
+      ],
+      "recipes": [
+        {
+          "inventorySku": "INS-POLLO-OCT",
+          "quantityUsed": 4.0
+        },
+        {
+          "inventorySku": "INS-CONT-TERM",
+          "quantityUsed": 1.0
+        }
+      ]
+    },
+    {
+      "sku": "POR-CUA-01",
+      "name": "1/4 de Pollo Completo",
+      "description": "1 presa grande seleccionada (pechuga o pierna) con papas fritas, menestra y ensalada personal.",
+      "category": "Porciones",
+      "basePrice": 4.00,
+      "taxRate": 0.00,
+      "imageUrl": "/images/tenants/la-granjita/catalogo/cuarto-pollo-llevar-completo.png",
       "isKitchen": true,
       "isActive": true,
       "modifierGroups": [
@@ -174,7 +438,364 @@
           "quantityUsed": 1.0
         }
       ]
+    },
+    {
+      "sku": "POR-OCT-01",
+      "name": "1/8 Personal Completo",
+      "description": "Presa personal dorada a la brasa con papas fritas, menestra o ensalada y ají casero.",
+      "category": "Porciones",
+      "basePrice": 2.75,
+      "taxRate": 0.00,
+      "imageUrl": "/images/tenants/la-granjita/catalogo/octavo-personal-llevar-completo.png",
+      "isKitchen": true,
+      "isActive": true,
+      "modifierGroups": [
+        "Tipo de Ají"
+      ],
+      "recipes": [
+        {
+          "inventorySku": "INS-POLLO-OCT",
+          "quantityUsed": 1.0
+        },
+        {
+          "inventorySku": "INS-CONT-TERM",
+          "quantityUsed": 1.0
+        }
+      ]
+    },
+    {
+      "sku": "PAP-LLE-01",
+      "name": "Papipollo Tradicional",
+      "description": "Presa de pollo asado sobre una cama de papas fritas crujientes con salsas artesanales.",
+      "category": "Porciones",
+      "basePrice": 2.50,
+      "taxRate": 0.00,
+      "imageUrl": "/images/tenants/la-granjita/catalogo/papipollo-llevar.png",
+      "isKitchen": true,
+      "isActive": true,
+      "modifierGroups": [
+        "Tipo de Ají"
+      ],
+      "recipes": [
+        {
+          "inventorySku": "INS-POLLO-OCT",
+          "quantityUsed": 1.0
+        },
+        {
+          "inventorySku": "INS-CONT-TERM",
+          "quantityUsed": 1.0
+        }
+      ]
+    },
+    {
+      "sku": "PAP-COL-01",
+      "name": "Papipollo + Bebida Personal",
+      "description": "Presa de pollo dorado con papas fritas crocantes más gaseosa personal bien helada.",
+      "category": "Porciones",
+      "basePrice": 2.25,
+      "taxRate": 0.00,
+      "imageUrl": "/images/tenants/la-granjita/catalogo/papipollo-mas-cola.png",
+      "isKitchen": true,
+      "isActive": true,
+      "modifierGroups": [
+        "Tipo de Ají"
+      ],
+      "recipes": [
+        {
+          "inventorySku": "INS-POLLO-OCT",
+          "quantityUsed": 1.0
+        },
+        {
+          "inventorySku": "INS-CONT-TERM",
+          "quantityUsed": 1.0
+        }
+      ]
+    },
+    {
+      "sku": "SAL-COL-01",
+      "name": "Salchipapa Especial + Bebida",
+      "description": "Papas fritas con salchichas en rodajas doradas, salsas y gaseosa personal helada.",
+      "category": "Porciones",
+      "basePrice": 1.75,
+      "taxRate": 0.00,
+      "imageUrl": "/images/tenants/la-granjita/catalogo/salchipapa-mas-cola.png",
+      "isKitchen": true,
+      "isActive": true,
+      "modifierGroups": [
+        "Tipo de Ají"
+      ],
+      "recipes": [
+        {
+          "inventorySku": "INS-CONT-TERM",
+          "quantityUsed": 1.0
+        }
+      ]
+    },
+    {
+      "sku": "SAL-SIN-01",
+      "name": "Salchipapa Clásica",
+      "description": "Porción de papas fritas con salchichas doradas y salsas especiales de la casa.",
+      "category": "Porciones",
+      "basePrice": 1.25,
+      "taxRate": 0.00,
+      "imageUrl": "/images/tenants/la-granjita/catalogo/salchipapa-sin-cola.png",
+      "isKitchen": true,
+      "isActive": true,
+      "modifierGroups": [
+        "Tipo de Ají"
+      ],
+      "recipes": [
+        {
+          "inventorySku": "INS-CONT-TERM",
+          "quantityUsed": 1.0
+        }
+      ]
+    },
+    {
+      "sku": "BRO-C01",
+      "name": "Combo Broaster Familiar 1",
+      "description": "Presas de pollo broaster crujiente marinado con receta secreta, papas fritas y ensalada fresca.",
+      "category": "Broaster",
+      "basePrice": 15.00,
+      "taxRate": 0.00,
+      "imageUrl": "/images/tenants/la-granjita/catalogo/pollo-completo.png",
+      "isKitchen": true,
+      "isActive": true,
+      "modifierGroups": [
+        "Elección de Guarnición",
+        "Tipo de Ají"
+      ],
+      "recipes": [
+        {
+          "inventorySku": "INS-POLLO-OCT",
+          "quantityUsed": 8.0
+        },
+        {
+          "inventorySku": "INS-CONT-TERM",
+          "quantityUsed": 1.0
+        }
+      ]
+    },
+    {
+      "sku": "BRO-C02",
+      "name": "Combo Broaster Mega 2",
+      "description": "Variedad de presas crujientes broaster con papas fritas abundantes y cremas de la casa.",
+      "category": "Broaster",
+      "basePrice": 13.00,
+      "taxRate": 0.00,
+      "imageUrl": "/images/tenants/la-granjita/catalogo/pollo-mas-papas.png",
+      "isKitchen": true,
+      "isActive": true,
+      "modifierGroups": [
+        "Elección de Guarnición",
+        "Tipo de Ají"
+      ],
+      "recipes": [
+        {
+          "inventorySku": "INS-POLLO-OCT",
+          "quantityUsed": 6.0
+        },
+        {
+          "inventorySku": "INS-CONT-TERM",
+          "quantityUsed": 1.0
+        }
+      ]
+    },
+    {
+      "sku": "BRO-C03",
+      "name": "Combo Broaster 3",
+      "description": "Combo broaster crujiente con papas fritas doradas y aderezos especiales.",
+      "category": "Broaster",
+      "basePrice": 11.00,
+      "taxRate": 0.00,
+      "imageUrl": "/images/tenants/la-granjita/catalogo/medio-mas-cuarto-completo.png",
+      "isKitchen": true,
+      "isActive": true,
+      "modifierGroups": [
+        "Elección de Guarnición",
+        "Tipo de Ají"
+      ],
+      "recipes": [
+        {
+          "inventorySku": "INS-POLLO-OCT",
+          "quantityUsed": 4.0
+        },
+        {
+          "inventorySku": "INS-CONT-TERM",
+          "quantityUsed": 1.0
+        }
+      ]
+    },
+    {
+      "sku": "BRO-C04",
+      "name": "Combo Broaster 4",
+      "description": "Presas broaster doradas con papas fritas rústicas y salsas artesanales.",
+      "category": "Broaster",
+      "basePrice": 8.00,
+      "taxRate": 0.00,
+      "imageUrl": "/images/tenants/la-granjita/catalogo/medio-completo.png",
+      "isKitchen": true,
+      "isActive": true,
+      "modifierGroups": [
+        "Elección de Guarnición",
+        "Tipo de Ají"
+      ],
+      "recipes": [
+        {
+          "inventorySku": "INS-POLLO-OCT",
+          "quantityUsed": 3.0
+        },
+        {
+          "inventorySku": "INS-CONT-TERM",
+          "quantityUsed": 1.0
+        }
+      ]
+    },
+    {
+      "sku": "BRO-C08",
+      "name": "Combo Broaster Banquete 8",
+      "description": "Banquete broaster gigante para toda la familia con ensalada y papas fritas abundantes.",
+      "category": "Broaster",
+      "basePrice": 22.00,
+      "taxRate": 0.00,
+      "imageUrl": "/images/tenants/la-granjita/catalogo/promo-2x1-2pollos-mas-papas.png",
+      "isKitchen": true,
+      "isActive": true,
+      "modifierGroups": [
+        "Elección de Guarnición",
+        "Tipo de Ají",
+        "Bebidas Opcionales"
+      ],
+      "recipes": [
+        {
+          "inventorySku": "INS-POLLO-OCT",
+          "quantityUsed": 10.0
+        },
+        {
+          "inventorySku": "INS-CONT-TERM",
+          "quantityUsed": 2.0
+        }
+      ]
+    },
+    {
+      "sku": "EXT-ARR-01",
+      "name": "Porción de Arroz Caliente",
+      "description": "Porción individual de arroz blanco tradicional recién preparado.",
+      "category": "Extras",
+      "basePrice": 1.25,
+      "taxRate": 0.00,
+      "imageUrl": "/images/tenants/la-granjita/catalogo/arroz-porcion.png",
+      "isKitchen": true,
+      "isActive": true,
+      "modifierGroups": []
+    },
+    {
+      "sku": "EXT-PAP-01",
+      "name": "Porción de Papas Fritas",
+      "description": "Papas fritas artesanales cortadas gruesas y doradas al punto de sal.",
+      "category": "Extras",
+      "basePrice": 1.50,
+      "taxRate": 0.00,
+      "imageUrl": "/images/tenants/la-granjita/catalogo/papa-porcion.png",
+      "isKitchen": true,
+      "isActive": true,
+      "modifierGroups": []
+    },
+    {
+      "sku": "EXT-MEN-01",
+      "name": "Porción de Menestra Casera",
+      "description": "Menestra de lenteja o fréjol cocinada a fuego lento con sofrito criollo tradicional.",
+      "category": "Extras",
+      "basePrice": 1.25,
+      "taxRate": 0.00,
+      "imageUrl": "/images/tenants/la-granjita/catalogo/menestra-porcion-p.png",
+      "isKitchen": true,
+      "isActive": true,
+      "modifierGroups": []
+    },
+    {
+      "sku": "EXT-MEN-G01",
+      "name": "Menestra Grande Familiar",
+      "description": "Porción grande de menestra casera ideal para acompañar combos familiares.",
+      "category": "Extras",
+      "basePrice": 2.50,
+      "taxRate": 0.00,
+      "imageUrl": "/images/tenants/la-granjita/catalogo/menestra-porcion-p.png",
+      "isKitchen": true,
+      "isActive": true,
+      "modifierGroups": []
+    },
+    {
+      "sku": "EXT-CON-01",
+      "name": "Consomé Especial de Pollo",
+      "description": "Caldo caliente reconfortante de pollo de campo con cilantro fresco y vegetales.",
+      "category": "Extras",
+      "basePrice": 1.25,
+      "taxRate": 0.00,
+      "imageUrl": "/images/tenants/la-granjita/catalogo/consome-extra-llevar.png",
+      "isKitchen": true,
+      "isActive": true,
+      "modifierGroups": []
+    },
+    {
+      "sku": "EXT-PRE-01",
+      "name": "Presa Vacía Adicional",
+      "description": "1 presa extra de pollo asado al carbón (pechuga o pierna dorada).",
+      "category": "Extras",
+      "basePrice": 1.50,
+      "taxRate": 0.00,
+      "imageUrl": "/images/tenants/la-granjita/catalogo/presa-vacia.png",
+      "isKitchen": true,
+      "isActive": true,
+      "modifierGroups": []
+    },
+    {
+      "sku": "BEB-COL-2L",
+      "name": "Gaseosa Familiar 2 Litros",
+      "description": "Botella familiar de 2 litros bien helada (sabores surtidos a elección).",
+      "category": "Bebidas",
+      "basePrice": 1.50,
+      "taxRate": 0.00,
+      "imageUrl": "/images/tenants/la-granjita/catalogo/cola-grande.png",
+      "isKitchen": false,
+      "isActive": true,
+      "modifierGroups": []
+    },
+    {
+      "sku": "BEB-COC-1L",
+      "name": "Coca-Cola 1 Litro",
+      "description": "Botella de 1 litro de Coca-Cola original bien helada.",
+      "category": "Bebidas",
+      "basePrice": 1.75,
+      "taxRate": 0.00,
+      "imageUrl": "/images/tenants/la-granjita/catalogo/cola-grande.png",
+      "isKitchen": false,
+      "isActive": true,
+      "modifierGroups": []
+    },
+    {
+      "sku": "BEB-COL-PER",
+      "name": "Gaseosa Personal",
+      "description": "Botella personal refrescante de 400ml a 500ml bien fría.",
+      "category": "Bebidas",
+      "basePrice": 0.50,
+      "taxRate": 0.00,
+      "imageUrl": "/images/tenants/la-granjita/catalogo/cola-perso.png",
+      "isKitchen": false,
+      "isActive": true,
+      "modifierGroups": []
+    },
+    {
+      "sku": "BEB-AGU-01",
+      "name": "Agua Purificada sin Gas",
+      "description": "Botella personal de agua mineral sin gas 500ml.",
+      "category": "Bebidas",
+      "basePrice": 0.50,
+      "taxRate": 0.00,
+      "imageUrl": "/images/tenants/la-granjita/catalogo/cola-perso.png",
+      "isKitchen": false,
+      "isActive": true,
+      "modifierGroups": []
     }
   ]
 }
-

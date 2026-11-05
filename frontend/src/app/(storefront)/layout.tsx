@@ -26,7 +26,7 @@ function StorefrontHeader() {
   const isPlatformRoot = pathname === "/";
   const tenantSlug = tenant?.slug || activeSlug || "";
   const brandHomeHref = isPlatformRoot ? "/" : (tenantSlug ? `/${tenantSlug}` : "/");
-  const catalogHref = isPlatformRoot ? "/#restaurantes" : (tenantSlug ? `/${tenantSlug}#catalogo` : "/#restaurantes");
+  const catalogHref = isPlatformRoot ? "/#restaurantes" : (tenantSlug ? `/${tenantSlug}/menu` : "/#restaurantes");
   const brandName = isPlatformRoot
     ? "MESAFY"
     : tenant?.name || "Restaurante Asociado";

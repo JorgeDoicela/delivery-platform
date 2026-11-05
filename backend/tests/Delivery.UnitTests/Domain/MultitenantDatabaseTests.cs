@@ -140,7 +140,7 @@ public class MultitenantDatabaseTests
         (await context.Branches.CountAsync(b => b.TenantId == laGranjita.Id)).Should().Be(2);
         (await context.Branches.CountAsync(b => b.TenantId == brasas.Id)).Should().Be(1);
         (await context.DiningTables.CountAsync(dt => dt.TenantId == laGranjita.Id)).Should().Be(16);
-        (await context.Products.CountAsync(p => p.TenantId == laGranjita.Id)).Should().Be(3);
+        (await context.Products.CountAsync(p => p.TenantId == laGranjita.Id)).Should().Be(33);
         (await context.Products.CountAsync(p => p.TenantId == brasas.Id)).Should().Be(3);
         (await context.Customers.CountAsync(c => c.TenantId == laGranjita.Id)).Should().Be(1);
     }

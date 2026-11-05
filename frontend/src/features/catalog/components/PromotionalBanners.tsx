@@ -60,7 +60,8 @@ export function PromotionalBanners({
 
               <div className="pt-6 relative z-10">
                 <Link
-                  href={banner.ctaHref || "/catalogo"}
+                  href={banner.ctaHref || "#catalogo"}
+                  suppressHydrationWarning
                   className={`inline-flex items-center gap-2 text-xs font-black uppercase tracking-wider px-6 py-3 rounded-full transition-all shadow-md active:scale-95 hover:scale-105 ${
                     idx % 2 === 1
                       ? "bg-white hover:bg-neutral-100 text-brand-primary"

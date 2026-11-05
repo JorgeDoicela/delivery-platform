@@ -133,6 +133,11 @@ public static partial class DatabaseSeeder
                 await context.Categories.AddAsync(newCat);
                 categoriesByName[catSpec.Name] = newCat;
             }
+            else
+            {
+                existingCategory.DisplayOrder = catSpec.DisplayOrder;
+                existingCategory.IsActive = catSpec.IsActive;
+            }
         }
         await context.SaveChangesAsync();
 
@@ -203,10 +208,10 @@ public static partial class DatabaseSeeder
 
         foreach (var prodSpec in corpus.Products)
         {
+            categoriesByName.TryGetValue(prodSpec.Category, out var cat);
+
             if (!productsBySku.TryGetValue(prodSpec.Sku, out var prodEntity))
             {
-                categoriesByName.TryGetValue(prodSpec.Category, out var cat);
-
                 prodEntity = new Product
                 {
                     TenantId = tenantId,
@@ -224,6 +229,19 @@ public static partial class DatabaseSeeder
 
                 await context.Products.AddAsync(prodEntity);
                 productsBySku[prodSpec.Sku] = prodEntity;
+            }
+            else
+            {
+                // Sincronizar atributos actualizados del corpus
+                prodEntity.CategoryId = cat?.Id ?? prodEntity.CategoryId;
+                prodEntity.Name = prodSpec.Name;
+                prodEntity.Description = prodSpec.Description;
+                prodEntity.BasePrice = prodSpec.BasePrice;
+                prodEntity.TaxRate = prodSpec.TaxRate;
+                prodEntity.ImageUrl = prodSpec.ImageUrl;
+                prodEntity.Category = prodSpec.Category;
+                prodEntity.IsKitchen = prodSpec.IsKitchen;
+                prodEntity.IsActive = prodSpec.IsActive;
             }
         }
         await context.SaveChangesAsync();

@@ -133,7 +133,8 @@ export function CatalogHero({ tenant: tenantProp }: CatalogHeroProps = {}) {
 
               <div className="flex flex-wrap items-center gap-4 pt-3">
                 <Link
-                  href={s.ctaHref || "/catalogo"}
+                  href={s.ctaHref || "#catalogo"}
+                  suppressHydrationWarning
                   tabIndex={isActive ? 0 : -1}
                   className="inline-flex items-center gap-2 bg-brand-primary hover:bg-brand-primary-hover text-white font-black text-sm uppercase tracking-wider px-9 py-4 rounded-full shadow-2xl transition-all hover:scale-105 active:scale-95"
                 >

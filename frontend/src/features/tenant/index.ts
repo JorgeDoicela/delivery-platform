@@ -8,3 +8,5 @@ export * from "./components/StorefrontBranchShowcase";
 export * from "./components/StorefrontCustomizerView";
 export * from "./components/CreateTenantModal";
 export * from "./components/PlatformTenantsGovernanceView";
+export * from "./components/RestaurantStorefrontView";
+export * from "./components/RestaurantDedicatedMenuView";
