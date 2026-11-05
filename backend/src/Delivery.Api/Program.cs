@@ -48,6 +48,18 @@ var jwtSection = builder.Configuration.GetSection(JwtOptions.SectionName);
 builder.Services.Configure<JwtOptions>(jwtSection);
 var jwtOptions = jwtSection.Get<JwtOptions>() ?? new JwtOptions();
 
+if (string.IsNullOrWhiteSpace(jwtOptions.SecretKey))
+{
+    if (builder.Environment.IsDevelopment())
+    {
+        jwtOptions.SecretKey = "DeliveryPlatformSecretKeyVerySecureAtLeast256BitsLongForSha256!";
+    }
+    else
+    {
+        throw new InvalidOperationException("Jwt:SecretKey no está configurada. En producción debe suministrarse mediante la variable de entorno JWT_SECRET.");
+    }
+}
+
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     .AddJwtBearer(options =>
     {

@@ -53,13 +53,17 @@ services:
       - ASPNETCORE_URLS=http://+:5005
       - ConnectionStrings__DefaultConnection=Host=postgres;Port=5432;Database=${POSTGRES_DB:-delivery};Username=${POSTGRES_USER:-postgres};Password=${POSTGRES_PASSWORD}
       - ConnectionStrings__Redis=redis:6379,password=${REDIS_PASSWORD}
+      - Jwt__SecretKey=${JWT_SECRET:?Definir JWT_SECRET en produccion}
+      - Jwt__Issuer=${JWT_ISSUER:-DeliveryPlatform.Api}
+      - Jwt__Audience=${JWT_AUDIENCE:-DeliveryPlatform.Clients}
+      - INITIAL_ADMIN_PASSWORD=${INITIAL_ADMIN_PASSWORD:-Admin123!}
     depends_on:
       postgres:
         condition: service_healthy
       redis:
         condition: service_healthy
     healthcheck:
-      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://127.0.0.1:5005/health"]
+      test: ["CMD", "curl", "-f", "http://127.0.0.1:5005/health"]
       interval: 10s
       timeout: 5s
       retries: 5
@@ -75,6 +79,7 @@ services:
         NEXT_PUBLIC_API_URL: ${NEXT_PUBLIC_API_URL:-http://localhost:5005}
         NEXT_PUBLIC_WS_URL: ${NEXT_PUBLIC_WS_URL:-http://localhost:5005/hubs}
         NEXT_PUBLIC_MAP_STYLE_URL: ${NEXT_PUBLIC_MAP_STYLE_URL:-https://demotiles.maplibre.org/style.json}
+        NEXT_PUBLIC_PLATFORM_DOMAIN: ${NEXT_PUBLIC_PLATFORM_DOMAIN:-delivery.com}
     image: delivery-frontend:latest
     container_name: delivery-frontend-prod
     restart: always
@@ -84,6 +89,11 @@ services:
       - NODE_ENV=production
       - PORT=3005
       - HOSTNAME=0.0.0.0
+      - INTERNAL_API_URL=${INTERNAL_API_URL:-http://backend:5005}
+      - NEXT_PUBLIC_API_URL=${NEXT_PUBLIC_API_URL:-http://localhost:5005}
+      - NEXT_PUBLIC_WS_URL=${NEXT_PUBLIC_WS_URL:-http://localhost:5005/hubs}
+      - NEXT_PUBLIC_MAP_STYLE_URL=${NEXT_PUBLIC_MAP_STYLE_URL:-https://demotiles.maplibre.org/style.json}
+      - NEXT_PUBLIC_PLATFORM_DOMAIN=${NEXT_PUBLIC_PLATFORM_DOMAIN:-delivery.com}
     depends_on:
       backend:
         condition: service_healthy

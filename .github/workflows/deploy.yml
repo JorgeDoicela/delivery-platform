@@ -92,8 +92,19 @@ jobs:
             DEPLOY_DIR="${{ secrets.DEPLOY_PATH }}"
             TARGET="${{ needs.pre-deploy-validation.outputs.deploy_target }}"
 
-            echo "[CI/CD] Accediendo al directorio de despliegue: ${DEPLOY_DIR}"
-            cd "${DEPLOY_DIR}"
+            if [ ! -d "${DEPLOY_DIR}" ]; then
+              echo "[CI/CD] Directorio ${DEPLOY_DIR} no encontrado. Clonando repositorio inicial..."
+              mkdir -p "$(dirname "${DEPLOY_DIR}")"
+              git clone "https://github.com/${{ github.repository }}.git" "${DEPLOY_DIR}"
+              cd "${DEPLOY_DIR}"
+              if [ ! -f .env ]; then
+                echo "[CI/CD] Inicializando .env base a partir de .env.example..."
+                cp .env.example .env
+              fi
+            else
+              echo "[CI/CD] Accediendo al directorio de despliegue: ${DEPLOY_DIR}"
+              cd "${DEPLOY_DIR}"
+            fi
 
             echo "[CI/CD] Actualizando codigo desde origin/main..."
             git fetch origin main

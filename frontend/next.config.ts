@@ -27,6 +27,26 @@ const nextConfig: NextConfig = {
   },
   // Desactivar generacion automatica de AGENTS.md en la subcarpeta frontend
   agentRules: false,
+  async rewrites() {
+    const backendUrl =
+      process.env.INTERNAL_API_URL ||
+      (process.env.NODE_ENV === "production" ? "http://backend:5005" : "http://localhost:5005");
+
+    return {
+      beforeFiles: [],
+      afterFiles: [],
+      fallback: [
+        {
+          source: "/api/:path*",
+          destination: `${backendUrl}/api/:path*`,
+        },
+        {
+          source: "/hubs/:path*",
+          destination: `${backendUrl}/hubs/:path*`,
+        },
+      ],
+    };
+  },
   async redirects() {
     return [
       { source: "/r/:slug", destination: "/:slug", permanent: true },

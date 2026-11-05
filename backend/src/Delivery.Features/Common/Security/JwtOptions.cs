@@ -4,7 +4,7 @@ public class JwtOptions
 {
     public const string SectionName = "Jwt";
 
-    public string SecretKey { get; set; } = "DeliveryPlatformSecretKeyVerySecureAtLeast256BitsLongForSha256!";
+    public string SecretKey { get; set; } = string.Empty;
     public string Issuer { get; set; } = "DeliveryPlatform.Api";
     public string Audience { get; set; } = "DeliveryPlatform.Clients";
     public int AccessTokenExpirationMinutes { get; set; } = 15;

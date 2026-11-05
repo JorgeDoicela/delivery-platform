@@ -9,7 +9,8 @@ namespace Delivery.Core.Infrastructure.Persistence;
 public static partial class DatabaseSeeder
 {
     private static readonly GeometryFactory GeometryFactory = new(new PrecisionModel(), 4326);
-    private static readonly string DefaultDevPasswordHash = BCrypt.Net.BCrypt.EnhancedHashPassword("Admin123!", 11);
+    private static readonly string DefaultDevPasswordHash = BCrypt.Net.BCrypt.EnhancedHashPassword(
+        Environment.GetEnvironmentVariable("INITIAL_ADMIN_PASSWORD") ?? "Admin123!", 11);
 
     private static readonly JsonSerializerOptions JsonOptions = new()
     {
