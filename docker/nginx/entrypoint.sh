@@ -16,3 +16,4 @@ else
 fi
 
 exec nginx -g "daemon off;"
+

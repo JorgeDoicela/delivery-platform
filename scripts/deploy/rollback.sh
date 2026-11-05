@@ -31,14 +31,21 @@ cd "$PROJECT_ROOT"
 # 1. Revertir imágenes docker taggeadas a :previous
 rollback_image() {
   local service_name="$1"
-  local image_name="$2"
+  local base_name="$2"
+  local full_image
+  full_image="$(docker compose -f "$COMPOSE_FILE" images -q "$service_name" 2>/dev/null || true)"
 
-  if docker image inspect "${image_name}:previous" >/dev/null 2>&1; then
-    log "Restaurando imagen ${image_name}:previous a ${image_name}:latest..."
-    docker tag "${image_name}:previous" "${image_name}:latest"
+  # Buscar tag previous por nombre de repositorio o fallback a local
+  if docker image inspect "ghcr.io/jorgedoicela/delivery-platform/${base_name}:previous" >/dev/null 2>&1; then
+    log "Restaurando ghcr.io/jorgedoicela/delivery-platform/${base_name}:previous..."
+    docker tag "ghcr.io/jorgedoicela/delivery-platform/${base_name}:previous" "ghcr.io/jorgedoicela/delivery-platform/${base_name}:latest"
+    docker compose -f "$COMPOSE_FILE" up -d --no-deps "$service_name"
+  elif docker image inspect "${base_name}:previous" >/dev/null 2>&1; then
+    log "Restaurando ${base_name}:previous a latest..."
+    docker tag "${base_name}:previous" "${base_name}:latest"
     docker compose -f "$COMPOSE_FILE" up -d --no-deps "$service_name"
   else
-    log "AVISO: No se encontro tag ${image_name}:previous en el cache local."
+    log "AVISO: No se encontro tag ${base_name}:previous en el cache local."
   fi
 }
 

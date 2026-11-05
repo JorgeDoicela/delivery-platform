@@ -60,33 +60,35 @@ fi
 
 # 3. Snapshot de imágenes previas para rollback rápido
 log "Respaldando tags de imagenes actuales a :previous para rollback rapido..."
-if docker image inspect delivery-backend:latest >/dev/null 2>&1; then
-  docker tag delivery-backend:latest delivery-backend:previous || true
-fi
-if docker image inspect delivery-frontend:latest >/dev/null 2>&1; then
-  docker tag delivery-frontend:latest delivery-frontend:previous || true
-fi
-if docker image inspect delivery-nginx:latest >/dev/null 2>&1; then
-  docker tag delivery-nginx:latest delivery-nginx:previous || true
-fi
+for svc in backend frontend nginx; do
+  img="$(docker compose -f "$COMPOSE_FILE" images -q "$svc" 2>/dev/null || true)"
+  if [ -n "$img" ]; then
+    tag_name="$(docker inspect --format='{{index .RepoTags 0}}' "$img" 2>/dev/null || true)"
+    if [ -n "$tag_name" ] && [ "$tag_name" != "<none>:<none>" ]; then
+      base="${tag_name%%:*}"
+      docker tag "$tag_name" "${base}:previous" 2>/dev/null || true
+    fi
+  fi
+done
 
-# 4. Construcción y despliegue según el target
+# 4. Descarga inmutable y despliegue según el target
 case "$TARGET" in
   backend)
-    log "Reconstruyendo y desplegando unicamente el servicio BACKEND..."
-    docker compose -f "$COMPOSE_FILE" build backend
+    log "Descargando imagen actualizada del servicio BACKEND desde GHCR..."
+    docker compose -f "$COMPOSE_FILE" pull backend
     docker compose -f "$COMPOSE_FILE" up -d --no-deps backend
     SERVICES_TO_CHECK=("delivery-backend-prod")
     ;;
   frontend)
-    log "Reconstruyendo y desplegando unicamente el servicio FRONTEND..."
-    docker compose -f "$COMPOSE_FILE" build frontend
+    log "Descargando imagen actualizada del servicio FRONTEND desde GHCR..."
+    docker compose -f "$COMPOSE_FILE" pull frontend
     docker compose -f "$COMPOSE_FILE" up -d --no-deps frontend
     SERVICES_TO_CHECK=("delivery-frontend-prod")
     ;;
   all|infra)
-    log "Reconstruyendo y desplegando el stack completo..."
-    docker compose -f "$COMPOSE_FILE" up -d --build --remove-orphans
+    log "Descargando imagenes actualizadas del stack completo desde GHCR..."
+    docker compose -f "$COMPOSE_FILE" pull
+    docker compose -f "$COMPOSE_FILE" up -d --remove-orphans
     SERVICES_TO_CHECK=("delivery-postgres-prod" "delivery-redis-prod" "delivery-backend-prod" "delivery-frontend-prod" "delivery-nginx-prod")
     ;;
   *)

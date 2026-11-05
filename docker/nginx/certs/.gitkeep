@@ -1,2 +1,3 @@
 # Directorio montado para certificados de origen (Cloudflare Origin CA)
 # origin.crt y origin.key se ignoran en git por seguridad.
+
