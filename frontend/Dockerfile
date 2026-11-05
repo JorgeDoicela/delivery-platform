@@ -48,6 +48,9 @@ ENV NEXT_TELEMETRY_DISABLED=1
 ENV PORT=3005
 ENV HOSTNAME="0.0.0.0"
 
+# Instalar curl para healthchecks ligeros sin levantar instancias de Node
+RUN apk add --no-cache curl
+
 # Crear usuario de sistema sin privilegios de root
 RUN addgroup --system --gid 1001 nodejs && \
     adduser --system --uid 1001 nextjs
@@ -56,13 +59,12 @@ RUN addgroup --system --gid 1001 nodejs && \
 COPY --from=builder --chown=nextjs:nodejs /app/frontend/.next/standalone ./
 COPY --from=builder --chown=nextjs:nodejs /app/frontend/.next/static ./frontend/.next/static
 COPY --from=builder --chown=nextjs:nodejs /app/frontend/public ./frontend/public
-COPY --from=builder --chown=nextjs:nodejs /app/frontend/public ./public
 
 USER nextjs
 
 EXPOSE 3005
 
-HEALTHCHECK --interval=10s --timeout=5s --start-period=15s --retries=5 \
-  CMD node -e "fetch('http://127.0.0.1:3005/api/health').then(r => process.exit(r.ok ? 0 : 1)).catch(() => process.exit(1))"
+HEALTHCHECK --interval=10s --timeout=3s --start-period=15s --retries=3 \
+  CMD curl -f http://127.0.0.1:3005/api/health || exit 1
 
 CMD ["node", "frontend/server.js"]

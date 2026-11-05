@@ -14,6 +14,8 @@
 *.keystore
 *.jks
 id_rsa*
+docker/nginx/certs/*
+!docker/nginx/certs/.gitkeep
 .last_successful_commit
 .previous_commit
 

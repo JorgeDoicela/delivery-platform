@@ -66,6 +66,9 @@ fi
 if docker image inspect delivery-frontend:latest >/dev/null 2>&1; then
   docker tag delivery-frontend:latest delivery-frontend:previous || true
 fi
+if docker image inspect delivery-nginx:latest >/dev/null 2>&1; then
+  docker tag delivery-nginx:latest delivery-nginx:previous || true
+fi
 
 # 4. Construcción y despliegue según el target
 case "$TARGET" in
@@ -84,7 +87,7 @@ case "$TARGET" in
   all|infra)
     log "Reconstruyendo y desplegando el stack completo..."
     docker compose -f "$COMPOSE_FILE" up -d --build --remove-orphans
-    SERVICES_TO_CHECK=("delivery-postgres-prod" "delivery-redis-prod" "delivery-backend-prod" "delivery-frontend-prod")
+    SERVICES_TO_CHECK=("delivery-postgres-prod" "delivery-redis-prod" "delivery-backend-prod" "delivery-frontend-prod" "delivery-nginx-prod")
     ;;
   *)
     die "Target desconocido: ${TARGET}. Opciones validas: all, backend, frontend, infra"

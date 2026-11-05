@@ -52,6 +52,7 @@ case "$TARGET" in
   all|infra)
     rollback_image "backend" "delivery-backend"
     rollback_image "frontend" "delivery-frontend"
+    rollback_image "nginx" "delivery-nginx"
     ;;
 esac
 

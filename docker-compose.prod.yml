@@ -46,8 +46,6 @@ services:
     image: delivery-backend:latest
     container_name: delivery-backend-prod
     restart: always
-    ports:
-      - "${API_PORT:-5005}:5005"
     environment:
       - ASPNETCORE_ENVIRONMENT=Production
       - ASPNETCORE_URLS=http://+:5005
@@ -83,9 +81,6 @@ services:
     image: delivery-frontend:latest
     container_name: delivery-frontend-prod
     restart: always
-    ports:
-      - "${HTTP_PORT:-80}:3005"
-      - "${PORT:-3005}:3005"
     environment:
       - NODE_ENV=production
       - PORT=3005
@@ -99,11 +94,37 @@ services:
       backend:
         condition: service_healthy
     healthcheck:
-      test: ["CMD", "node", "-e", "fetch('http://127.0.0.1:3005/api/health').then(r => process.exit(r.ok ? 0 : 1)).catch(() => process.exit(1))"]
+      test: ["CMD", "curl", "-f", "http://127.0.0.1:3005/api/health"]
       interval: 10s
-      timeout: 5s
-      retries: 5
+      timeout: 3s
+      retries: 3
       start_period: 20s
+    networks:
+      - delivery-prod-network
+
+  nginx:
+    build:
+      context: .
+      dockerfile: docker/nginx/Dockerfile
+    image: delivery-nginx:latest
+    container_name: delivery-nginx-prod
+    restart: always
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./docker/nginx/certs:/etc/nginx/certs
+    depends_on:
+      frontend:
+        condition: service_healthy
+      backend:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://127.0.0.1/health"]
+      interval: 10s
+      timeout: 3s
+      retries: 3
+      start_period: 10s
     networks:
       - delivery-prod-network
 
