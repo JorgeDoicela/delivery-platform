@@ -39,6 +39,13 @@ fi
 
 # 2. Análisis del objetivo de despliegue (selective deployment)
 TARGET="${1:-all}"
+
+# Si la infraestructura base no está activa, forzar despliegue completo 'all'
+if ! docker ps --format '{{.Names}}' | grep -q "^delivery-postgres-prod$"; then
+  log "La infraestructura base no está corriendo activamente. Forzando despliegue completo 'all' para asegurar inicialización."
+  TARGET="all"
+fi
+
 log "Iniciando despliegue de produccion. Objetivo: ${TARGET}"
 
 cd "$PROJECT_ROOT"
