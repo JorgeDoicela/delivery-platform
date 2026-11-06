@@ -7,6 +7,7 @@ import { RefreshCw } from "lucide-react";
 import { DriverDeliveryView } from "@/features/tracking";
 import { AuthGuard, UserRole, useAuthStore } from "@/features/auth";
 import { useTenantStore } from "@/features/tenant";
+import { isPlatformHost } from "@/shared/lib/api-client";
 
 export default function RepartidorRootPage() {
   const router = useRouter();
@@ -14,7 +15,10 @@ export default function RepartidorRootPage() {
   const tenantSlug = useTenantStore((s) => s.tenantSlug) || user?.tenantSlug;
 
   useEffect(() => {
-    if (tenantSlug) {
+    // Solo redirigir canónicamente a /[slug]/repartidor si se navega desde el host global de la plataforma
+    // En dominios personalizados de comercio (ej. pedidos.lagranjita.com), la URL limpia es /repartidor
+    const isPlatform = typeof window !== "undefined" && isPlatformHost(window.location.hostname);
+    if (tenantSlug && isPlatform) {
       router.replace(`/${tenantSlug}/repartidor`);
     }
   }, [tenantSlug, router]);

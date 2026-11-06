@@ -119,9 +119,28 @@ public class TenantResolutionMiddleware
         }
 
         string? tenantSlug = null;
-        var host = context.Request.Host.Host.ToLowerInvariant();
 
-        // 3. Detección por Dominio Personalizado (CustomDomain en TenantSettings)
+        // 3. Detección de Host / Dominio: Prioriza cabeceras de proxy reverso (X-Tenant-Domain, X-Forwarded-Host)
+        // permitiendo que frontends en dominios personalizados o subdominios comuniquen el host original a la API.
+        string? domainHeader = null;
+        if (context.Request.Headers.TryGetValue("X-Tenant-Domain", out var domainValues))
+        {
+            var raw = domainValues.ToString().Trim().ToLowerInvariant();
+            domainHeader = raw.Contains(':') ? raw.Split(':')[0] : raw;
+        }
+        else if (context.Request.Headers.TryGetValue("X-Forwarded-Host", out var fwdValues))
+        {
+            var raw = fwdValues.ToString().Trim().ToLowerInvariant().Split(',')[0].Trim();
+            domainHeader = raw.Contains(':') ? raw.Split(':')[0] : raw;
+        }
+
+        var host = (!string.IsNullOrWhiteSpace(domainHeader) ? domainHeader : context.Request.Host.Host).ToLowerInvariant();
+        if (host.Contains(':'))
+        {
+            host = host.Split(':')[0];
+        }
+
+        // 4. Detección por Dominio Personalizado (CustomDomain en TenantSettings)
         if (host != "localhost" && host != "127.0.0.1")
         {
 #pragma warning disable CA1862, CA1304, CA1311
@@ -141,7 +160,7 @@ public class TenantResolutionMiddleware
                 return;
             }
 
-            // 4. Detección por Subdominio ({slug}.dominio.com)
+            // 5. Detección por Subdominio ({slug}.dominio.com)
             var parts = host.Split('.');
             var reservedSubdomains = new HashSet<string>(StringComparer.OrdinalIgnoreCase)
             {
@@ -154,7 +173,7 @@ public class TenantResolutionMiddleware
             }
         }
 
-        // 5. Fallback al tenant predeterminado configurado
+        // 6. Fallback al tenant predeterminado configurado
         if (string.IsNullOrWhiteSpace(tenantSlug))
         {
             tenantSlug = _configuration["Multitenancy:DefaultTenantSlug"] ?? "la-granjita";

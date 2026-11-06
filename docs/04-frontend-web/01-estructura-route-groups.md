@@ -88,8 +88,19 @@ La plataforma implementa un panel de accesos directos en [`src/app/(storefront)/
 * **Diseno Visual:** Diseno optimizado para pantallas tactiles de cocina (1080p en modo horizontal) y formularios de gestion administrativa con alto contraste y validacion React Hook Form + Zod.
 
 ### 4.3. Canal Repartidor (`src/app/(driver)/`)
-* **URL Publica:** `/active-delivery`, `/repartidor`
+* **URL Publica:** `/active-delivery`, `/repartidor` (o `/[slug]/repartidor`, `/[slug]/active-delivery` en plataforma)
 * **Diseno Visual:** Shell restringido a ancho de smartphone (maximo 512px) con botones de toque amplio para facilitar operacion a una sola mano en motocicleta.
+* **Operativa Multi-Sucursal:** Selector de sucursal en cabecera (`DriverHeader.tsx`) que sincroniza en caliente la conexión SignalR (`kitchen_branch_{branchId}`) y filtra comandas listas en cocina según la sede activa.
+
+### 4.4. Resolucion en Dominios Propios (Custom Domain vs Dominio de Plataforma)
+* **Hosts de Plataforma (`mesafy.com`, `localhost`):** La raíz `/` monta el portal multimarca (`PlatformLandingView`). Las tiendas operan en `/[slug]`.
+* **Dominios Propios (`pedidos.comercio.com` o subdominios `comercio.mesafy.com`):** La raíz `/` monta directamente la vitrina del comercio (`RestaurantStorefrontView`). Las rutas operativas permanecen limpias (`/repartidor`, `/cocina`, `/sucursales`, `/checkout`) sin prefijos redundantes y el cliente API inyecta automáticamente la cabecera `X-Tenant-Domain: pedidos.comercio.com`.
+
+### 4.5. Operación Multi-Sucursal (Multi-Branch)
+* **Vitrina B2C y Carrito:** Selector de sucursal en encabezado (`TenantBranchSelector.tsx`) para pedidos con retiro en local (Takeout/Pickup).
+* **Validación de Cobertura PostGIS:** En pedidos a domicilio (Delivery), la sucursal de despacho se resuelve automáticamente evaluando las coordenadas del cliente contra los polígonos de cobertura indexados con GiST (`/api/geofencing/resolve`).
+* **Terminal KDS de Cocina:** Cada terminal filtra estrictamente las comandas de su `branchId` con alertas sonoras aisladas por sucursal.
+* **Flota de Reparto:** Los motorizados pueden operar fijos a una sucursal o conmutar entre sedes según su asignación de turno.
 
 ---
 

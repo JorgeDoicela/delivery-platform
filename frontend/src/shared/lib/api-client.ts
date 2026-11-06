@@ -42,6 +42,10 @@ import {
     ACTIVE_TENANT_STORAGE_KEY,
     DEFAULT_TENANT_SLUG,
     RESERVED_TENANT_SLUGS,
+    PLATFORM_HOSTS,
+    isPlatformHost,
+    getTenantSubdomain,
+    getApiClientTenantDomain,
     getApiClientAccessToken,
     getApiClientTenantSlug,
     setApiClientAccessToken,
@@ -52,6 +56,10 @@ export {
     ACTIVE_TENANT_STORAGE_KEY,
     DEFAULT_TENANT_SLUG,
     RESERVED_TENANT_SLUGS,
+    PLATFORM_HOSTS,
+    isPlatformHost,
+    getTenantSubdomain,
+    getApiClientTenantDomain,
     getApiClientTenantSlug,
     setApiClientAccessToken,
     setApiClientTenantSlug,
@@ -62,9 +70,12 @@ function buildHeaders(
     tenantSlugOverride?: string
 ): Record<string, string> {
     const slug = tenantSlugOverride || getApiClientTenantSlug();
+    const domain = getApiClientTenantDomain();
+
     const headers: Record<string, string> = {
         "Content-Type": "application/json",
         ...(slug ? { "X-Tenant-Slug": slug } : {}),
+        ...(domain ? { "X-Tenant-Domain": domain } : {}),
         ...extraHeaders,
     };
 

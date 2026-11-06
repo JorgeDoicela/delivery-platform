@@ -16,12 +16,14 @@ interface DriverStoreState {
   deliveredToday: DriverOrderDto[];
   shiftSummary: DriverShiftSummaryDto;
   selectedOrderId: string | null;
+  selectedBranchId: number | null;
   activeTab: DriverTab;
   loading: boolean;
   error: string | null;
 
   // Acciones
-  fetchDashboard: () => Promise<void>;
+  fetchDashboard: (branchId?: number | null) => Promise<void>;
+  setSelectedBranchId: (branchId: number | null) => void;
   toggleAvailability: (isAvailable: boolean) => Promise<boolean>;
   claimOrder: (orderId: string) => Promise<boolean>;
   completeDelivery: (orderId: string) => Promise<boolean>;
@@ -43,16 +45,18 @@ export const useDriverStore = create<DriverStoreState>()((set, get) => ({
   deliveredToday: [],
   shiftSummary: initialShiftSummary,
   selectedOrderId: null,
+  selectedBranchId: null,
   activeTab: 'active',
   loading: true,
   error: null,
 
-  fetchDashboard: async () => {
+  fetchDashboard: async (branchId?: number | null) => {
     set({ loading: true, error: null });
     try {
+      const nextBranchId = branchId !== undefined ? branchId : get().selectedBranchId;
       const [profileData, ordersData] = await Promise.all([
         apiClient.getDriverProfile(),
-        apiClient.getDriverOrders(),
+        apiClient.getDriverOrders(nextBranchId ?? undefined),
       ]);
 
       const active = ordersData.activeOrders || [];
@@ -64,6 +68,9 @@ export const useDriverStore = create<DriverStoreState>()((set, get) => ({
             : active[0].orderId
           : null;
 
+      // Si aún no se ha seleccionado sucursal, sincronizar con la sucursal asignada del perfil
+      const resolvedBranchId = nextBranchId !== undefined ? nextBranchId : (profileData?.branchId ?? null);
+
       set({
         profile: profileData,
         activeOrders: active,
@@ -71,6 +78,7 @@ export const useDriverStore = create<DriverStoreState>()((set, get) => ({
         deliveredToday: ordersData.deliveredToday || [],
         shiftSummary: ordersData.shiftSummary || initialShiftSummary,
         selectedOrderId: nextSelected,
+        selectedBranchId: resolvedBranchId,
         loading: false,
         error: null,
       });
@@ -80,6 +88,11 @@ export const useDriverStore = create<DriverStoreState>()((set, get) => ({
         error: 'No se pudo sincronizar el estado del repartidor con el servidor.',
       });
     }
+  },
+
+  setSelectedBranchId: (branchId: number | null) => {
+    set({ selectedBranchId: branchId });
+    get().fetchDashboard(branchId);
   },
 
   toggleAvailability: async (isAvailable: boolean) => {

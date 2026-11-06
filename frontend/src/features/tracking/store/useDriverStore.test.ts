@@ -1,7 +1,7 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { useDriverStore } from './useDriverStore';
 import { apiClient } from '@/shared/lib/api-client';
-import { OrderStatus, PaymentMethod } from '@/shared/types/api';
+import { OrderStatus, PaymentMethod, DriverProfileResponse } from '@/shared/types/api';
 
 describe('useDriverStore', () => {
   beforeEach(() => {
@@ -204,6 +204,21 @@ describe('useDriverStore', () => {
     const success = await useDriverStore.getState().toggleAvailability(false);
     expect(success).toBe(true);
     expect(useDriverStore.getState().profile?.isAvailable).toBe(false);
+  });
+
+  it('setSelectedBranchId updates selected branch and fetches filtered orders', async () => {
+    vi.spyOn(apiClient, 'getDriverProfile').mockResolvedValue(null as unknown as DriverProfileResponse);
+    const getDriverOrdersSpy = vi.spyOn(apiClient, 'getDriverOrders').mockResolvedValue({
+      activeOrders: [],
+      availableOrders: [],
+      deliveredToday: [],
+      shiftSummary: { completedCount: 0, cashCollected: 0, totalEarnings: 0 },
+    });
+
+    useDriverStore.getState().setSelectedBranchId(2);
+
+    expect(useDriverStore.getState().selectedBranchId).toBe(2);
+    expect(getDriverOrdersSpy).toHaveBeenCalledWith(2);
   });
 });
 

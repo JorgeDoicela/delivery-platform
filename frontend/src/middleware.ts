@@ -1,20 +1,22 @@
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 
-const PROTECTED_PREFIXES = [
-  "/cocina",
-  "/kitchen",
-  "/admin",
-  "/superadmin",
-  "/driver",
-  "/repartidor",
-];
+const OPERATIONAL_KEYWORDS = new Set([
+  "cocina",
+  "kitchen",
+  "admin",
+  "superadmin",
+  "driver",
+  "repartidor",
+  "active-delivery",
+]);
 
 export function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
+  const segments = pathname.split("/").filter(Boolean);
 
-  const isProtected = PROTECTED_PREFIXES.some((prefix) =>
-    pathname.startsWith(prefix)
+  const isProtected = segments.some((seg) =>
+    OPERATIONAL_KEYWORDS.has(seg.toLowerCase())
   );
 
   if (isProtected) {
@@ -45,6 +47,11 @@ export const config = {
     "/superadmin/:path*",
     "/driver/:path*",
     "/repartidor/:path*",
+    "/active-delivery/:path*",
+    "/:slug/cocina/:path*",
+    "/:slug/kitchen/:path*",
+    "/:slug/repartidor/:path*",
+    "/:slug/active-delivery/:path*",
   ],
 };
 

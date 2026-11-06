@@ -24,6 +24,7 @@ import {
   TenantSwitcher,
   useCurrentTenantQuery,
 } from "@/features/tenant";
+import { isPlatformHost, getTenantSubdomain } from "@/shared/lib/api-client";
 import { ThemeToggle } from "@/shared/components/ThemeToggle";
 import { useSmartScrollHeader } from "@/shared/hooks/useSmartScrollHeader";
 
@@ -42,10 +43,18 @@ function StorefrontHeader() {
       : undefined;
   const { data: tenant } = useCurrentTenantQuery(activeSlug);
 
-  const isPlatformRoot = pathname === "/";
-  const tenantSlug = tenant?.slug || activeSlug || "";
-  const brandHomeHref = isPlatformRoot ? "/" : (tenantSlug ? `/${tenantSlug}` : "/");
-  const catalogHref = isPlatformRoot ? "/#restaurantes" : (tenantSlug ? `/${tenantSlug}/menu` : "/#restaurantes");
+  const isPlatformHostName = typeof window !== "undefined" ? isPlatformHost(window.location.hostname) : true;
+  const subdomain = typeof window !== "undefined" ? getTenantSubdomain(window.location.hostname) : null;
+  const isCustomDomain = typeof window !== "undefined" ? !isPlatformHost(window.location.hostname) : false;
+  const isPlatformRoot = pathname === "/" && isPlatformHostName && !subdomain;
+
+  const tenantSlug = tenant?.slug || activeSlug || subdomain || "";
+  const brandHomeHref = isPlatformRoot ? "/" : (isCustomDomain || subdomain ? "/" : (tenantSlug ? `/${tenantSlug}` : "/"));
+  const catalogHref = isPlatformRoot
+    ? "/#restaurantes"
+    : (isCustomDomain || subdomain
+        ? "/#catalogo"
+        : (tenantSlug ? `/${tenantSlug}#catalogo` : "/#catalogo"));
   const brandName = isPlatformRoot
     ? "MESAFY"
     : tenant?.name || "Restaurante Asociado";

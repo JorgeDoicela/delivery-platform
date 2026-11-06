@@ -1,5 +1,13 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { apiClient, ApiClientError, getApiClientTenantSlug, setApiClientTenantSlug } from './api-client';
+import {
+  apiClient,
+  ApiClientError,
+  getApiClientTenantSlug,
+  setApiClientTenantSlug,
+  isPlatformHost,
+  getTenantSubdomain,
+  getApiClientTenantDomain,
+} from './api-client';
 
 describe('apiClient - RFC 7807 Error Handling', () => {
   beforeEach(() => {
@@ -212,6 +220,21 @@ describe('apiClient - RFC 7807 Error Handling', () => {
         body: JSON.stringify({ isAvailable: false }),
       })
     );
+  });
+
+  it('correctly identifies platform hosts and tenant subdomains', () => {
+    expect(isPlatformHost('localhost')).toBe(true);
+    expect(isPlatformHost('localhost:3005')).toBe(true);
+    expect(isPlatformHost('mesafy.com')).toBe(true);
+    expect(isPlatformHost('pedidos.lagranjita.com')).toBe(false);
+    expect(isPlatformHost('pollos-al-carbon.ec')).toBe(false);
+
+    expect(getTenantSubdomain('la-granjita.mesafy.com')).toBe('la-granjita');
+    expect(getTenantSubdomain('api.mesafy.com')).toBeNull();
+    expect(getTenantSubdomain('www.mesafy.com')).toBeNull();
+    expect(getTenantSubdomain('localhost')).toBeNull();
+
+    expect(getApiClientTenantDomain()).toBeNull();
   });
 });
 

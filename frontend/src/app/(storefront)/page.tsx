@@ -4,27 +4,26 @@ import React, { Suspense } from "react";
 import { useSearchParams } from "next/navigation";
 import { PlatformLandingView } from "@/features/platform";
 import { RestaurantStorefrontView } from "@/features/tenant/components/RestaurantStorefrontView";
-import { RESERVED_TENANT_SLUGS } from "@/shared/lib/api-client";
+import { isPlatformHost, getTenantSubdomain } from "@/shared/lib/api-client";
 
 const noopSubscribe = () => () => {};
 
 function getSubdomainSnapshot(): string | null {
   if (typeof window === "undefined") return null;
-  const hostname = window.location.hostname.toLowerCase();
-  const parts = hostname.split(".");
-  if (
-    parts.length > 2 &&
-    parts[0] !== "www" &&
-    parts[0] !== "api" &&
-    !RESERVED_TENANT_SLUGS.has(parts[0])
-  ) {
-    return parts[0];
-  }
-  return null;
+  return getTenantSubdomain(window.location.hostname);
+}
+
+function getIsCustomDomainSnapshot(): boolean {
+  if (typeof window === "undefined") return false;
+  return !isPlatformHost(window.location.hostname);
 }
 
 function getServerSnapshot(): string | null {
   return null;
+}
+
+function getServerBooleanSnapshot(): boolean {
+  return false;
 }
 
 function HomePageContent() {
@@ -33,6 +32,11 @@ function HomePageContent() {
     noopSubscribe,
     getSubdomainSnapshot,
     getServerSnapshot
+  );
+  const isCustomDomain = React.useSyncExternalStore(
+    noopSubscribe,
+    getIsCustomDomainSnapshot,
+    getServerBooleanSnapshot
   );
 
   const explicitBrand =
@@ -50,7 +54,12 @@ function HomePageContent() {
     return <RestaurantStorefrontView initialSlug={subdomainSlug} />;
   }
 
-  // 3. Por defecto en la raíz: Landing Principal de la Plataforma Multi-Tenant
+  // 3. Dominio Personalizado de Negocio (ej. pedidos.lagranjita.com)
+  if (isCustomDomain) {
+    return <RestaurantStorefrontView />;
+  }
+
+  // 4. Por defecto en la raíz de la plataforma: Directorio multimarca global
   return <PlatformLandingView />;
 }
 

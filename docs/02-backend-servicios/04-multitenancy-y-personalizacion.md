@@ -49,8 +49,8 @@ flowchart TD
 1. **Bypass de Sistema:** Endpoints globales como `/health`, `/swagger`, `/hangfire`, `/hubs`, autenticacion `/api/v1/auth`, y gobernanza `/api/tenants` no requieren contexto de tenant previo.
 2. **Aislamiento Criptografico Estricto por JWT:** Si un usuario esta autenticado como operador (cajero, cocina, administrador de tienda) y no es `SuperAdmin`, el middleware **fuerza el `tenant_id` contenido en su token de acceso**. Queda bloqueada cualquier posibilidad de que un operador intente usurpar datos de otra marca enviando cabeceras `X-Tenant-Slug` manipuladas.
 3. **Cabecera `X-Tenant-Slug`:** Habilitada para navegacion publica en vitrinas B2C (Storefront) o peticiones de diagnostico del `SuperAdmin`.
-4. **Dominio Personalizado (`CustomDomain`):** Permite a cada marca apuntar su propio dominio (ej. `pedidos.lagranjita.com` o `carnesbrasas.ec`) resolviendose contra la tabla `TenantSettings`.
-5. **Subdominio:** Extraccion del prefijo en dominios wildcard (ej. `la-granjita.deliveryplatform.com`).
+4. **Dominio Personalizado (`CustomDomain` y Cabeceras `X-Tenant-Domain` / `X-Forwarded-Host`):** Permite a cada marca apuntar su propio dominio (ej. `pedidos.lagranjita.com` o `carnesbrasas.ec`). El backend prioriza cabeceras `X-Tenant-Domain` o `X-Forwarded-Host` (enviadas por clientes web o proxies reversos) antes de caer al host directo de la API, resolviendo la entidad contra la columna `TenantSettings.CustomDomain` con indexacion insensible a mayúsculas.
+5. **Subdominio:** Extraccion del prefijo en dominios wildcard (ej. `la-granjita.mesafy.com`).
 6. **Fallback de Configuracion:** Si no coincide ninguna regla, se asigna el tenant configurado en `Multitenancy:DefaultTenantSlug` (por defecto `la-granjita`).
 
 ---

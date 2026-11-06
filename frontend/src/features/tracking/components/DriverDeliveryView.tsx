@@ -47,8 +47,10 @@ export function DriverDeliveryView({ initialOrderId }: DriverDeliveryViewProps) 
     }
   }, [initialOrderId, setSelectedOrderId, setActiveTab]);
 
-  // Suscripción en tiempo real a SignalR (Cocina y Despacho)
-  useDriverHub({ branchId: profile?.branchId, enabled: Boolean(profile) });
+  // Suscripción en tiempo real a SignalR (Cocina y Despacho según sucursal activa)
+  const selectedBranchId = useDriverStore((s) => s.selectedBranchId);
+  const effectiveBranchId = selectedBranchId !== null ? selectedBranchId : profile?.branchId;
+  useDriverHub({ branchId: effectiveBranchId, enabled: Boolean(profile) });
 
   const handleManualRefresh = async () => {
     setIsRefreshing(true);
@@ -142,7 +144,7 @@ export function DriverDeliveryView({ initialOrderId }: DriverDeliveryViewProps) 
           </div>
           <button
             type="button"
-            onClick={fetchDashboard}
+            onClick={() => fetchDashboard()}
             className="underline font-bold uppercase tracking-wider text-[11px] cursor-pointer"
           >
             Reintentar
