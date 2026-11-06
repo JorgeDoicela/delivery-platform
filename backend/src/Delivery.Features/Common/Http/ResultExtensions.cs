@@ -51,7 +51,8 @@ public static class ResultExtensions
         var code when code.EndsWith("NotFound", StringComparison.OrdinalIgnoreCase) => StatusCodes.Status404NotFound,
         var code when code.Contains("OutsideCoverage", StringComparison.OrdinalIgnoreCase) => StatusCodes.Status422UnprocessableEntity,
         var code when code.Contains("SlotCapacityExceeded", StringComparison.OrdinalIgnoreCase) => StatusCodes.Status429TooManyRequests,
-        var code when code.Contains("Conflict", StringComparison.OrdinalIgnoreCase) => StatusCodes.Status409Conflict,
+        var code when code.Contains("Conflict", StringComparison.OrdinalIgnoreCase) ||
+                       code.Contains("AlreadyRegistered", StringComparison.OrdinalIgnoreCase) => StatusCodes.Status409Conflict,
         var code when code.Contains("NotPendingValidation", StringComparison.OrdinalIgnoreCase) => StatusCodes.Status400BadRequest,
         var code when code.Contains("InvalidTransition", StringComparison.OrdinalIgnoreCase) => StatusCodes.Status400BadRequest,
         _ => StatusCodes.Status400BadRequest

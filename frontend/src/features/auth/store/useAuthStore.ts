@@ -5,7 +5,7 @@ import {
   setApiClientAccessToken,
   setApiClientTenantSlug,
 } from "@/shared/lib/api-client";
-import type { AuthState, AuthUser, AuthStatus } from "../types";
+import type { AuthState, AuthUser, AuthStatus, RegisterRequest } from "../types";
 import type { LoginFormData } from "../schemas/loginSchema";
 
 const SESSION_STORAGE_KEY = "delivery_has_session";
@@ -37,6 +37,7 @@ function normalizeAuthUser(user: AuthUser, forceSyncTenant = false): AuthUser {
 
 interface AuthActions {
   login: (credentials: LoginFormData) => Promise<boolean>;
+  register: (data: RegisterRequest) => Promise<boolean>;
   logout: () => Promise<void>;
   checkAuth: () => Promise<boolean>;
   setAccessToken: (token: string | null) => void;
@@ -93,6 +94,45 @@ export const useAuthStore = create<AuthStore>()(
         } catch (err: unknown) {
           const message =
             err instanceof Error ? err.message : "Error al iniciar sesión.";
+
+          setApiClientAccessToken(null);
+          if (typeof window !== "undefined") {
+            localStorage.removeItem(SESSION_STORAGE_KEY);
+          }
+
+          set({
+            user: null,
+            accessToken: null,
+            isAuthenticated: false,
+            status: "error",
+            error: message,
+          });
+          return false;
+        }
+      },
+
+      register: async (data) => {
+        set({ status: "loading", error: null });
+        try {
+          const response = await authApi.register(data);
+          const normalizedUser = normalizeAuthUser(response.user, true);
+          setApiClientAccessToken(response.accessToken);
+
+          if (typeof window !== "undefined") {
+            localStorage.setItem(SESSION_STORAGE_KEY, "1");
+          }
+
+          set({
+            user: normalizedUser,
+            accessToken: response.accessToken,
+            isAuthenticated: true,
+            status: "success",
+            error: null,
+          });
+          return true;
+        } catch (err: unknown) {
+          const message =
+            err instanceof Error ? err.message : "Error al registrar la cuenta.";
 
           setApiClientAccessToken(null);
           if (typeof window !== "undefined") {

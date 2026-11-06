@@ -38,6 +38,18 @@ export interface LoginResponse {
   expiresAt: string;
 }
 
+export interface RegisterRequest {
+  fullName: string;
+  email: string;
+  phone: string;
+  password: string;
+  tenantSlug?: string;
+  identificationType?: string;
+  identificationNumber?: string;
+}
+
+export type RegisterResponse = LoginResponse;
+
 export interface RefreshTokenResponse {
   accessToken: string;
   user: AuthUser;

@@ -7,6 +7,8 @@ import type {
   AuthUser,
   LoginResponse,
   RefreshTokenResponse,
+  RegisterRequest,
+  RegisterResponse,
 } from "../types";
 import type { LoginFormData } from "../schemas/loginSchema";
 
@@ -54,6 +56,20 @@ export const authApi = {
       body: JSON.stringify({ ...credentials, tenantSlug }),
     });
     return handleAuthResponse<LoginResponse>(res);
+  },
+
+  async register(data: RegisterRequest): Promise<RegisterResponse> {
+    const tenantSlug = getApiClientTenantSlug();
+    const res = await fetch(`${getApiBaseUrl()}/api/v1/auth/register`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        ...(tenantSlug ? { "X-Tenant-Slug": tenantSlug } : {}),
+      },
+      credentials: "include",
+      body: JSON.stringify({ ...data, tenantSlug: data.tenantSlug || tenantSlug }),
+    });
+    return handleAuthResponse<RegisterResponse>(res);
   },
 
   async refresh(): Promise<RefreshTokenResponse> {

@@ -6,6 +6,7 @@ import { UserRole } from "../types";
 vi.mock("../api/authApi", () => ({
   authApi: {
     login: vi.fn(),
+    register: vi.fn(),
     refresh: vi.fn(),
     getCurrentUser: vi.fn(),
     logout: vi.fn(),
@@ -81,6 +82,60 @@ describe("useAuthStore", () => {
     expect(state.user).toBeNull();
     expect(state.status).toBe("error");
     expect(state.error).toBe("Credenciales inválidas.");
+  });
+
+  it("debe registrar un usuario exitosamente e iniciar su sesión", async () => {
+    const mockUser = {
+      id: "c1a71dc1-1a32-4754-a957-3b2d13aa11e2",
+      email: "cliente.nuevo@gmail.com",
+      fullName: "Cliente Nuevo",
+      role: UserRole.Customer,
+      tenantId: "00000000-0000-0000-0000-000000000001",
+      branchId: null,
+      isActive: true,
+    };
+
+    vi.mocked(authApi.register).mockResolvedValueOnce({
+      accessToken: "mock.jwt.register.token",
+      user: mockUser,
+      expiresAt: new Date(Date.now() + 15 * 60 * 1000).toISOString(),
+    });
+
+    const success = await useAuthStore.getState().register({
+      fullName: "Cliente Nuevo",
+      email: "cliente.nuevo@gmail.com",
+      phone: "+593991234567",
+      password: "Password123!",
+    });
+
+    expect(success).toBe(true);
+    const state = useAuthStore.getState();
+    expect(state.isAuthenticated).toBe(true);
+    expect(state.accessToken).toBe("mock.jwt.register.token");
+    expect(state.user?.email).toBe("cliente.nuevo@gmail.com");
+    expect(state.status).toBe("success");
+    expect(state.error).toBeNull();
+  });
+
+  it("debe manejar error al registrar un usuario", async () => {
+    vi.mocked(authApi.register).mockRejectedValueOnce(
+      new Error("El correo electrónico ya se encuentra registrado.")
+    );
+
+    const success = await useAuthStore.getState().register({
+      fullName: "Cliente Existente",
+      email: "yaexiste@gmail.com",
+      phone: "+593991234567",
+      password: "Password123!",
+    });
+
+    expect(success).toBe(false);
+    const state = useAuthStore.getState();
+    expect(state.isAuthenticated).toBe(false);
+    expect(state.accessToken).toBeNull();
+    expect(state.user).toBeNull();
+    expect(state.status).toBe("error");
+    expect(state.error).toBe("El correo electrónico ya se encuentra registrado.");
   });
 
   it("debe cerrar sesión y limpiar el estado", async () => {

@@ -27,5 +27,9 @@ public static class AuthErrors
     public static readonly Error TenantNotFound = new(
         "Auth.TenantNotFound",
         "No se pudo determinar el tenant activo para la autenticacion.");
+
+    public static readonly Error EmailAlreadyRegistered = new(
+        "Auth.EmailAlreadyRegistered",
+        "El correo electrónico ya se encuentra registrado.");
 }
 

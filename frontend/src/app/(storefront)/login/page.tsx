@@ -1,9 +1,9 @@
 "use client";
 
-import { Suspense, useEffect } from "react";
+import { Suspense, useEffect, useState } from "react";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
-import { LoginForm, useAuthStore } from "@/features/auth";
+import { LoginForm, RegisterForm, useAuthStore } from "@/features/auth";
 import {
   ChevronRight,
   UtensilsCrossed,
@@ -20,6 +20,11 @@ import { useCurrentTenantQuery } from "@/features/tenant";
 function LoginContent() {
   const searchParams = useSearchParams();
   const redirectUrl = searchParams.get("redirect") || undefined;
+  const initialMode =
+    searchParams.get("tab") === "register" || searchParams.get("mode") === "register"
+      ? "register"
+      : "login";
+  const [authMode, setAuthMode] = useState<"login" | "register">(initialMode);
 
   const isMounted = useIsMounted();
   const { data: tenant } = useCurrentTenantQuery();
@@ -184,18 +189,49 @@ function LoginContent() {
               </div>
             </div>
           ) : (
-            /* Formulario de Login Directo */
+            /* Formulario de Login / Registro con Pestañas */
             <div className="w-full max-w-md mx-auto py-2">
+              <div className="flex items-center p-1 bg-neutral-100 rounded-full mb-6 border border-neutral-200">
+                <button
+                  type="button"
+                  onClick={() => setAuthMode("login")}
+                  className={`flex-1 py-2 text-center text-xs font-bold uppercase tracking-wider font-display rounded-full transition-all cursor-pointer ${
+                    authMode === "login"
+                      ? "bg-white text-neutral-950 shadow-xs"
+                      : "text-neutral-500 hover:text-neutral-900"
+                  }`}
+                >
+                  Iniciar Sesión
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setAuthMode("register")}
+                  className={`flex-1 py-2 text-center text-xs font-bold uppercase tracking-wider font-display rounded-full transition-all cursor-pointer ${
+                    authMode === "register"
+                      ? "bg-white text-neutral-950 shadow-xs"
+                      : "text-neutral-500 hover:text-neutral-900"
+                  }`}
+                >
+                  Crear Cuenta
+                </button>
+              </div>
+
               <div className="mb-6 pb-3 border-b border-neutral-100">
                 <h2 className="text-2xl font-black uppercase tracking-tight text-neutral-950 font-display">
-                  Iniciar Sesión
+                  {authMode === "login" ? "Iniciar Sesión" : "Crear Nueva Cuenta"}
                 </h2>
                 <p className="text-xs text-neutral-500 mt-1">
-                  Accede a tu cuenta para gestionar pedidos, cocina o administración.
+                  {authMode === "login"
+                    ? "Accede a tu cuenta para gestionar pedidos, cocina o administración."
+                    : `Regístrate en ${brandName} para disfrutar pedidos en línea y seguimiento satelital.`}
                 </p>
               </div>
 
-              <LoginForm redirectUrl={redirectUrl} embedded={true} />
+              {authMode === "login" ? (
+                <LoginForm redirectUrl={redirectUrl} embedded={true} />
+              ) : (
+                <RegisterForm redirectUrl={redirectUrl} embedded={true} />
+              )}
             </div>
           )}
         </div>
