@@ -9,3 +9,4 @@ public record RegisterCommand(
     string? IdentificationType = null,
     string? IdentificationNumber = null,
     string? IpAddress = null);
+

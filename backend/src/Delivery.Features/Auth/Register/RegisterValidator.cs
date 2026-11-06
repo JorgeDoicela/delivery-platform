@@ -26,3 +26,4 @@ public class RegisterValidator : AbstractValidator<RegisterCommand>
             .MaximumLength(100).WithMessage("La contraseña no puede exceder 100 caracteres.");
     }
 }
+
