@@ -23,9 +23,9 @@ export function CartDrawerItem({ item }: CartDrawerItemProps) {
   const displayImage = item.imageUrl || "/images/shared/placeholders/dish-default.webp";
 
   return (
-    <div className="p-4 rounded-2xl bg-surface-canvas/50 border border-surface-border hover:border-surface-border-subtle transition-all duration-200 flex items-start gap-4 shadow-2xs">
+    <div className="p-4 rounded-2xl bg-surface-canvas/60 hover:bg-surface-canvas transition-all duration-200 flex items-start gap-4 shadow-2xs">
       {/* Thumbnail de producto */}
-      <div className="relative w-18 h-18 sm:w-20 sm:h-20 rounded-2xl overflow-hidden bg-neutral-100 border border-surface-border shrink-0">
+      <div className="relative w-18 h-18 sm:w-20 sm:h-20 rounded-2xl overflow-hidden bg-neutral-100 shrink-0 shadow-2xs">
         <Image
           src={displayImage}
           alt={item.name}

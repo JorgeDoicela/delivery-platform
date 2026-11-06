@@ -94,7 +94,7 @@ export function CatalogHero({ tenant: tenantProp }: CatalogHeroProps = {}) {
             type="button"
             onClick={handlePrev}
             aria-label="Anterior promoción"
-            className="absolute left-2.5 sm:left-4 top-1/2 -translate-y-1/2 w-9 h-9 sm:w-10 sm:h-10 rounded-full bg-black/25 hover:bg-black/60 text-white/75 hover:text-white items-center justify-center transition-all duration-200 backdrop-blur-xs border border-white/10 hover:border-white/25 z-20 hover:scale-105 active:scale-95 flex cursor-pointer"
+            className="absolute left-2.5 sm:left-4 top-1/2 -translate-y-1/2 w-9 h-9 sm:w-10 sm:h-10 rounded-full bg-black/30 hover:bg-black/60 text-white/90 hover:text-white items-center justify-center transition-all duration-200 backdrop-blur-sm z-20 hover:scale-105 active:scale-95 flex cursor-pointer shadow-md"
           >
             <ChevronLeft className="w-5 h-5" />
           </button>
@@ -103,7 +103,7 @@ export function CatalogHero({ tenant: tenantProp }: CatalogHeroProps = {}) {
             type="button"
             onClick={handleNext}
             aria-label="Siguiente promoción"
-            className="absolute right-2.5 sm:right-4 top-1/2 -translate-y-1/2 w-9 h-9 sm:w-10 sm:h-10 rounded-full bg-black/25 hover:bg-black/60 text-white/75 hover:text-white items-center justify-center transition-all duration-200 backdrop-blur-xs border border-white/10 hover:border-white/25 z-20 hover:scale-105 active:scale-95 flex cursor-pointer"
+            className="absolute right-2.5 sm:right-4 top-1/2 -translate-y-1/2 w-9 h-9 sm:w-10 sm:h-10 rounded-full bg-black/30 hover:bg-black/60 text-white/90 hover:text-white items-center justify-center transition-all duration-200 backdrop-blur-sm z-20 hover:scale-105 active:scale-95 flex cursor-pointer shadow-md"
           >
             <ChevronRight className="w-5 h-5" />
           </button>

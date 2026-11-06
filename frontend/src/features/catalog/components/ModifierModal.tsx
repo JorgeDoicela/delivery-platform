@@ -139,7 +139,7 @@ export function ModifierModal({ product, onClose }: ModifierModalProps) {
             aria-modal="true"
             aria-labelledby="modifier-modal-title"
         >
-            <div className="relative w-full max-w-lg bg-surface-card rounded-t-3xl sm:rounded-3xl shadow-2xl border border-surface-border/60 flex flex-col h-[90vh] sm:h-auto sm:max-h-[85vh] overflow-hidden text-text-strong ring-1 ring-black/10 animate-in zoom-in-95 duration-200">
+            <div className="relative w-full max-w-lg bg-surface-card rounded-t-3xl sm:rounded-3xl shadow-2xl flex flex-col h-[90vh] sm:h-auto sm:max-h-[85vh] overflow-hidden text-text-strong animate-in zoom-in-95 duration-200">
                 {/* Cabecera Hero Fotográfica Gastronómica */}
                 <div className="relative w-full h-44 sm:h-52 bg-neutral-900 overflow-hidden shrink-0">
                     <Image
@@ -153,7 +153,7 @@ export function ModifierModal({ product, onClose }: ModifierModalProps) {
                     <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent" />
 
                     {/* Badge de Categoría Superior Izquierdo */}
-                    <span className="absolute top-3.5 left-3.5 z-10 text-[10px] font-bold uppercase tracking-wider text-white bg-black/60 backdrop-blur-md px-3 py-1 rounded-full shadow-md font-sans border border-white/10">
+                    <span className="absolute top-3.5 left-3.5 z-10 text-[10px] font-bold uppercase tracking-wider text-white bg-black/60 backdrop-blur-md px-3 py-1 rounded-full shadow-md font-sans">
                         {product.category}
                     </span>
 
@@ -162,7 +162,7 @@ export function ModifierModal({ product, onClose }: ModifierModalProps) {
                         type="button"
                         onClick={onClose}
                         aria-label="Cerrar modal"
-                        className="absolute top-3.5 right-3.5 z-10 w-9 h-9 rounded-full bg-black/60 hover:bg-black/80 text-white backdrop-blur-md flex items-center justify-center transition-all shadow-md active:scale-90 cursor-pointer border border-white/10"
+                        className="absolute top-3.5 right-3.5 z-10 w-9 h-9 rounded-full bg-black/60 hover:bg-black/80 text-white backdrop-blur-md flex items-center justify-center transition-all shadow-md active:scale-90 cursor-pointer"
                     >
                         <X className="w-5 h-5 stroke-[2.5]" />
                     </button>
@@ -171,7 +171,7 @@ export function ModifierModal({ product, onClose }: ModifierModalProps) {
                 {/* Contenido Desplazable del Producto y Modificadores */}
                 <div className="flex-1 min-h-0 overflow-y-auto p-5 sm:p-6 space-y-6 custom-scrollbar overscroll-contain bg-surface-card">
                     {/* Información Principal del Plato */}
-                    <div className="space-y-1.5 pb-4 border-b border-surface-border">
+                    <div className="space-y-1.5 pb-2">
                         <div className="flex items-start justify-between gap-4">
                             <h2 id="modifier-modal-title" className="text-xl sm:text-2xl font-black text-text-strong uppercase tracking-tight font-display leading-tight">
                                 {product.name}
@@ -277,11 +277,11 @@ export function ModifierModal({ product, onClose }: ModifierModalProps) {
 
                 {/* Footer Modal Fijo y 100% Opaco */}
                 <div
-                    className="p-4 sm:p-5 bg-surface-card border-t border-surface-border flex items-center justify-between gap-3 sm:gap-4 shrink-0 shadow-lg z-10"
+                    className="p-4 sm:p-5 bg-surface-card flex items-center justify-between gap-3 sm:gap-4 shrink-0 shadow-[0_-4px_16px_rgba(0,0,0,0.06)] z-10"
                     style={{ paddingBottom: "max(1rem, env(safe-area-inset-bottom))" }}
                 >
                     {/* Stepper Cantidad */}
-                    <div className="flex items-center gap-1 bg-surface-canvas border border-surface-border rounded-full p-1 shadow-2xs shrink-0">
+                    <div className="flex items-center gap-1 bg-surface-canvas rounded-full p-1 shadow-xs shrink-0">
                         <button
                             type="button"
                             onClick={() => setQuantity((q) => Math.max(1, q - 1))}

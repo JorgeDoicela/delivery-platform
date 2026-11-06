@@ -34,9 +34,7 @@ export function CartDrawerCoupon() {
     return (
       <div className="p-3 rounded-2xl bg-brand-primary/10 border border-brand-primary/30 flex items-center justify-between text-xs">
         <div className="flex items-center gap-2">
-          <div className="w-6 h-6 rounded-full bg-brand-primary text-white flex items-center justify-center">
-            <Check className="w-3.5 h-3.5 stroke-[3]" />
-          </div>
+          <Check className="w-4 h-4 text-brand-primary stroke-[2.5] shrink-0" />
           <div>
             <span className="font-bold text-text-strong font-mono uppercase block">
               {couponCode}
@@ -68,9 +66,7 @@ export function CartDrawerCoupon() {
           className="w-full px-4 py-2.5 rounded-full bg-neutral-900 text-white dark:bg-neutral-800 flex items-center justify-between text-xs transition-colors hover:bg-neutral-800 dark:hover:bg-neutral-700 cursor-pointer"
         >
           <div className="flex items-center gap-2">
-            <div className="w-5 h-5 rounded-full bg-brand-primary flex items-center justify-center text-white text-[10px] font-bold">
-              %
-            </div>
+            <Tag className="w-4 h-4 text-brand-primary shrink-0" />
             <span className="font-semibold text-[11px] tracking-wide">¿Tienes un código?</span>
           </div>
           <div className="flex items-center gap-1 text-[11px] text-neutral-300 font-bold font-display uppercase tracking-wider">

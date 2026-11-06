@@ -16,7 +16,6 @@ import {
   MapPin,
   Clock,
   ShoppingBag,
-  Sparkles,
 } from "lucide-react";
 import { CartButtonBadge, CartDrawer, useCartStore } from "@/features/cart";
 import {
@@ -120,26 +119,12 @@ function StorefrontHeader() {
               </div>
             </Link>
 
-            <nav className="hidden xl:flex items-center gap-5 text-[13px] sm:text-sm font-semibold text-text-strong">
+            <nav className="hidden xl:flex items-center gap-6 text-[13px] sm:text-sm font-semibold text-text-strong">
               <Link
                 href={catalogHref}
                 className="hover:text-brand-primary transition-colors"
               >
                 {isPlatformRoot ? "Restaurantes" : "Menú & Combos"}
-              </Link>
-              {!isPlatformRoot && (
-                <Link
-                  href={`/${tenantSlug}#especialidades`}
-                  className="hover:text-brand-primary transition-colors"
-                >
-                  Especialidades
-                </Link>
-              )}
-              <Link
-                href={isPlatformRoot ? "/#sucursales" : `/${tenantSlug}#sucursales`}
-                className="hover:text-brand-primary transition-colors"
-              >
-                Sucursales
               </Link>
               <Link
                 href="/rastreo"
@@ -296,26 +281,6 @@ function StorefrontHeader() {
                 >
                   <Utensils className="w-4 h-4 text-brand-primary shrink-0" />
                   <span>{isPlatformRoot ? "Directorio de Restaurantes" : "Menú & Combos"}</span>
-                </Link>
-
-                {!isPlatformRoot && (
-                  <Link
-                    href={`/${tenantSlug}#especialidades`}
-                    onClick={() => setIsMobileMenuOpen(false)}
-                    className="flex items-center gap-3 px-3.5 py-3 rounded-2xl hover:bg-surface-canvas text-text-strong hover:text-brand-primary font-display font-black text-sm uppercase tracking-wide transition-colors"
-                  >
-                    <Sparkles className="w-4 h-4 text-brand-accent shrink-0" />
-                    <span>Especialidades</span>
-                  </Link>
-                )}
-
-                <Link
-                  href="/sucursales"
-                  onClick={() => setIsMobileMenuOpen(false)}
-                  className="flex items-center gap-3 px-3.5 py-3 rounded-2xl hover:bg-surface-canvas text-text-strong hover:text-brand-primary font-display font-black text-sm uppercase tracking-wide transition-colors"
-                >
-                  <MapPin className="w-4 h-4 text-brand-primary shrink-0" />
-                  <span>Sucursales & Horarios</span>
                 </Link>
 
                 <Link
@@ -527,7 +492,7 @@ function StorefrontFooter() {
         )}
 
         {/* Sub-footer unificado */}
-        <div className="mt-4 pt-3.5 border-t border-surface-border flex flex-col sm:flex-row items-center justify-between gap-2.5 text-[11px] text-text-subtle">
+        <div className="mt-3 flex flex-col sm:flex-row items-center justify-between gap-2.5 text-[11px] text-text-subtle">
           <div className="text-center sm:text-left">
             <span>
               © {currentYear} {brandName}.

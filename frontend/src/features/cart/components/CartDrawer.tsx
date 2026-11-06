@@ -77,14 +77,12 @@ export function CartDrawer() {
       />
 
       {/* Panel Deslizante Lateral (Drawer Ampliado con Bordes Exteriores Redondeados) */}
-      <div className="fixed inset-y-0 right-0 max-w-full flex pl-0 sm:pl-10">
-        <div className="w-screen max-w-full sm:max-w-xl md:max-w-[560px] bg-surface-card rounded-t-3xl sm:rounded-l-[2.5rem] sm:rounded-tr-none border-l border-surface-border shadow-2xl flex flex-col justify-between overflow-hidden">
+      <div className="fixed inset-y-0 right-0 max-w-full flex pl-0 sm:pl-6">
+        <div className="w-screen max-w-full sm:max-w-xl md:max-w-2xl lg:max-w-[680px] xl:max-w-[720px] bg-surface-card rounded-t-2xl sm:rounded-l-2xl sm:rounded-tr-none shadow-2xl flex flex-col justify-between overflow-hidden">
           {/* 1. Cabecera Fija */}
-          <div className="px-5 sm:px-7 py-4 border-b border-surface-border flex items-center justify-between bg-surface-card shrink-0">
+          <div className="px-5 sm:px-8 py-4 border-b border-surface-border flex items-center justify-between bg-surface-card shrink-0">
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-2xl bg-brand-primary/10 text-brand-primary flex items-center justify-center shrink-0">
-                <ShoppingBag className="w-5 h-5 stroke-[2.2]" />
-              </div>
+              <ShoppingBag className="w-6 h-6 text-brand-primary stroke-[2.2] shrink-0" />
               <div>
                 <h2
                   id="cart-drawer-title"
@@ -101,7 +99,7 @@ export function CartDrawer() {
             <button
               type="button"
               onClick={closeCart}
-              className="w-10 h-10 rounded-full flex items-center justify-center text-text-muted hover:text-text-strong bg-surface-canvas hover:bg-surface-card-hover border border-surface-border transition-colors cursor-pointer active:scale-95"
+              className="w-10 h-10 rounded-full flex items-center justify-center text-text-muted hover:text-text-strong bg-surface-canvas hover:bg-surface-card-hover shadow-2xs transition-colors cursor-pointer active:scale-95"
               aria-label="Cerrar carrito"
             >
               <X className="w-5 h-5 stroke-[2.5]" />
@@ -114,8 +112,8 @@ export function CartDrawer() {
           ) : (
             <div className="flex-1 min-h-0 flex flex-col">
               {/* Subcabecera de Sucursal y Cupón */}
-              <div className="p-5 sm:p-6 pb-3 space-y-3 shrink-0">
-                <div className="flex items-center justify-between bg-surface-canvas p-3 sm:p-3.5 rounded-2xl border border-surface-border">
+              <div className="p-5 sm:p-8 pb-3 space-y-3 shrink-0">
+                <div className="flex items-center justify-between bg-surface-canvas p-3 sm:p-3.5 rounded-2xl shadow-2xs">
                   <div className="flex items-center gap-2.5 min-w-0">
                     <Store className="w-4 h-4 text-brand-primary shrink-0" />
                     <span className="font-display font-black text-sm uppercase tracking-wide text-text-strong truncate">
@@ -138,10 +136,10 @@ export function CartDrawer() {
 
                 {/* Banner de Horario de Atención */}
                 <div
-                  className={`p-3 rounded-2xl text-xs leading-relaxed flex items-center gap-2.5 ${
+                  className={`p-3 rounded-2xl text-xs leading-relaxed flex items-center gap-2.5 shadow-2xs ${
                     !opStatus.isOpen
                       ? "bg-brand-primary text-white"
-                      : "bg-surface-canvas border border-surface-border text-text-muted"
+                      : "bg-surface-canvas text-text-muted"
                   }`}
                 >
                   <span className="text-[11px] leading-relaxed">
@@ -154,7 +152,7 @@ export function CartDrawer() {
 
               {/* Área Desplazable de Productos con ScrollArea */}
               <ScrollArea
-                className="flex-1 px-5 sm:px-6 min-h-0"
+                className="flex-1 px-5 sm:px-8 min-h-0"
                 viewportClassName="space-y-3"
                 scrollShadows
               >
@@ -182,7 +180,7 @@ export function CartDrawer() {
 
               {/* 3. Resumen y Botón de Checkout Sticky */}
               <div
-                className="px-5 sm:px-6 pb-6 pt-2 border-t border-surface-border bg-surface-canvas shrink-0"
+                className="px-5 sm:px-8 pb-6 pt-2 border-t border-surface-border bg-surface-canvas shrink-0"
                 style={{ paddingBottom: "max(1.5rem, env(safe-area-inset-bottom))" }}
               >
                 <CartDrawerSummary />

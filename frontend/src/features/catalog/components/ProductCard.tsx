@@ -59,7 +59,7 @@ export function ProductCard({ product }: ProductCardProps) {
         </div>
 
         {/* Fila Inferior de Precio y Botón Pedir */}
-        <div className="px-4 pb-4 sm:px-5 sm:pb-5 pt-3 border-t border-surface-border/70 flex items-center justify-between mt-auto">
+        <div className="px-4 pb-4 sm:px-5 sm:pb-5 pt-1.5 flex items-center justify-between mt-auto">
           <span className="text-lg sm:text-xl font-black text-text-strong tracking-tight tabular-nums font-mono">
             {formatCurrency(product.basePrice)}
           </span>

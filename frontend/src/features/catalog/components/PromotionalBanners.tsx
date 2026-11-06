@@ -28,10 +28,8 @@ export function PromotionalBanners({
           return (
             <div
               key={`${banner.id}-${idx}`}
-              className={`relative overflow-hidden rounded-3xl p-6 sm:p-8 flex flex-col justify-between text-white shadow-lg min-h-[280px] sm:min-h-[320px] group ${
-                isSlate
-                  ? "bg-slate-950 border border-slate-300/20"
-                  : "bg-neutral-950 border border-white/20"
+              className={`relative overflow-hidden rounded-3xl p-6 sm:p-8 flex flex-col justify-between text-white shadow-xl min-h-[280px] sm:min-h-[320px] group ${
+                isSlate ? "bg-slate-950" : "bg-neutral-950"
               }`}
             >
               <div className="absolute inset-0 z-0">

@@ -101,7 +101,7 @@ export function CatalogSection({ tenantSlug }: CatalogSectionProps = {}) {
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             placeholder="Buscar por plato, combo o bebida..."
-            className="w-full pl-11 pr-10 py-2.5 rounded-full text-xs sm:text-sm bg-surface-card border border-surface-border focus:border-brand-primary focus:ring-1 focus:ring-brand-primary text-text-strong placeholder:text-text-muted transition-all shadow-2xs outline-hidden"
+            className="w-full pl-11 pr-10 py-2.5 rounded-full text-xs sm:text-sm bg-surface-card focus:ring-2 focus:ring-brand-primary text-text-strong placeholder:text-text-muted transition-all shadow-xs outline-hidden"
           />
           {searchQuery && (
             <button
@@ -129,7 +129,7 @@ export function CatalogSection({ tenantSlug }: CatalogSectionProps = {}) {
                   className={`inline-flex items-center gap-1.5 px-4 sm:px-5 py-2 rounded-full text-xs font-black uppercase tracking-wider font-display transition-all whitespace-nowrap cursor-pointer shrink-0 ${
                     isSelected
                       ? "bg-brand-primary text-white shadow-xs scale-[1.02]"
-                      : "bg-surface-card text-text-strong hover:bg-surface-card-hover border border-surface-border hover:border-surface-border-subtle"
+                      : "bg-surface-card text-text-strong hover:bg-surface-card-hover shadow-2xs hover:shadow-xs"
                   }`}
                 >
                   <span>{cat.name}</span>
@@ -194,12 +194,12 @@ export function CatalogSection({ tenantSlug }: CatalogSectionProps = {}) {
 
             return (
               <section key={category.categoryName} className="space-y-5">
-                <div className="flex items-center justify-between pb-2 border-b border-surface-border/60">
+                <div className="flex items-center justify-between pb-1">
                   <div className="flex items-center gap-2.5">
                     <h3 className="text-xl sm:text-2xl font-black text-text-strong uppercase tracking-tight font-display">
                       {category.categoryName}
                     </h3>
-                    <span className="text-xs text-text-muted font-mono font-bold bg-surface-card border border-surface-border px-2 py-0.5 rounded-full">
+                    <span className="text-xs text-text-muted font-mono font-bold bg-surface-card px-2.5 py-0.5 rounded-full shadow-2xs">
                       {category.products.length}
                     </span>
                   </div>

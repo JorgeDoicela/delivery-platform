@@ -89,7 +89,7 @@ export function PopularProductsSection({
 
         <Link
           href={menuUrl}
-          className="inline-flex items-center gap-1.5 self-start sm:self-auto bg-surface-card hover:bg-surface-card-hover border border-surface-border hover:border-brand-primary text-text-strong hover:text-brand-primary text-xs font-bold uppercase tracking-wider px-4 py-2 rounded-full transition-all duration-200 group shrink-0 shadow-2xs font-display"
+          className="inline-flex items-center gap-1.5 self-start sm:self-auto bg-surface-card hover:bg-surface-card-hover text-text-strong hover:text-brand-primary text-xs font-bold uppercase tracking-wider px-4.5 py-2.5 rounded-full transition-all duration-200 group shrink-0 shadow-xs hover:shadow-md font-display"
         >
           <span>Ver Menú Completo</span>
           <ArrowRight className="w-3.5 h-3.5 transition-transform group-hover:translate-x-1" />

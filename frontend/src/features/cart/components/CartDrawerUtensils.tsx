@@ -12,13 +12,11 @@ export function CartDrawerUtensils() {
   const switchId = useId();
 
   return (
-    <div className="p-4 rounded-2xl bg-surface-canvas/60 border border-surface-border space-y-3 shadow-2xs">
+    <div className="p-4 rounded-2xl bg-surface-canvas/60 space-y-3 shadow-2xs">
       {/* Fila principal con toggle */}
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2.5 text-text-strong">
-          <div className="w-8 h-8 rounded-full bg-brand-primary/10 text-brand-primary flex items-center justify-center">
-            <Utensils className="w-4 h-4 stroke-[2.2]" />
-          </div>
+          <Utensils className="w-4 h-4 text-brand-primary stroke-[2.2] shrink-0" />
           <label
             htmlFor={switchId}
             className="text-xs font-black font-display uppercase tracking-wider cursor-pointer"
@@ -47,7 +45,7 @@ export function CartDrawerUtensils() {
 
       {/* Opciones desplegables cuando el switch está activo */}
       {utensils.enabled && (
-        <div className="pt-2 border-t border-surface-border/60 space-y-2">
+        <div className="pt-2 space-y-2">
           <label className="flex items-center justify-between p-2 rounded-xl hover:bg-surface-card transition-colors text-xs text-text-strong font-medium cursor-pointer">
             <span>Salsas y aderezos</span>
             <input

@@ -72,15 +72,15 @@ export function StorefrontBranchShowcase({ tenant }: StorefrontBranchShowcasePro
             Dónde Encontrarnos
           </span>
           <h3 className="text-3xl sm:text-4xl font-black text-text-strong uppercase tracking-wide font-display">
-            Ven a Comer al Local o Pide a Domicilio
+            Ubicación y Horarios de Atención
           </h3>
-          <p className="text-xs sm:text-sm text-text-muted mt-1 leading-relaxed">
-            Te esperamos en nuestro restaurante en {branchDisplayName} para almorzar o cenar en familia, o pide en línea y te lo llevamos calientito directo a tu puerta.
+          <p className="text-xs sm:text-sm text-text-muted mt-1 leading-relaxed max-w-xl">
+            Atención continua todos los días de {activeBranch.openingTime || "10:30"} a {activeBranch.closingTime || "21:30"} en nuestro local de {branchDisplayName}.
           </p>
         </div>
 
         {branches.length > 1 && (
-          <div className="flex items-center gap-2 bg-neutral-100 dark:bg-neutral-800 p-1 rounded-full border border-neutral-200 dark:border-neutral-700 shrink-0">
+          <div className="flex items-center gap-2 bg-neutral-100 dark:bg-neutral-800 p-1 rounded-full shrink-0 shadow-2xs">
             {branches.map((b) => {
               const isSelected = b.id === activeBranch.id;
               return (
@@ -105,10 +105,10 @@ export function StorefrontBranchShowcase({ tenant }: StorefrontBranchShowcasePro
       {/* Tarjeta Principal Showcase 2 Columnas */}
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-stretch">
         {/* Columna Izquierda: Información Editorial y Limpia (5 columnas) */}
-        <div className="lg:col-span-5 flex flex-col justify-between bg-surface-card border border-surface-border rounded-3xl p-6 sm:p-8 shadow-xs">
+        <div className="lg:col-span-5 flex flex-col justify-between bg-surface-card rounded-3xl p-6 sm:p-8 shadow-sm">
           <div className="space-y-6">
             {/* Cabecera del Local y Estatus Tipográfico Dinámico */}
-            <div className="flex items-start justify-between gap-4 pb-4 border-b border-surface-border">
+            <div className="flex items-start justify-between gap-4 pb-2">
               <div>
                 <span className="text-[11px] font-bold uppercase tracking-widest text-text-muted block mb-1 font-display">
                   Nuestro Local
@@ -220,7 +220,7 @@ export function StorefrontBranchShowcase({ tenant }: StorefrontBranchShowcasePro
           </div>
 
           {/* Botones de Acción Canónicos (rounded-full) */}
-          <div className="pt-6 mt-6 border-t border-surface-border flex flex-col sm:flex-row items-center gap-3">
+          <div className="pt-4 mt-4 flex flex-col sm:flex-row items-center gap-3">
             <a
               href={shortLinkUrl || googleMapsUrl}
               target="_blank"
@@ -232,7 +232,7 @@ export function StorefrontBranchShowcase({ tenant }: StorefrontBranchShowcasePro
 
             <a
               href="#catalogo"
-              className="w-full sm:w-auto inline-flex items-center justify-center bg-surface-canvas hover:bg-surface-card-hover border border-surface-border text-text-strong text-xs font-bold font-display uppercase tracking-wider px-6 py-3.5 rounded-full transition-all active:scale-95 text-center"
+              className="w-full sm:w-auto inline-flex items-center justify-center bg-surface-canvas hover:bg-surface-card-hover text-text-strong text-xs font-bold font-display uppercase tracking-wider px-6 py-3.5 rounded-full shadow-xs hover:shadow-sm transition-all active:scale-95 text-center"
             >
               {opStatus.isOpen ? "Ver Menú & Ordenar" : "Ver Menú"}
             </a>
@@ -240,7 +240,7 @@ export function StorefrontBranchShowcase({ tenant }: StorefrontBranchShowcasePro
         </div>
 
         {/* Columna Derecha: Vista Cartográfica Interactiva Vectorial con MapLibre GL JS */}
-        <div className="lg:col-span-7 rounded-3xl border border-surface-border overflow-hidden bg-surface-canvas relative min-h-[380px] lg:min-h-[460px] shadow-xs flex flex-col">
+        <div className="lg:col-span-7 rounded-3xl overflow-hidden bg-surface-canvas relative min-h-[380px] lg:min-h-[460px] shadow-sm flex flex-col">
           <BranchMapViewer
             branchName={branchDisplayName}
             address={activeBranch.address}

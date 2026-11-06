@@ -40,8 +40,8 @@ export function OrderModeSelector() {
               onClick={() => handleSelectMode("delivery")}
               className={`group relative overflow-hidden py-4 px-4 sm:py-6 sm:px-6 rounded-2xl sm:rounded-3xl flex items-center justify-center gap-3.5 sm:gap-4 text-left transition-all active:scale-95 bg-brand-primary hover:bg-brand-primary-hover text-white cursor-pointer ${
                 deliveryType === "delivery"
-                  ? "shadow-2xl scale-[1.01] ring-2 ring-white/40"
-                  : "shadow-md hover:shadow-lg"
+                  ? "shadow-xl scale-[1.01]"
+                  : "shadow-md hover:shadow-lg opacity-90 hover:opacity-100"
               }`}
             >
               <Bike className="w-8 h-8 sm:w-10 sm:h-10 text-white shrink-0 group-hover:scale-110 transition-transform" />
@@ -62,8 +62,8 @@ export function OrderModeSelector() {
               onClick={() => handleSelectMode("takeout")}
               className={`group relative overflow-hidden py-4 px-4 sm:py-6 sm:px-6 rounded-2xl sm:rounded-3xl flex items-center justify-center gap-3.5 sm:gap-4 text-left transition-all active:scale-95 bg-brand-primary hover:bg-brand-primary-hover text-white cursor-pointer ${
                 deliveryType === "takeout"
-                  ? "shadow-2xl scale-[1.01] ring-2 ring-white/40"
-                  : "shadow-md hover:shadow-lg"
+                  ? "shadow-xl scale-[1.01]"
+                  : "shadow-md hover:shadow-lg opacity-90 hover:opacity-100"
               }`}
             >
               <Store className="w-8 h-8 sm:w-10 sm:h-10 text-white shrink-0 group-hover:scale-110 transition-transform" />
@@ -85,7 +85,7 @@ export function OrderModeSelector() {
             const catalog = document.getElementById("catalogo");
             if (catalog) catalog.scrollIntoView({ behavior: "smooth" });
           }}
-          className="w-full flex items-center justify-center gap-2.5 bg-white hover:bg-neutral-50 border border-neutral-300 py-3 px-6 rounded-full shadow-sm text-sm transition-all active:scale-98"
+          className="w-full flex items-center justify-center gap-2.5 bg-surface-card hover:bg-surface-card-hover py-3 px-6 rounded-full shadow-xs hover:shadow-sm text-sm transition-all active:scale-98"
         >
           <span className="w-5 h-5 rounded-full bg-brand-primary text-white flex items-center justify-center text-xs font-black">
             %
