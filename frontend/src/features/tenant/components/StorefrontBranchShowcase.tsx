@@ -4,6 +4,7 @@ import React, { useState, useEffect } from "react";
 import type { TenantStorefrontConfigDto, TenantBranchSummaryDto } from "@/shared/types/api";
 import { useBranchesQuery } from "../hooks/useTenantQueries";
 import { getBranchOperatingStatus } from "@/shared/lib/schedule";
+import { BranchMapViewer } from "./BranchMapViewer";
 
 interface StorefrontBranchShowcaseProps {
   tenant: TenantStorefrontConfigDto | null | undefined;
@@ -62,14 +63,10 @@ export function StorefrontBranchShowcase({ tenant }: StorefrontBranchShowcasePro
   const googleMapsUrl = `https://www.google.com/maps/search/?api=1&query=${lat},${lng}`;
   const shortLinkUrl = "https://maps.app.goo.gl/bitq9r465t2GuHKCA";
 
-  // Bounding box para OpenStreetMap
-  const bbox = `${lng - 0.007}%2C${lat - 0.0045}%2C${lng + 0.007}%2C${lat + 0.0045}`;
-  const embedMapUrl = `https://www.openstreetmap.org/export/embed.html?bbox=${bbox}&layer=mapnik&marker=${lat}%2C${lng}`;
-
   return (
     <section id="sucursales" className="max-w-[1240px] mx-auto pt-10 w-full space-y-6">
       {/* Encabezado Editorial Canónico */}
-      <div className="flex flex-col sm:flex-row sm:items-end justify-between pb-4 border-b border-surface-border gap-4">
+      <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4">
         <div>
           <span className="text-[11px] font-bold uppercase tracking-widest text-brand-primary block mb-1 font-sans">
             Dónde Encontrarnos
@@ -127,19 +124,16 @@ export function StorefrontBranchShowcase({ tenant }: StorefrontBranchShowcasePro
                 </span>
               ) : opStatus.isOpen ? (
                 opStatus.isClosingSoon ? (
-                  <span className="inline-flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider text-amber-600 dark:text-amber-400 font-display shrink-0 mt-1">
-                    <span className="w-2 h-2 rounded-full bg-amber-500 animate-pulse" />
+                  <span className="text-xs font-bold uppercase tracking-wider text-amber-600 dark:text-amber-400 font-display shrink-0 mt-1">
                     Cierra Pronto
                   </span>
                 ) : (
-                  <span className="inline-flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider text-emerald-600 dark:text-emerald-400 font-display shrink-0 mt-1">
-                    <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
+                  <span className="text-xs font-bold uppercase tracking-wider text-emerald-600 dark:text-emerald-400 font-display shrink-0 mt-1">
                     Abierto Ahora
                   </span>
                 )
               ) : (
-                <span className="inline-flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider text-text-muted font-display shrink-0 mt-1">
-                  <span className="w-2 h-2 rounded-full bg-neutral-400" />
+                <span className="text-xs font-bold uppercase tracking-wider text-text-muted font-display shrink-0 mt-1">
                   Cerrado Actualmente
                 </span>
               )}
@@ -196,24 +190,27 @@ export function StorefrontBranchShowcase({ tenant }: StorefrontBranchShowcasePro
                 </div>
               </div>
 
-              {/* Modalidades en Píldoras Neutras Limpias */}
+              {/* Modalidades en Lista Limpia Tipográfica (Sin apariencia de botón) */}
               <div className="pt-1">
-                <span className="text-[10px] font-bold uppercase tracking-wider text-text-muted block mb-2">
+                <span className="text-[10px] font-bold uppercase tracking-wider text-text-muted block mb-1.5">
                   Modalidades de Atención
                 </span>
-                <div className="flex flex-wrap items-center gap-2">
+                <div className="flex flex-wrap items-center gap-x-4 gap-y-1.5 text-xs font-semibold text-text-strong">
                   {tenant?.enableDineIn !== false && (
-                    <span className="px-3.5 py-1.5 rounded-full bg-surface-canvas border border-surface-border text-xs font-semibold text-text-strong">
+                    <span className="inline-flex items-center gap-1.5">
+                      <span className="w-1.5 h-1.5 rounded-full bg-brand-primary shrink-0" />
                       Consumo en Salón
                     </span>
                   )}
                   {tenant?.enableTakeout !== false && (
-                    <span className="px-3.5 py-1.5 rounded-full bg-surface-canvas border border-surface-border text-xs font-semibold text-text-strong">
+                    <span className="inline-flex items-center gap-1.5">
+                      <span className="w-1.5 h-1.5 rounded-full bg-brand-primary shrink-0" />
                       Para Llevar
                     </span>
                   )}
                   {tenant?.enableDelivery !== false && (
-                    <span className="px-3.5 py-1.5 rounded-full bg-surface-canvas border border-surface-border text-xs font-semibold text-text-strong">
+                    <span className="inline-flex items-center gap-1.5">
+                      <span className="w-1.5 h-1.5 rounded-full bg-brand-primary shrink-0" />
                       A Domicilio
                     </span>
                   )}
@@ -242,24 +239,16 @@ export function StorefrontBranchShowcase({ tenant }: StorefrontBranchShowcasePro
           </div>
         </div>
 
-        {/* Columna Derecha: Vista Cartográfica Limpia (7 columnas) */}
+        {/* Columna Derecha: Vista Cartográfica Interactiva Vectorial con MapLibre GL JS */}
         <div className="lg:col-span-7 rounded-3xl border border-surface-border overflow-hidden bg-surface-canvas relative min-h-[380px] lg:min-h-[460px] shadow-xs flex flex-col">
-          <iframe
-            title={`Ubicación de ${activeBranch.name}`}
-            src={embedMapUrl}
-            className="w-full h-full min-h-[380px] lg:min-h-[460px] border-0"
-            loading="lazy"
+          <BranchMapViewer
+            branchName={branchDisplayName}
+            address={activeBranch.address}
+            latitude={lat}
+            longitude={lng}
+            imageUrl="/images/tenants/la-granjita/banners/promo-hecho-a-la-brasa.jpg"
+            googleMapsUrl={shortLinkUrl || googleMapsUrl}
           />
-
-          {/* Botón Flotante Canónico */}
-          <a
-            href={shortLinkUrl || googleMapsUrl}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="absolute bottom-4 right-4 inline-flex items-center px-5 py-2.5 rounded-full bg-neutral-950/90 hover:bg-neutral-900 text-white text-xs font-bold font-display uppercase tracking-wider transition-all shadow-lg active:scale-95 backdrop-blur-sm"
-          >
-            Abrir en Google Maps
-          </a>
         </div>
       </div>
     </section>

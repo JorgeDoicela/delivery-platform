@@ -12,14 +12,16 @@ export function CartDrawerUtensils() {
   const switchId = useId();
 
   return (
-    <div className="py-4 border-b border-surface-border space-y-3">
+    <div className="p-4 rounded-2xl bg-surface-canvas/60 border border-surface-border space-y-3 shadow-2xs">
       {/* Fila principal con toggle */}
       <div className="flex items-center justify-between">
-        <div className="flex items-center gap-2 text-text-strong">
-          <Utensils className="w-4 h-4 text-brand-primary" />
+        <div className="flex items-center gap-2.5 text-text-strong">
+          <div className="w-8 h-8 rounded-full bg-brand-primary/10 text-brand-primary flex items-center justify-center">
+            <Utensils className="w-4 h-4 stroke-[2.2]" />
+          </div>
           <label
             htmlFor={switchId}
-            className="text-xs font-bold font-display uppercase tracking-wider cursor-pointer"
+            className="text-xs font-black font-display uppercase tracking-wider cursor-pointer"
           >
             ¿Quieres añadir utensilios?
           </label>
@@ -31,7 +33,7 @@ export function CartDrawerUtensils() {
           role="switch"
           aria-checked={utensils.enabled}
           onClick={() => setUtensilsEnabled(!utensils.enabled)}
-          className={`relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none ${
+          className={`relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-hidden ${
             utensils.enabled ? "bg-brand-primary" : "bg-neutral-300 dark:bg-neutral-700"
           }`}
         >
@@ -45,9 +47,9 @@ export function CartDrawerUtensils() {
 
       {/* Opciones desplegables cuando el switch está activo */}
       {utensils.enabled && (
-        <div className="pl-6 space-y-2 pt-1">
-          <label className="flex items-center justify-between text-xs text-text-base cursor-pointer group">
-            <span>Salsas</span>
+        <div className="pt-2 border-t border-surface-border/60 space-y-2">
+          <label className="flex items-center justify-between p-2 rounded-xl hover:bg-surface-card transition-colors text-xs text-text-strong font-medium cursor-pointer">
+            <span>Salsas y aderezos</span>
             <input
               type="checkbox"
               checked={utensils.sauces}
@@ -55,18 +57,18 @@ export function CartDrawerUtensils() {
               className="sr-only"
             />
             <span
-              className={`w-4 h-4 rounded flex items-center justify-center transition-colors ${
+              className={`w-5 h-5 rounded-md flex items-center justify-center transition-colors ${
                 utensils.sauces
                   ? "bg-brand-primary text-white"
-                  : "border border-surface-border bg-surface-canvas"
+                  : "border-2 border-surface-border bg-surface-card"
               }`}
             >
-              {utensils.sauces && <Check className="w-3 h-3 stroke-[3]" />}
+              {utensils.sauces && <Check className="w-3.5 h-3.5 stroke-[3]" />}
             </span>
           </label>
 
-          <label className="flex items-center justify-between text-xs text-text-base cursor-pointer group">
-            <span>Cubiertos</span>
+          <label className="flex items-center justify-between p-2 rounded-xl hover:bg-surface-card transition-colors text-xs text-text-strong font-medium cursor-pointer">
+            <span>Cubiertos desechables</span>
             <input
               type="checkbox"
               checked={utensils.cutlery}
@@ -74,17 +76,17 @@ export function CartDrawerUtensils() {
               className="sr-only"
             />
             <span
-              className={`w-4 h-4 rounded flex items-center justify-center transition-colors ${
+              className={`w-5 h-5 rounded-md flex items-center justify-center transition-colors ${
                 utensils.cutlery
                   ? "bg-brand-primary text-white"
-                  : "border border-surface-border bg-surface-canvas"
+                  : "border-2 border-surface-border bg-surface-card"
               }`}
             >
-              {utensils.cutlery && <Check className="w-3 h-3 stroke-[3]" />}
+              {utensils.cutlery && <Check className="w-3.5 h-3.5 stroke-[3]" />}
             </span>
           </label>
 
-          <label className="flex items-center justify-between text-xs text-text-base cursor-pointer group">
+          <label className="flex items-center justify-between p-2 rounded-xl hover:bg-surface-card transition-colors text-xs text-text-strong font-medium cursor-pointer">
             <span>Servilletas</span>
             <input
               type="checkbox"
@@ -93,13 +95,13 @@ export function CartDrawerUtensils() {
               className="sr-only"
             />
             <span
-              className={`w-4 h-4 rounded flex items-center justify-center transition-colors ${
+              className={`w-5 h-5 rounded-md flex items-center justify-center transition-colors ${
                 utensils.napkins
                   ? "bg-brand-primary text-white"
-                  : "border border-surface-border bg-surface-canvas"
+                  : "border-2 border-surface-border bg-surface-card"
               }`}
             >
-              {utensils.napkins && <Check className="w-3 h-3 stroke-[3]" />}
+              {utensils.napkins && <Check className="w-3.5 h-3.5 stroke-[3]" />}
             </span>
           </label>
         </div>
@@ -107,4 +109,3 @@ export function CartDrawerUtensils() {
     </div>
   );
 }
-

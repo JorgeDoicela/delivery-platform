@@ -34,7 +34,7 @@ export function AsaderoClassicLandingLayout({
           id="catalogo"
           className="max-w-[1240px] mx-auto pt-4 w-full"
         >
-          <PopularProductsSection tenantSlug={tenant?.slug} limit={6} />
+          <PopularProductsSection tenantSlug={tenant?.slug} limit={8} />
         </section>
 
 

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Image from "next/image";
 import type { MenuProductDto, MenuModifierGroupDto } from "@/shared/types/api";
 import { useCartStore, type SelectedModifier } from "@/features/cart";
@@ -16,6 +16,31 @@ export function ModifierModal({ product, onClose }: ModifierModalProps) {
     const addItem = useCartStore((s) => s.addItem);
     const openCart = useCartStore((s) => s.openCart);
     const [quantity, setQuantity] = useState(1);
+
+    // Bloqueo estricto del scroll del fondo (body scroll lock) y soporte de tecla Escape
+    useEffect(() => {
+        const originalOverflow = document.body.style.overflow;
+        const originalPaddingRight = document.body.style.paddingRight;
+        const scrollbarWidth = window.innerWidth - document.documentElement.clientWidth;
+
+        if (scrollbarWidth > 0) {
+            document.body.style.paddingRight = `${scrollbarWidth}px`;
+        }
+        document.body.style.overflow = "hidden";
+
+        const handleKeyDown = (e: KeyboardEvent) => {
+            if (e.key === "Escape") {
+                onClose();
+            }
+        };
+        window.addEventListener("keydown", handleKeyDown);
+
+        return () => {
+            document.body.style.overflow = originalOverflow;
+            document.body.style.paddingRight = originalPaddingRight;
+            window.removeEventListener("keydown", handleKeyDown);
+        };
+    }, [onClose]);
 
     // Mapa de selecciones: [groupId]: Set<optionId>
     const [selections, setSelections] = useState<Record<number, number[]>>(() => {
@@ -103,43 +128,66 @@ export function ModifierModal({ product, onClose }: ModifierModalProps) {
     };
 
     return (
-        <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center p-0 sm:p-4 bg-black/65 backdrop-blur-xs animate-in fade-in duration-200">
-            <div className="relative w-full max-w-lg bg-surface-card rounded-t-3xl sm:rounded-2xl shadow-2xl flex flex-col h-[85vh] sm:h-auto sm:max-h-[85vh] overflow-hidden text-text-strong">
-                {/* Header Modal Fijo y Opaco */}
-                <div className="p-4 sm:p-6 border-b border-surface-border flex items-start justify-between gap-3 sm:gap-4 shrink-0 bg-surface-card z-10">
-                    <div className="flex items-start gap-3 sm:gap-4 min-w-0">
-                        <div className="relative w-14 h-14 sm:w-20 sm:h-20 rounded-2xl overflow-hidden bg-surface-canvas shrink-0 border border-surface-border">
-                            <Image
-                                src={product.imageUrl || "/images/shared/placeholders/dish-default.webp"}
-                                alt={product.name}
-                                fill
-                                sizes="(max-width: 640px) 56px, 80px"
-                                className="object-cover"
-                            />
-                        </div>
-                        <div className="min-w-0">
-                            <span className="text-[10px] font-bold uppercase tracking-wider text-text-strong bg-surface-canvas border border-surface-border px-2.5 py-0.5 rounded-full inline-block truncate max-w-full">
-                                {product.category}
-                            </span>
-                            <h3 className="text-lg sm:text-2xl font-black uppercase tracking-tight text-text-strong mt-1.5 font-display leading-tight truncate">
-                                {product.name}
-                            </h3>
-                            <p className="text-xs text-text-muted mt-0.5 line-clamp-2 leading-relaxed">
-                                {product.description}
-                            </p>
-                        </div>
-                    </div>
+        <div
+            className="fixed inset-0 z-50 flex items-end sm:items-center justify-center p-0 sm:p-4 bg-black/75 backdrop-blur-md animate-in fade-in duration-200 overscroll-none"
+            onClick={(e) => {
+                if (e.target === e.currentTarget) {
+                    onClose();
+                }
+            }}
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="modifier-modal-title"
+        >
+            <div className="relative w-full max-w-lg bg-surface-card rounded-t-3xl sm:rounded-3xl shadow-2xl border border-surface-border/60 flex flex-col h-[90vh] sm:h-auto sm:max-h-[85vh] overflow-hidden text-text-strong ring-1 ring-black/10 animate-in zoom-in-95 duration-200">
+                {/* Cabecera Hero Fotográfica Gastronómica */}
+                <div className="relative w-full h-44 sm:h-52 bg-neutral-900 overflow-hidden shrink-0">
+                    <Image
+                        src={product.imageUrl || "/images/shared/placeholders/dish-default.webp"}
+                        alt={product.name}
+                        fill
+                        sizes="(max-width: 640px) 100vw, 512px"
+                        className="object-cover object-center"
+                        priority
+                    />
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent" />
+
+                    {/* Badge de Categoría Superior Izquierdo */}
+                    <span className="absolute top-3.5 left-3.5 z-10 text-[10px] font-bold uppercase tracking-wider text-white bg-black/60 backdrop-blur-md px-3 py-1 rounded-full shadow-md font-sans border border-white/10">
+                        {product.category}
+                    </span>
+
+                    {/* Botón de Cierre Flotante Superior Derecho */}
                     <button
+                        type="button"
                         onClick={onClose}
                         aria-label="Cerrar modal"
-                        className="w-9 h-9 rounded-full flex items-center justify-center hover:bg-surface-card-hover text-text-muted hover:text-text-strong transition-colors shrink-0 cursor-pointer"
+                        className="absolute top-3.5 right-3.5 z-10 w-9 h-9 rounded-full bg-black/60 hover:bg-black/80 text-white backdrop-blur-md flex items-center justify-center transition-all shadow-md active:scale-90 cursor-pointer border border-white/10"
                     >
-                        <X className="w-5 h-5" />
+                        <X className="w-5 h-5 stroke-[2.5]" />
                     </button>
                 </div>
 
-                {/* Grupos de Modificadores Desplazables (Sin superposición, altura calculada exacta) */}
-                <div className="flex-1 min-h-0 overflow-y-auto p-4 sm:p-6 space-y-6 custom-scrollbar overscroll-contain bg-surface-card">
+                {/* Contenido Desplazable del Producto y Modificadores */}
+                <div className="flex-1 min-h-0 overflow-y-auto p-5 sm:p-6 space-y-6 custom-scrollbar overscroll-contain bg-surface-card">
+                    {/* Información Principal del Plato */}
+                    <div className="space-y-1.5 pb-4 border-b border-surface-border">
+                        <div className="flex items-start justify-between gap-4">
+                            <h2 id="modifier-modal-title" className="text-xl sm:text-2xl font-black text-text-strong uppercase tracking-tight font-display leading-tight">
+                                {product.name}
+                            </h2>
+                            <span className="text-xl sm:text-2xl font-black text-text-strong font-mono tabular-nums shrink-0">
+                                {formatCurrency(product.basePrice)}
+                            </span>
+                        </div>
+                        {product.description && (
+                            <p className="text-xs sm:text-sm text-text-muted leading-relaxed">
+                                {product.description}
+                            </p>
+                        )}
+                    </div>
+
+                    {/* Grupos de Modificadores */}
                     {product.modifierGroups.map((group) => {
                         const selectedIds = selections[group.id] || [];
                         const isGroupValid = !group.isRequired || selectedIds.length >= group.minSelectable;
@@ -148,24 +196,32 @@ export function ModifierModal({ product, onClose }: ModifierModalProps) {
                             <div key={group.id} className="space-y-3">
                                 <div className="flex items-center justify-between pb-1.5 border-b border-surface-border-subtle">
                                     <div>
-                                        <h4 className="text-sm font-bold text-text-strong font-display uppercase tracking-wide">
-                                            {group.name}
-                                        </h4>
-                                        <p className="text-[11px] text-text-muted">
+                                        <div className="flex items-center gap-2">
+                                            <h3 className="text-sm sm:text-base font-black text-text-strong font-display uppercase tracking-wide">
+                                                {group.name}
+                                            </h3>
+                                            {group.isRequired && !isGroupValid && (
+                                                <span className="text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full bg-brand-primary/10 text-brand-primary">
+                                                    Requerido
+                                                </span>
+                                            )}
+                                        </div>
+                                        <p className="text-[11px] text-text-muted mt-0.5">
                                             {group.maxSelectable === 1
                                                 ? "Selecciona 1 opción"
                                                 : `Elige hasta ${group.maxSelectable} opciones`}
                                         </p>
                                     </div>
                                     <span
-                                        className={`text-[10px] font-bold uppercase tracking-wider px-2.5 py-0.5 rounded-full ${group.isRequired
+                                        className={`text-[10px] font-bold uppercase tracking-wider px-2.5 py-0.5 rounded-full ${
+                                            group.isRequired
                                                 ? isGroupValid
                                                     ? "bg-status-success-bg text-status-success"
                                                     : "bg-status-warning-bg text-status-warning"
                                                 : "bg-surface-canvas text-text-muted border border-surface-border"
-                                            }`}
+                                        }`}
                                     >
-                                        {group.isRequired ? (isGroupValid ? "Completado" : "Obligatorio") : "Opcional"}
+                                        {group.isRequired ? (isGroupValid ? "Listo" : "Obligatorio") : "Opcional"}
                                     </span>
                                 </div>
 
@@ -178,29 +234,34 @@ export function ModifierModal({ product, onClose }: ModifierModalProps) {
                                                 key={option.id}
                                                 type="button"
                                                 onClick={() => handleToggleOption(group, option.id)}
-                                                className={`w-full flex items-center justify-between p-3.5 rounded-xl border text-left text-xs transition-all cursor-pointer ${isSelected
-                                                        ? "border-2 border-brand-primary bg-surface-card shadow-xs ring-1 ring-brand-primary/20"
-                                                        : "border-surface-border hover:border-surface-border-subtle bg-surface-card"
-                                                    }`}
+                                                className={`w-full flex items-center justify-between p-3.5 sm:p-4 rounded-2xl border text-left text-xs sm:text-sm transition-all duration-200 cursor-pointer ${
+                                                    isSelected
+                                                        ? "border-2 border-brand-primary bg-brand-primary/5 shadow-xs"
+                                                        : "border-surface-border hover:border-surface-border-subtle bg-surface-card hover:bg-surface-canvas/50"
+                                                }`}
                                             >
                                                 <div className="flex items-center gap-3">
                                                     <div
-                                                        className={`w-4 h-4 rounded-full border flex items-center justify-center transition-colors ${isSelected
-                                                                ? "border-brand-primary bg-brand-primary text-white"
-                                                                : "border-surface-border bg-surface-card"
-                                                            }`}
+                                                        className={`w-5 h-5 rounded-full border-2 flex items-center justify-center transition-all shrink-0 ${
+                                                            isSelected
+                                                                ? "border-brand-primary bg-brand-primary text-white shadow-xs scale-105"
+                                                                : "border-neutral-300 dark:border-neutral-600 bg-white dark:bg-neutral-800"
+                                                        }`}
                                                     >
-                                                        {isSelected && <Check className="w-2.5 h-2.5 stroke-[3]" />}
+                                                        {isSelected && <Check className="w-3 h-3 stroke-[3]" />}
                                                     </div>
                                                     <span
-                                                        className={`font-medium ${isSelected ? "text-text-strong font-bold" : "text-text-base"
-                                                            }`}
+                                                        className={`font-medium ${
+                                                            isSelected ? "text-text-strong font-bold" : "text-text-base"
+                                                        }`}
                                                     >
                                                         {option.name}
                                                     </span>
                                                 </div>
 
-                                                <span className="font-bold text-text-muted tabular-nums font-mono">
+                                                <span className={`text-xs sm:text-sm font-bold tabular-nums font-mono ${
+                                                    option.additionalPrice > 0 ? "text-brand-primary font-black" : "text-text-muted"
+                                                }`}>
                                                     {option.additionalPrice > 0
                                                         ? `+ ${formatCurrency(option.additionalPrice)}`
                                                         : "Incluido"}
@@ -214,41 +275,41 @@ export function ModifierModal({ product, onClose }: ModifierModalProps) {
                     })}
                 </div>
 
-                {/* Footer Modal Fijo y 100% Opaco (Nunca se superpone con las opciones) */}
+                {/* Footer Modal Fijo y 100% Opaco */}
                 <div
-                    className="p-3.5 sm:p-6 bg-surface-card border-t border-surface-border flex items-center justify-between gap-3 sm:gap-4 shrink-0 shadow-md z-10"
-                    style={{ paddingBottom: "max(0.875rem, env(safe-area-inset-bottom))" }}
+                    className="p-4 sm:p-5 bg-surface-card border-t border-surface-border flex items-center justify-between gap-3 sm:gap-4 shrink-0 shadow-lg z-10"
+                    style={{ paddingBottom: "max(1rem, env(safe-area-inset-bottom))" }}
                 >
                     {/* Stepper Cantidad */}
-                    <div className="flex items-center gap-1.5 sm:gap-2 bg-surface-canvas border border-surface-border rounded-full p-1 shadow-2xs shrink-0">
+                    <div className="flex items-center gap-1 bg-surface-canvas border border-surface-border rounded-full p-1 shadow-2xs shrink-0">
                         <button
                             type="button"
                             onClick={() => setQuantity((q) => Math.max(1, q - 1))}
                             disabled={quantity <= 1}
                             aria-label="Disminuir cantidad"
-                            className="w-9 h-9 sm:w-10 sm:h-10 rounded-full flex items-center justify-center text-text-base hover:bg-surface-card-hover disabled:opacity-30 disabled:hover:bg-transparent transition-colors cursor-pointer"
+                            className="w-9 h-9 sm:w-10 sm:h-10 rounded-full flex items-center justify-center text-text-base hover:bg-surface-card hover:shadow-xs disabled:opacity-30 disabled:hover:bg-transparent transition-all cursor-pointer active:scale-90"
                         >
-                            <Minus className="w-4 h-4" />
+                            <Minus className="w-4 h-4 stroke-[2.5]" />
                         </button>
-                        <span className="w-5 sm:w-6 text-center text-sm font-black text-text-strong font-mono tabular-nums">
+                        <span className="w-6 sm:w-7 text-center text-sm sm:text-base font-black text-text-strong font-mono tabular-nums">
                             {quantity}
                         </span>
                         <button
                             type="button"
                             onClick={() => setQuantity((q) => Math.min(20, q + 1))}
                             aria-label="Aumentar cantidad"
-                            className="w-9 h-9 sm:w-10 sm:h-10 rounded-full flex items-center justify-center text-text-base hover:bg-surface-card-hover transition-colors cursor-pointer"
+                            className="w-9 h-9 sm:w-10 sm:h-10 rounded-full flex items-center justify-center text-text-base hover:bg-surface-card hover:shadow-xs transition-all cursor-pointer active:scale-90"
                         >
-                            <Plus className="w-4 h-4" />
+                            <Plus className="w-4 h-4 stroke-[2.5]" />
                         </button>
                     </div>
 
-                    {/* Botón Agregar */}
+                    {/* Botón Agregar al Pedido */}
                     <button
                         type="button"
                         onClick={handleAddToCart}
                         disabled={!isValid}
-                        className="flex-1 min-w-0 flex items-center justify-between bg-brand-primary hover:bg-brand-primary-hover disabled:bg-surface-border disabled:text-text-muted text-white text-xs font-black uppercase tracking-wider py-3.5 sm:py-4 px-4 sm:px-6 rounded-full shadow-md transition-all hover:scale-[1.01] active:scale-95 disabled:active:scale-100 cursor-pointer font-display gap-2"
+                        className="flex-1 min-w-0 h-11 sm:h-12 flex items-center justify-between bg-brand-primary hover:bg-brand-primary-hover disabled:bg-neutral-200 dark:disabled:bg-neutral-800 disabled:text-neutral-400 text-white text-xs sm:text-sm font-black uppercase tracking-wider px-5 sm:px-6 rounded-full shadow-md hover:shadow-lg transition-all active:scale-95 disabled:active:scale-100 cursor-pointer font-display gap-2"
                     >
                         <span className="truncate">{isValid ? "Agregar al Pedido" : "Opciones requeridas"}</span>
                         <span className="text-xs sm:text-sm font-black tracking-tight font-mono tabular-nums shrink-0">

@@ -383,8 +383,8 @@ function StorefrontFooter() {
       className="bg-surface-card text-text-muted text-xs border-t border-surface-border mt-8 sm:mt-10 transition-colors duration-200"
     >
       <div
-        className={`max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 ${
-          isPlatformRoot ? "py-8 sm:py-10" : "py-5 sm:py-6"
+        className={`w-full px-4 sm:px-8 md:px-12 lg:px-16 ${
+          isPlatformRoot ? "max-w-7xl mx-auto py-8 sm:py-10" : "py-5 sm:py-6"
         }`}
       >
         {isPlatformRoot ? (
@@ -470,82 +470,70 @@ function StorefrontFooter() {
             </div>
           </div>
         ) : (
-          <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-6 pb-2">
-            {/* Marca & Contacto Directo */}
-            <div className="space-y-2">
-              <div className="flex items-center gap-2.5">
-                <div className="relative w-8 h-8 shrink-0">
-                  <Image
-                    src={brandLogo}
-                    alt={`Logo ${brandName}`}
-                    width={32}
-                    height={32}
-                    className="w-full h-full object-contain"
-                  />
-                </div>
-                <span className="font-black text-xl tracking-tight text-text-strong block font-display">
-                  {brandName}
-                </span>
+          <div className="flex flex-col lg:flex-row items-center justify-between gap-5 pb-1">
+            {/* 1. Marca a la izquierda */}
+            <div className="flex items-center gap-2.5 shrink-0">
+              <div className="relative w-8 h-8 shrink-0">
+                <Image
+                  src={brandLogo}
+                  alt={`Logo ${brandName}`}
+                  width={32}
+                  height={32}
+                  className="w-full h-full object-contain"
+                />
               </div>
-              <div className="flex flex-col gap-1.5 text-xs text-text-muted">
-                {tenant?.contactPhone && (
-                  <a
-                    href={`tel:${tenant.contactPhone}`}
-                    className="flex items-center gap-1.5 hover:text-brand-primary transition-colors"
-                  >
-                    <Phone className="w-3.5 h-3.5 text-brand-primary shrink-0" />
-                    <span>
-                      WhatsApp / Pedidos:{" "}
-                      <strong className="text-text-strong font-mono">
-                        {tenant.contactPhone}
-                      </strong>
-                    </span>
-                  </a>
-                )}
-                {tenant?.contactEmail && (
-                  <a
-                    href={`mailto:${tenant.contactEmail}`}
-                    className="flex items-center gap-1.5 hover:text-brand-primary transition-colors"
-                  >
-                    <Mail className="w-3.5 h-3.5 text-brand-primary shrink-0" />
-                    <span>{tenant.contactEmail}</span>
-                  </a>
-                )}
-              </div>
+              <span className="font-black text-xl tracking-tight text-text-strong uppercase font-display leading-none">
+                {brandName}
+              </span>
             </div>
 
-            {/* Enlaces de Navegación Esenciales */}
-            <nav className="flex flex-wrap items-center gap-x-6 gap-y-2 text-xs font-semibold text-text-muted">
-              <Link
-                href={`/${activeSlug}#catalogo`}
-                className="hover:text-brand-primary transition-colors"
-              >
-                Menú & Combos
-              </Link>
-              <Link
-                href={`/${activeSlug}#sucursales`}
-                className="hover:text-brand-primary transition-colors"
-              >
-                Ubicación & Horarios
-              </Link>
-              <Link
-                href="/rastreo"
-                className="hover:text-brand-primary transition-colors"
-              >
-                Rastrear Pedido
-              </Link>
-            </nav>
+            {/* 2. Mensaje Informativo Central (Opción 2) */}
+            <div className="flex items-center justify-center gap-2 text-xs text-text-muted text-center py-0.5">
+              <span className="font-semibold text-text-strong font-display uppercase tracking-wider">
+                {tenant?.tagline || "Sabor Tradicional a la Brasa"}
+              </span>
+              <span className="text-text-subtle hidden sm:inline">&bull;</span>
+              <span className="text-text-muted hidden sm:inline">
+                Atención diaria 10:30 – 21:30
+              </span>
+            </div>
+
+            {/* 3. Contacto directo a la derecha */}
+            <div className="flex flex-wrap items-center justify-center lg:justify-end gap-x-5 gap-y-1 text-xs text-text-muted shrink-0">
+              {tenant?.contactPhone && (
+                <a
+                  href={`tel:${tenant.contactPhone}`}
+                  className="flex items-center gap-1.5 hover:text-brand-primary transition-colors"
+                  title="WhatsApp / Pedidos"
+                >
+                  <Phone className="w-3.5 h-3.5 text-brand-primary shrink-0" />
+                  <span className="font-mono font-bold text-text-strong">
+                    {tenant.contactPhone}
+                  </span>
+                </a>
+              )}
+              {tenant?.contactEmail && (
+                <a
+                  href={`mailto:${tenant.contactEmail}`}
+                  className="flex items-center gap-1.5 hover:text-brand-primary transition-colors"
+                  title="Correo de contacto"
+                >
+                  <Mail className="w-3.5 h-3.5 text-brand-primary shrink-0" />
+                  <span>{tenant.contactEmail}</span>
+                </a>
+              )}
+            </div>
           </div>
         )}
 
         {/* Sub-footer unificado */}
-        <div className="mt-4 pt-3.5 border-t border-surface-border flex flex-col sm:flex-row items-center justify-between gap-3 text-[11px] text-text-subtle">
-          <div className="flex flex-col text-center sm:text-left gap-0.5">
+        <div className="mt-4 pt-3.5 border-t border-surface-border flex flex-col sm:flex-row items-center justify-between gap-2.5 text-[11px] text-text-subtle">
+          <div className="text-center sm:text-left">
             <span>
               © {currentYear} {brandName}.
               {tenant?.taxId ? ` RUC: ${tenant.taxId}.` : ""}
-            </span>
-            <span>Todos los derechos reservados.</span>
+            </span>{" "}
+            <span className="inline-block">Todos los derechos reservados.</span>
           </div>
 
           <div className="flex items-center gap-4">

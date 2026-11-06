@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useRef, useState } from 'react';
-import { Map, Marker, Popup, NavigationControl, LngLatBounds, type StyleSpecification } from 'maplibre-gl';
+import { Map, Marker, Popup, NavigationControl, LngLatBounds, setWorkerUrl, type StyleSpecification } from 'maplibre-gl';
 import 'maplibre-gl/dist/maplibre-gl.css';
 import { createDriverDomMarker, createDestinationDomMarker } from './DriverMarker';
 import { Navigation, Compass, Layers } from 'lucide-react';
@@ -59,6 +59,9 @@ export function OrderMap({ destination, driverLocation, className = '' }: OrderM
   // Inicialización del Mapa
   useEffect(() => {
     if (!mapContainerRef.current || mapInstanceRef.current) return;
+    if (typeof window !== 'undefined') {
+      setWorkerUrl('/maplibre-gl-worker.mjs');
+    }
 
     const styleUrl = process.env.NEXT_PUBLIC_MAP_STYLE_URL;
     const mapStyle = styleUrl && styleUrl.startsWith('http') && !styleUrl.includes('demotiles')

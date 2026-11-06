@@ -121,7 +121,7 @@
       "category": "Combos",
       "basePrice": 22.00,
       "taxRate": 0.00,
-      "imageUrl": "/images/tenants/la-granjita/catalogo/pollo-completo.png",
+      "imageUrl": "/images/tenants/la-granjita/menu/combo-familiar.webp",
       "isKitchen": true,
       "isActive": true,
       "modifierGroups": [
@@ -147,7 +147,7 @@
       "category": "Combos",
       "basePrice": 13.00,
       "taxRate": 0.00,
-      "imageUrl": "/images/tenants/la-granjita/catalogo/pollo-completo.png",
+      "imageUrl": "/images/tenants/la-granjita/banners/hero-pollo-brasa.jpg",
       "isKitchen": true,
       "isActive": true,
       "modifierGroups": [
@@ -199,7 +199,7 @@
       "category": "Combos",
       "basePrice": 20.50,
       "taxRate": 0.00,
-      "imageUrl": "/images/tenants/la-granjita/catalogo/promo-2x1-2pollos-mas-papas.png",
+      "imageUrl": "/images/tenants/la-granjita/banners/promo-hecho-a-la-brasa.jpg",
       "isKitchen": true,
       "isActive": true,
       "modifierGroups": [
@@ -323,7 +323,7 @@
       "category": "Porciones",
       "basePrice": 7.50,
       "taxRate": 0.00,
-      "imageUrl": "/images/tenants/la-granjita/catalogo/medio-completo.png",
+      "imageUrl": "/images/tenants/la-granjita/menu/medio-pollo.webp",
       "isKitchen": true,
       "isActive": true,
       "modifierGroups": [
@@ -348,7 +348,7 @@
       "category": "Porciones",
       "basePrice": 10.00,
       "taxRate": 0.00,
-      "imageUrl": "/images/tenants/la-granjita/catalogo/medio-mas-cuarto-completo.png",
+      "imageUrl": "/images/tenants/la-granjita/banners/hero-combo-familiar.jpg",
       "isKitchen": true,
       "isActive": true,
       "modifierGroups": [
@@ -421,7 +421,7 @@
       "category": "Porciones",
       "basePrice": 4.00,
       "taxRate": 0.00,
-      "imageUrl": "/images/tenants/la-granjita/catalogo/cuarto-pollo-llevar-completo.png",
+      "imageUrl": "/images/tenants/la-granjita/menu/cuarto-pollo.webp",
       "isKitchen": true,
       "isActive": true,
       "modifierGroups": [
@@ -446,7 +446,7 @@
       "category": "Porciones",
       "basePrice": 2.75,
       "taxRate": 0.00,
-      "imageUrl": "/images/tenants/la-granjita/catalogo/octavo-personal-llevar-completo.png",
+      "imageUrl": "/images/tenants/la-granjita/banners/hero-combo-personal.jpg",
       "isKitchen": true,
       "isActive": true,
       "modifierGroups": [
@@ -558,7 +558,7 @@
       "category": "Broaster",
       "basePrice": 15.00,
       "taxRate": 0.00,
-      "imageUrl": "/images/tenants/la-granjita/catalogo/pollo-completo.png",
+      "imageUrl": "/images/tenants/la-granjita/banners/promo-receta-tradicional.jpg",
       "isKitchen": true,
       "isActive": true,
       "modifierGroups": [

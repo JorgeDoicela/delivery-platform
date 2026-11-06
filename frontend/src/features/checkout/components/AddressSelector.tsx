@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useRef, useState } from 'react';
-import { Map, Marker, NavigationControl, type StyleSpecification } from 'maplibre-gl';
+import { Map, Marker, NavigationControl, setWorkerUrl, type StyleSpecification } from 'maplibre-gl';
 import 'maplibre-gl/dist/maplibre-gl.css';
 import { MapPin, Crosshair, Check } from 'lucide-react';
 
@@ -78,6 +78,9 @@ export function AddressSelector({
 
   useEffect(() => {
     if (!mapContainerRef.current || mapInstanceRef.current) return;
+    if (typeof window !== 'undefined') {
+      setWorkerUrl('/maplibre-gl-worker.mjs');
+    }
 
     const styleUrl = process.env.NEXT_PUBLIC_MAP_STYLE_URL;
     const mapStyle =

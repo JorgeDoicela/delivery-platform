@@ -23,7 +23,7 @@ export function ThemeToggle({ className = "" }: ThemeToggleProps) {
   if (!isMounted) {
     return (
       <div
-        className={`w-9 h-9 sm:w-10 sm:h-10 rounded-full border border-surface-border bg-surface-card opacity-50 shrink-0 ${className}`}
+        className={`w-8 h-8 sm:w-9 sm:h-9 opacity-0 shrink-0 ${className}`}
         aria-hidden="true"
       />
     );
@@ -37,12 +37,12 @@ export function ThemeToggle({ className = "" }: ThemeToggleProps) {
       onClick={toggleTheme}
       aria-label={isDark ? "Cambiar a modo claro" : "Cambiar a modo oscuro"}
       title={isDark ? "Activar modo claro" : "Activar modo oscuro"}
-      className={`relative w-9 h-9 sm:w-10 sm:h-10 rounded-full border border-surface-border bg-surface-card hover:bg-surface-card-hover text-text-muted hover:text-text-strong transition-all flex items-center justify-center shrink-0 shadow-2xs active:scale-95 cursor-pointer ${className}`}
+      className={`p-1.5 sm:p-2 rounded-full text-text-strong hover:text-brand-primary transition-colors flex items-center justify-center shrink-0 active:scale-95 cursor-pointer ${className}`}
     >
       {isDark ? (
-        <Sun className="w-4 h-4 sm:w-4.5 sm:h-4.5 text-brand-accent transition-transform duration-200 rotate-0" />
+        <Sun className="w-5 h-5 text-brand-accent transition-transform duration-200 stroke-[1.8]" />
       ) : (
-        <Moon className="w-4 h-4 sm:w-4.5 sm:h-4.5 text-neutral-700 transition-transform duration-200 rotate-0" />
+        <Moon className="w-5 h-5 text-text-strong hover:text-brand-primary transition-transform duration-200 stroke-[1.8]" />
       )}
     </button>
   );

@@ -25,9 +25,9 @@ export function CartDrawerSummary() {
   };
 
   return (
-    <div className="pt-4 space-y-4">
+    <div className="pt-2 space-y-4">
       {/* Desglose de totales */}
-      <div className="space-y-1.5 text-xs text-text-muted">
+      <div className="space-y-2 text-xs sm:text-sm text-text-muted">
         <div className="flex items-center justify-between">
           <span>Subtotal:</span>
           <span className="font-mono font-bold text-text-strong tabular-nums">
@@ -43,7 +43,7 @@ export function CartDrawerSummary() {
         </div>
 
         {discountAmount > 0 && (
-          <div className="flex items-center justify-between text-brand-primary">
+          <div className="flex items-center justify-between text-brand-primary font-semibold">
             <span>Descuento aplicado:</span>
             <span className="font-mono font-bold tabular-nums">
               -${discountAmount.toFixed(2)}
@@ -51,26 +51,26 @@ export function CartDrawerSummary() {
           </div>
         )}
 
-        <div className="flex items-center justify-between pt-2 border-t border-surface-border text-sm font-bold text-text-strong">
+        <div className="flex items-center justify-between pt-2.5 border-t border-surface-border text-base font-black text-text-strong font-display uppercase tracking-wide">
           <span>Total del pedido:</span>
-          <span className="font-mono font-black text-base text-text-strong tabular-nums font-display">
+          <span className="font-mono font-black text-xl text-text-strong tabular-nums">
             ${total.toFixed(2)}
           </span>
         </div>
       </div>
 
       {/* Botón Sticky Ir a Pagar */}
-      <div className="pt-2">
+      <div className="pt-1">
         <button
           type="button"
           onClick={handleCheckout}
-          className="w-full py-4 px-6 rounded-full bg-brand-primary hover:bg-brand-primary-hover text-white flex items-center justify-between font-display font-black text-sm uppercase tracking-wider shadow-lg transition-all active:scale-[0.98] cursor-pointer"
+          className="w-full h-13 sm:h-14 py-4 px-6 rounded-full bg-brand-primary hover:bg-brand-primary-hover text-white flex items-center justify-between font-display font-black text-xs sm:text-sm uppercase tracking-wider shadow-lg hover:shadow-xl transition-all active:scale-[0.98] cursor-pointer"
         >
           <div className="flex items-center gap-2">
             <span>Ir a pagar</span>
             <ArrowRight className="w-4 h-4" />
           </div>
-          <span className="font-mono text-base font-black tabular-nums">
+          <span className="font-mono text-base sm:text-lg font-black tabular-nums">
             ${total.toFixed(2)}
           </span>
         </button>
@@ -78,4 +78,3 @@ export function CartDrawerSummary() {
     </div>
   );
 }
-

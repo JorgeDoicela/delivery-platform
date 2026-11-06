@@ -20,33 +20,34 @@ export function CartDrawerItem({ item }: CartDrawerItemProps) {
       : null;
 
   const itemTotal = item.itemPrice * item.quantity;
+  const displayImage = item.imageUrl || "/images/shared/placeholders/dish-default.webp";
 
   return (
-    <div className="py-4 border-b border-surface-border flex items-start gap-3.5 transition-colors">
+    <div className="p-4 rounded-2xl bg-surface-canvas/50 border border-surface-border hover:border-surface-border-subtle transition-all duration-200 flex items-start gap-4 shadow-2xs">
       {/* Thumbnail de producto */}
-      <div className="relative w-16 h-16 rounded-2xl overflow-hidden bg-surface-canvas border border-surface-border shrink-0">
+      <div className="relative w-18 h-18 sm:w-20 sm:h-20 rounded-2xl overflow-hidden bg-neutral-100 border border-surface-border shrink-0">
         <Image
-          src={item.imageUrl || "/images/shared/placeholders/food-default.png"}
+          src={displayImage}
           alt={item.name}
           fill
-          sizes="64px"
+          sizes="80px"
           className="object-cover"
         />
       </div>
 
       {/* Contenido descriptivo */}
-      <div className="flex-1 min-w-0 space-y-1">
-        <div className="flex items-start justify-between gap-2">
-          <h4 className="font-display font-black text-sm uppercase tracking-wide text-text-strong truncate">
+      <div className="flex-1 min-w-0 space-y-1.5">
+        <div className="flex items-start justify-between gap-3">
+          <h4 className="font-display font-black text-sm sm:text-base uppercase tracking-wide text-text-strong leading-snug">
             {item.name}
           </h4>
-          <span className="font-mono font-bold text-sm text-text-strong shrink-0 tabular-nums">
+          <span className="font-mono font-black text-sm sm:text-base text-text-strong shrink-0 tabular-nums">
             ${itemTotal.toFixed(2)}
           </span>
         </div>
 
         {modifiersText && (
-          <p className="text-[11px] text-text-muted leading-tight line-clamp-2">
+          <p className="text-xs text-text-muted leading-relaxed line-clamp-2">
             {modifiersText}
           </p>
         )}
@@ -56,24 +57,24 @@ export function CartDrawerItem({ item }: CartDrawerItemProps) {
           <button
             type="button"
             onClick={() => removeItem(item.cartItemId)}
-            className="text-[11px] font-semibold text-text-muted hover:text-status-danger transition-colors cursor-pointer flex items-center gap-1"
+            className="text-xs font-semibold text-text-muted hover:text-status-danger transition-colors cursor-pointer flex items-center gap-1.5 active:scale-95"
           >
-            <Trash2 className="w-3 h-3" />
+            <Trash2 className="w-3.5 h-3.5" />
             <span>Eliminar</span>
           </button>
 
-          {/* Contador de unidades (-) Qty (+) */}
-          <div className="flex items-center gap-2">
+          {/* Stepper de cantidad (-) Qty (+) */}
+          <div className="flex items-center gap-1.5 bg-surface-card border border-surface-border rounded-full p-1 shadow-2xs">
             <button
               type="button"
               onClick={() => updateQuantity(item.cartItemId, -1)}
               aria-label={`Disminuir cantidad de ${item.name}`}
-              className="w-7 h-7 rounded-full border border-surface-border bg-surface-canvas hover:bg-surface-card-hover flex items-center justify-center text-text-strong transition-colors active:scale-90 cursor-pointer"
+              className="w-7 h-7 rounded-full hover:bg-surface-canvas flex items-center justify-center text-text-strong transition-all active:scale-90 cursor-pointer"
             >
-              <Minus className="w-3.5 h-3.5" />
+              <Minus className="w-3.5 h-3.5 stroke-[2.5]" />
             </button>
 
-            <span className="font-mono font-bold text-xs text-text-strong min-w-[16px] text-center tabular-nums">
+            <span className="font-mono font-black text-xs sm:text-sm text-text-strong min-w-[20px] text-center tabular-nums">
               {item.quantity}
             </span>
 
@@ -81,9 +82,9 @@ export function CartDrawerItem({ item }: CartDrawerItemProps) {
               type="button"
               onClick={() => updateQuantity(item.cartItemId, 1)}
               aria-label={`Aumentar cantidad de ${item.name}`}
-              className="w-7 h-7 rounded-full border border-surface-border bg-surface-canvas hover:bg-surface-card-hover flex items-center justify-center text-text-strong transition-colors active:scale-90 cursor-pointer"
+              className="w-7 h-7 rounded-full hover:bg-surface-canvas flex items-center justify-center text-text-strong transition-all active:scale-90 cursor-pointer"
             >
-              <Plus className="w-3.5 h-3.5" />
+              <Plus className="w-3.5 h-3.5 stroke-[2.5]" />
             </button>
           </div>
         </div>
@@ -91,4 +92,3 @@ export function CartDrawerItem({ item }: CartDrawerItemProps) {
     </div>
   );
 }
-
