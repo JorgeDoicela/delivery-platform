@@ -106,22 +106,22 @@ export function ModifierModal({ product, onClose }: ModifierModalProps) {
         <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center p-0 sm:p-4 bg-black/65 backdrop-blur-xs animate-in fade-in duration-200">
             <div className="relative w-full max-w-lg bg-surface-card rounded-t-3xl sm:rounded-2xl shadow-2xl flex flex-col h-[85vh] sm:h-auto sm:max-h-[85vh] overflow-hidden text-text-strong">
                 {/* Header Modal Fijo y Opaco */}
-                <div className="p-4 sm:p-6 border-b border-surface-border flex items-start justify-between gap-4 shrink-0 bg-surface-card z-10">
-                    <div className="flex items-start gap-4">
-                        <div className="relative w-16 h-16 sm:w-20 sm:h-20 rounded-2xl overflow-hidden bg-surface-canvas shrink-0 border border-surface-border">
+                <div className="p-4 sm:p-6 border-b border-surface-border flex items-start justify-between gap-3 sm:gap-4 shrink-0 bg-surface-card z-10">
+                    <div className="flex items-start gap-3 sm:gap-4 min-w-0">
+                        <div className="relative w-14 h-14 sm:w-20 sm:h-20 rounded-2xl overflow-hidden bg-surface-canvas shrink-0 border border-surface-border">
                             <Image
                                 src={product.imageUrl || "/images/shared/placeholders/dish-default.webp"}
                                 alt={product.name}
                                 fill
-                                sizes="(max-width: 640px) 64px, 80px"
+                                sizes="(max-width: 640px) 56px, 80px"
                                 className="object-cover"
                             />
                         </div>
-                        <div>
-                            <span className="text-[10px] font-bold uppercase tracking-wider text-text-strong bg-surface-canvas border border-surface-border px-2.5 py-0.5 rounded-full">
+                        <div className="min-w-0">
+                            <span className="text-[10px] font-bold uppercase tracking-wider text-text-strong bg-surface-canvas border border-surface-border px-2.5 py-0.5 rounded-full inline-block truncate max-w-full">
                                 {product.category}
                             </span>
-                            <h3 className="text-xl sm:text-2xl font-black uppercase tracking-tight text-text-strong mt-1.5 font-display leading-tight">
+                            <h3 className="text-lg sm:text-2xl font-black uppercase tracking-tight text-text-strong mt-1.5 font-display leading-tight truncate">
                                 {product.name}
                             </h3>
                             <p className="text-xs text-text-muted mt-0.5 line-clamp-2 leading-relaxed">
@@ -132,7 +132,7 @@ export function ModifierModal({ product, onClose }: ModifierModalProps) {
                     <button
                         onClick={onClose}
                         aria-label="Cerrar modal"
-                        className="p-1.5 rounded-full hover:bg-surface-card-hover text-text-muted hover:text-text-strong transition-colors shrink-0 cursor-pointer"
+                        className="w-9 h-9 rounded-full flex items-center justify-center hover:bg-surface-card-hover text-text-muted hover:text-text-strong transition-colors shrink-0 cursor-pointer"
                     >
                         <X className="w-5 h-5" />
                     </button>
@@ -215,26 +215,29 @@ export function ModifierModal({ product, onClose }: ModifierModalProps) {
                 </div>
 
                 {/* Footer Modal Fijo y 100% Opaco (Nunca se superpone con las opciones) */}
-                <div className="p-4 sm:p-6 bg-surface-card border-t border-surface-border flex items-center justify-between gap-4 shrink-0 shadow-md z-10">
+                <div
+                    className="p-3.5 sm:p-6 bg-surface-card border-t border-surface-border flex items-center justify-between gap-3 sm:gap-4 shrink-0 shadow-md z-10"
+                    style={{ paddingBottom: "max(0.875rem, env(safe-area-inset-bottom))" }}
+                >
                     {/* Stepper Cantidad */}
-                    <div className="flex items-center gap-2 bg-surface-canvas border border-surface-border rounded-full p-1 shadow-2xs">
+                    <div className="flex items-center gap-1.5 sm:gap-2 bg-surface-canvas border border-surface-border rounded-full p-1 shadow-2xs shrink-0">
                         <button
                             type="button"
                             onClick={() => setQuantity((q) => Math.max(1, q - 1))}
                             disabled={quantity <= 1}
                             aria-label="Disminuir cantidad"
-                            className="w-8 h-8 rounded-full flex items-center justify-center text-text-base hover:bg-surface-card-hover disabled:opacity-30 disabled:hover:bg-transparent transition-colors cursor-pointer"
+                            className="w-9 h-9 sm:w-10 sm:h-10 rounded-full flex items-center justify-center text-text-base hover:bg-surface-card-hover disabled:opacity-30 disabled:hover:bg-transparent transition-colors cursor-pointer"
                         >
                             <Minus className="w-4 h-4" />
                         </button>
-                        <span className="w-6 text-center text-sm font-black text-text-strong font-mono tabular-nums">
+                        <span className="w-5 sm:w-6 text-center text-sm font-black text-text-strong font-mono tabular-nums">
                             {quantity}
                         </span>
                         <button
                             type="button"
                             onClick={() => setQuantity((q) => Math.min(20, q + 1))}
                             aria-label="Aumentar cantidad"
-                            className="w-8 h-8 rounded-full flex items-center justify-center text-text-base hover:bg-surface-card-hover transition-colors cursor-pointer"
+                            className="w-9 h-9 sm:w-10 sm:h-10 rounded-full flex items-center justify-center text-text-base hover:bg-surface-card-hover transition-colors cursor-pointer"
                         >
                             <Plus className="w-4 h-4" />
                         </button>
@@ -245,10 +248,10 @@ export function ModifierModal({ product, onClose }: ModifierModalProps) {
                         type="button"
                         onClick={handleAddToCart}
                         disabled={!isValid}
-                        className="flex-1 flex items-center justify-between bg-brand-primary hover:bg-brand-primary-hover disabled:bg-neutral-200 disabled:text-neutral-400 text-white text-xs font-black uppercase tracking-wider py-4 px-6 rounded-full shadow-md transition-all hover:scale-[1.01] active:scale-95 disabled:active:scale-100 cursor-pointer font-display"
+                        className="flex-1 min-w-0 flex items-center justify-between bg-brand-primary hover:bg-brand-primary-hover disabled:bg-surface-border disabled:text-text-muted text-white text-xs font-black uppercase tracking-wider py-3.5 sm:py-4 px-4 sm:px-6 rounded-full shadow-md transition-all hover:scale-[1.01] active:scale-95 disabled:active:scale-100 cursor-pointer font-display gap-2"
                     >
-                        <span>{isValid ? "Agregar al Pedido" : "Selecciona las opciones requeridas"}</span>
-                        <span className="text-sm font-black tracking-tight font-mono tabular-nums">
+                        <span className="truncate">{isValid ? "Agregar al Pedido" : "Opciones requeridas"}</span>
+                        <span className="text-xs sm:text-sm font-black tracking-tight font-mono tabular-nums shrink-0">
                             {formatCurrency(lineTotal)}
                         </span>
                     </button>

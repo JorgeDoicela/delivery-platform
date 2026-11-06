@@ -37,7 +37,7 @@ export function SteakhouseGourmetLandingLayout({
             src={primarySlide?.imageUrl || "/images/tenants/brasas-del-valle/banners/hero-pollo-brasa.jpg"}
             alt={primarySlide?.title || "Cortes Angus Madurados"}
             fill
-            priority
+            loading="eager"
             sizes="100vw"
             className="object-cover object-center filter brightness-[0.45] contrast-125"
           />

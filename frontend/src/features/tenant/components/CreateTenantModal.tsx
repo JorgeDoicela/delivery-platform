@@ -92,20 +92,20 @@ export function CreateTenantModal({
 
   return (
     <div
-      className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-xs p-4 overflow-y-auto"
+      className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-xs p-2 sm:p-4 overflow-y-auto"
       role="dialog"
       aria-modal="true"
       aria-labelledby="modal-create-tenant-title"
     >
-      <div className="w-full max-w-2xl bg-surface-card border border-surface-border rounded-3xl shadow-2xl overflow-hidden my-8 text-text-strong">
-        <div className="px-6 sm:px-8 py-5 border-b border-surface-border flex items-center justify-between bg-surface-canvas">
-          <div>
-            <span className="text-[10px] font-bold uppercase tracking-widest text-brand-primary block font-display">
+      <div className="w-full max-w-2xl bg-surface-card border border-surface-border rounded-3xl shadow-2xl overflow-hidden my-4 sm:my-8 text-text-strong max-h-[92vh] flex flex-col">
+        <div className="px-4 sm:px-8 py-4 sm:py-5 border-b border-surface-border flex items-center justify-between bg-surface-canvas shrink-0">
+          <div className="min-w-0 pr-2">
+            <span className="text-[10px] font-bold uppercase tracking-widest text-brand-primary block font-display truncate">
               Aprovisionamiento Multi-Tenant SaaS
             </span>
             <h2
               id="modal-create-tenant-title"
-              className="text-xl sm:text-2xl font-black uppercase tracking-tight text-text-strong font-display"
+              className="text-lg sm:text-2xl font-black uppercase tracking-tight text-text-strong font-display truncate"
             >
               Registrar Nuevo Comercio y Administrador
             </h2>
@@ -114,13 +114,13 @@ export function CreateTenantModal({
             type="button"
             onClick={onClose}
             aria-label="Cerrar modal"
-            className="p-2 rounded-full text-text-muted hover:text-text-strong hover:bg-surface-card-hover transition-colors cursor-pointer"
+            className="p-2 rounded-full text-text-muted hover:text-text-strong hover:bg-surface-card-hover transition-colors cursor-pointer shrink-0"
           >
             <X className="w-5 h-5" />
           </button>
         </div>
 
-        <form onSubmit={handleSubmit} className="p-6 sm:p-8 space-y-6 max-h-[75vh] overflow-y-auto">
+        <form onSubmit={handleSubmit} className="p-4 sm:p-8 space-y-5 sm:space-y-6 flex-1 overflow-y-auto overscroll-contain text-xs">
           {formError && (
             <div className="p-4 rounded-2xl bg-red-500/10 border border-red-500/30 text-xs text-red-500 font-semibold">
               {formError}
@@ -384,18 +384,18 @@ export function CreateTenantModal({
             </div>
           </div>
 
-          <div className="pt-4 border-t border-surface-border flex items-center justify-end gap-3">
+          <div className="pt-4 border-t border-surface-border flex flex-col-reverse sm:flex-row sm:items-center justify-end gap-3 shrink-0">
             <button
               type="button"
               onClick={onClose}
-              className="px-5 py-2.5 rounded-full border border-surface-border text-xs font-bold uppercase tracking-wider text-text-muted hover:text-text-strong hover:bg-surface-card-hover transition-colors cursor-pointer"
+              className="w-full sm:w-auto px-5 py-2.5 rounded-full border border-surface-border text-xs font-bold uppercase tracking-wider text-text-muted hover:text-text-strong hover:bg-surface-card-hover transition-colors cursor-pointer min-h-[44px] text-center"
             >
               Cancelar
             </button>
             <button
               type="submit"
               disabled={createMutation.isPending}
-              className="px-6 py-2.5 rounded-full bg-brand-primary hover:bg-brand-primary-hover disabled:opacity-50 text-white text-xs font-black uppercase tracking-wider font-display inline-flex items-center gap-2 transition-all cursor-pointer shadow-md active:scale-95"
+              className="w-full sm:w-auto px-6 py-2.5 rounded-full bg-brand-primary hover:bg-brand-primary-hover disabled:opacity-50 text-white text-xs font-black uppercase tracking-wider font-display inline-flex items-center justify-center gap-2 transition-all cursor-pointer shadow-md active:scale-95 min-h-[44px]"
             >
               {createMutation.isPending && <Loader2 className="w-4 h-4 animate-spin" />}
               <span>Aprovisionar Comercio</span>

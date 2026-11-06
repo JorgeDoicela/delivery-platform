@@ -103,7 +103,7 @@ export function TenantSwitcher({ variant = "auto" }: TenantSwitcherProps) {
 
       {isOpen && (
         <div
-          className={`absolute right-0 mt-2 w-80 rounded-3xl border shadow-2xl p-3 z-50 space-y-2 ${dropdownClasses}`}
+          className={`absolute right-0 mt-2 w-[calc(100vw-2rem)] max-w-xs sm:w-80 rounded-3xl border shadow-2xl p-3 z-50 space-y-2 ${dropdownClasses}`}
         >
           <div className="px-2 pt-1 pb-1.5 border-b border-surface-border">
             <span className="text-[10px] font-bold uppercase tracking-wider text-text-muted">

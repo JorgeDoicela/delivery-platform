@@ -30,28 +30,26 @@ export function OrderModeSelector() {
         </h2>
 
         <div
-          className={`grid gap-4 sm:gap-5 w-full ${
-            enableDelivery && enableTakeout ? "grid-cols-2" : "grid-cols-1"
+          className={`grid gap-3 sm:gap-5 w-full ${
+            enableDelivery && enableTakeout ? "grid-cols-1 sm:grid-cols-2" : "grid-cols-1"
           }`}
         >
           {enableDelivery && (
             <button
               type="button"
               onClick={() => handleSelectMode("delivery")}
-              className={`group relative overflow-hidden py-5 px-4 sm:py-6 sm:px-6 rounded-2xl sm:rounded-3xl flex items-center justify-center gap-3.5 sm:gap-5 text-left transition-all active:scale-95 bg-brand-primary hover:bg-brand-primary-hover text-white ${
+              className={`group relative overflow-hidden py-4 px-4 sm:py-6 sm:px-6 rounded-2xl sm:rounded-3xl flex items-center justify-center gap-3.5 sm:gap-4 text-left transition-all active:scale-95 bg-brand-primary hover:bg-brand-primary-hover text-white cursor-pointer ${
                 deliveryType === "delivery"
-                  ? "shadow-2xl scale-[1.01]"
-                  : "shadow-md opacity-90 hover:opacity-100"
+                  ? "shadow-2xl scale-[1.01] ring-2 ring-white/40"
+                  : "shadow-md hover:shadow-lg"
               }`}
             >
-              <div className="w-12 h-12 sm:w-14 sm:h-14 rounded-2xl bg-white/20 flex items-center justify-center shrink-0 border border-white/20">
-                <Bike className="w-7 h-7 sm:w-8 sm:h-8 text-white group-hover:scale-110 transition-transform" />
-              </div>
-              <div>
-                <span className="text-xs sm:text-sm font-bold tracking-wider uppercase text-white/90 block leading-tight">
+              <Bike className="w-8 h-8 sm:w-10 sm:h-10 text-white shrink-0 group-hover:scale-110 transition-transform" />
+              <div className="min-w-0">
+                <span className="text-xs sm:text-sm font-bold tracking-wider uppercase text-white/90 block leading-tight truncate">
                   {brandName}
                 </span>
-                <span className="text-base sm:text-xl md:text-2xl font-black uppercase tracking-tight block leading-tight text-white font-display">
+                <span className="text-lg sm:text-xl md:text-2xl font-black uppercase tracking-tight block leading-tight text-white font-display">
                   A Domicilio
                 </span>
               </div>
@@ -62,20 +60,18 @@ export function OrderModeSelector() {
             <button
               type="button"
               onClick={() => handleSelectMode("takeout")}
-              className={`group relative overflow-hidden py-5 px-4 sm:py-6 sm:px-6 rounded-2xl sm:rounded-3xl flex items-center justify-center gap-3.5 sm:gap-5 text-left transition-all active:scale-95 bg-brand-primary hover:bg-brand-primary-hover text-white ${
+              className={`group relative overflow-hidden py-4 px-4 sm:py-6 sm:px-6 rounded-2xl sm:rounded-3xl flex items-center justify-center gap-3.5 sm:gap-4 text-left transition-all active:scale-95 bg-brand-primary hover:bg-brand-primary-hover text-white cursor-pointer ${
                 deliveryType === "takeout"
-                  ? "shadow-2xl scale-[1.01]"
-                  : "shadow-md opacity-90 hover:opacity-100"
+                  ? "shadow-2xl scale-[1.01] ring-2 ring-white/40"
+                  : "shadow-md hover:shadow-lg"
               }`}
             >
-              <div className="w-12 h-12 sm:w-14 sm:h-14 rounded-2xl bg-white/20 flex items-center justify-center shrink-0 border border-white/20">
-                <Store className="w-7 h-7 sm:w-8 sm:h-8 text-white group-hover:scale-110 transition-transform" />
-              </div>
-              <div>
-                <span className="text-xs sm:text-sm font-bold tracking-wider uppercase text-white/90 block leading-tight">
+              <Store className="w-8 h-8 sm:w-10 sm:h-10 text-white shrink-0 group-hover:scale-110 transition-transform" />
+              <div className="min-w-0">
+                <span className="text-xs sm:text-sm font-bold tracking-wider uppercase text-white/90 block leading-tight truncate">
                   {brandName}
                 </span>
-                <span className="text-base sm:text-xl md:text-2xl font-black uppercase tracking-tight block leading-tight text-white font-display">
+                <span className="text-lg sm:text-xl md:text-2xl font-black uppercase tracking-tight block leading-tight text-white font-display">
                   Recoge en Local
                 </span>
               </div>

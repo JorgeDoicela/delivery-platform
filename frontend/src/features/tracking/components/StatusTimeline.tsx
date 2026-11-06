@@ -47,7 +47,7 @@ export function StatusTimeline({ status }: StatusTimelineProps) {
           return (
             <div key={s.step} className="flex flex-col items-center text-center">
               <div
-                className={`h-9 w-9 rounded-full flex items-center justify-center font-bold text-xs mb-2 transition-all shadow-sm ${
+                className={`h-8 w-8 sm:h-9 sm:w-9 rounded-full flex items-center justify-center font-bold text-xs mb-1.5 sm:mb-2 transition-all shadow-sm ${
                   isCompleted
                     ? 'bg-status-success text-white'
                     : isCurrent
@@ -58,7 +58,7 @@ export function StatusTimeline({ status }: StatusTimelineProps) {
                 {isCompleted ? <CheckCircle2 className="h-4 w-4" /> : s.step}
               </div>
               <span
-                className={`text-[10px] uppercase tracking-wider leading-tight ${
+                className={`text-[9px] sm:text-[10px] uppercase tracking-wider leading-tight max-w-full break-words ${
                   isCurrent ? 'text-brand-primary font-black' : isCompleted ? 'text-text-strong font-bold' : 'text-text-muted font-medium'
                 }`}
               >

@@ -101,7 +101,7 @@ function StorefrontCustomizerForm({
   return (
     <form
       onSubmit={handleSubmit}
-      className="space-y-6 w-full max-w-6xl mx-auto pb-12 overflow-y-auto max-h-[calc(100vh-95px)] pr-2"
+      className="space-y-6 w-full max-w-6xl mx-auto pb-12"
     >
       {/* Cabecera de Personalización */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between pb-4 border-b border-surface-border gap-4">
@@ -112,15 +112,15 @@ function StorefrontCustomizerForm({
           <h1 className="text-2xl sm:text-3xl font-black uppercase tracking-wide text-text-strong font-display mt-0.5">
             Personalización de Marca & Landing Page
           </h1>
-          <p className="text-xs text-text-muted mt-1">
+          <p className="text-xs text-text-muted mt-1 leading-relaxed">
             Configura colores, logotipo, carrusel Hero, tarjetas promocionales, tarifas y cuenta bancaria de {formState.name}.
           </p>
         </div>
 
-        <div className="flex flex-wrap items-center gap-3">
+        <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2.5 w-full sm:w-auto">
           <Link
             href={`/${tenant.slug}`}
-            className="px-5 py-2.5 rounded-full bg-surface-card hover:bg-surface-card-hover border border-surface-border text-xs font-bold uppercase tracking-wider text-text-strong transition-colors cursor-pointer"
+            className="inline-flex items-center justify-center px-5 py-2.5 rounded-full bg-surface-card hover:bg-surface-card-hover border border-surface-border text-xs font-bold uppercase tracking-wider text-text-strong transition-colors cursor-pointer min-h-[44px] text-center"
           >
             Ver Landing en Vivo
           </Link>
@@ -128,7 +128,7 @@ function StorefrontCustomizerForm({
           <button
             type="submit"
             disabled={updateMutation.isPending}
-            className="flex items-center gap-2 px-6 py-2.5 rounded-full bg-brand-primary hover:bg-brand-primary-hover text-white text-xs font-black uppercase tracking-wider font-display shadow-lg transition-all active:scale-95 disabled:opacity-50 cursor-pointer"
+            className="inline-flex items-center justify-center gap-2 px-6 py-2.5 rounded-full bg-brand-primary hover:bg-brand-primary-hover text-white text-xs font-black uppercase tracking-wider font-display shadow-lg transition-all active:scale-95 disabled:opacity-50 cursor-pointer min-h-[44px]"
           >
             {updateMutation.isPending && (
               <Loader2 className="w-4 h-4 animate-spin" />
@@ -157,21 +157,21 @@ function StorefrontCustomizerForm({
         </div>
       )}
 
-      {/* Pestañas de Secciones */}
-      <div className="flex flex-wrap items-center gap-2 border-b border-surface-border pb-3">
+      {/* Pestañas de Secciones con scroll horizontal táctil */}
+      <div className="flex items-center gap-2 border-b border-surface-border pb-3 overflow-x-auto scrollbar-none -mx-2 px-2 sm:mx-0 sm:px-0">
         {(
           [
-            ["branding", "1. Identidad & Paleta de Colores"],
-            ["hero", "2. Carrusel Hero Principal"],
-            ["promos", "3. Tarjetas Promocionales"],
-            ["operations", "4. Tarifas, Pagos & Banco"],
+            ["branding", "1. Identidad & Paleta"],
+            ["hero", "2. Carrusel Hero"],
+            ["promos", "3. Tarjetas Promos"],
+            ["operations", "4. Tarifas & Pagos"],
           ] as const
         ).map(([key, label]) => (
           <button
             key={key}
             type="button"
             onClick={() => setActiveTab(key)}
-            className={`px-4 py-2 rounded-full text-xs font-black uppercase tracking-wider font-display transition-all cursor-pointer ${
+            className={`px-4 py-2.5 rounded-full text-xs font-black uppercase tracking-wider font-display transition-all cursor-pointer shrink-0 whitespace-nowrap min-h-[40px] ${
               activeTab === key
                 ? "bg-brand-primary text-white shadow-md"
                 : "bg-surface-card text-text-muted hover:text-text-strong hover:bg-surface-card-hover border border-surface-border"

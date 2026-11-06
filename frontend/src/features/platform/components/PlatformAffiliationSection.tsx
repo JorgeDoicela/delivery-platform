@@ -71,7 +71,7 @@ export function PlatformAffiliationSection() {
           </div>
         </div>
 
-        <div className="lg:col-span-8 bg-surface-card border border-surface-border rounded-3xl p-8 sm:p-12 shadow-sm">
+        <div className="lg:col-span-8 bg-surface-card border border-surface-border rounded-3xl p-5 sm:p-8 lg:p-12 shadow-sm">
           {leadSubmitted ? (
             <div className="py-8 text-center space-y-4">
               <h3 className="text-2xl font-black uppercase tracking-tight text-text-strong font-display">

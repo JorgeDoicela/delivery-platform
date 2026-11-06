@@ -103,7 +103,7 @@ export function FastCasualUrbanLandingLayout({
                 src={heroImage}
                 alt={primarySlide?.title || brandName}
                 fill
-                priority
+                loading="eager"
                 sizes="(max-width: 1024px) 100vw, 50vw"
                 className="object-cover object-center"
               />

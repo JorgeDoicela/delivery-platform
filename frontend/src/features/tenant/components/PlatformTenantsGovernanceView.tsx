@@ -123,11 +123,11 @@ export function PlatformTenantsGovernanceView() {
           </p>
         </div>
 
-        <div className="flex flex-wrap items-center gap-3 shrink-0">
+        <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 w-full sm:w-auto shrink-0">
           <button
             type="button"
             onClick={() => refetch()}
-            className="px-4 py-2.5 rounded-full border border-surface-border bg-surface-card hover:bg-surface-card-hover text-xs font-bold uppercase tracking-wider font-display text-text-strong transition-colors cursor-pointer shadow-xs"
+            className="px-4 py-2.5 rounded-full border border-surface-border bg-surface-card hover:bg-surface-card-hover text-xs font-bold uppercase tracking-wider font-display text-text-strong transition-colors cursor-pointer shadow-xs text-center min-h-[44px]"
           >
             Actualizar
           </button>
@@ -135,7 +135,7 @@ export function PlatformTenantsGovernanceView() {
           <button
             type="button"
             onClick={() => setIsModalOpen(true)}
-            className="px-5 py-2.5 rounded-full bg-brand-primary hover:bg-brand-primary-hover text-white text-xs font-black uppercase tracking-wider font-display transition-all cursor-pointer shadow-md active:scale-95"
+            className="px-5 py-2.5 rounded-full bg-brand-primary hover:bg-brand-primary-hover text-white text-xs font-black uppercase tracking-wider font-display transition-all cursor-pointer shadow-md active:scale-95 text-center min-h-[44px]"
           >
             + Afiliar Nuevo Restaurante
           </button>
@@ -288,8 +288,8 @@ export function PlatformTenantsGovernanceView() {
               </div>
 
               {/* Acciones de Gobernanza por Tenant */}
-              <div className="pt-4 border-t border-surface-border flex items-center justify-between gap-2">
-                <div className="flex items-center gap-2">
+              <div className="pt-4 border-t border-surface-border flex flex-col sm:flex-row sm:items-center justify-between gap-2.5">
+                <div className="grid grid-cols-2 sm:flex sm:items-center gap-2 w-full sm:w-auto">
                   <button
                     type="button"
                     onClick={() => {
@@ -298,15 +298,15 @@ export function PlatformTenantsGovernanceView() {
                         `Contexto operativo cambiado a "${tenant.name}" (${tenant.slug}).`
                       );
                     }}
-                    className="px-4 py-2 rounded-full bg-surface-canvas hover:bg-surface-card-hover text-text-strong border border-surface-border text-xs font-bold uppercase tracking-wider font-display transition-colors cursor-pointer"
+                    className="inline-flex items-center justify-center px-4 py-2.5 rounded-full bg-surface-canvas hover:bg-surface-card-hover text-text-strong border border-surface-border text-xs font-bold uppercase tracking-wider font-display transition-colors cursor-pointer min-h-[42px] text-center"
                   >
-                    Gestionar Marca
+                    Gestionar
                   </button>
 
                   <Link
                     href={`/${tenant.slug}`}
                     onClick={() => setTenantSlug(tenant.slug)}
-                    className="px-4 py-2 rounded-full border border-surface-border bg-surface-card hover:bg-surface-canvas text-text-strong text-xs font-bold uppercase tracking-wider font-display transition-colors"
+                    className="inline-flex items-center justify-center px-4 py-2.5 rounded-full border border-surface-border bg-surface-card hover:bg-surface-canvas text-text-strong text-xs font-bold uppercase tracking-wider font-display transition-colors min-h-[42px] text-center"
                   >
                     Ver Tienda
                   </Link>
@@ -323,7 +323,7 @@ export function PlatformTenantsGovernanceView() {
                       tenant.name
                     )
                   }
-                  className={`px-4 py-2 rounded-full text-xs font-bold uppercase tracking-wider font-display transition-colors cursor-pointer border ${
+                  className={`w-full sm:w-auto inline-flex items-center justify-center px-4 py-2.5 rounded-full text-xs font-bold uppercase tracking-wider font-display transition-colors cursor-pointer border min-h-[42px] ${
                     tenant.isActive
                       ? "border-red-500/30 text-red-500 hover:bg-red-500/10"
                       : "border-emerald-500/30 text-emerald-500 hover:bg-emerald-500/10"

@@ -70,21 +70,21 @@ function BranchScheduleForm({ branch, onClose }: BranchScheduleFormProps) {
   };
 
   return (
-    <div className="bg-surface-card border border-surface-border rounded-3xl w-full max-w-lg shadow-2xl overflow-hidden flex flex-col">
+    <div className="bg-surface-card border border-surface-border rounded-3xl w-full max-w-lg shadow-2xl overflow-hidden flex flex-col max-h-[92vh]">
       {/* Cabecera del modal */}
-      <div className="px-6 py-5 border-b border-surface-border flex items-center justify-between bg-surface-canvas">
-        <div className="flex items-center gap-2.5">
-          <div className="w-9 h-9 rounded-xl bg-brand-primary/10 border border-brand-primary/20 flex items-center justify-center text-brand-primary">
+      <div className="px-4 sm:px-6 py-4 sm:py-5 border-b border-surface-border flex items-center justify-between bg-surface-canvas shrink-0">
+        <div className="flex items-center gap-2.5 min-w-0 pr-2">
+          <div className="w-9 h-9 rounded-xl bg-brand-primary/10 border border-brand-primary/20 flex items-center justify-center text-brand-primary shrink-0">
             <Clock className="w-5 h-5" />
           </div>
-          <div>
+          <div className="min-w-0">
             <h2
               id="modal-schedule-title"
-              className="font-display font-black text-lg uppercase tracking-wide text-text-strong"
+              className="font-display font-black text-base sm:text-lg uppercase tracking-wide text-text-strong truncate"
             >
               Horarios • {branch.name}
             </h2>
-            <p className="text-[11px] text-text-muted">
+            <p className="text-[11px] text-text-muted truncate">
               Configuración operativa y disponibilidad en tiempo real
             </p>
           </div>
@@ -93,7 +93,7 @@ function BranchScheduleForm({ branch, onClose }: BranchScheduleFormProps) {
         <button
           type="button"
           onClick={onClose}
-          className="w-8 h-8 rounded-full flex items-center justify-center text-text-muted hover:text-text-strong hover:bg-surface-card-hover transition-colors"
+          className="w-8 h-8 rounded-full flex items-center justify-center text-text-muted hover:text-text-strong hover:bg-surface-card-hover transition-colors shrink-0 cursor-pointer"
           aria-label="Cerrar modal"
         >
           <X className="w-4 h-4" />
@@ -101,7 +101,7 @@ function BranchScheduleForm({ branch, onClose }: BranchScheduleFormProps) {
       </div>
 
       {/* Contenido del formulario */}
-      <form onSubmit={handleSubmit} className="p-6 space-y-5">
+      <form onSubmit={handleSubmit} className="p-4 sm:p-6 space-y-4 sm:space-y-5 overflow-y-auto flex-1 overscroll-contain">
         {/* Alertas */}
         {validationError && (
           <div className="p-3 rounded-2xl bg-status-danger/10 border border-status-danger/30 text-status-danger text-xs flex items-center gap-2.5">
@@ -119,10 +119,10 @@ function BranchScheduleForm({ branch, onClose }: BranchScheduleFormProps) {
 
         {/* Previsualización en vivo */}
         <div className="p-4 rounded-2xl bg-surface-canvas border border-surface-border space-y-1.5">
-          <div className="flex items-center justify-between text-xs">
+          <div className="flex items-center justify-between text-xs gap-2">
             <span className="text-text-muted font-medium">Estado resultante ahora:</span>
             <span
-              className={`font-mono font-bold text-[11px] px-2.5 py-0.5 rounded-full uppercase tracking-wider ${
+              className={`font-mono font-bold text-[11px] px-2.5 py-0.5 rounded-full uppercase tracking-wider shrink-0 ${
                 !isActive
                   ? "bg-neutral-200 text-neutral-700 dark:bg-neutral-800 dark:text-neutral-300"
                   : livePreview.isOpen
@@ -141,7 +141,7 @@ function BranchScheduleForm({ branch, onClose }: BranchScheduleFormProps) {
         </div>
 
         {/* Inputs de Horario */}
-        <div className="grid grid-cols-2 gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
           <div>
             <label
               htmlFor={openingId}
@@ -180,12 +180,12 @@ function BranchScheduleForm({ branch, onClose }: BranchScheduleFormProps) {
         </div>
 
         {/* Toggle de Estado Activo */}
-        <div className="pt-2 border-t border-surface-border flex items-center justify-between">
-          <div>
+        <div className="pt-2 border-t border-surface-border flex items-center justify-between gap-3">
+          <div className="min-w-0">
             <span className="text-xs font-bold text-text-strong block font-display uppercase tracking-wider">
               Operación de la Sucursal
             </span>
-            <span className="text-[11px] text-text-muted">
+            <span className="text-[11px] text-text-muted truncate block">
               {isActive ? "Disponible para pedidos y salón" : "Pausada temporalmente"}
             </span>
           </div>
@@ -193,7 +193,7 @@ function BranchScheduleForm({ branch, onClose }: BranchScheduleFormProps) {
           <button
             type="button"
             onClick={() => setIsActive((prev) => !prev)}
-            className={`flex items-center gap-1.5 px-3.5 py-1.5 rounded-full text-xs font-bold uppercase tracking-wider transition-colors cursor-pointer ${
+            className={`flex items-center gap-1.5 px-3.5 py-1.5 rounded-full text-xs font-bold uppercase tracking-wider transition-colors cursor-pointer shrink-0 min-h-[36px] ${
               isActive
                 ? "bg-status-success/20 text-status-success border border-status-success/40"
                 : "bg-surface-canvas text-text-muted border border-surface-border"
@@ -205,12 +205,12 @@ function BranchScheduleForm({ branch, onClose }: BranchScheduleFormProps) {
         </div>
 
         {/* Botones de acción */}
-        <div className="pt-4 border-t border-surface-border flex items-center justify-end gap-3">
+        <div className="pt-4 border-t border-surface-border flex flex-col-reverse sm:flex-row sm:items-center justify-end gap-2.5 shrink-0">
           <button
             type="button"
             onClick={onClose}
             disabled={mutation.isPending}
-            className="px-4 py-2 rounded-full text-xs font-bold text-text-muted hover:text-text-strong hover:bg-surface-canvas border border-transparent transition-colors cursor-pointer"
+            className="w-full sm:w-auto px-4 py-2.5 rounded-full text-xs font-bold text-text-muted hover:text-text-strong hover:bg-surface-canvas border border-surface-border sm:border-transparent transition-colors cursor-pointer min-h-[44px] text-center"
           >
             Cancelar
           </button>
@@ -218,7 +218,7 @@ function BranchScheduleForm({ branch, onClose }: BranchScheduleFormProps) {
           <button
             type="submit"
             disabled={mutation.isPending}
-            className="inline-flex items-center gap-2 px-5 py-2.5 bg-brand-primary hover:bg-brand-primary-hover text-white text-xs font-black font-display uppercase tracking-wider rounded-full shadow-md transition-all active:scale-95 disabled:opacity-50 cursor-pointer"
+            className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-5 py-2.5 bg-brand-primary hover:bg-brand-primary-hover text-white text-xs font-black font-display uppercase tracking-wider rounded-full shadow-md transition-all active:scale-95 disabled:opacity-50 cursor-pointer min-h-[44px]"
           >
             <Save className="w-3.5 h-3.5" />
             <span>{mutation.isPending ? "Guardando..." : "Guardar Horario"}</span>
@@ -243,7 +243,7 @@ export function BranchScheduleEditorModal({
       role="dialog"
       aria-modal="true"
       aria-labelledby="modal-schedule-title"
-      className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-neutral-950/60 backdrop-blur-xs animate-in fade-in duration-200"
+      className="fixed inset-0 z-50 flex items-center justify-center p-2 sm:p-4 bg-neutral-950/60 backdrop-blur-xs animate-in fade-in duration-200 overflow-y-auto"
     >
       <BranchScheduleForm key={branch.id} branch={branch} onClose={onClose} />
     </div>

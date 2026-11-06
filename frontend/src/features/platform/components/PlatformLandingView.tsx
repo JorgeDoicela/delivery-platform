@@ -19,9 +19,9 @@ export function PlatformLandingView() {
   const tenants = data?.tenants ?? [];
 
   return (
-    <div className="w-full pb-16 space-y-14 bg-surface-canvas transition-colors duration-200">
+    <div className="w-full pb-16 space-y-12 sm:space-y-14 bg-surface-canvas transition-colors duration-200">
       {/* 1. Hero Panorámico a Ancho Completo */}
-      <section className="relative overflow-hidden w-full min-h-[480px] sm:min-h-[530px] md:min-h-[580px] bg-neutral-950 text-white shadow-xl flex items-center py-14 sm:py-18 px-6 sm:px-12 md:px-16 lg:px-20">
+      <section className="relative overflow-hidden w-full min-h-[440px] sm:min-h-[520px] md:min-h-[580px] bg-neutral-950 text-white shadow-xl flex items-center py-10 sm:py-18 px-4 sm:px-12 md:px-16 lg:px-20">
         <div className="absolute inset-0 z-0">
           <Image
             src="/images/platform/hero-platform.jpg"
@@ -31,27 +31,27 @@ export function PlatformLandingView() {
             sizes="100vw"
             className="object-cover object-center md:object-right"
           />
-          <div className="absolute inset-0 bg-gradient-to-r from-black/95 via-black/75 to-transparent sm:from-black/90 sm:via-black/60 md:to-black/25" />
-          <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-black/30" />
+          <div className="absolute inset-0 bg-gradient-to-r from-black/95 via-black/80 to-transparent sm:from-black/90 sm:via-black/60 md:to-black/25" />
+          <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-transparent to-black/30" />
         </div>
 
-        <div className="relative z-10 w-full max-w-2xl space-y-6">
+        <div className="relative z-10 w-full max-w-2xl space-y-4 sm:space-y-6">
           <div className="inline-flex items-center bg-brand-primary text-white px-3.5 py-1 rounded-full text-xs font-bold uppercase tracking-wider shadow-md">
             <span>RED GASTRONÓMICA MULTI-MARCA</span>
           </div>
 
-          <h1 className="text-4xl sm:6xl md:text-7xl font-black uppercase tracking-tight leading-none text-white drop-shadow-md font-display">
+          <h1 className="text-3xl sm:text-5xl md:text-6xl lg:text-7xl font-black uppercase tracking-tight leading-none text-white drop-shadow-md font-display">
             PEDIDOS DIRECTOS A TU RESTAURANTE FAVORITO
           </h1>
 
-          <p className="text-white/90 text-sm sm:text-base leading-relaxed font-medium drop-shadow max-w-xl">
+          <p className="text-white/90 text-xs sm:text-base leading-relaxed font-medium drop-shadow max-w-xl">
             Selecciona tu restaurante o franquicia favorita, verifica cobertura satelital exacta y recibe tu orden recién preparada en casa o recógela en el local.
           </p>
 
-          <div className="flex flex-wrap items-center gap-4 pt-2">
+          <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 sm:gap-4 pt-2">
             <a
               href="#restaurantes"
-              className="inline-flex items-center gap-2 bg-brand-primary hover:bg-brand-primary-hover text-white font-black text-xs sm:text-sm uppercase tracking-wider font-display px-8 py-4 rounded-full shadow-2xl transition-all hover:scale-105 active:scale-95"
+              className="inline-flex items-center justify-center gap-2 bg-brand-primary hover:bg-brand-primary-hover text-white font-black text-xs sm:text-sm uppercase tracking-wider font-display px-7 sm:px-8 py-3.5 sm:py-4 rounded-full shadow-2xl transition-all hover:scale-105 active:scale-95 text-center"
             >
               <span>ELEGIR RESTAURANTE</span>
               <ArrowRight className="w-4 h-4 text-white" />
@@ -59,7 +59,7 @@ export function PlatformLandingView() {
 
             <a
               href="#afiliacion"
-              className="inline-flex items-center gap-2 bg-black/40 hover:bg-black/60 text-white font-bold text-xs uppercase tracking-wider px-6 py-4 rounded-full border border-white/30 transition-all backdrop-blur-md shadow-md active:scale-95"
+              className="inline-flex items-center justify-center gap-2 bg-black/40 hover:bg-black/60 text-white font-bold text-xs uppercase tracking-wider px-5 sm:px-6 py-3.5 sm:py-4 rounded-full border border-white/30 transition-all backdrop-blur-md shadow-md active:scale-95 text-center"
             >
               <MapPin className="w-4 h-4 text-amber-300" />
               <span>AFILIAR MI RESTAURANTE</span>
@@ -68,7 +68,7 @@ export function PlatformLandingView() {
         </div>
       </section>
 
-      <div className="w-full px-4 sm:px-8 lg:px-12 space-y-14">
+      <div className="w-full px-3.5 sm:px-8 lg:px-12 space-y-12 sm:space-y-14">
         {/* 2. Selector Rápido de Acción en Plataforma */}
         <section className="w-full text-center py-2">
           <div className="max-w-[760px] mx-auto space-y-4">
@@ -160,10 +160,13 @@ export function PlatformLandingView() {
                       <div className="absolute inset-0 bg-gradient-to-t from-black/65 via-transparent to-transparent" />
 
                       <div className="absolute top-3 left-3 right-3 flex items-center justify-between gap-2 z-10">
-                        <span className="text-[10px] font-bold uppercase tracking-wider text-neutral-900 bg-white/95 backdrop-blur-md px-3 py-1 rounded-full shadow-sm">
+                        <span className="text-[10px] font-bold uppercase tracking-wider text-neutral-900 bg-white/95 backdrop-blur-md px-3 py-1 rounded-full shadow-sm truncate">
                           {t.tagline}
                         </span>
-                        <span className="text-[10px] font-bold uppercase tracking-wider text-white bg-black/65 backdrop-blur-md px-2.5 py-1 rounded-full shadow-sm">
+                        <span
+                          suppressHydrationWarning
+                          className="text-[10px] font-bold uppercase tracking-wider text-white bg-black/65 backdrop-blur-md px-2.5 py-1 rounded-full shadow-sm shrink-0 whitespace-nowrap"
+                        >
                           {t.activeBranchesCount}{" "}
                           {t.activeBranchesCount === 1 ? "SUCURSAL" : "SUCURSALES"}
                         </span>

@@ -194,10 +194,22 @@ Para eliminar las barras de desplazamiento toscas y flechas nativas del sistema 
 
 ---
 
-## 7. Ergonomía Táctil y Mobile-First
+## 7. Responsividad Universal, Modo PC y Ergonomía en Todos los Tamaños de Pantalla
 
-* **Zonas de Pulsación (Touch Targets):**
-  - Todo botón interactivo, selector de modificador, casilla o campo de formulario debe tener una dimensión mínima de `44px` (ideal `48px`).
+El sistema visual y todos sus componentes deben diseñarse de forma nativa e innegociable **tanto para Modo PC / Escritorio (1280px a 1920px+) como para un comportamiento completamente responsive adaptado a todos los tamaños de pantalla** (smartphones 360px-480px, tablets 768px-1024px, laptops y monitores ultra-wide):
+
+* **Modo PC / Desktop (>= 1280px):**
+  - Interfaces de alta resolución con navegación horizontal o lateral extendida, sin colapsar menús ni ocultar accesos clave.
+  - Tableros operativos y vistas de gobernanza con distribución multidimensional (tableros KDS en 3 columnas simultáneas, tablas de inventario completas, vistas de dos columnas en pedidos y checkout).
+  - Máximo aprovechamiento del ancho de pantalla con contenedores centrados (`max-w-7xl` o `max-w-6xl`) y márgenes balanceados.
+* **Tablets y Laptops (768px a 1024px):**
+  - Transición fluida a rejillas de 2 columnas (`md:grid-cols-2`), selectores y botones de tamaño medio y modales con padding equilibrado.
+* **Smartphones y Pantallas Pequeñas (360px a 480px):**
+  - **Cero Desbordamiento Horizontal:** Prohibido el uso de anchos rígidos en píxeles que superen 320px. Los contenedores y menús desplegables deben emplear anchos adaptables (`w-[calc(100vw-2rem)] max-w-xs sm:w-80`).
+  - **Navegación Móvil:** Integración de cajón deslizante (`MobileNavDrawer`) y barra de navegación inferior fija (`MobileBottomNav`) con soporte explícito para el área segura de dispositivos móviles (`safe-area-inset-bottom`).
+  - **Vistas en Tarjetas para Tablas:** Las tablas de datos administrativas deben presentar una vista alternativa en tarjetas individuales (`md:hidden`) optimizadas para lectura vertical.
+  - **Modales Adaptables:** Altura contenida (`max-h-[92vh] flex flex-col`) con cabecera y pie fijos (`shrink-0`) y formulario interno con desplazamiento independiente (`overflow-y-auto overscroll-contain`).
+  - **Zonas de Pulsación (Touch Targets):** Todo botón interactivo, selector de modificador, casilla o campo de formulario debe tener una dimensión mínima de `44px` (ideal `48px`).
 * **Micro-Interacciones Hápticas:**
   - Reducción visual al pulsar: `active:scale-95`.
   - Transiciones suaves y consistentes: `transition-all duration-200 ease-out`.

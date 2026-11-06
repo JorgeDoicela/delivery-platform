@@ -16,7 +16,7 @@ export const FALLBACK_TENANT_CONFIGS: Record<string, TenantStorefrontConfigDto> 
     name: "La Granjita",
     tagline: "Asadero",
     description:
-      "Pollo asado artesanalmente al carbón vegetal y leña seleccionada. Guarniciones tradicionales, ensalada fresca y ají de la casa.",
+      "Pollo asado artesanalmente al carbón vegetal y leña seleccionada en La Granjita Asadero. Pedidos directos sin intermediarios.",
     heroSubtitle:
       "Personaliza tu orden con guarniciones calientes, ensalada fresca y ají artesanal",
     businessName: "Asadero La Granjita Cia. Ltda.",

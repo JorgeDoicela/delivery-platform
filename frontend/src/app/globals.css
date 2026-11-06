@@ -54,9 +54,9 @@
   --status-warning-bg: rgba(245, 158, 11, 0.12);
   --status-warning-border: rgba(245, 158, 11, 0.28);
 
-  --status-danger: #dc2626;
-  --status-danger-bg: rgba(220, 38, 38, 0.12);
-  --status-danger-border: rgba(220, 38, 38, 0.28);
+  --status-danger: #e4002b;
+  --status-danger-bg: rgba(228, 0, 43, 0.12);
+  --status-danger-border: rgba(228, 0, 43, 0.28);
 
   --status-info: #0284c7;
   --status-info-bg: rgba(2, 132, 199, 0.12);

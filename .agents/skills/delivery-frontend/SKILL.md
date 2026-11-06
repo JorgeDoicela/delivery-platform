@@ -87,7 +87,23 @@ El App Router de Next.js (`src/app/`) separa los contextos operativos manteniend
 
 ---
 
-## 7. Mandato de Calidad, Cero Parches y Conformidad con `delivery-estilos`
+## 7. Responsividad Universal y Compatibilidad Multipantalla (Modo PC y Móvil)
+
+Toda pantalla, componente o flujo desarrollado o modificado debe estar **siempre concebido tanto para Modo PC / Escritorio (1280px a 1920px+) como para diseño completamente responsive en todos los tamaños de pantalla** (móviles 360px-480px, tabletas 768px-1024px, laptops y pantallas ultra-wide):
+* **Modo PC / Desktop:**
+  - Navegación extendida, barras laterales completas o encabezados con navegación visible sin colapsar.
+  - Vistas multidimensionales de alta densidad informativa (ej. tableros KDS en 3 columnas simultáneas, tablas de inventario completas, dos columnas en checkout y perfil).
+* **Adaptabilidad Móvil y Tablets:**
+  - Cero desbordamiento horizontal (`overflow-x: hidden` en el layout y anchos dinámicos `w-full max-w-full` o relativos `w-[calc(100vw-2rem)]` en dropdowns y modales).
+  - Vistas de tarjeta o apiladas (`md:hidden`) en tablas de datos o listas densas.
+  - Cajones deslizantes laterales (`MobileNavDrawer`) y barras de navegación fijas inferiores (`MobileBottomNav`) con respeto de áreas seguras (`safe-area-inset-bottom`).
+  - Objetivos táctiles ergonómicos (botones, selectores y controles con altura mínima de 44px).
+* **Modales y Diálogos:**
+  - Altura máxima acotada (`max-h-[90vh]` o `max-h-[92vh] flex flex-col`), cabecera y pie fijos (`shrink-0`), y cuerpo con scroll interno fluido (`overflow-y-auto overscroll-contain`).
+
+---
+
+## 8. Mandato de Calidad, Cero Parches y Conformidad con `delivery-estilos`
 
 * **Tipado Estricto (Cero `any`):**
   - Todo modelo, propiedad, evento y respuesta de API debe tener un tipo o interfaz explícita. Los identificadores de orden (`orderId`) son cadenas UUID; prohibido convertirlos con `Number()`.

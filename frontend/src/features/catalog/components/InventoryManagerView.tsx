@@ -179,9 +179,111 @@ export function InventoryManagerView() {
         )}
       </div>
 
-      {/* Tabla de Productos */}
+      {/* Vista Responsive: Tarjetas en Móvil (md:hidden) y Tabla en Desktop (hidden md:block) */}
       <div className="bg-surface-card border border-surface-border rounded-3xl overflow-hidden shadow-xs">
-        <div className="overflow-x-auto">
+        {/* Mobile Cards */}
+        <div className="divide-y divide-surface-border md:hidden">
+          {filteredProducts.map((product) => {
+            const isPending = togglingId === product.id;
+
+            return (
+              <div key={product.id} className="p-4 flex flex-col gap-3">
+                <div className="flex items-start gap-3">
+                  <div className="relative w-16 h-16 rounded-2xl overflow-hidden bg-surface-canvas shrink-0 border border-surface-border">
+                    <Image
+                      src={product.imageUrl || "/images/shared/placeholders/dish-default.webp"}
+                      alt={product.name}
+                      fill
+                      sizes="64px"
+                      className="object-cover"
+                    />
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-start justify-between gap-2">
+                      <h3 className="font-bold text-text-strong text-sm leading-snug line-clamp-2">
+                        {product.name}
+                      </h3>
+                      <span className="font-mono font-bold text-brand-accent text-sm whitespace-nowrap">
+                        {formatCurrency(product.basePrice)}
+                      </span>
+                    </div>
+                    <div className="flex items-center gap-2 mt-1">
+                      <span className="bg-surface-canvas text-text-muted font-mono text-[10px] px-2 py-0.5 rounded border border-surface-border truncate">
+                        {product.categoryName}
+                      </span>
+                      {product.modifierGroups.length > 0 && (
+                        <span className="text-text-muted text-[10px]">
+                          {product.modifierGroups.length} modif.
+                        </span>
+                      )}
+                    </div>
+                    <div className="mt-2">
+                      <span
+                        className={`inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[10px] font-bold ${
+                          product.isActive
+                            ? "bg-status-success/20 text-status-success border border-status-success/40"
+                            : "bg-status-danger/20 text-status-danger border border-status-danger/40"
+                        }`}
+                      >
+                        {product.isActive ? (
+                          <>
+                            <CheckCircle2 className="w-3 h-3" />
+                            <span>En Menú</span>
+                          </>
+                        ) : (
+                          <>
+                            <XCircle className="w-3 h-3" />
+                            <span>Agotado</span>
+                          </>
+                        )}
+                      </span>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Acciones móviles con botones de al menos 40px para pulsación táctil */}
+                <div className="grid grid-cols-2 gap-2 pt-1 border-t border-surface-border/60">
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setEditingProduct(product);
+                      setIsProductModalOpen(true);
+                    }}
+                    className="inline-flex items-center justify-center gap-1.5 px-3 py-2.5 rounded-xl text-xs font-bold uppercase tracking-wider bg-surface-canvas hover:bg-surface-card-hover text-text-strong border border-surface-border transition-colors cursor-pointer min-h-[42px]"
+                  >
+                    <Pencil className="w-3.5 h-3.5 text-brand-accent" />
+                    <span>Editar</span>
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={() => handleToggleStatus(product.id, product.isActive)}
+                    disabled={isPending}
+                    className={`inline-flex items-center justify-center gap-1.5 px-3 py-2.5 rounded-xl text-xs font-bold uppercase tracking-wider transition-all active:scale-95 disabled:opacity-50 cursor-pointer min-h-[42px] ${
+                      product.isActive
+                        ? "bg-status-danger/15 hover:bg-status-danger/25 text-status-danger border border-status-danger/40"
+                        : "bg-status-success/15 hover:bg-status-success/25 text-status-success border border-status-success/40"
+                    }`}
+                  >
+                    {isPending ? (
+                      <>
+                        <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                        <span>Guardando...</span>
+                      </>
+                    ) : product.isActive ? (
+                      <span>Pausar</span>
+                    ) : (
+                      <span>Habilitar</span>
+                    )}
+                  </button>
+                </div>
+              </div>
+            );
+          })}
+        </div>
+
+        {/* Desktop Table */}
+        <div className="hidden md:block overflow-x-auto">
           <table className="w-full text-left text-xs">
             <thead className="bg-surface-canvas text-text-muted uppercase font-mono tracking-wider text-[11px] border-b border-surface-border">
               <tr>

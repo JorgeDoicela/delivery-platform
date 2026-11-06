@@ -101,7 +101,7 @@ function LoginContent() {
         </div>
 
         {/* Columna Derecha: Tarjeta Blanca Principal de Estado / Formulario */}
-        <div className="lg:col-span-8 bg-white border border-neutral-200/90 rounded-3xl p-8 sm:p-12 shadow-sm min-h-[380px] flex flex-col justify-center">
+        <div className="lg:col-span-8 bg-white border border-neutral-200/90 rounded-3xl p-5 sm:p-10 lg:p-12 shadow-sm min-h-[380px] flex flex-col justify-center">
           {!isMounted ? (
             <div className="flex flex-col items-center justify-center p-8 text-neutral-400 gap-2">
               <Loader2 className="w-6 h-6 animate-spin text-brand-primary" />
@@ -124,11 +124,11 @@ function LoginContent() {
                 </p>
               </div>
 
-              <div className="flex flex-wrap items-center justify-center gap-3 pt-4">
+              <div className="flex flex-col sm:flex-row flex-wrap items-stretch sm:items-center justify-center gap-3 pt-4 w-full sm:w-auto">
                 {(user.role === "SuperAdmin" || Number(user.role) === 1) && (
                   <Link
                     href="/superadmin"
-                    className="bg-neutral-950 hover:bg-neutral-800 active:scale-95 text-white font-black text-xs uppercase tracking-wider font-display px-6 py-3 rounded-full shadow-md transition-all inline-flex items-center gap-2"
+                    className="bg-neutral-950 hover:bg-neutral-800 active:scale-95 text-white font-black text-xs uppercase tracking-wider font-display px-6 py-3 rounded-full shadow-md transition-all inline-flex items-center justify-center gap-2 min-h-[44px]"
                   >
                     <span>Consola SuperAdmin</span>
                     <ArrowRight className="w-3.5 h-3.5" />
@@ -141,7 +141,7 @@ function LoginContent() {
                   Number(user.role) === 1) && (
                   <Link
                     href="/admin/personalizacion"
-                    className="bg-brand-primary hover:bg-brand-primary-hover active:scale-95 text-white font-black text-xs uppercase tracking-wider font-display px-6 py-3 rounded-full shadow-md shadow-brand-primary/20 transition-all inline-flex items-center gap-2"
+                    className="bg-brand-primary hover:bg-brand-primary-hover active:scale-95 text-white font-black text-xs uppercase tracking-wider font-display px-6 py-3 rounded-full shadow-md shadow-brand-primary/20 transition-all inline-flex items-center justify-center gap-2 min-h-[44px]"
                   >
                     <span>Panel de Marca</span>
                     <ArrowRight className="w-3.5 h-3.5" />
@@ -150,7 +150,7 @@ function LoginContent() {
 
                 <Link
                   href="/cocina"
-                  className="bg-neutral-800 hover:bg-neutral-700 active:scale-95 text-white font-black text-xs uppercase tracking-wider font-display px-6 py-3 rounded-full shadow-sm transition-all inline-flex items-center gap-2"
+                  className="bg-neutral-800 hover:bg-neutral-700 active:scale-95 text-white font-black text-xs uppercase tracking-wider font-display px-6 py-3 rounded-full shadow-sm transition-all inline-flex items-center justify-center gap-2 min-h-[44px]"
                 >
                   <span>Ir a Cocina KDS</span>
                   <ArrowRight className="w-3.5 h-3.5" />
@@ -159,7 +159,7 @@ function LoginContent() {
                 <button
                   type="button"
                   onClick={handleLogout}
-                  className="bg-neutral-100 hover:bg-neutral-200 active:scale-95 text-neutral-800 font-bold text-xs uppercase tracking-wider px-6 py-3 rounded-full transition-colors inline-flex items-center gap-1.5"
+                  className="bg-neutral-100 hover:bg-neutral-200 active:scale-95 text-neutral-800 font-bold text-xs uppercase tracking-wider px-6 py-3 rounded-full transition-colors inline-flex items-center justify-center gap-1.5 cursor-pointer min-h-[44px]"
                 >
                   <LogOut className="w-3.5 h-3.5" />
                   <span>Cerrar Sesión</span>

@@ -139,20 +139,20 @@ export function ProductFormModal({
 
   return (
     <div
-      className="fixed inset-0 z-50 flex items-center justify-center bg-black/75 backdrop-blur-xs p-4 overflow-y-auto"
+      className="fixed inset-0 z-50 flex items-center justify-center bg-black/75 backdrop-blur-xs p-2 sm:p-4 overflow-y-auto"
       role="dialog"
       aria-modal="true"
       aria-labelledby="modal-product-form-title"
     >
-      <div className="w-full max-w-xl bg-surface-card border border-surface-border rounded-3xl shadow-2xl overflow-hidden my-8 text-text-strong">
-        <div className="px-6 py-4 border-b border-surface-border flex items-center justify-between bg-surface-canvas">
-          <div>
-            <span className="text-[10px] font-bold uppercase tracking-widest text-brand-primary block font-display">
+      <div className="w-full max-w-xl bg-surface-card border border-surface-border rounded-3xl shadow-2xl overflow-hidden my-4 sm:my-8 text-text-strong max-h-[92vh] flex flex-col">
+        <div className="px-4 sm:px-6 py-3.5 sm:py-4 border-b border-surface-border flex items-center justify-between bg-surface-canvas shrink-0">
+          <div className="min-w-0 pr-2">
+            <span className="text-[10px] font-bold uppercase tracking-widest text-brand-primary block font-display truncate">
               Catálogo Multi-Tenant • Imagen y Ficha de Producto
             </span>
             <h2
               id="modal-product-form-title"
-              className="text-xl font-black uppercase tracking-tight text-text-strong font-display"
+              className="text-lg sm:text-xl font-black uppercase tracking-tight text-text-strong font-display truncate"
             >
               {isEditing ? `Editar Producto #${productToEdit?.id}` : "Crear Nuevo Producto"}
             </h2>
@@ -161,13 +161,13 @@ export function ProductFormModal({
             type="button"
             onClick={onClose}
             aria-label="Cerrar modal"
-            className="p-2 rounded-full text-text-muted hover:text-text-strong hover:bg-surface-card-hover transition-colors cursor-pointer"
+            className="p-2 rounded-full text-text-muted hover:text-text-strong hover:bg-surface-card-hover transition-colors cursor-pointer shrink-0"
           >
             <X className="w-5 h-5" />
           </button>
         </div>
 
-        <form onSubmit={handleSubmit} className="p-6 space-y-4 text-xs">
+        <form onSubmit={handleSubmit} className="p-4 sm:p-6 space-y-4 text-xs overflow-y-auto flex-1 overscroll-contain">
           {errorMsg && (
             <div className="p-3.5 rounded-2xl bg-status-danger/20 border border-status-danger/40 text-status-danger font-semibold">
               {errorMsg}
@@ -332,34 +332,34 @@ export function ProductFormModal({
             </div>
           </div>
 
-          <div className="pt-3 border-t border-surface-border flex items-center justify-between gap-3">
-            <label className="flex items-center gap-2 text-text-strong cursor-pointer">
+          <div className="pt-3 border-t border-surface-border flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+            <label className="flex items-center gap-2 text-text-strong cursor-pointer text-xs">
               <input
                 type="checkbox"
                 checked={form.isActive}
                 onChange={(e) =>
                   setForm({ ...form, isActive: e.target.checked })
                 }
-                className="rounded border-surface-border"
+                className="w-4 h-4 rounded border-surface-border text-brand-primary focus:ring-brand-primary"
               />
               <span>Disponible inmediatamente en el menú</span>
             </label>
 
-            <div className="flex items-center gap-2.5">
+            <div className="flex items-center gap-2.5 w-full sm:w-auto justify-end">
               <button
                 type="button"
                 onClick={onClose}
-                className="px-4 py-2 rounded-full border border-surface-border text-text-muted hover:text-text-strong font-bold uppercase tracking-wider transition-colors cursor-pointer"
+                className="flex-1 sm:flex-initial px-4 py-2.5 rounded-full border border-surface-border text-text-muted hover:text-text-strong font-bold uppercase tracking-wider transition-colors cursor-pointer min-h-[42px] text-center"
               >
                 Cancelar
               </button>
               <button
                 type="submit"
                 disabled={isSubmitting}
-                className="px-5 py-2 rounded-full bg-brand-primary hover:bg-brand-primary-hover text-white font-black uppercase tracking-wider font-display inline-flex items-center gap-2 transition-all disabled:opacity-50 cursor-pointer shadow-md active:scale-95"
+                className="flex-1 sm:flex-initial px-5 py-2.5 rounded-full bg-brand-primary hover:bg-brand-primary-hover text-white font-black uppercase tracking-wider font-display inline-flex items-center justify-center gap-2 transition-all disabled:opacity-50 cursor-pointer shadow-md active:scale-95 min-h-[42px]"
               >
                 {isSubmitting && <Loader2 className="w-3.5 h-3.5 animate-spin" />}
-                <span>{isEditing ? "Guardar Cambios" : "Crear Producto"}</span>
+                <span>{isEditing ? "Guardar" : "Crear Producto"}</span>
               </button>
             </div>
           </div>

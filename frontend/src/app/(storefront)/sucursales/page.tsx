@@ -42,10 +42,10 @@ export default function SucursalesPage() {
             return (
               <div
                 key={branch.id}
-                className="bg-surface-card border border-surface-border rounded-3xl p-6 sm:p-8 space-y-5 shadow-sm"
+                className="bg-surface-card border border-surface-border rounded-3xl p-5 sm:p-8 space-y-5 shadow-sm"
               >
                 <div className="flex items-start justify-between">
-                  <div>
+                  <div className="min-w-0">
                     <div className="flex items-center gap-2">
                       <span className="text-[10px] font-bold uppercase tracking-wider text-text-strong bg-surface-canvas border border-surface-border px-2.5 py-0.5 rounded-full font-mono">
                         Sucursal #{idx + 1}
@@ -62,7 +62,7 @@ export default function SucursalesPage() {
                         {!branch.isActive ? "Pausada" : opStatus.statusLabel}
                       </span>
                     </div>
-                    <h2 className="text-2xl font-black uppercase tracking-tight text-text-strong font-display mt-2">
+                    <h2 className="text-xl sm:text-2xl font-black uppercase tracking-tight text-text-strong font-display mt-2 truncate">
                       {branch.name}
                     </h2>
                     <p className="text-xs text-text-muted mt-0.5">
@@ -91,7 +91,7 @@ export default function SucursalesPage() {
                 <Link
                   href={tenant?.slug ? `/${tenant.slug}#catalogo` : "/#catalogo"}
                   onClick={() => setBranch(branch.id, branch.name)}
-                  className="inline-flex items-center justify-center w-full bg-brand-primary hover:bg-brand-primary-hover text-white text-xs font-bold uppercase tracking-wider py-3.5 px-6 rounded-full shadow-md transition-all active:scale-95"
+                  className="inline-flex items-center justify-center w-full bg-brand-primary hover:bg-brand-primary-hover text-white text-xs font-bold uppercase tracking-wider py-3.5 px-6 rounded-full shadow-md transition-all active:scale-95 min-h-[44px]"
                 >
                   {opStatus.isOpen ? "Ordenar en esta sucursal" : "Ver Menú de esta sucursal"}
                 </Link>

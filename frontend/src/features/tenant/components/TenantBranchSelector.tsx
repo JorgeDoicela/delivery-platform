@@ -57,7 +57,7 @@ export function TenantBranchSelector({ tenant }: TenantBranchSelectorProps) {
         <span className="hidden sm:inline text-[10px] uppercase tracking-wider text-text-muted font-semibold">
           Sucursal:
         </span>
-        <span className="font-display uppercase tracking-wide font-black text-xs text-text-strong max-w-[130px] truncate">
+        <span className="font-display uppercase tracking-wide font-black text-xs text-text-strong max-w-[80px] sm:max-w-[130px] truncate">
           {currentBranch?.name || "Seleccionar"}
         </span>
         <ChevronDown
@@ -68,7 +68,7 @@ export function TenantBranchSelector({ tenant }: TenantBranchSelectorProps) {
       </button>
 
       {isOpen && (
-        <div className="absolute right-0 mt-2 w-80 bg-surface-card rounded-3xl border border-surface-border shadow-2xl p-3.5 z-50 space-y-2 text-text-strong">
+        <div className="absolute right-0 mt-2 w-[calc(100vw-2rem)] max-w-xs sm:w-80 bg-surface-card rounded-3xl border border-surface-border shadow-2xl p-3.5 z-50 space-y-2 text-text-strong">
           <div className="px-2 pt-1 pb-2 border-b border-surface-border flex items-center justify-between">
             <span className="text-[10px] font-bold uppercase tracking-wider text-text-muted">
               Sucursales de {tenant?.name || "este local"}

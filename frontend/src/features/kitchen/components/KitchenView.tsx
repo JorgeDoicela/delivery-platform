@@ -39,6 +39,8 @@ export function KitchenView() {
   const inKitchenOrders = orders.filter((o) => o.status === OrderStatus.InKitchen);
   const readyOrders = orders.filter((o) => o.status === OrderStatus.ReadyForDelivery);
 
+  const [mobileColumn, setMobileColumn] = useState<"confirmed" | "inkitchen" | "ready">("confirmed");
+
   return (
     <div className="space-y-4">
       <div className="flex flex-col sm:flex-row sm:items-center justify-between pb-4 border-b border-surface-border gap-4">
@@ -119,8 +121,61 @@ export function KitchenView() {
         </div>
       )}
 
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4 min-h-[calc(100vh-160px)]">
-        <div className="bg-surface-card rounded-2xl border border-surface-border p-4 flex flex-col shadow-xs transition-colors duration-200">
+      {/* Selector de Columnas en Dispositivos Móviles (< md) */}
+      <div className="flex md:hidden items-center gap-1.5 p-1 bg-surface-card border border-surface-border rounded-2xl shadow-xs">
+        <button
+          type="button"
+          onClick={() => setMobileColumn("confirmed")}
+          className={`flex-1 py-2 px-2 rounded-xl text-[11px] font-black uppercase font-display tracking-wide transition-all flex items-center justify-center gap-1.5 ${
+            mobileColumn === "confirmed"
+              ? "bg-status-warning text-neutral-950 shadow-sm"
+              : "text-text-muted hover:text-text-strong"
+          }`}
+        >
+          <span>Espera</span>
+          <span className="font-mono text-[10px] font-bold bg-black/15 px-1.5 py-0.2 rounded-full">
+            {confirmedOrders.length}
+          </span>
+        </button>
+
+        <button
+          type="button"
+          onClick={() => setMobileColumn("inkitchen")}
+          className={`flex-1 py-2 px-2 rounded-xl text-[11px] font-black uppercase font-display tracking-wide transition-all flex items-center justify-center gap-1.5 ${
+            mobileColumn === "inkitchen"
+              ? "bg-status-info text-white shadow-sm"
+              : "text-text-muted hover:text-text-strong"
+          }`}
+        >
+          <span>Horno</span>
+          <span className="font-mono text-[10px] font-bold bg-white/20 px-1.5 py-0.2 rounded-full">
+            {inKitchenOrders.length}
+          </span>
+        </button>
+
+        <button
+          type="button"
+          onClick={() => setMobileColumn("ready")}
+          className={`flex-1 py-2 px-2 rounded-xl text-[11px] font-black uppercase font-display tracking-wide transition-all flex items-center justify-center gap-1.5 ${
+            mobileColumn === "ready"
+              ? "bg-status-success text-white shadow-sm"
+              : "text-text-muted hover:text-text-strong"
+          }`}
+        >
+          <span>Listos</span>
+          <span className="font-mono text-[10px] font-bold bg-white/20 px-1.5 py-0.2 rounded-full">
+            {readyOrders.length}
+          </span>
+        </button>
+      </div>
+
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4 min-h-[calc(100vh-180px)]">
+        {/* Columna 1: En Espera */}
+        <div
+          className={`bg-surface-card rounded-2xl border border-surface-border p-4 flex flex-col shadow-xs transition-colors duration-200 ${
+            mobileColumn === "confirmed" ? "flex" : "hidden md:flex"
+          }`}
+        >
           <div className="flex items-center justify-between pb-3 border-b border-surface-border text-xs font-black uppercase tracking-wider font-display text-status-warning">
             <span>EN ESPERA (CONFIRMADOS)</span>
             <span className="bg-status-warning/20 text-status-warning px-2.5 py-0.5 rounded-full border border-status-warning/40 font-mono font-bold">
@@ -128,7 +183,7 @@ export function KitchenView() {
             </span>
           </div>
 
-          <div className="flex-1 mt-3 space-y-3 overflow-y-auto max-h-[calc(100vh-220px)] pr-1">
+          <div className="flex-1 mt-3 space-y-3 overflow-y-auto max-h-[calc(100vh-250px)] md:max-h-[calc(100vh-220px)] pr-1">
             {confirmedOrders.length === 0 ? (
               <div className="h-40 flex items-center justify-center text-xs text-text-muted font-medium border border-dashed border-surface-border rounded-xl bg-surface-canvas">
                 Sin pedidos en espera
@@ -145,7 +200,12 @@ export function KitchenView() {
           </div>
         </div>
 
-        <div className="bg-surface-card rounded-2xl border border-surface-border p-4 flex flex-col shadow-xs transition-colors duration-200">
+        {/* Columna 2: En Preparación */}
+        <div
+          className={`bg-surface-card rounded-2xl border border-surface-border p-4 flex flex-col shadow-xs transition-colors duration-200 ${
+            mobileColumn === "inkitchen" ? "flex" : "hidden md:flex"
+          }`}
+        >
           <div className="flex items-center justify-between pb-3 border-b border-surface-border text-xs font-black uppercase tracking-wider font-display text-status-info">
             <span>EN PREPARACIÓN (HORNO)</span>
             <span className="bg-status-info/20 text-status-info px-2.5 py-0.5 rounded-full border border-status-info/40 font-mono font-bold">
@@ -153,7 +213,7 @@ export function KitchenView() {
             </span>
           </div>
 
-          <div className="flex-1 mt-3 space-y-3 overflow-y-auto max-h-[calc(100vh-220px)] pr-1">
+          <div className="flex-1 mt-3 space-y-3 overflow-y-auto max-h-[calc(100vh-250px)] md:max-h-[calc(100vh-220px)] pr-1">
             {inKitchenOrders.length === 0 ? (
               <div className="h-40 flex items-center justify-center text-xs text-text-muted font-medium border border-dashed border-surface-border rounded-xl bg-surface-canvas">
                 Sin pedidos en preparación
@@ -170,7 +230,12 @@ export function KitchenView() {
           </div>
         </div>
 
-        <div className="bg-surface-card rounded-2xl border border-surface-border p-4 flex flex-col shadow-xs transition-colors duration-200">
+        {/* Columna 3: Listos para Despacho */}
+        <div
+          className={`bg-surface-card rounded-2xl border border-surface-border p-4 flex flex-col shadow-xs transition-colors duration-200 ${
+            mobileColumn === "ready" ? "flex" : "hidden md:flex"
+          }`}
+        >
           <div className="flex items-center justify-between pb-3 border-b border-surface-border text-xs font-black uppercase tracking-wider font-display text-status-success">
             <span>LISTOS PARA DESPACHO</span>
             <span className="bg-status-success/20 text-status-success px-2.5 py-0.5 rounded-full border border-status-success/40 font-mono font-bold">
@@ -178,7 +243,7 @@ export function KitchenView() {
             </span>
           </div>
 
-          <div className="flex-1 mt-3 space-y-3 overflow-y-auto max-h-[calc(100vh-220px)] pr-1">
+          <div className="flex-1 mt-3 space-y-3 overflow-y-auto max-h-[calc(100vh-250px)] md:max-h-[calc(100vh-220px)] pr-1">
             {readyOrders.length === 0 ? (
               <div className="h-40 flex items-center justify-center text-xs text-text-muted font-medium border border-dashed border-surface-border rounded-xl bg-surface-canvas">
                 Sin pedidos listos para entrega
