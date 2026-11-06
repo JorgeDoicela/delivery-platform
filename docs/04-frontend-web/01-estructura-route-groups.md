@@ -60,7 +60,7 @@ La plataforma implementa un panel de accesos directos en [`src/app/(storefront)/
 | **Tienda & Clientes** | `/[slug]/checkout` / `/checkout` | N/A | Flujo de seleccion de direccion y confirmacion |
 | **Tienda & Clientes** | `/[slug]/rastreo` / `/rastreo` | N/A | Telemetria y seguimiento de motorizado en vivo |
 | **Tienda & Clientes** | `/terminos` y `/privacidad` | N/A | Politicas de privacidad y terminos de servicio |
-| **Autenticacion** | `/login` | N/A | Inicio de sesion operativo con rotacion HttpOnly y RBAC |
+| **Autenticacion** | `/login` (con `?tab=login` o `?tab=register`) | N/A | Inicio de sesion operativo y creacion de cuenta de cliente, conmutador de pestanas y acceso federado con Google OAuth |
 | **Cocina & KDS** | `/[slug]/cocina` / `/cocina` | N/A | Terminal KDS con semaforizacion FIFO y audio |
 | **Operaciones Sede** | `/admin/inventario` (o `/inventory`) | N/A | Gestion de stock de pollo, papas y empaques |
 | **Operaciones Sede** | `/admin/sucursales` (o `/branches`) | N/A | Throttling de hornos (pedidos por slot de 20 min)|

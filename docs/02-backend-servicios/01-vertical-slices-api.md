@@ -67,6 +67,76 @@ El backend de la plataforma esta construido en .NET 8 utilizando C# 12 y Minimal
 * **Descripcion:** Revoca el Refresh Token en base de datos y borra la cookie `refreshToken` del navegador.
 * **Respuesta Exitosa (200 OK):** `{"message": "Sesion cerrada exitosamente."}`
 
+#### 2.0.5. Registro de Cuenta de Cliente (`POST /api/v1/auth/register`)
+* **Descripcion:** Permite a un nuevo comensal crear una cuenta en la plataforma vinculada al comercio actual o global. Asigna automáticamente el rol `Customer` (`RoleId = 7`), genera su ficha en el directorio de clientes (`Customers`) para facturación electrónica y despacha de forma inmediata la sesión autenticada con Access Token (JWT) y Refresh Token en cookie `HttpOnly`.
+* **Payload de Entrada:**
+  ```json
+  {
+    "fullName": "Juan Perez",
+    "email": "juan.perez@gmail.com",
+    "phone": "+593991234567",
+    "password": "Password123!",
+    "tenantSlug": "la-granjita",
+    "identificationType": "CONSUMIDOR_FINAL",
+    "identificationNumber": "9999999999999"
+  }
+  ```
+* **Respuesta Exitosa (200 OK):**
+  ```json
+  {
+    "accessToken": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
+    "refreshToken": "7c1e9a2b...",
+    "expiresAt": "2026-11-06T22:30:00Z",
+    "user": {
+      "id": "f47ac10b-58cc-4372-a567-0e02b2c3d479",
+      "email": "juan.perez@gmail.com",
+      "fullName": "Juan Perez",
+      "phone": "+593991234567",
+      "role": "Customer",
+      "tenantId": "c3b9e4a1-0000-0000-0000-000000000001",
+      "tenantSlug": "la-granjita",
+      "branchId": null,
+      "isActive": true,
+      "roles": ["Customer"]
+    }
+  }
+  ```
+* **Cabecera Set-Cookie Emitida:**
+  `refreshToken=<token>; Path=/api/v1/auth; HttpOnly; SameSite=Lax; Secure; Max-Age=604800`
+* **Errores Posibles:** `400 Bad Request` (fallo de validación en contraseña o teléfono), `409 Conflict` (`Auth.EmailAlreadyRegistered` si el correo ya existe).
+
+#### 2.0.6. Autenticacion Federada con Google (`POST /api/v1/auth/google`)
+* **Descripcion:** Autentica e inicia sesión utilizando Google Identity Services (OpenID Connect). El backend valida criptográficamente el token con el endpoint de verificación oficial de Google (`https://oauth2.googleapis.com/tokeninfo`). Si el usuario no existe, aprovisiona de forma instantánea (Just-In-Time) la cuenta del cliente y emite los tokens JWT y cookies correspondientes.
+* **Payload de Entrada:**
+  ```json
+  {
+    "idToken": "eyJhbGciOiJSUzI1NiIsImtpZCI6Ij...",
+    "tenantSlug": "la-granjita"
+  }
+  ```
+* **Respuesta Exitosa (200 OK):**
+  ```json
+  {
+    "accessToken": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
+    "refreshToken": "8b2d4e1a...",
+    "expiresAt": "2026-11-06T22:30:00Z",
+    "user": {
+      "id": "a1b2c3d4-e5f6-7a8b-9c0d-1e2f3a4b5c6d",
+      "email": "usuario.google@gmail.com",
+      "fullName": "Usuario Google",
+      "phone": "",
+      "role": "Customer",
+      "tenantId": "c3b9e4a1-0000-0000-0000-000000000001",
+      "tenantSlug": "la-granjita",
+      "branchId": null,
+      "isActive": true,
+      "roles": ["Customer"],
+      "picture": "https://lh3.googleusercontent.com/..."
+    }
+  }
+  ```
+* **Errores Posibles:** `400 Bad Request` (`Auth.GoogleEmailNotVerified`), `401 Unauthorized` (`Auth.InvalidGoogleToken`), `403 Forbidden` (`Auth.TenantInactive`, `Auth.UserInactive`).
+
 ---
 
 ### 2.1. Sucursales, Geofencing y Capacidad de Horno

@@ -83,6 +83,72 @@ sequenceDiagram
     end
 ```
 
+### 2.3. Flujo de Registro de Cliente con Sesion Inmediata (Register)
+
+```mermaid
+sequenceDiagram
+    autonumber
+    actor Cliente as Navegador Web / Storefront
+    participant API as AuthEndpoints (POST /register)
+    participant Handler as RegisterHandler
+    participant DB as PostgreSQL (Users / Customers / Roles)
+    participant BCrypt as BCryptPasswordHasher
+    participant TokenProv as JwtTokenProvider
+
+    Cliente->>API: POST /api/v1/auth/register { fullName, email, phone, password, tenantSlug }
+    API->>Handler: Ejecuta RegisterCommand
+    Handler->>DB: Verifica si email existe en el tenant o global
+    alt Correo ya registrado
+        Handler-->>API: Result.Failure(AuthErrors.EmailAlreadyRegistered)
+        API-->>Cliente: 409 Conflict / RFC 7807 ProblemDetails
+    else Correo disponible
+        Handler->>BCrypt: Hash(password)
+        Handler->>DB: Inserta User con Role: Customer
+        Handler->>DB: Inserta o vincula Customer (Directorio SRI)
+        Handler->>TokenProv: GenerateAccessToken(user, roles, tenantId)
+        TokenProv-->>Handler: Access Token JWT (15 min)
+        Handler->>TokenProv: GenerateRefreshToken()
+        TokenProv-->>Handler: Raw Token + Hash SHA-256
+        Handler->>DB: Inserta RefreshTokenEntity
+        DB-->>Handler: Transaccion confirmada
+        Handler-->>API: Result.Success(RegisterResponse)
+        API->>Cliente: Set-Cookie: refreshToken=... (HttpOnly, SameSite=Lax)<br/>Body: { accessToken, user, expiresAt }
+    end
+```
+
+### 2.4. Flujo de Autenticacion Federada con Google (OpenID Connect)
+
+```mermaid
+sequenceDiagram
+    autonumber
+    actor Cliente as Navegador Web (Google Sign-In)
+    participant API as AuthEndpoints (POST /google)
+    participant Handler as GoogleAuthHandler
+    participant Validator as GoogleTokenValidator
+    participant Google as Servidores Google (tokeninfo)
+    participant DB as PostgreSQL (Users / Customers / RefreshTokens)
+    participant TokenProv as JwtTokenProvider
+
+    Cliente->>API: POST /api/v1/auth/google { idToken, tenantSlug }
+    API->>Handler: Ejecuta GoogleAuthCommand
+    Handler->>Validator: ValidateAsync(idToken)
+    Validator->>Google: GET oauth2.googleapis.com/tokeninfo?id_token=...
+    Google-->>Validator: Payload JSON (sub, email, email_verified, name)
+    Validator-->>Handler: Result.Success(GoogleTokenPayload)
+    Handler->>DB: Busca User por email verificado
+    alt Usuario no existe (Primer acceso JIT)
+        Handler->>DB: Crea User (Customer, PasswordHash en blanco)
+        Handler->>DB: Crea Customer en directorio comercial SRI
+    end
+    Handler->>TokenProv: GenerateAccessToken(user, roles, tenantId)
+    TokenProv-->>Handler: Access Token JWT (15 min)
+    Handler->>TokenProv: GenerateRefreshToken()
+    TokenProv-->>Handler: Raw Token + Hash SHA-256
+    Handler->>DB: Guarda RefreshTokenEntity
+    Handler-->>API: Result.Success(GoogleAuthResponse)
+    API->>Cliente: Set-Cookie: refreshToken=... (HttpOnly, SameSite=Lax)<br/>Body: { accessToken, user, expiresAt }
+```
+
 ---
 
 ## 3. Especificacion del Token JWT (Access Token)
@@ -176,20 +242,26 @@ builder.Services.AddAuthorization(options =>
 
 ## 5. Implementacion de Vertical Slices (`Delivery.Features/Auth`)
 
-La funcionalidad de seguridad se encuentra dividida en 4 rebanadas verticales independientes y cohesivas:
+La funcionalidad de seguridad se encuentra dividida en 6 rebanadas verticales independientes y cohesivas:
 
 ### 5.1. Catalogo de Slices
 
 1. **Login:** `Delivery.Features.Auth.Login`
    - Endpoint: `POST /api/v1/auth/login`
    - Validacion de credenciales con BCrypt, emision de JWT y establecimiento de cookie de refresh token.
-2. **RefreshToken:** `Delivery.Features.Auth.RefreshToken`
+2. **Register:** `Delivery.Features.Auth.Register`
+   - Endpoint: `POST /api/v1/auth/register`
+   - Registro de comensales con rol `Customer`, alta en directorio SRI del tenant y emision de sesion inmediata.
+3. **GoogleAuth:** `Delivery.Features.Auth.GoogleAuth`
+   - Endpoint: `POST /api/v1/auth/google`
+   - Verificacion de Google ID Token (OpenID Connect), aprovisionamiento Just-In-Time de cliente y emision de sesion.
+4. **RefreshToken:** `Delivery.Features.Auth.RefreshToken`
    - Endpoint: `POST /api/v1/auth/refresh`
    - Extraccion del token desde cookie o cabecera, rotacion atomica y emision de nuevo par de credenciales.
-3. **GetCurrentUser:** `Delivery.Features.Auth.GetCurrentUser`
+5. **GetCurrentUser:** `Delivery.Features.Auth.GetCurrentUser`
    - Endpoint: `GET /api/v1/auth/me`
    - Protegido por autenticacion JWT Bearer. Retorna el perfil y los claims del usuario activo.
-4. **RevokeToken (Logout):** `Delivery.Features.Auth.RevokeToken`
+6. **RevokeToken (Logout):** `Delivery.Features.Auth.RevokeToken`
    - Endpoint: `POST /api/v1/auth/logout`
    - Invalida el refresh token en base de datos y expira inmediatamente la cookie `HttpOnly`.
 

@@ -101,12 +101,13 @@ pnpm dev:frontend
 * **Sucursales y Horarios:** `http://localhost:3005/sucursales` (o `#sucursales`)
 * **Checkout con Resolucion de Cobertura:** `http://localhost:3005/finalizar-pedido` (o `/checkout`)
 * **Seguimiento del Pedido en Vivo:** `http://localhost:3005/rastreo` (o `/track/<order-uuid>`)
+* **Acceso, Registro y Cuenta de Clientes:** `http://localhost:3005/login` (conmutador entre Iniciar Sesión, Registro directo y Google Sign-In)
 * **Politicas y Terminos Legales:** `http://localhost:3005/terminos` y `http://localhost:3005/privacidad`
-* **Pantalla de Cocina (KDS en Tiempo Real):** `http://localhost:3005/cocina` (o `/kitchen`)
+* **Pantalla de Cocina (KDS en Tiempo Real):** `http://localhost:3005/cocina` (o `/[slug]/cocina`)
 * **Control de Inventario y Kardex:** `http://localhost:3005/admin/inventario` (o `/admin/inventory`)
 * **Capacidad de Hornos por Slot:** `http://localhost:3005/admin/sucursales` (o `/admin/branches`)
 * **Personalizacion de Storefront Tenant:** `http://localhost:3005/admin/personalizacion`
 * **Gestion de Tenants de Plataforma:** `http://localhost:3005/admin/tenants`
 * **SuperAdmin Dashboard:** `http://localhost:3005/superadmin`
-* **Portal del Repartidor:** `http://localhost:3005/repartidor`
+* **Portal del Repartidor:** `http://localhost:3005/repartidor` (o `/[slug]/repartidor`)
 * **Ruta Activa con Transmision GPS:** `http://localhost:3005/active-delivery`
