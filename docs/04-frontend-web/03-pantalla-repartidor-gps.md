@@ -1,7 +1,7 @@
 # 03. Herramienta Móvil del Repartidor y Telemetría GPS
 
 ## 1. Descripción General
-El módulo de repartidor (`src/app/(driver)/repartidor/page.tsx` y `src/app/(driver)/active-delivery/page.tsx`) proporciona una interfaz táctil optimizada para teléfonos móviles y terminales portátiles, dirigida a motorizados y repartidores de la plataforma Mesafy.
+El módulo de repartidor (`src/app/(driver)/[slug]/repartidor/page.tsx`, `src/app/(driver)/[slug]/active-delivery/page.tsx` con rutas de redirección canónica `/repartidor` y `/active-delivery`) proporciona una interfaz táctil optimizada para teléfonos móviles y terminales portátiles, dirigida a motorizados y repartidores de la plataforma Mesafy. Toda operación mantiene el slug del tenant activo en la URL del navegador (`/[slug]/repartidor`), garantizando el aislamiento contextual y la inyección automática del encabezado `X-Tenant-Slug`.
 
 El sistema unifica la recepción de pedidos listos en cocina, la navegación asistida hacia el domicilio del cliente, la telemetría GPS satelital en tiempo real transmitida a Redis GEO y SignalR, y la liquidación contable del turno y cobro en efectivo.
 

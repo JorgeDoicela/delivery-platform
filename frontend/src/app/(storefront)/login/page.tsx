@@ -150,7 +150,7 @@ function LoginContent() {
 
                 {(user.role === "Driver" || Number(user.role) === 6) && (
                   <Link
-                    href="/repartidor"
+                    href={`/${user.tenantSlug || tenant?.slug || "la-granjita"}/repartidor`}
                     className="bg-brand-primary hover:bg-brand-primary-hover active:scale-95 text-white font-black text-xs uppercase tracking-wider font-display px-6 py-3 rounded-full shadow-md shadow-brand-primary/20 transition-all inline-flex items-center justify-center gap-2 min-h-[44px]"
                   >
                     <span>Ir a Reparto Móvil</span>
@@ -165,7 +165,7 @@ function LoginContent() {
                   Number(user.role) === 1 ||
                   Number(user.role) === 2) && (
                   <Link
-                    href="/cocina"
+                    href={`/${user.tenantSlug || tenant?.slug || "la-granjita"}/cocina`}
                     className="bg-neutral-800 hover:bg-neutral-700 active:scale-95 text-white font-black text-xs uppercase tracking-wider font-display px-6 py-3 rounded-full shadow-sm transition-all inline-flex items-center justify-center gap-2 min-h-[44px]"
                   >
                     <span>Ir a Cocina KDS</span>

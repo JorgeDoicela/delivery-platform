@@ -20,7 +20,7 @@ function normalizeAuthUser(user: AuthUser, forceSyncTenant = false): AuthUser {
   if (user.tenantSlug) {
     const isOperationalPath =
       typeof window !== "undefined" &&
-      /^\/(cocina|kitchen|admin|repartidor|active-delivery)(\/|$)/i.test(
+      /^\/([a-z0-9_-]+\/)?(cocina|kitchen|admin|repartidor|active-delivery)(\/|$)/i.test(
         window.location.pathname
       );
 

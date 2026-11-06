@@ -113,6 +113,9 @@ describe('apiClient - RFC 7807 Error Handling', () => {
 
     expect(getApiClientTenantSlug()).toBe('brasas-del-valle');
 
+    window.history.pushState({}, '', '/brasas-del-valle/repartidor');
+    expect(getApiClientTenantSlug()).toBe('brasas-del-valle');
+
     window.history.pushState({}, '', '/');
     expect(getApiClientTenantSlug()).toBeNull();
   });

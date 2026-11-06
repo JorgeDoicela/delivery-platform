@@ -90,7 +90,7 @@ export function getApiClientTenantSlug(): string | null {
         .filter(Boolean);
 
       if (
-        pathSegments.length === 1 &&
+        pathSegments.length >= 1 &&
         !RESERVED_TENANT_SLUGS.has(pathSegments[0]) &&
         !pathSegments[0].includes(".")
       ) {

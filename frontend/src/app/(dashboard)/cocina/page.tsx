@@ -1,14 +1,22 @@
+"use client";
+
+import { useEffect } from "react";
+import { useRouter } from "next/navigation";
 import { KitchenView } from '@/features/kitchen';
-import { AuthGuard, UserRole } from '@/features/auth';
+import { AuthGuard, UserRole, useAuthStore } from '@/features/auth';
+import { useTenantStore } from '@/features/tenant';
 
-export const metadata = {
-  title: 'KDS Cocina | Operaciones',
-  description: 'Pantalla operativa de comandas para cocina en tiempo real.',
-};
+export default function CocinaRootPage() {
+  const router = useRouter();
+  const user = useAuthStore((s) => s.user);
+  const tenantSlug = useTenantStore((s) => s.tenantSlug) || user?.tenantSlug;
 
-export const instant = false;
+  useEffect(() => {
+    if (tenantSlug) {
+      router.replace(`/${tenantSlug}/cocina`);
+    }
+  }, [tenantSlug, router]);
 
-export default function CocinaPage() {
   return (
     <AuthGuard
       allowedRoles={[
@@ -26,4 +34,3 @@ export default function CocinaPage() {
     </AuthGuard>
   );
 }
-

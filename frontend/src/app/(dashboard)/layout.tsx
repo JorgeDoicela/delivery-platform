@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, Suspense } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { usePathname } from "next/navigation";
@@ -17,11 +17,11 @@ import {
   ExternalLink,
 } from "lucide-react";
 import { UserNav, useAuthStore, UserRole, AuthGuard } from "@/features/auth";
-import { TenantSwitcher, useCurrentTenantQuery, useTenantStore } from "@/features/tenant";
+import { TenantSwitcher, useCurrentTenantQuery, useTenantStore, RESERVED_TENANT_SLUGS } from "@/features/tenant";
 import { ThemeToggle } from "@/shared/components/ThemeToggle";
 import { useSmartScrollHeader } from "@/shared/hooks/useSmartScrollHeader";
 
-export default function DashboardLayout({
+function DashboardLayoutContent({
   children,
 }: {
   children: React.ReactNode;
@@ -32,15 +32,23 @@ export default function DashboardLayout({
     threshold: 15,
     pinThreshold: 76,
   });
+  const rawSlug = pathname?.split("/").filter(Boolean)[0];
+  const urlSlug =
+    rawSlug && !RESERVED_TENANT_SLUGS.has(rawSlug.toLowerCase())
+      ? rawSlug
+      : undefined;
+
   const tenantSlug = useTenantStore((s) => s.tenantSlug);
   const setTenantSlug = useTenantStore((s) => s.setTenantSlug);
   const user = useAuthStore((s) => s.user);
 
+  const activeTenantSlug = urlSlug || tenantSlug || user?.tenantSlug || "la-granjita";
+
   useEffect(() => {
-    if (!tenantSlug) {
-      setTenantSlug(user?.tenantSlug || "la-granjita");
+    if (activeTenantSlug && activeTenantSlug !== tenantSlug) {
+      setTenantSlug(activeTenantSlug);
     }
-  }, [tenantSlug, user?.tenantSlug, setTenantSlug]);
+  }, [activeTenantSlug, tenantSlug, setTenantSlug]);
 
   const [prevPathname, setPrevPathname] = useState(pathname);
   if (prevPathname !== pathname) {
@@ -48,7 +56,7 @@ export default function DashboardLayout({
     setIsMobileMenuOpen(false);
   }
 
-  const { data: tenant } = useCurrentTenantQuery(tenantSlug || undefined);
+  const { data: tenant } = useCurrentTenantQuery(activeTenantSlug);
   const isSuperAdmin = Boolean(
     user &&
       (user.role === "SuperAdmin" ||
@@ -85,7 +93,7 @@ export default function DashboardLayout({
       <div className="flex flex-col min-h-screen bg-surface-canvas text-text-strong transition-colors duration-200">
         <header className="h-16 bg-surface-card border-b border-surface-border px-3 sm:px-6 flex items-center justify-between shrink-0 shadow-xs transition-colors duration-200">
           <div className="flex items-center gap-3 sm:gap-6 min-w-0 shrink">
-            <Link href="/cocina" className="flex items-center gap-2.5 sm:gap-3 group min-w-0 shrink">
+            <Link href={`/${activeTenantSlug}/cocina`} className="flex items-center gap-2.5 sm:gap-3 group min-w-0 shrink">
               <div className="relative w-8 h-8 sm:w-9 sm:h-9 shrink-0">
                 <Image
                   src={brandLogo}
@@ -111,9 +119,9 @@ export default function DashboardLayout({
 
             <nav className="hidden md:flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider font-display">
               <Link
-                href="/cocina"
+                href={`/${activeTenantSlug}/cocina`}
                 className={`px-3.5 py-1.5 rounded-full transition-colors flex items-center gap-1.5 ${
-                  pathname === "/cocina" || pathname === "/kitchen"
+                  pathname.endsWith("/cocina") || pathname.endsWith("/kitchen")
                     ? "bg-brand-primary text-white shadow-xs"
                     : "text-text-muted hover:text-text-strong hover:bg-surface-card-hover"
                 }`}
@@ -277,10 +285,10 @@ export default function DashboardLayout({
                   </span>
 
                   <Link
-                    href="/cocina"
+                    href={`/${activeTenantSlug}/cocina`}
                     onClick={() => setIsMobileMenuOpen(false)}
                     className={`flex items-center gap-3 px-3.5 py-3 rounded-2xl font-display font-black text-sm uppercase tracking-wide transition-colors ${
-                      pathname === "/cocina" || pathname === "/kitchen"
+                      pathname.endsWith("/cocina") || pathname.endsWith("/kitchen")
                         ? "bg-brand-primary text-white shadow-xs"
                         : "text-text-strong hover:bg-surface-canvas hover:text-brand-primary"
                     }`}
@@ -386,9 +394,9 @@ export default function DashboardLayout({
           style={{ paddingBottom: "max(0.4rem, env(safe-area-inset-bottom))" }}
         >
           <Link
-            href="/cocina"
+            href={`/${activeTenantSlug}/cocina`}
             className={`flex flex-col items-center justify-center py-1 px-2 rounded-xl text-[10px] font-bold font-display uppercase tracking-wider transition-colors min-w-[50px] min-h-[44px] ${
-              pathname === "/cocina" || pathname === "/kitchen"
+              pathname.endsWith("/cocina") || pathname.endsWith("/kitchen")
                 ? "text-brand-primary"
                 : "text-text-muted hover:text-text-strong"
             }`}
@@ -461,5 +469,17 @@ export default function DashboardLayout({
         </nav>
       </div>
     </AuthGuard>
+  );
+}
+
+export default function DashboardLayout({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
+  return (
+    <Suspense fallback={<div className="min-h-screen bg-surface-canvas" />}>
+      <DashboardLayoutContent>{children}</DashboardLayoutContent>
+    </Suspense>
   );
 }

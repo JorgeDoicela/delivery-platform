@@ -61,16 +61,20 @@ export function LoginForm({ redirectUrl, embedded = false }: LoginFormProps) {
         loggedUser?.role === UserRole.Driver ||
         loggedUser?.roles?.includes("Driver");
 
+      const tenantSlug =
+        loggedUser?.tenantSlug || useTenantStore.getState().tenantSlug || "la-granjita";
+
       const defaultDestination = isSuperAdmin
         ? "/superadmin"
         : isTenantAdmin
           ? "/admin/personalizacion"
           : isDriver
-            ? "/repartidor"
-            : "/cocina";
+            ? `/${tenantSlug}/repartidor`
+            : `/${tenantSlug}/cocina`;
 
       const isDefaultCocinaConflict =
-        redirectUrl === "/cocina" && (isDriver || isSuperAdmin || isTenantAdmin);
+        (redirectUrl === "/cocina" || redirectUrl === `/${tenantSlug}/cocina`) &&
+        (isDriver || isSuperAdmin || isTenantAdmin);
 
       const destination =
         redirectUrl && !isDefaultCocinaConflict

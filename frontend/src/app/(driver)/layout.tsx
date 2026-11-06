@@ -1,24 +1,33 @@
 "use client";
 
-import React, { useEffect } from "react";
+import React, { useEffect, Suspense } from "react";
 import Link from "next/link";
 import Image from "next/image";
-import { useRouter } from "next/navigation";
+import { useRouter, usePathname } from "next/navigation";
 import { LogOut } from "lucide-react";
-import { useCurrentTenantQuery, useTenantStore } from "@/features/tenant";
+import { useCurrentTenantQuery, useTenantStore, RESERVED_TENANT_SLUGS } from "@/features/tenant";
 import { AuthGuard, UserRole, useAuthStore } from "@/features/auth";
 import { ThemeToggle } from "@/shared/components/ThemeToggle";
 
-export default function DriverLayout({
+function DriverLayoutContent({
   children,
 }: {
   children: React.ReactNode;
 }) {
   const router = useRouter();
+  const pathname = usePathname();
+  const rawSlug = pathname?.split("/").filter(Boolean)[0];
+  const urlSlug =
+    rawSlug && !RESERVED_TENANT_SLUGS.has(rawSlug.toLowerCase())
+      ? rawSlug
+      : undefined;
+
   const tenantSlug = useTenantStore((s) => s.tenantSlug);
   const setTenantSlug = useTenantStore((s) => s.setTenantSlug);
   const user = useAuthStore((s) => s.user);
   const logout = useAuthStore((s) => s.logout);
+
+  const activeTenantSlug = urlSlug || tenantSlug || user?.tenantSlug || "la-granjita";
 
   const handleLogout = async () => {
     await logout();
@@ -26,20 +35,21 @@ export default function DriverLayout({
   };
 
   useEffect(() => {
-    if (!tenantSlug) {
-      setTenantSlug(user?.tenantSlug || "la-granjita");
+    if (activeTenantSlug && activeTenantSlug !== tenantSlug) {
+      setTenantSlug(activeTenantSlug);
     }
-  }, [tenantSlug, user?.tenantSlug, setTenantSlug]);
+  }, [activeTenantSlug, tenantSlug, setTenantSlug]);
 
-  const { data: tenant } = useCurrentTenantQuery(tenantSlug || undefined);
+  const { data: tenant } = useCurrentTenantQuery(activeTenantSlug);
   const brandName = tenant?.name || "La Granjita";
   const brandLogo = tenant?.logoUrl || "/images/shared/placeholders/logo-default.png";
+  const brandHomeHref = `/${activeTenantSlug}`;
 
   return (
     <AuthGuard allowedRoles={[UserRole.SuperAdmin, UserRole.Driver]}>
       <div className="flex flex-col min-h-screen bg-surface-canvas text-text-strong select-none transition-colors duration-200">
         <header className="h-16 bg-surface-card border-b border-surface-border px-3 sm:px-6 flex items-center justify-between shrink-0 shadow-xs transition-colors duration-200 gap-2">
-          <Link href="/" className="flex items-center gap-2.5 sm:gap-3 group min-w-0 shrink">
+          <Link href={brandHomeHref} className="flex items-center gap-2.5 sm:gap-3 group min-w-0 shrink">
             <div className="relative w-8 h-8 sm:w-9 sm:h-9 shrink-0">
               <Image
                 src={brandLogo}
@@ -58,7 +68,7 @@ export default function DriverLayout({
                 {brandName}
               </span>
               <span className="text-[9px] sm:text-[10px] tracking-widest text-brand-accent font-bold uppercase block mt-0.5 truncate hidden xs:block">
-                Reparto Móvil • {tenant?.slug}
+                Reparto Móvil • {activeTenantSlug}
               </span>
             </div>
           </Link>
@@ -84,5 +94,17 @@ export default function DriverLayout({
         </main>
       </div>
     </AuthGuard>
+  );
+}
+
+export default function DriverLayout({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
+  return (
+    <Suspense fallback={<div className="min-h-screen bg-surface-canvas" />}>
+      <DriverLayoutContent>{children}</DriverLayoutContent>
+    </Suspense>
   );
 }

@@ -19,6 +19,9 @@ flowchart TD
     Storefront --> StoreLayout["Storefront Layout (Header reactivo + Footer + Modales)"]
     StoreLayout --> Home["/ (Landing Principal de Plataforma Multi-Tenant PlatformLandingView)"]
     StoreLayout --> TenantSlug["/[slug] (Vitrina Branded Dinamica por Comercio RestaurantStorefrontView)"]
+    StoreLayout --> TenantSucursales["/[slug]/sucursales (Sedes con mapa vectorial del tenant)"]
+    StoreLayout --> TenantRastreo["/[slug]/rastreo (Seguimiento satelital con contexto de marca)"]
+    StoreLayout --> TenantCheckout["/[slug]/checkout (Finalizacion de pedido con geocercas)"]
     StoreLayout --> DomainRouter["_domain_router (Resolucion Transparente para Dominios CustomDomain CNAME)"]
     StoreLayout --> CatalogoRoute["/catalogo (Ruta de catalogo directo)"]
     StoreLayout --> SucursalesRoute["/sucursales (Ruta de mapa y sedes)"]
@@ -28,6 +31,7 @@ flowchart TD
     StoreLayout --> LoginRoute["/login (Formulario de Acceso y Sesion RBAC)"]
 
     Dashboard --> DashLayout["Dashboard Layout (Fullscreen Dark KDS + UserNav)"]
+    Dashboard --> TenantKitchen["/[slug]/cocina y /[slug]/kitchen (KDS con slug en URL)"]
     DashLayout --> Kitchen["/kitchen y /cocina (Tablero Kanban FIFO de Cocina con AuthGuard)"]
     DashLayout --> AdminInventario["/admin/inventario y /admin/inventory (Control de Insumos y Kardex)"]
     DashLayout --> AdminSucursales["/admin/sucursales y /admin/branches (Capacidad de Hornos por Slot)"]
@@ -36,7 +40,8 @@ flowchart TD
     DashLayout --> SuperAdmin["/superadmin (Dashboard de Plataforma Global)"]
 
     Driver --> DriverLayout["Driver Layout (Mobile Shell 430px Centrado)"]
-    DriverLayout --> RepartidorPortal["/repartidor (Portal del Motorizado)"]
+    Driver --> TenantDriver["/[slug]/repartidor y /[slug]/active-delivery (Modulo Motorizado con Slug)"]
+    DriverLayout --> RepartidorPortal["/repartidor (Portal del Motorizado - Redireccion canonica)"]
     DriverLayout --> ActiveDelivery["/active-delivery (Ruta Activa con Transmision GPS)"]
 ```
 
@@ -50,20 +55,20 @@ La plataforma implementa un panel de accesos directos en [`src/app/(storefront)/
 | :--- | :--- | :--- | :--- |
 | **Plataforma Global** | `/` | `#restaurantes`, `#afiliacion` | Portal directorio multimarca y flujo B2B de afiliacion de comercios |
 | **Tienda por Comercio** | `/[slug]` o Dominio Propio | `#catalogo`, `#sucursales` | Vitrina comercial y pedidos en linea del restaurante seleccionado |
-| **Tienda & Clientes** | `/catalogo` | `#catalogo` | Catalogo completo de combos y productos |
-| **Tienda & Clientes** | `/sucursales` | `#sucursales` | Informacion de sedes, horarios y telefonos |
-| **Tienda & Clientes** | `/finalizar-pedido` / `/checkout` | N/A | Flujo de seleccion de direccion y confirmacion |
-| **Tienda & Clientes** | `/rastreo` / `/track/[orderId]` | N/A | Telemetria y seguimiento de motorizado en vivo |
+| **Tienda & Clientes** | `/[slug]/catalogo` / `/catalogo` | `#catalogo` | Catalogo completo de combos y productos |
+| **Tienda & Clientes** | `/[slug]/sucursales` / `/sucursales` | `#sucursales` | Informacion de sedes, horarios y telefonos |
+| **Tienda & Clientes** | `/[slug]/checkout` / `/checkout` | N/A | Flujo de seleccion de direccion y confirmacion |
+| **Tienda & Clientes** | `/[slug]/rastreo` / `/rastreo` | N/A | Telemetria y seguimiento de motorizado en vivo |
 | **Tienda & Clientes** | `/terminos` y `/privacidad` | N/A | Politicas de privacidad y terminos de servicio |
 | **Autenticacion** | `/login` | N/A | Inicio de sesion operativo con rotacion HttpOnly y RBAC |
-| **Cocina & KDS** | `/cocina` / `/kitchen` | N/A | Terminal KDS con semaforizacion FIFO y audio |
+| **Cocina & KDS** | `/[slug]/cocina` / `/cocina` | N/A | Terminal KDS con semaforizacion FIFO y audio |
 | **Operaciones Sede** | `/admin/inventario` (o `/inventory`) | N/A | Gestion de stock de pollo, papas y empaques |
 | **Operaciones Sede** | `/admin/sucursales` (o `/branches`) | N/A | Throttling de hornos (pedidos por slot de 20 min)|
 | **Gestion Tenant** | `/admin/personalizacion` | N/A | Configuracion visual, banners, tarifas y datos bancarios |
 | **Gestion Tenant** | `/admin/tenants` | N/A | Administracion y auditoria de comercios |
 | **SuperAdmin** | `/superadmin` | N/A | Control maestro global de la plataforma multi-tenant |
-| **Repartidor** | `/repartidor` | N/A | Portal y lista de pedidos asignados al conductor|
-| **Repartidor** | `/active-delivery` | N/A | Transmision continua de geolocalizacion GPS |
+| **Repartidor** | `/[slug]/repartidor` / `/repartidor` | N/A | Portal y lista de pedidos asignados al conductor con slug canonico |
+| **Repartidor** | `/[slug]/active-delivery` / `/active-delivery` | N/A | Transmision continua de geolocalizacion GPS |
 
 > [!NOTE]
 > Las anclas `#catalogo` y `#sucursales` en el encabezado ([`layout.tsx`](../../frontend/src/app/%28storefront%29/layout.tsx)) permiten desplazamiento suave directo a las secciones de la vitrina principal sin recargar la aplicacion.

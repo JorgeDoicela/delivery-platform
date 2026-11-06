@@ -127,7 +127,7 @@ function StorefrontHeader() {
                 {isPlatformRoot ? "Restaurantes" : "Menú & Combos"}
               </Link>
               <Link
-                href="/rastreo"
+                href={tenantSlug ? `/${tenantSlug}/rastreo` : "/rastreo"}
                 className="hover:text-brand-primary transition-colors"
               >
                 Rastrear Pedido
@@ -284,7 +284,7 @@ function StorefrontHeader() {
                 </Link>
 
                 <Link
-                  href="/rastreo"
+                  href={tenantSlug ? `/${tenantSlug}/rastreo` : "/rastreo"}
                   onClick={() => setIsMobileMenuOpen(false)}
                   className="flex items-center gap-3 px-3.5 py-3 rounded-2xl hover:bg-surface-canvas text-text-strong hover:text-brand-primary font-display font-black text-sm uppercase tracking-wide transition-colors"
                 >
@@ -578,9 +578,9 @@ function MobileBottomNav() {
       </Link>
 
       <Link
-        href="/sucursales"
+        href={activeSlug ? `/${activeSlug}/sucursales` : "/sucursales"}
         className={`flex flex-col items-center justify-center py-1 px-2 rounded-xl text-[10px] font-bold font-display uppercase tracking-wider transition-colors min-w-[50px] min-h-[44px] ${
-          pathname === "/sucursales" ? "text-brand-primary" : "text-text-muted hover:text-text-strong"
+          pathname.includes("sucursales") ? "text-brand-primary" : "text-text-muted hover:text-text-strong"
         }`}
       >
         <MapPin className="w-5 h-5 mb-0.5" />
@@ -588,9 +588,9 @@ function MobileBottomNav() {
       </Link>
 
       <Link
-        href="/rastreo"
+        href={activeSlug ? `/${activeSlug}/rastreo` : "/rastreo"}
         className={`flex flex-col items-center justify-center py-1 px-2 rounded-xl text-[10px] font-bold font-display uppercase tracking-wider transition-colors min-w-[50px] min-h-[44px] ${
-          pathname.startsWith("/rastreo") || pathname.startsWith("/track")
+          pathname.includes("rastreo") || pathname.includes("track")
             ? "text-brand-primary"
             : "text-text-muted hover:text-text-strong"
         }`}

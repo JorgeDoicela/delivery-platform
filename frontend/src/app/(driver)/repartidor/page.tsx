@@ -1,11 +1,24 @@
-import { Suspense } from 'react';
-import { RefreshCw } from 'lucide-react';
-import { DriverDeliveryView } from '@/features/tracking';
-import { AuthGuard, UserRole } from '@/features/auth';
+"use client";
 
-export const instant = false;
+import { useEffect } from "react";
+import { useRouter } from "next/navigation";
+import { Suspense } from "react";
+import { RefreshCw } from "lucide-react";
+import { DriverDeliveryView } from "@/features/tracking";
+import { AuthGuard, UserRole, useAuthStore } from "@/features/auth";
+import { useTenantStore } from "@/features/tenant";
 
-export default function RepartidorPage() {
+export default function RepartidorRootPage() {
+  const router = useRouter();
+  const user = useAuthStore((s) => s.user);
+  const tenantSlug = useTenantStore((s) => s.tenantSlug) || user?.tenantSlug;
+
+  useEffect(() => {
+    if (tenantSlug) {
+      router.replace(`/${tenantSlug}/repartidor`);
+    }
+  }, [tenantSlug, router]);
+
   return (
     <AuthGuard allowedRoles={[UserRole.SuperAdmin, UserRole.Driver]}>
       <Suspense
@@ -21,4 +34,3 @@ export default function RepartidorPage() {
     </AuthGuard>
   );
 }
-
