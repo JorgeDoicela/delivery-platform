@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { apiClient } from '@/shared/lib/api-client';
+import { useAuthStore } from '@/features/auth';
 
 interface UseDriverTrackingProps {
   orderId: string;
@@ -13,11 +14,13 @@ interface UseDriverTrackingProps {
 
 export function useDriverTracking({
   orderId,
-  driverId = 'driver_1',
+  driverId: explicitDriverId,
   isActive,
   destinationLat = -0.1782,
   destinationLng = -78.4845,
 }: UseDriverTrackingProps) {
+  const authUserId = useAuthStore((s) => s.user?.id);
+  const driverId = explicitDriverId || authUserId || 'driver_1';
   const [currentPosition, setCurrentPosition] = useState<{
     latitude: number;
     longitude: number;

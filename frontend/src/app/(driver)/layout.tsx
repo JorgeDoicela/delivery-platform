@@ -3,7 +3,8 @@
 import React, { useEffect } from "react";
 import Link from "next/link";
 import Image from "next/image";
-import { Radio } from "lucide-react";
+import { useRouter } from "next/navigation";
+import { LogOut } from "lucide-react";
 import { useCurrentTenantQuery, useTenantStore } from "@/features/tenant";
 import { AuthGuard, UserRole, useAuthStore } from "@/features/auth";
 import { ThemeToggle } from "@/shared/components/ThemeToggle";
@@ -13,9 +14,16 @@ export default function DriverLayout({
 }: {
   children: React.ReactNode;
 }) {
+  const router = useRouter();
   const tenantSlug = useTenantStore((s) => s.tenantSlug);
   const setTenantSlug = useTenantStore((s) => s.setTenantSlug);
   const user = useAuthStore((s) => s.user);
+  const logout = useAuthStore((s) => s.logout);
+
+  const handleLogout = async () => {
+    await logout();
+    router.push("/login");
+  };
 
   useEffect(() => {
     if (!tenantSlug) {
@@ -56,12 +64,18 @@ export default function DriverLayout({
           </Link>
 
           <div className="flex items-center gap-2 sm:gap-3 shrink-0">
-            <div className="flex items-center gap-1.5 bg-status-success/15 text-status-success border border-status-success/30 px-2.5 sm:px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider">
-              <Radio className="w-3 h-3 animate-pulse text-status-success shrink-0" />
-              <span>GPS<span className="hidden sm:inline"> Satelital Activo</span></span>
-            </div>
-
             <ThemeToggle />
+
+            <button
+              type="button"
+              onClick={handleLogout}
+              title="Cerrar sesión"
+              aria-label="Cerrar sesión"
+              className="p-2 sm:px-3 sm:py-1.5 rounded-full text-text-muted hover:text-red-500 hover:bg-surface-card-hover border border-surface-border transition-colors cursor-pointer flex items-center gap-1.5"
+            >
+              <LogOut className="w-3.5 h-3.5" />
+              <span className="hidden sm:inline text-[11px] font-bold uppercase tracking-wider">Salir</span>
+            </button>
           </div>
         </header>
 

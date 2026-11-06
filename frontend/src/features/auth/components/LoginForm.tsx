@@ -50,19 +50,30 @@ export function LoginForm({ redirectUrl, embedded = false }: LoginFormProps) {
 
       const isSuperAdmin =
         loggedUser?.role === "SuperAdmin" ||
-        loggedUser?.role === UserRole.SuperAdmin;
+        loggedUser?.role === UserRole.SuperAdmin ||
+        loggedUser?.roles?.includes("SuperAdmin");
       const isTenantAdmin =
         loggedUser?.role === "TenantAdmin" ||
-        loggedUser?.role === UserRole.TenantAdmin;
+        loggedUser?.role === UserRole.TenantAdmin ||
+        loggedUser?.roles?.includes("TenantAdmin");
+      const isDriver =
+        loggedUser?.role === "Driver" ||
+        loggedUser?.role === UserRole.Driver ||
+        loggedUser?.roles?.includes("Driver");
 
       const defaultDestination = isSuperAdmin
         ? "/superadmin"
         : isTenantAdmin
           ? "/admin/personalizacion"
-          : "/cocina";
+          : isDriver
+            ? "/repartidor"
+            : "/cocina";
+
+      const isDefaultCocinaConflict =
+        redirectUrl === "/cocina" && (isDriver || isSuperAdmin || isTenantAdmin);
 
       const destination =
-        redirectUrl && redirectUrl !== "/cocina"
+        redirectUrl && !isDefaultCocinaConflict
           ? redirectUrl
           : defaultDestination;
 

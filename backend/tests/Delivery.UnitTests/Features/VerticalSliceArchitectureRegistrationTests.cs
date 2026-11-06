@@ -69,9 +69,9 @@ public class VerticalSliceArchitectureRegistrationTests
         // Act
         services.AddDeliveryFeatures();
 
-        // Assert: Deben registrarse exactamente 24 endpoints autónomos (13 operativos + 4 de autenticación + 7 de tenants y sucursales)
+        // Assert: Deben registrarse exactamente 28 endpoints autónomos (13 operativos + 4 de autenticación + 7 de tenants y sucursales + 4 de motorizados)
         var endpointDescriptors = services.Where(s => s.ServiceType == typeof(IEndpoint)).ToList();
-        endpointDescriptors.Should().HaveCount(24);
+        endpointDescriptors.Should().HaveCount(28);
 
         var endpointImplementationTypes = endpointDescriptors.Select(d => d.ImplementationType).ToHashSet();
         endpointImplementationTypes.Should().Contain(typeof(ResolveBranchEndpoint));
@@ -98,6 +98,10 @@ public class VerticalSliceArchitectureRegistrationTests
         endpointImplementationTypes.Should().Contain(typeof(Delivery.Features.Auth.RefreshToken.RefreshTokenEndpoint));
         endpointImplementationTypes.Should().Contain(typeof(Delivery.Features.Auth.GetCurrentUser.GetCurrentUserEndpoint));
         endpointImplementationTypes.Should().Contain(typeof(Delivery.Features.Auth.RevokeToken.RevokeTokenEndpoint));
+        endpointImplementationTypes.Should().Contain(typeof(Delivery.Features.Drivers.GetDriverProfile.GetDriverProfileEndpoint));
+        endpointImplementationTypes.Should().Contain(typeof(Delivery.Features.Drivers.UpdateDriverStatus.UpdateDriverStatusEndpoint));
+        endpointImplementationTypes.Should().Contain(typeof(Delivery.Features.Drivers.GetDriverOrders.GetDriverOrdersEndpoint));
+        endpointImplementationTypes.Should().Contain(typeof(Delivery.Features.Drivers.ClaimDriverOrder.ClaimDriverOrderEndpoint));
     }
 
     [Fact]

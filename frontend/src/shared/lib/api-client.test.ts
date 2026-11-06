@@ -116,5 +116,99 @@ describe('apiClient - RFC 7807 Error Handling', () => {
     window.history.pushState({}, '', '/');
     expect(getApiClientTenantSlug()).toBeNull();
   });
+
+  it('correctly executes getDriverProfile and getDriverOrders', async () => {
+    const mockProfile = {
+      driverId: 'driver-uuid',
+      userId: 'user-uuid',
+      fullName: 'Carlos Repartidor',
+      email: 'carlos@mesafy.com',
+      phone: '099112233',
+      vehicleType: 'Moto',
+      isAvailable: true,
+      todayDeliveredCount: 5,
+      todayCashCollected: 125.5,
+    };
+
+    const mockOrders = {
+      activeOrders: [],
+      availableOrders: [],
+      deliveredToday: [],
+      shiftSummary: { completedCount: 5, cashCollected: 125.5, totalEarnings: 15.0 },
+    };
+
+    global.fetch = vi
+      .fn()
+      .mockResolvedValueOnce({
+        ok: true,
+        status: 200,
+        json: async () => mockProfile,
+      } as unknown as Response)
+      .mockResolvedValueOnce({
+        ok: true,
+        status: 200,
+        json: async () => mockOrders,
+      } as unknown as Response);
+
+    const profile = await apiClient.getDriverProfile();
+    expect(profile).toEqual(mockProfile);
+    expect(global.fetch).toHaveBeenCalledWith(
+      expect.stringContaining('/api/driver/me'),
+      expect.objectContaining({ method: 'GET' })
+    );
+
+    const orders = await apiClient.getDriverOrders(2);
+    expect(orders).toEqual(mockOrders);
+    expect(global.fetch).toHaveBeenCalledWith(
+      expect.stringContaining('/api/driver/orders?branchId=2'),
+      expect.objectContaining({ method: 'GET' })
+    );
+  });
+
+  it('correctly executes claimDriverOrder and updateDriverStatus', async () => {
+    const mockClaimed = {
+      orderId: 'order-123',
+      orderNumber: 1001,
+      customerName: 'Juan Perez',
+      status: 4, // OnTheWay
+    };
+
+    const mockStatusResponse = {
+      driverId: 'driver-uuid',
+      isAvailable: false,
+      vehicleType: 'Moto',
+      updatedAt: '2026-11-06T15:00:00Z',
+    };
+
+    global.fetch = vi
+      .fn()
+      .mockResolvedValueOnce({
+        ok: true,
+        status: 200,
+        json: async () => mockClaimed,
+      } as unknown as Response)
+      .mockResolvedValueOnce({
+        ok: true,
+        status: 200,
+        json: async () => mockStatusResponse,
+      } as unknown as Response);
+
+    const claimed = await apiClient.claimDriverOrder('order-123');
+    expect(claimed).toEqual(mockClaimed);
+    expect(global.fetch).toHaveBeenCalledWith(
+      expect.stringContaining('/api/driver/orders/order-123/claim'),
+      expect.objectContaining({ method: 'POST' })
+    );
+
+    const updated = await apiClient.updateDriverStatus({ isAvailable: false });
+    expect(updated).toEqual(mockStatusResponse);
+    expect(global.fetch).toHaveBeenCalledWith(
+      expect.stringContaining('/api/driver/status'),
+      expect.objectContaining({
+        method: 'PUT',
+        body: JSON.stringify({ isAvailable: false }),
+      })
+    );
+  });
 });
 

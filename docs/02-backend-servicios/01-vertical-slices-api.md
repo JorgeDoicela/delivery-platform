@@ -424,6 +424,40 @@ El backend de la plataforma esta construido en .NET 8 utilizando C# 12 y Minimal
 
 ---
 
+### 2.9. Modulo de Repartidores y Gestion de Despacho (Drivers)
+
+#### 2.9.1. Perfil Operativo del Repartidor (`GET /api/driver/me`)
+* **Autorizacion:** Roles `Driver`, `SuperAdmin`
+* **Descripcion:** Retorna los datos de identidad del repartidor autenticado, vehículo registrado, placa, disponibilidad actual (`isAvailable`), sucursal vinculada y métricas acumuladas del turno actual (pedidos entregados hoy y efectivo en mano a liquidar).
+
+#### 2.9.2. Actualizar Disponibilidad y Vehículo (`PUT /api/driver/status`)
+* **Autorizacion:** Roles `Driver`, `SuperAdmin`
+* **Descripcion:** Permite al repartidor conmutar su estado entre disponible para despacho (`isAvailable: true`) o en pausa (`isAvailable: false`), además de actualizar datos del vehículo o placa.
+* **Payload de Entrada:**
+  ```json
+  {
+    "isAvailable": true,
+    "vehicleType": "Motocicleta",
+    "licensePlate": "PBA-1234"
+  }
+  ```
+
+#### 2.9.3. Bandejas de Órdenes del Repartidor (`GET /api/driver/orders`)
+* **Autorizacion:** Roles `Driver`, `SuperAdmin`
+* **Parametros Query:** `branchId` (opcional, `int`)
+* **Descripcion:** Obtiene las comandas segmentadas en tres colecciones operativas:
+  - `activeOrders`: Pedidos en ruta (`OnTheWay`) asignados al repartidor.
+  - `availableOrders`: Pedidos listos en cocina (`ReadyForDelivery`) esperando toma por motorizados.
+  - `deliveredToday`: Pedidos completados (`Delivered`) en la jornada actual.
+  - `shiftSummary`: Resumen cuantitativo del turno (conteo de entregas, efectivo total a liquidar en caja y ganancias estimadas).
+
+#### 2.9.4. Reclamar / Asignarse Pedido de Cocina (`POST /api/driver/orders/{orderId}/claim`)
+* **Autorizacion:** Roles `Driver`, `SuperAdmin`
+* **Descripcion:** Asigna una comanda lista en cocina al repartidor solicitante. Transiciona la orden de `ReadyForDelivery` a `OnTheWay`, vincula el registro `OrderDelivery` y notifica en tiempo real a los hubs de SignalR (`TrackingHub` y `KitchenHub`).
+* **Respuesta Exitosa (200 OK):** Retorna `DriverOrderDto` de la comanda tomada.
+
+---
+
 ## Navegacion de Documentacion
 * **Anterior:** [02. Maquina de Estados del Pedido](../01-arquitectura/02-maquina-estados.md)
 * **Siguiente:** [02. Especificacion de SignalR Hubs en Tiempo Real](./02-signalr-hubs.md)

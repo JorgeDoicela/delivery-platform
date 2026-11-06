@@ -185,6 +185,79 @@ export interface DriverLocationResponse {
   timestamp: string;
 }
 
+export interface DriverProfileResponse {
+  driverId: string;
+  userId: string;
+  fullName: string;
+  email: string;
+  phone: string;
+  vehicleType: string;
+  licensePlate?: string | null;
+  isAvailable: boolean;
+  branchId?: number | null;
+  branchName?: string | null;
+  todayDeliveredCount: number;
+  todayCashCollected: number;
+}
+
+export interface DriverOrderItemDto {
+  productName: string;
+  quantity: number;
+  modifiers: string[];
+}
+
+export interface DriverOrderDto {
+  orderId: string;
+  orderNumber: number;
+  customerName: string;
+  customerPhone: string;
+  addressStreet: string;
+  addressReference: string;
+  deliveryLatitude?: number | null;
+  deliveryLongitude?: number | null;
+  subtotal: number;
+  deliveryFee: number;
+  total: number;
+  paymentMethod: PaymentMethod;
+  cashAmountPaid?: number | null;
+  changeDue?: number | null;
+  status: OrderStatus;
+  createdAt: string;
+  assignedAt?: string | null;
+  pickedUpAt?: string | null;
+  deliveredAt?: string | null;
+  customerNotes?: string | null;
+  branchName: string;
+  items: DriverOrderItemDto[];
+}
+
+export interface DriverShiftSummaryDto {
+  completedCount: number;
+  cashCollected: number;
+  totalEarnings: number;
+}
+
+export interface DriverOrdersResponse {
+  activeOrders: DriverOrderDto[];
+  availableOrders: DriverOrderDto[];
+  deliveredToday: DriverOrderDto[];
+  shiftSummary: DriverShiftSummaryDto;
+}
+
+export interface UpdateDriverStatusRequest {
+  isAvailable: boolean;
+  vehicleType?: string | null;
+  licensePlate?: string | null;
+}
+
+export interface UpdateDriverStatusResponse {
+  driverId: string;
+  isAvailable: boolean;
+  vehicleType: string;
+  licensePlate?: string | null;
+  updatedAt: string;
+}
+
 export interface ApiError {
   code: string;
   message: string;

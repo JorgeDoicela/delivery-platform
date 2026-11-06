@@ -200,7 +200,13 @@ export const useAuthStore = create<AuthStore>()(
       partialize: (state) => ({
         user: state.user,
         isAuthenticated: state.isAuthenticated,
+        accessToken: state.accessToken,
       }),
+      onRehydrateStorage: () => (state) => {
+        if (state?.accessToken) {
+          setApiClientAccessToken(state.accessToken);
+        }
+      },
     }
   )
 );

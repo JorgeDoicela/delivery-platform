@@ -19,6 +19,11 @@ import type {
     UpdateTenantStorefrontCommand,
     UpsertProductCommand,
     UpsertProductResponse,
+    DriverProfileResponse,
+    DriverOrdersResponse,
+    DriverOrderDto,
+    UpdateDriverStatusRequest,
+    UpdateDriverStatusResponse,
     ApiError,
 } from "@/shared/types/api";
 
@@ -348,5 +353,47 @@ export const apiClient = {
             body: JSON.stringify({ ...command, productId }),
         });
         return handleResponse<UpsertProductResponse>(res);
+    },
+
+    // 12. Repartidor: Perfil operativo y estado
+    async getDriverProfile(): Promise<DriverProfileResponse> {
+        const res = await fetch(`${getApiBaseUrl()}/api/driver/me`, {
+            method: "GET",
+            headers: buildHeaders(),
+            cache: "no-store",
+        });
+        return handleResponse<DriverProfileResponse>(res);
+    },
+
+    // 13. Repartidor: Actualizar disponibilidad y vehículo
+    async updateDriverStatus(
+        data: UpdateDriverStatusRequest
+    ): Promise<UpdateDriverStatusResponse> {
+        const res = await fetch(`${getApiBaseUrl()}/api/driver/status`, {
+            method: "PUT",
+            headers: buildHeaders(),
+            body: JSON.stringify(data),
+        });
+        return handleResponse<UpdateDriverStatusResponse>(res);
+    },
+
+    // 14. Repartidor: Bandejas de pedidos (Activos, Disponibles, Entregados hoy)
+    async getDriverOrders(branchId?: number): Promise<DriverOrdersResponse> {
+        const query = branchId ? `?branchId=${branchId}` : "";
+        const res = await fetch(`${getApiBaseUrl()}/api/driver/orders${query}`, {
+            method: "GET",
+            headers: buildHeaders(),
+            cache: "no-store",
+        });
+        return handleResponse<DriverOrdersResponse>(res);
+    },
+
+    // 15. Repartidor: Reclamar / Asignarse comanda lista en cocina
+    async claimDriverOrder(orderId: string): Promise<DriverOrderDto> {
+        const res = await fetch(`${getApiBaseUrl()}/api/driver/orders/${orderId}/claim`, {
+            method: "POST",
+            headers: buildHeaders(),
+        });
+        return handleResponse<DriverOrderDto>(res);
     },
 };

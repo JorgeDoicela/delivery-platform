@@ -133,6 +133,23 @@ export function setApiClientAccessToken(token: string | null): void {
 }
 
 export function getApiClientAccessToken(): string | null {
-  return currentAccessTokenMemory;
+  if (currentAccessTokenMemory) {
+    return currentAccessTokenMemory;
+  }
+  if (typeof window !== "undefined") {
+    try {
+      const stored = window.localStorage.getItem("delivery_auth_session");
+      if (stored) {
+        const parsed = JSON.parse(stored);
+        if (parsed?.state?.accessToken) {
+          currentAccessTokenMemory = parsed.state.accessToken;
+          return currentAccessTokenMemory;
+        }
+      }
+    } catch {
+      // Ignorar errores de deserialización
+    }
+  }
+  return null;
 }
 
