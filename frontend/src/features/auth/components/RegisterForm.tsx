@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import Image from "next/image";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -14,12 +15,14 @@ interface RegisterFormProps {
   redirectUrl?: string;
   embedded?: boolean;
   onSuccess?: () => void;
+  onSwitchToLogin?: () => void;
 }
 
 export function RegisterForm({
   redirectUrl,
   embedded = false,
   onSuccess,
+  onSwitchToLogin,
 }: RegisterFormProps) {
   const router = useRouter();
   const registerAction = useAuthStore((s) => s.register);
@@ -300,6 +303,29 @@ export function RegisterForm({
           <span>Registrarme y Continuar</span>
         )}
       </button>
+
+      {/* Enlace alternativo para iniciar sesión */}
+      <div className="pt-2 text-center border-t border-neutral-100">
+        <p className="text-xs text-neutral-500 font-sans">
+          ¿Ya tienes una cuenta registrada?{" "}
+          {onSwitchToLogin ? (
+            <button
+              type="button"
+              onClick={onSwitchToLogin}
+              className="font-bold text-brand-primary hover:underline cursor-pointer"
+            >
+              Inicia sesión aquí
+            </button>
+          ) : (
+            <Link
+              href="/login?tab=login"
+              className="font-bold text-brand-primary hover:underline"
+            >
+              Inicia sesión aquí
+            </Link>
+          )}
+        </p>
+      </div>
     </form>
   );
 }

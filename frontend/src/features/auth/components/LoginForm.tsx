@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import Image from "next/image";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -14,9 +15,14 @@ import { useCurrentTenantQuery, useTenantStore } from "@/features/tenant";
 interface LoginFormProps {
   redirectUrl?: string;
   embedded?: boolean;
+  onSwitchToRegister?: () => void;
 }
 
-export function LoginForm({ redirectUrl, embedded = false }: LoginFormProps) {
+export function LoginForm({
+  redirectUrl,
+  embedded = false,
+  onSwitchToRegister,
+}: LoginFormProps) {
   const router = useRouter();
   const login = useAuthStore((s) => s.login);
   const { data: tenant } = useCurrentTenantQuery();
@@ -221,6 +227,29 @@ export function LoginForm({ redirectUrl, embedded = false }: LoginFormProps) {
           <span>Acceder al Sistema</span>
         )}
       </button>
+
+      {/* Enlace alternativo para crear cuenta */}
+      <div className="pt-2 text-center border-t border-neutral-100">
+        <p className="text-xs text-neutral-500 font-sans">
+          ¿No tienes una cuenta aún?{" "}
+          {onSwitchToRegister ? (
+            <button
+              type="button"
+              onClick={onSwitchToRegister}
+              className="font-bold text-brand-primary hover:underline cursor-pointer"
+            >
+              Crear cuenta gratis
+            </button>
+          ) : (
+            <Link
+              href="/login?tab=register"
+              className="font-bold text-brand-primary hover:underline"
+            >
+              Crear cuenta gratis
+            </Link>
+          )}
+        </p>
+      </div>
     </form>
   );
 }

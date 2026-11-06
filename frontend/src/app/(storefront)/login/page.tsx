@@ -72,9 +72,17 @@ function LoginContent() {
             <h2 className="text-xl font-black uppercase tracking-tight font-display leading-tight mb-2">
               Únete a Beneficios {brandName}
             </h2>
-            <p className="text-xs text-white/90 leading-relaxed font-sans">
+            <p className="text-xs text-white/90 leading-relaxed font-sans mb-4">
               Acumula pedidos en cada compra directa, accede a promociones exclusivas y rastrea tus despachos en tiempo real.
             </p>
+            <button
+              type="button"
+              onClick={() => setAuthMode(authMode === "login" ? "register" : "login")}
+              className="bg-white text-brand-primary hover:bg-neutral-100 active:scale-95 text-xs font-black uppercase tracking-wider font-display px-5 py-2.5 rounded-full shadow-xs transition-all cursor-pointer inline-flex items-center gap-2"
+            >
+              <span>{authMode === "login" ? "Crear Cuenta de Cliente" : "Ya Tengo una Cuenta"}</span>
+              <ArrowRight className="w-3.5 h-3.5" />
+            </button>
           </div>
 
           {/* Menú Lateral con Iconos Limpios (Alineado al fondo al ras de la tarjeta derecha) */}
@@ -228,9 +236,17 @@ function LoginContent() {
               </div>
 
               {authMode === "login" ? (
-                <LoginForm redirectUrl={redirectUrl} embedded={true} />
+                <LoginForm
+                  redirectUrl={redirectUrl}
+                  embedded={true}
+                  onSwitchToRegister={() => setAuthMode("register")}
+                />
               ) : (
-                <RegisterForm redirectUrl={redirectUrl} embedded={true} />
+                <RegisterForm
+                  redirectUrl={redirectUrl}
+                  embedded={true}
+                  onSwitchToLogin={() => setAuthMode("login")}
+                />
               )}
             </div>
           )}
