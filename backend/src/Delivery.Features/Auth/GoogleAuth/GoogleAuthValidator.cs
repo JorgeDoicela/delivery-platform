@@ -11,3 +11,4 @@ public class GoogleAuthValidator : AbstractValidator<GoogleAuthCommand>
             .MinimumLength(10).WithMessage("El token de Google tiene un formato inválido.");
     }
 }
+

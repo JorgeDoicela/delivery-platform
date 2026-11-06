@@ -50,3 +50,4 @@ public class GoogleAuthEndpoint : IEndpoint
         .ProducesProblem(StatusCodes.Status403Forbidden);
     }
 }
+

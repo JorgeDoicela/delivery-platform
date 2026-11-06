@@ -13,3 +13,4 @@ public interface IGoogleTokenValidator
 {
     Task<Result<GoogleTokenPayload>> ValidateAsync(string idToken, CancellationToken cancellationToken = default);
 }
+
