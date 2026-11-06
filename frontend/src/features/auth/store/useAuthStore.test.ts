@@ -7,6 +7,7 @@ vi.mock("../api/authApi", () => ({
   authApi: {
     login: vi.fn(),
     register: vi.fn(),
+    loginWithGoogle: vi.fn(),
     refresh: vi.fn(),
     getCurrentUser: vi.fn(),
     logout: vi.fn(),
@@ -136,6 +137,54 @@ describe("useAuthStore", () => {
     expect(state.user).toBeNull();
     expect(state.status).toBe("error");
     expect(state.error).toBe("El correo electrónico ya se encuentra registrado.");
+  });
+
+  it("debe autenticar con Google exitosamente", async () => {
+    const mockUser = {
+      id: "g1a71dc1-1a32-4754-a957-3b2d13aa11e3",
+      email: "google.user@gmail.com",
+      fullName: "Google User",
+      role: UserRole.Customer,
+      tenantId: "00000000-0000-0000-0000-000000000001",
+      branchId: null,
+      isActive: true,
+    };
+
+    vi.mocked(authApi.loginWithGoogle).mockResolvedValueOnce({
+      accessToken: "mock.jwt.google.token",
+      user: mockUser,
+      expiresAt: new Date(Date.now() + 15 * 60 * 1000).toISOString(),
+    });
+
+    const success = await useAuthStore.getState().loginWithGoogle({
+      idToken: "mock-google-id-token",
+    });
+
+    expect(success).toBe(true);
+    const state = useAuthStore.getState();
+    expect(state.isAuthenticated).toBe(true);
+    expect(state.accessToken).toBe("mock.jwt.google.token");
+    expect(state.user?.email).toBe("google.user@gmail.com");
+    expect(state.status).toBe("success");
+    expect(state.error).toBeNull();
+  });
+
+  it("debe manejar error al autenticar con Google", async () => {
+    vi.mocked(authApi.loginWithGoogle).mockRejectedValueOnce(
+      new Error("El token de autenticación de Google es inválido o ha expirado.")
+    );
+
+    const success = await useAuthStore.getState().loginWithGoogle({
+      idToken: "invalid-token",
+    });
+
+    expect(success).toBe(false);
+    const state = useAuthStore.getState();
+    expect(state.isAuthenticated).toBe(false);
+    expect(state.accessToken).toBeNull();
+    expect(state.user).toBeNull();
+    expect(state.status).toBe("error");
+    expect(state.error).toBe("El token de autenticación de Google es inválido o ha expirado.");
   });
 
   it("debe cerrar sesión y limpiar el estado", async () => {

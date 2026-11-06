@@ -50,6 +50,13 @@ export interface RegisterRequest {
 
 export type RegisterResponse = LoginResponse;
 
+export interface GoogleAuthRequest {
+  idToken: string;
+  tenantSlug?: string;
+}
+
+export type GoogleAuthResponse = LoginResponse;
+
 export interface RefreshTokenResponse {
   accessToken: string;
   user: AuthUser;

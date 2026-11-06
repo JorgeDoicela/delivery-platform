@@ -44,6 +44,7 @@ public static class ResultExtensions
     {
         var code when code.Contains("Unauthorized", StringComparison.OrdinalIgnoreCase) ||
                        code.Contains("InvalidCredentials", StringComparison.OrdinalIgnoreCase) ||
+                       code.Contains("InvalidGoogleToken", StringComparison.OrdinalIgnoreCase) ||
                        code.Contains("InvalidRefreshToken", StringComparison.OrdinalIgnoreCase) => StatusCodes.Status401Unauthorized,
         var code when code.Contains("Forbidden", StringComparison.OrdinalIgnoreCase) ||
                        code.Contains("UserInactive", StringComparison.OrdinalIgnoreCase) ||

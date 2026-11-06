@@ -14,8 +14,10 @@ public static class DependencyInjection
         var assembly = typeof(DependencyInjection).Assembly;
 
         // 0. Servicios de Seguridad y Autenticacion
+        services.AddHttpClient();
         services.AddSingleton<IPasswordHasher, BCryptPasswordHasher>();
         services.AddSingleton<ITokenProvider, JwtTokenProvider>();
+        services.AddScoped<Delivery.Features.Auth.GoogleAuth.IGoogleTokenValidator, Delivery.Features.Auth.GoogleAuth.GoogleTokenValidator>();
 
         // 1. Registro automático de Validadores FluentValidation
         services.AddValidatorsFromAssembly(assembly);

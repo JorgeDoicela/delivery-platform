@@ -9,6 +9,8 @@ import type {
   RefreshTokenResponse,
   RegisterRequest,
   RegisterResponse,
+  GoogleAuthRequest,
+  GoogleAuthResponse,
 } from "../types";
 import type { LoginFormData } from "../schemas/loginSchema";
 
@@ -70,6 +72,20 @@ export const authApi = {
       body: JSON.stringify({ ...data, tenantSlug: data.tenantSlug || tenantSlug }),
     });
     return handleAuthResponse<RegisterResponse>(res);
+  },
+
+  async loginWithGoogle(data: GoogleAuthRequest): Promise<GoogleAuthResponse> {
+    const tenantSlug = getApiClientTenantSlug();
+    const res = await fetch(`${getApiBaseUrl()}/api/v1/auth/google`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        ...(tenantSlug ? { "X-Tenant-Slug": tenantSlug } : {}),
+      },
+      credentials: "include",
+      body: JSON.stringify({ ...data, tenantSlug: data.tenantSlug || tenantSlug }),
+    });
+    return handleAuthResponse<GoogleAuthResponse>(res);
   },
 
   async refresh(): Promise<RefreshTokenResponse> {

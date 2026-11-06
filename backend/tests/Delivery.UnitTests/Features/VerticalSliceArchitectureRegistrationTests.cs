@@ -69,9 +69,9 @@ public class VerticalSliceArchitectureRegistrationTests
         // Act
         services.AddDeliveryFeatures();
 
-        // Assert: Deben registrarse exactamente 29 endpoints autónomos (13 operativos + 5 de autenticación + 7 de tenants y sucursales + 4 de motorizados)
+        // Assert: Deben registrarse exactamente 30 endpoints autónomos (13 operativos + 6 de autenticación + 7 de tenants y sucursales + 4 de motorizados)
         var endpointDescriptors = services.Where(s => s.ServiceType == typeof(IEndpoint)).ToList();
-        endpointDescriptors.Should().HaveCount(29);
+        endpointDescriptors.Should().HaveCount(30);
 
         var endpointImplementationTypes = endpointDescriptors.Select(d => d.ImplementationType).ToHashSet();
         endpointImplementationTypes.Should().Contain(typeof(ResolveBranchEndpoint));
@@ -96,6 +96,7 @@ public class VerticalSliceArchitectureRegistrationTests
         endpointImplementationTypes.Should().Contain(typeof(GetDriverLocationEndpoint));
         endpointImplementationTypes.Should().Contain(typeof(Delivery.Features.Auth.Login.LoginEndpoint));
         endpointImplementationTypes.Should().Contain(typeof(Delivery.Features.Auth.Register.RegisterEndpoint));
+        endpointImplementationTypes.Should().Contain(typeof(Delivery.Features.Auth.GoogleAuth.GoogleAuthEndpoint));
         endpointImplementationTypes.Should().Contain(typeof(Delivery.Features.Auth.RefreshToken.RefreshTokenEndpoint));
         endpointImplementationTypes.Should().Contain(typeof(Delivery.Features.Auth.GetCurrentUser.GetCurrentUserEndpoint));
         endpointImplementationTypes.Should().Contain(typeof(Delivery.Features.Auth.RevokeToken.RevokeTokenEndpoint));

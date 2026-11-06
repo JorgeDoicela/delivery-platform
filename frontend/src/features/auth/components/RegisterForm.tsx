@@ -10,6 +10,7 @@ import { Loader2, AlertCircle, Eye, EyeOff } from "lucide-react";
 import { registerSchema, type RegisterFormData } from "../schemas/registerSchema";
 import { useAuthStore } from "../store/useAuthStore";
 import { useCurrentTenantQuery, useTenantStore } from "@/features/tenant";
+import { GoogleSignInButton } from "./GoogleSignInButton";
 
 interface RegisterFormProps {
   redirectUrl?: string;
@@ -303,6 +304,20 @@ export function RegisterForm({
           <span>Registrarme y Continuar</span>
         )}
       </button>
+
+      {/* Separador para autenticación federada */}
+      <div className="relative my-2">
+        <div className="absolute inset-0 flex items-center">
+          <div className="w-full border-t border-neutral-200" />
+        </div>
+        <div className="relative flex justify-center text-xs uppercase">
+          <span className="bg-white px-3 text-neutral-400 font-bold text-[10px] tracking-wider font-mono">
+            o continúa con
+          </span>
+        </div>
+      </div>
+
+      <GoogleSignInButton redirectUrl={redirectUrl} />
 
       {/* Enlace alternativo para iniciar sesión */}
       <div className="pt-2 text-center border-t border-neutral-100">

@@ -31,5 +31,13 @@ public static class AuthErrors
     public static readonly Error EmailAlreadyRegistered = new(
         "Auth.EmailAlreadyRegistered",
         "El correo electrónico ya se encuentra registrado.");
+
+    public static readonly Error InvalidGoogleToken = new(
+        "Auth.InvalidGoogleToken",
+        "El token de autenticación de Google es inválido o ha expirado.");
+
+    public static readonly Error GoogleEmailNotVerified = new(
+        "Auth.GoogleEmailNotVerified",
+        "La cuenta de Google no tiene un correo electrónico verificado.");
 }
 

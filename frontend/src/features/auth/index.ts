@@ -5,5 +5,6 @@ export * from "./api/authApi";
 export * from "./store/useAuthStore";
 export * from "./components/LoginForm";
 export * from "./components/RegisterForm";
+export * from "./components/GoogleSignInButton";
 export * from "./components/AuthGuard";
 export * from "./components/UserNav";
