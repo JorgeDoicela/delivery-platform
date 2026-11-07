@@ -25,7 +25,15 @@ export function middleware(request: NextRequest) {
       request.cookies.get("refreshToken");
 
     if (!refreshToken || !refreshToken.value) {
-      const loginUrl = new URL("/login", request.url);
+      // Si la ruta contiene un prefijo de slug de tenant (ej: /la-granjita/cocina o /la-granjita/admin/personalizacion)
+      // redirige nativamente a la pantalla de login del tenant (/la-granjita/login)
+      const isTenantPrefixed =
+        segments.length >= 2 &&
+        !OPERATIONAL_KEYWORDS.has(segments[0].toLowerCase()) &&
+        OPERATIONAL_KEYWORDS.has(segments[1].toLowerCase());
+
+      const loginPath = isTenantPrefixed ? `/${segments[0]}/login` : "/login";
+      const loginUrl = new URL(loginPath, request.url);
       loginUrl.searchParams.set("redirect", pathname);
       return NextResponse.redirect(loginUrl);
     }
@@ -52,6 +60,6 @@ export const config = {
     "/:slug/kitchen/:path*",
     "/:slug/repartidor/:path*",
     "/:slug/active-delivery/:path*",
+    "/:slug/admin/:path*",
   ],
 };
-

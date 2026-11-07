@@ -1,14 +1,16 @@
 "use client";
 
-import React from "react";
-import { MapPin, Phone, Clock } from "lucide-react";
+import React, { Suspense } from "react";
+import { MapPin, Phone, Clock, Loader2 } from "lucide-react";
 import Link from "next/link";
 import { useCartStore } from "@/features/cart";
 import { useBranchesQuery, useCurrentTenantQuery } from "@/features/tenant";
 import { getBranchOperatingStatus } from "@/shared/lib/schedule";
+import { useTenantRoutes } from "@/shared/lib/tenant-routing";
 
-export default function SucursalesPage() {
+function SucursalesContent() {
   const { data: tenant } = useCurrentTenantQuery();
+  const routes = useTenantRoutes(tenant?.slug);
   const { data: branches, isLoading } = useBranchesQuery();
   const setBranch = useCartStore((s) => s.setBranch);
 
@@ -89,7 +91,7 @@ export default function SucursalesPage() {
                 </div>
 
                 <Link
-                  href={tenant?.slug ? `/${tenant.slug}#catalogo` : "/#catalogo"}
+                  href={routes.getCatalogHref(branch.id)}
                   onClick={() => setBranch(branch.id, branch.name)}
                   className="inline-flex items-center justify-center w-full bg-brand-primary hover:bg-brand-primary-hover text-white text-xs font-bold uppercase tracking-wider py-3.5 px-6 rounded-full shadow-md transition-all active:scale-95 min-h-[44px]"
                 >
@@ -101,5 +103,22 @@ export default function SucursalesPage() {
         </div>
       )}
     </div>
+  );
+}
+
+export default function SucursalesPage() {
+  return (
+    <Suspense
+      fallback={
+        <div className="flex flex-col items-center justify-center min-h-[40vh] text-text-muted gap-2">
+          <Loader2 className="w-6 h-6 animate-spin text-brand-primary" />
+          <span className="text-xs font-semibold uppercase tracking-wider">
+            Cargando sucursales...
+          </span>
+        </div>
+      }
+    >
+      <SucursalesContent />
+    </Suspense>
   );
 }

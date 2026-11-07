@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { Loader2, AlertCircle, KeyRound, X } from "lucide-react";
 import { useAuthStore } from "../store/useAuthStore";
 import { useCurrentTenantQuery, useTenantStore } from "@/features/tenant";
+import { resolveTenantRouting } from "@/shared/lib/tenant-routing";
 
 interface GoogleSignInButtonProps {
   redirectUrl?: string;
@@ -77,7 +78,13 @@ export function GoogleSignInButton({
           const tenantSlug =
             loggedUser?.tenantSlug || activeTenantSlug || "la-granjita";
 
-          const destination = redirectUrl || `/${tenantSlug}`;
+          const routing = resolveTenantRouting({
+            explicitSlug: tenantSlug,
+            pathname: typeof window !== "undefined" ? window.location.pathname : "/",
+            hostname: typeof window !== "undefined" ? window.location.hostname : undefined,
+          });
+
+          const destination = redirectUrl || routing.getHomeHref();
           router.push(destination);
           router.refresh();
         } else {

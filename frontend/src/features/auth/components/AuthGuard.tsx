@@ -6,6 +6,7 @@ import { useAuthStore } from "../store/useAuthStore";
 import { UserRole, type UserRoleName } from "../types";
 import { ShieldAlert, Loader2 } from "lucide-react";
 import { useIsMounted } from "@/shared/hooks/useIsMounted";
+import { resolveTenantRouting } from "@/shared/lib/tenant-routing";
 
 const ROLE_NAME_TO_ENUM: Record<string, UserRole> = {
   SuperAdmin: UserRole.SuperAdmin,
@@ -89,7 +90,8 @@ export function AuthGuard({ children, allowedRoles }: AuthGuardProps) {
     if (!isMounted) return;
 
     if (!isAuthenticated && useAuthStore.getState().status !== "loading") {
-      router.push(`/login?redirect=${encodeURIComponent(pathname)}`);
+      const routes = resolveTenantRouting({ pathname });
+      router.push(routes.getLoginHref({ redirect: pathname }));
     }
   }, [isMounted, isAuthenticated, pathname, router]);
 

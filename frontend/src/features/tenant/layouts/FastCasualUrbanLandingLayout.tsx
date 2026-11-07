@@ -16,6 +16,7 @@ import {
   CatalogSection,
 } from "@/features/catalog";
 import type { TenantStorefrontConfigDto } from "@/shared/types/api";
+import { useTenantRoutes } from "@/shared/lib/tenant-routing";
 
 interface FastCasualUrbanLandingLayoutProps {
   tenant: TenantStorefrontConfigDto | null | undefined;
@@ -24,6 +25,7 @@ interface FastCasualUrbanLandingLayoutProps {
 export function FastCasualUrbanLandingLayout({
   tenant,
 }: FastCasualUrbanLandingLayoutProps) {
+  const routes = useTenantRoutes(tenant?.slug);
   const slides = tenant?.heroSlides ?? [];
   const primarySlide = slides[0];
   const brandName = tenant?.name ?? "Restaurante Urbano";
@@ -88,7 +90,7 @@ export function FastCasualUrbanLandingLayout({
               </a>
 
               <Link
-                href="/sucursales"
+                href={routes.getSucursalesHref()}
                 className="inline-flex items-center gap-2 bg-neutral-100 hover:bg-neutral-200 text-neutral-900 font-bold text-xs uppercase tracking-wider px-6 py-4 rounded-full transition-colors"
               >
                 <MapPin className="w-4 h-4 text-brand-primary" />

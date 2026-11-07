@@ -13,10 +13,12 @@ import { PaymentMethodSection } from "./PaymentMethodSection";
 import { useCartStore } from "@/features/cart";
 import { apiClient } from "@/shared/lib/api-client";
 import { formatCurrency } from "@/shared/lib/utils";
+import { useTenantRoutes } from "@/shared/lib/tenant-routing";
 import { Loader2 } from "lucide-react";
 
 export function CheckoutForm() {
   const router = useRouter();
+  const routes = useTenantRoutes();
   const items = useCartStore((s) => s.items);
   const branchId = useCartStore((s) => s.branchId);
   const deliveryType = useCartStore((s) => s.deliveryType);
@@ -107,7 +109,7 @@ export function CheckoutForm() {
 
       // Limpiar carrito y redirigir a tracking en español
       clearCart();
-      router.push(`/rastreo/${response.orderId}`);
+      router.push(routes.getRastreoHref(response.orderId));
     } catch (err: unknown) {
       const message =
         err instanceof Error ? err.message : "Error al procesar el pedido. Intenta nuevamente.";

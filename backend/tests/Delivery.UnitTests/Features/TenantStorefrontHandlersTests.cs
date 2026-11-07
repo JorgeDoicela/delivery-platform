@@ -171,7 +171,8 @@ public class TenantStorefrontHandlersTests
             var handler = new GetBranchesHandler(granjitaCtx);
             var res = await handler.Handle(new GetBranchesQuery());
             res.IsSuccess.Should().BeTrue();
-            res.Value.Should().HaveCount(2);
+            res.Value.Should().HaveCount(1);
+            res.Value.Should().ContainSingle(b => b.Name == "Guamaní");
         }
 
         await using (var brasasCtx = new AppDbContext(CreateOptions(dbName), new FakeTenantContext { TenantId = brasas.Id }))

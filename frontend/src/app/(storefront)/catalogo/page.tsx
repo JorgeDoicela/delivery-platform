@@ -1,4 +1,6 @@
+import React, { Suspense } from "react";
 import { CatalogSection } from "@/features/catalog";
+import { Loader2 } from "lucide-react";
 
 export const metadata = {
   title: "Catálogo y Menú Interactivo",
@@ -17,7 +19,18 @@ export default function CatalogoPage() {
         </p>
       </div>
 
-      <CatalogSection />
+      <Suspense
+        fallback={
+          <div className="flex flex-col items-center justify-center min-h-[40vh] text-text-muted gap-2">
+            <Loader2 className="w-6 h-6 animate-spin text-brand-primary" />
+            <span className="text-xs font-semibold uppercase tracking-wider">
+              Cargando catálogo...
+            </span>
+          </div>
+        }
+      >
+        <CatalogSection />
+      </Suspense>
     </div>
   );
 }

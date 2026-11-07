@@ -3,9 +3,11 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { Search, MapPin, ArrowRight } from "lucide-react";
+import { useTenantRoutes } from "@/shared/lib/tenant-routing";
 
 export function OrderSearchView() {
   const router = useRouter();
+  const routes = useTenantRoutes();
   const [orderId, setOrderId] = useState("");
   const [error, setError] = useState<string | null>(null);
 
@@ -16,7 +18,7 @@ export function OrderSearchView() {
       setError("Por favor ingresa el número o código de tu orden.");
       return;
     }
-    router.push(`/rastreo/${cleanId}`);
+    router.push(routes.getRastreoHref(cleanId));
   };
 
   return (

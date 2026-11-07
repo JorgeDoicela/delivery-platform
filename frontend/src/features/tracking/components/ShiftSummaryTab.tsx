@@ -13,6 +13,7 @@ import {
   LogOut,
 } from 'lucide-react';
 import { useAuthStore } from '@/features/auth';
+import { useTenantRoutes } from '@/shared/lib/tenant-routing';
 import { DriverProfileResponse, DriverShiftSummaryDto, DriverOrderDto, PaymentMethod } from '@/shared/types/api';
 
 interface ShiftSummaryTabProps {
@@ -28,10 +29,11 @@ export function ShiftSummaryTab({
 }: ShiftSummaryTabProps) {
   const router = useRouter();
   const logout = useAuthStore((s) => s.logout);
+  const routes = useTenantRoutes();
 
   const handleLogout = async () => {
     await logout();
-    router.push('/login');
+    router.push(routes.getLoginHref());
   };
   return (
     <div className="space-y-4 w-full">

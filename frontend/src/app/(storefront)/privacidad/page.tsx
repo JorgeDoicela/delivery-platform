@@ -1,12 +1,14 @@
 "use client";
 
-import React from "react";
+import React, { Suspense } from "react";
 import Link from "next/link";
-import { ChevronRight, Shield, Lock, MapPin, Database } from "lucide-react";
+import { ChevronRight, Shield, Lock, MapPin, Database, Loader2 } from "lucide-react";
 import { useCurrentTenantQuery } from "@/features/tenant";
+import { useTenantRoutes } from "@/shared/lib/tenant-routing";
 
-export default function PoliticaPrivacidadPage() {
+function PoliticaPrivacidadContent() {
   const { data: tenant } = useCurrentTenantQuery();
+  const routes = useTenantRoutes(tenant?.slug);
 
   const brandName = tenant?.name || "Mesafy";
   const businessName = tenant?.businessName || "Mesafy Technologies S.A.S.";
@@ -19,7 +21,7 @@ export default function PoliticaPrivacidadPage() {
     <div className="w-full max-w-[1000px] mx-auto px-4 sm:px-8 py-8 sm:py-12 space-y-8">
       {/* Miga de Pan */}
       <nav aria-label="Miga de pan" className="flex items-center gap-2 text-xs font-semibold text-neutral-500">
-        <Link href="/" className="hover:text-brand-primary transition-colors">
+        <Link href={routes.getHomeHref()} className="hover:text-brand-primary transition-colors">
           Inicio
         </Link>
         <ChevronRight className="w-3.5 h-3.5 text-neutral-400" />
@@ -88,7 +90,7 @@ export default function PoliticaPrivacidadPage() {
           <div className="pt-4 border-t border-neutral-100 flex flex-wrap items-center justify-between text-xs text-neutral-400 gap-3">
             <span>Conforme a la Ley Orgánica de Protección de Datos Personales (LOPDP Ecuador)</span>
             <div className="flex items-center gap-4">
-              <Link href="/terminos" className="hover:text-brand-primary underline">
+              <Link href={routes.getTermsHref()} className="hover:text-brand-primary underline">
                 Ver Términos y Condiciones
               </Link>
             </div>
@@ -99,3 +101,19 @@ export default function PoliticaPrivacidadPage() {
   );
 }
 
+export default function PoliticaPrivacidadPage() {
+  return (
+    <Suspense
+      fallback={
+        <div className="flex flex-col items-center justify-center min-h-[40vh] text-text-muted gap-2">
+          <Loader2 className="w-6 h-6 animate-spin text-brand-primary" />
+          <span className="text-xs font-semibold uppercase tracking-wider">
+            Cargando política de privacidad...
+          </span>
+        </div>
+      }
+    >
+      <PoliticaPrivacidadContent />
+    </Suspense>
+  );
+}

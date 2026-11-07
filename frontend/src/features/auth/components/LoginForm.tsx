@@ -12,6 +12,7 @@ import { useAuthStore } from "../store/useAuthStore";
 import { UserRole } from "../types";
 import { useCurrentTenantQuery, useTenantStore } from "@/features/tenant";
 import { GoogleSignInButton } from "./GoogleSignInButton";
+import { useTenantRoutes, resolveTenantRouting } from "@/shared/lib/tenant-routing";
 
 interface LoginFormProps {
   redirectUrl?: string;
@@ -27,6 +28,7 @@ export function LoginForm({
   const router = useRouter();
   const login = useAuthStore((s) => s.login);
   const { data: tenant } = useCurrentTenantQuery();
+  const routes = useTenantRoutes(tenant?.slug);
   const brandName = tenant?.name || "La Granjita";
   const brandTagline = tenant?.tagline || "Asadero";
   const brandLogo = tenant?.logoUrl || "/images/shared/placeholders/logo-default.png";
@@ -71,16 +73,22 @@ export function LoginForm({
       const tenantSlug =
         loggedUser?.tenantSlug || useTenantStore.getState().tenantSlug || "la-granjita";
 
+      const routing = resolveTenantRouting({
+        explicitSlug: tenantSlug,
+        pathname: typeof window !== "undefined" ? window.location.pathname : "/",
+        hostname: typeof window !== "undefined" ? window.location.hostname : undefined,
+      });
+
       const defaultDestination = isSuperAdmin
         ? "/superadmin"
         : isTenantAdmin
-          ? "/admin/personalizacion"
+          ? routing.getAdminHref("personalizacion")
           : isDriver
-            ? `/${tenantSlug}/repartidor`
-            : `/${tenantSlug}/cocina`;
+            ? routing.getDriverHref()
+            : routing.getKitchenHref();
 
       const isDefaultCocinaConflict =
-        (redirectUrl === "/cocina" || redirectUrl === `/${tenantSlug}/cocina`) &&
+        (redirectUrl === "/cocina" || redirectUrl === routing.getKitchenHref()) &&
         (isDriver || isSuperAdmin || isTenantAdmin);
 
       const destination =
@@ -257,7 +265,7 @@ export function LoginForm({
             </button>
           ) : (
             <Link
-              href="/login?tab=register"
+              href={routes.getRegisterHref({ redirect: redirectUrl })}
               className="font-bold text-brand-primary hover:underline"
             >
               Crear cuenta gratis

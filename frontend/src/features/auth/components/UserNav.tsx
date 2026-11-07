@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { LogOut, User as UserIcon } from "lucide-react";
 import { useAuthStore } from "../store/useAuthStore";
 import { useIsMounted } from "@/shared/hooks/useIsMounted";
+import { useTenantRoutes } from "@/shared/lib/tenant-routing";
 
 export function UserNav() {
   const router = useRouter();
@@ -12,6 +13,7 @@ export function UserNav() {
   const user = useAuthStore((s) => s.user);
   const logout = useAuthStore((s) => s.logout);
   const checkAuth = useAuthStore((s) => s.checkAuth);
+  const routes = useTenantRoutes(user?.tenantSlug);
 
   useEffect(() => {
     checkAuth();
@@ -23,7 +25,7 @@ export function UserNav() {
 
   const handleLogout = async () => {
     await logout();
-    router.push("/login");
+    router.push(routes.getLoginHref());
     router.refresh();
   };
 

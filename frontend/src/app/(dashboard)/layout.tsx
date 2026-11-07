@@ -20,6 +20,7 @@ import { UserNav, useAuthStore, UserRole, AuthGuard } from "@/features/auth";
 import { TenantSwitcher, useCurrentTenantQuery, useTenantStore, RESERVED_TENANT_SLUGS } from "@/features/tenant";
 import { ThemeToggle } from "@/shared/components/ThemeToggle";
 import { useSmartScrollHeader } from "@/shared/hooks/useSmartScrollHeader";
+import { useTenantRoutes } from "@/shared/lib/tenant-routing";
 
 function DashboardLayoutContent({
     children,
@@ -43,6 +44,7 @@ function DashboardLayoutContent({
     const user = useAuthStore((s) => s.user);
 
     const activeTenantSlug = urlSlug || tenantSlug || user?.tenantSlug || "la-granjita";
+    const routes = useTenantRoutes(activeTenantSlug);
 
     useEffect(() => {
         if (activeTenantSlug && activeTenantSlug !== tenantSlug) {
@@ -93,7 +95,7 @@ function DashboardLayoutContent({
             <div className="flex flex-col min-h-screen bg-surface-canvas text-text-strong transition-colors duration-200">
                 <header className="h-16 bg-surface-card border-b border-surface-border px-3 sm:px-6 flex items-center justify-between shrink-0 shadow-xs transition-colors duration-200">
                     <div className="flex items-center gap-3 sm:gap-6 min-w-0 shrink">
-                        <Link href={`/${activeTenantSlug}/cocina`} className="flex items-center gap-2.5 sm:gap-3 group min-w-0 shrink">
+                        <Link href={routes.getKitchenHref()} className="flex items-center gap-2.5 sm:gap-3 group min-w-0 shrink">
                             <div className="relative w-8 h-8 sm:w-9 sm:h-9 shrink-0">
                                 <Image
                                     src={brandLogo}
@@ -119,7 +121,7 @@ function DashboardLayoutContent({
 
                         <nav className="hidden md:flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider font-display">
                             <Link
-                                href={`/${activeTenantSlug}/cocina`}
+                                href={routes.getKitchenHref()}
                                 className={`px-3.5 py-1.5 rounded-full transition-colors flex items-center gap-1.5 ${pathname.endsWith("/cocina") || pathname.endsWith("/kitchen")
                                         ? "bg-brand-primary text-white shadow-xs"
                                         : "text-text-muted hover:text-text-strong hover:bg-surface-card-hover"
@@ -132,8 +134,8 @@ function DashboardLayoutContent({
                             {canManageFranchise && (
                                 <>
                                     <Link
-                                        href="/admin/inventario"
-                                        className={`px-3.5 py-1.5 rounded-full transition-colors flex items-center gap-1.5 ${pathname.startsWith("/admin/inventario") || pathname.startsWith("/admin/inventory")
+                                        href={routes.getAdminHref("inventario")}
+                                        className={`px-3.5 py-1.5 rounded-full transition-colors flex items-center gap-1.5 ${pathname.includes("/admin/inventario") || pathname.includes("/admin/inventory")
                                                 ? "bg-brand-primary text-white shadow-xs"
                                                 : "text-text-muted hover:text-text-strong hover:bg-surface-card-hover"
                                             }`}
@@ -143,8 +145,8 @@ function DashboardLayoutContent({
                                     </Link>
 
                                     <Link
-                                        href="/admin/sucursales"
-                                        className={`px-3.5 py-1.5 rounded-full transition-colors flex items-center gap-1.5 ${pathname.startsWith("/admin/sucursales") || pathname.startsWith("/admin/branches")
+                                        href={routes.getAdminHref("sucursales")}
+                                        className={`px-3.5 py-1.5 rounded-full transition-colors flex items-center gap-1.5 ${pathname.includes("/admin/sucursales") || pathname.includes("/admin/branches")
                                                 ? "bg-brand-primary text-white shadow-xs"
                                                 : "text-text-muted hover:text-text-strong hover:bg-surface-card-hover"
                                             }`}
@@ -154,8 +156,8 @@ function DashboardLayoutContent({
                                     </Link>
 
                                     <Link
-                                        href="/admin/personalizacion"
-                                        className={`px-3.5 py-1.5 rounded-full transition-colors flex items-center gap-1.5 ${pathname.startsWith("/admin/personalizacion")
+                                        href={routes.getAdminHref("personalizacion")}
+                                        className={`px-3.5 py-1.5 rounded-full transition-colors flex items-center gap-1.5 ${pathname.includes("/admin/personalizacion")
                                                 ? "bg-brand-primary text-white shadow-xs"
                                                 : "text-text-muted hover:text-text-strong hover:bg-surface-card-hover"
                                             }`}
@@ -168,8 +170,8 @@ function DashboardLayoutContent({
 
                             {isSuperAdmin && (
                                 <Link
-                                    href="/superadmin"
-                                    className={`px-3.5 py-1.5 rounded-full transition-colors flex items-center gap-1.5 ${pathname.startsWith("/superadmin") || pathname.startsWith("/admin/tenants")
+                                    href={routes.getSuperAdminHref()}
+                                    className={`px-3.5 py-1.5 rounded-full transition-colors flex items-center gap-1.5 ${pathname.startsWith("/superadmin") || pathname.includes("/admin/tenants")
                                             ? "bg-brand-primary text-white shadow-xs"
                                             : "text-text-muted hover:text-text-strong hover:bg-surface-card-hover"
                                         }`}
@@ -194,7 +196,7 @@ function DashboardLayoutContent({
                         </div>
 
                         <Link
-                            href={`/${tenant?.slug || "la-granjita"}`}
+                            href={routes.getHomeHref()}
                             className="text-xs font-bold uppercase tracking-wider text-text-strong hover:text-brand-primary transition-colors px-2.5 sm:px-3 py-1.5 rounded-full bg-surface-canvas hover:bg-surface-card-hover border border-surface-border font-display hidden sm:inline-flex items-center gap-1.5"
                             title="Ver Tienda Pública en Vivo"
                         >
@@ -280,7 +282,7 @@ function DashboardLayoutContent({
                                     </span>
 
                                     <Link
-                                        href={`/${activeTenantSlug}/cocina`}
+                                        href={routes.getKitchenHref()}
                                         onClick={() => setIsMobileMenuOpen(false)}
                                         className={`flex items-center gap-3 px-3.5 py-3 rounded-2xl font-display font-black text-sm uppercase tracking-wide transition-colors ${pathname.endsWith("/cocina") || pathname.endsWith("/kitchen")
                                                 ? "bg-brand-primary text-white shadow-xs"
@@ -294,9 +296,9 @@ function DashboardLayoutContent({
                                     {canManageFranchise && (
                                         <>
                                             <Link
-                                                href="/admin/inventario"
+                                                href={routes.getAdminHref("inventario")}
                                                 onClick={() => setIsMobileMenuOpen(false)}
-                                                className={`flex items-center gap-3 px-3.5 py-3 rounded-2xl font-display font-black text-sm uppercase tracking-wide transition-colors ${pathname.startsWith("/admin/inventario") || pathname.startsWith("/admin/inventory")
+                                                className={`flex items-center gap-3 px-3.5 py-3 rounded-2xl font-display font-black text-sm uppercase tracking-wide transition-colors ${pathname.includes("/admin/inventario") || pathname.includes("/admin/inventory")
                                                         ? "bg-brand-primary text-white shadow-xs"
                                                         : "text-text-strong hover:bg-surface-canvas hover:text-brand-primary"
                                                     }`}
@@ -306,9 +308,9 @@ function DashboardLayoutContent({
                                             </Link>
 
                                             <Link
-                                                href="/admin/sucursales"
+                                                href={routes.getAdminHref("sucursales")}
                                                 onClick={() => setIsMobileMenuOpen(false)}
-                                                className={`flex items-center gap-3 px-3.5 py-3 rounded-2xl font-display font-black text-sm uppercase tracking-wide transition-colors ${pathname.startsWith("/admin/sucursales") || pathname.startsWith("/admin/branches")
+                                                className={`flex items-center gap-3 px-3.5 py-3 rounded-2xl font-display font-black text-sm uppercase tracking-wide transition-colors ${pathname.includes("/admin/sucursales") || pathname.includes("/admin/branches")
                                                         ? "bg-brand-primary text-white shadow-xs"
                                                         : "text-text-strong hover:bg-surface-canvas hover:text-brand-primary"
                                                     }`}
@@ -318,9 +320,9 @@ function DashboardLayoutContent({
                                             </Link>
 
                                             <Link
-                                                href="/admin/personalizacion"
+                                                href={routes.getAdminHref("personalizacion")}
                                                 onClick={() => setIsMobileMenuOpen(false)}
-                                                className={`flex items-center gap-3 px-3.5 py-3 rounded-2xl font-display font-black text-sm uppercase tracking-wide transition-colors ${pathname.startsWith("/admin/personalizacion")
+                                                className={`flex items-center gap-3 px-3.5 py-3 rounded-2xl font-display font-black text-sm uppercase tracking-wide transition-colors ${pathname.includes("/admin/personalizacion")
                                                         ? "bg-brand-primary text-white shadow-xs"
                                                         : "text-text-strong hover:bg-surface-canvas hover:text-brand-primary"
                                                     }`}
@@ -333,9 +335,9 @@ function DashboardLayoutContent({
 
                                     {isSuperAdmin && (
                                         <Link
-                                            href="/superadmin"
+                                            href={routes.getSuperAdminHref()}
                                             onClick={() => setIsMobileMenuOpen(false)}
-                                            className={`flex items-center gap-3 px-3.5 py-3 rounded-2xl font-display font-black text-sm uppercase tracking-wide transition-colors ${pathname.startsWith("/superadmin") || pathname.startsWith("/admin/tenants")
+                                            className={`flex items-center gap-3 px-3.5 py-3 rounded-2xl font-display font-black text-sm uppercase tracking-wide transition-colors ${pathname.startsWith("/superadmin") || pathname.includes("/admin/tenants")
                                                     ? "bg-brand-primary text-white shadow-xs"
                                                     : "text-text-strong hover:bg-surface-canvas hover:text-brand-primary"
                                                 }`}
@@ -396,8 +398,8 @@ function DashboardLayoutContent({
                     {canManageFranchise && (
                         <>
                             <Link
-                                href="/admin/inventario"
-                                className={`flex flex-col items-center justify-center py-1 px-2 rounded-xl text-[10px] font-bold font-display uppercase tracking-wider transition-colors min-w-[50px] min-h-[44px] ${pathname.startsWith("/admin/inventario") || pathname.startsWith("/admin/inventory")
+                                href={routes.getAdminHref("inventario")}
+                                className={`flex flex-col items-center justify-center py-1 px-2 rounded-xl text-[10px] font-bold font-display uppercase tracking-wider transition-colors min-w-[50px] min-h-[44px] ${pathname.includes("/admin/inventario") || pathname.includes("/admin/inventory")
                                         ? "text-brand-primary"
                                         : "text-text-muted hover:text-text-strong"
                                     }`}
@@ -407,8 +409,8 @@ function DashboardLayoutContent({
                             </Link>
 
                             <Link
-                                href="/admin/sucursales"
-                                className={`flex flex-col items-center justify-center py-1 px-2 rounded-xl text-[10px] font-bold font-display uppercase tracking-wider transition-colors min-w-[50px] min-h-[44px] ${pathname.startsWith("/admin/sucursales") || pathname.startsWith("/admin/branches")
+                                href={routes.getAdminHref("sucursales")}
+                                className={`flex flex-col items-center justify-center py-1 px-2 rounded-xl text-[10px] font-bold font-display uppercase tracking-wider transition-colors min-w-[50px] min-h-[44px] ${pathname.includes("/admin/sucursales") || pathname.includes("/admin/branches")
                                         ? "text-brand-primary"
                                         : "text-text-muted hover:text-text-strong"
                                     }`}
@@ -418,8 +420,8 @@ function DashboardLayoutContent({
                             </Link>
 
                             <Link
-                                href="/admin/personalizacion"
-                                className={`flex flex-col items-center justify-center py-1 px-2 rounded-xl text-[10px] font-bold font-display uppercase tracking-wider transition-colors min-w-[50px] min-h-[44px] ${pathname.startsWith("/admin/personalizacion")
+                                href={routes.getAdminHref("personalizacion")}
+                                className={`flex flex-col items-center justify-center py-1 px-2 rounded-xl text-[10px] font-bold font-display uppercase tracking-wider transition-colors min-w-[50px] min-h-[44px] ${pathname.includes("/admin/personalizacion")
                                         ? "text-brand-primary"
                                         : "text-text-muted hover:text-text-strong"
                                     }`}
@@ -432,8 +434,8 @@ function DashboardLayoutContent({
 
                     {isSuperAdmin && (
                         <Link
-                            href="/superadmin"
-                            className={`flex flex-col items-center justify-center py-1 px-2 rounded-xl text-[10px] font-bold font-display uppercase tracking-wider transition-colors min-w-[50px] min-h-[44px] ${pathname.startsWith("/superadmin") || pathname.startsWith("/admin/tenants")
+                            href={routes.getSuperAdminHref()}
+                            className={`flex flex-col items-center justify-center py-1 px-2 rounded-xl text-[10px] font-bold font-display uppercase tracking-wider transition-colors min-w-[50px] min-h-[44px] ${pathname.startsWith("/superadmin") || pathname.includes("/admin/tenants")
                                     ? "text-brand-primary"
                                     : "text-text-muted hover:text-text-strong"
                                 }`}

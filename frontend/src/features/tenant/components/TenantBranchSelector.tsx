@@ -1,9 +1,11 @@
 "use client";
 
 import React, { useState, useRef, useEffect } from "react";
+import Link from "next/link";
 import { ChevronDown, MapPin, Check, Clock } from "lucide-react";
 import { useCartStore } from "@/features/cart";
 import type { TenantStorefrontConfigDto } from "@/shared/types/api";
+import { useTenantRoutes } from "@/shared/lib/tenant-routing";
 
 interface TenantBranchSelectorProps {
   tenant?: TenantStorefrontConfigDto | null;
@@ -12,6 +14,7 @@ interface TenantBranchSelectorProps {
 export function TenantBranchSelector({ tenant }: TenantBranchSelectorProps) {
   const [isOpen, setIsOpen] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
+  const routes = useTenantRoutes(tenant?.slug);
 
   const cartBranchId = useCartStore((s) => s.branchId);
   const setBranch = useCartStore((s) => s.setBranch);
@@ -129,13 +132,13 @@ export function TenantBranchSelector({ tenant }: TenantBranchSelectorProps) {
           </div>
 
           <div className="pt-2 border-t border-surface-border px-2 flex items-center justify-between text-[11px]">
-            <a
-              href="#sucursales"
+            <Link
+              href={routes.getSucursalesHref()}
               onClick={() => setIsOpen(false)}
               className="font-bold text-brand-primary hover:underline font-display uppercase tracking-wider"
             >
               Ver mapa y horarios completos →
-            </a>
+            </Link>
           </div>
         </div>
       )}

@@ -5,8 +5,10 @@ import { formatCurrency } from "@/shared/lib/utils";
 import { ScrollArea } from "@/shared/components";
 import { Trash2, Plus, Minus, ShoppingBag, Truck, Store } from "lucide-react";
 import Link from "next/link";
+import { useTenantRoutes } from "@/shared/lib/tenant-routing";
 
 export function OrderSummary() {
+  const routes = useTenantRoutes();
   const items = useCartStore((s) => s.items);
   const deliveryType = useCartStore((s) => s.deliveryType);
   const setDeliveryType = useCartStore((s) => s.setDeliveryType);
@@ -33,7 +35,7 @@ export function OrderSummary() {
           </p>
         </div>
         <Link
-          href="/catalogo"
+          href={routes.getCatalogHref()}
           className="inline-flex items-center justify-center bg-brand-primary hover:bg-brand-primary-hover text-white text-xs font-black uppercase tracking-wider py-3.5 px-7 rounded-full shadow-md transition-all active:scale-95 cursor-pointer"
         >
           Explorar el Menú

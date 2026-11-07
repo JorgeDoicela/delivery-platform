@@ -55,7 +55,7 @@ export function BranchMapViewer({
     if (!mapRef.current) return;
     mapRef.current.flyTo({
       center: [longitude, latitude],
-      zoom: 16.5,
+      zoom: 16,
       speed: 1.4,
       curve: 1.2,
       essential: true,
@@ -75,7 +75,7 @@ export function BranchMapViewer({
       center: [longitude, latitude],
       zoom: 16,
       maxZoom: 19,
-      minZoom: 11,
+      minZoom: 10,
       pitchWithRotate: false,
       dragRotate: false,
     });
@@ -85,22 +85,17 @@ export function BranchMapViewer({
       "top-right"
     );
 
-    // Contenedor DOM enriquecido con la foto del local sobre la flecha/pin
+    // Pin compacto sobre la ubicación con miniatura circular limpia
     const markerEl = document.createElement("div");
     markerEl.className = "branch-marker-container flex flex-col items-center select-none cursor-pointer";
+    markerEl.setAttribute("title", branchName);
+    markerEl.setAttribute("aria-label", `Ubicación de ${branchName}`);
     markerEl.innerHTML = `
-      <div class="relative w-24 h-16 sm:w-28 sm:h-18 rounded-2xl overflow-hidden border-2.5 border-white shadow-2xl bg-neutral-900 transition-transform duration-200 hover:scale-105">
+      <div class="relative w-9 h-9 rounded-full overflow-hidden border-2 border-white shadow-lg bg-neutral-900 shrink-0">
         <img src="${imageUrl}" alt="${branchName}" class="w-full h-full object-cover" />
-        <div class="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent"></div>
-        <div class="absolute bottom-1 left-1 right-1 text-center">
-          <span class="text-[9px] font-black text-white uppercase tracking-tight block truncate drop-shadow-md">
-            ${branchName}
-          </span>
-        </div>
       </div>
-      <!-- Puntero / Flecha de ubicación que señala las coordenadas exactas -->
-      <div class="w-0 h-0 border-l-[7px] border-l-transparent border-r-[7px] border-r-transparent border-t-[9px] border-t-white -mt-0.5 filter drop-shadow-md"></div>
-      <div class="w-3.5 h-3.5 rounded-full bg-brand-primary border-2 border-white shadow-md -mt-1.5"></div>
+      <div class="w-0 h-0 border-l-[4px] border-l-transparent border-r-[4px] border-r-transparent border-t-[6px] border-t-white -mt-0.5 filter drop-shadow-sm"></div>
+      <div class="w-2 h-2 rounded-full bg-brand-primary border-1.5 border-white shadow-xs -mt-1"></div>
     `;
 
     markerEl.addEventListener("click", () => {

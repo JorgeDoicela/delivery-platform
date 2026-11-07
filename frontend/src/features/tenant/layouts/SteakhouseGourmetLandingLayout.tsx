@@ -17,6 +17,7 @@ import {
   CatalogSection,
 } from "@/features/catalog";
 import type { TenantStorefrontConfigDto } from "@/shared/types/api";
+import { useTenantRoutes } from "@/shared/lib/tenant-routing";
 
 interface SteakhouseGourmetLandingLayoutProps {
   tenant: TenantStorefrontConfigDto | null | undefined;
@@ -25,6 +26,7 @@ interface SteakhouseGourmetLandingLayoutProps {
 export function SteakhouseGourmetLandingLayout({
   tenant,
 }: SteakhouseGourmetLandingLayoutProps) {
+  const routes = useTenantRoutes(tenant?.slug);
   const slides = tenant?.heroSlides ?? [];
   const primarySlide = slides[0];
 
@@ -93,7 +95,7 @@ export function SteakhouseGourmetLandingLayout({
               </a>
 
               <Link
-                href="/sucursales"
+                href={routes.getSucursalesHref()}
                 className="inline-flex items-center gap-2 bg-white/5 hover:bg-white/10 text-white font-bold text-xs uppercase tracking-wider px-6 py-4 rounded-full border border-white/20 transition-all backdrop-blur-md"
               >
                 <MapPin className="w-4 h-4 text-emerald-400" />
@@ -192,7 +194,7 @@ export function SteakhouseGourmetLandingLayout({
               Ver Menú & Cortes
             </a>
             <Link
-              href="/login"
+              href={routes.getLoginHref()}
               className="px-4 py-2 rounded-full bg-emerald-600 hover:bg-emerald-500 text-white font-bold uppercase tracking-wider text-[11px] transition-colors"
             >
               Acceso Clientes / Staff

@@ -6,6 +6,7 @@ import { ArrowLeft, Clock, Truck, AlertCircle, RefreshCw } from 'lucide-react';
 import { StatusTimeline } from './StatusTimeline';
 import { OrderMap } from './OrderMap';
 import { useOrderTracking } from '../hooks/useOrderTracking';
+import { useTenantRoutes } from '@/shared/lib/tenant-routing';
 
 const statusLabels: Record<OrderStatus, string> = {
   [OrderStatus.Created]: 'Pedido Registrado',
@@ -24,6 +25,7 @@ interface OrderTrackingViewProps {
 
 export function OrderTrackingView({ orderId }: OrderTrackingViewProps) {
   const router = useRouter();
+  const routes = useTenantRoutes();
   const { order, loading, error, driverLocation, refresh } = useOrderTracking({ orderId });
 
   if (loading) {
@@ -50,7 +52,7 @@ export function OrderTrackingView({ orderId }: OrderTrackingViewProps) {
             Reintentar
           </button>
           <button
-            onClick={() => router.push('/')}
+            onClick={() => router.push(routes.getHomeHref())}
             className="inline-flex items-center gap-2 px-5 py-2.5 bg-brand-primary hover:bg-brand-primary-hover text-white text-xs uppercase tracking-wider rounded-full font-black transition-all shadow-md active:scale-95 cursor-pointer"
           >
             <ArrowLeft className="h-3.5 w-3.5" />
@@ -64,8 +66,8 @@ export function OrderTrackingView({ orderId }: OrderTrackingViewProps) {
   return (
     <div className="w-full space-y-6">
       <button
-        onClick={() => router.push('/')}
-        className="inline-flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-text-muted hover:text-brand-primary transition-colors"
+        onClick={() => router.push(routes.getHomeHref())}
+        className="inline-flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-text-muted hover:text-brand-primary transition-colors cursor-pointer"
       >
         <ArrowLeft className="h-4 w-4" />
         Volver a la carta

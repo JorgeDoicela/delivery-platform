@@ -75,6 +75,7 @@ export const RESERVED_TENANT_SLUGS = new Set([
   "rastreo",
   "track",
   "sucursales",
+  "sucursal",
   "terminos",
   "privacidad",
   "terms",

@@ -1,12 +1,14 @@
 "use client";
 
-import React from "react";
+import React, { Suspense } from "react";
 import Link from "next/link";
-import { ChevronRight, FileText, ShieldCheck, Building2 } from "lucide-react";
+import { ChevronRight, FileText, ShieldCheck, Building2, Loader2 } from "lucide-react";
 import { useCurrentTenantQuery } from "@/features/tenant";
+import { useTenantRoutes } from "@/shared/lib/tenant-routing";
 
-export default function TerminosLegalesPage() {
+function TerminosLegalesContent() {
   const { data: tenant } = useCurrentTenantQuery();
+  const routes = useTenantRoutes(tenant?.slug);
 
   const brandName = tenant?.name || "Mesafy";
   const businessName = tenant?.businessName || "Mesafy Technologies S.A.S.";
@@ -21,7 +23,7 @@ export default function TerminosLegalesPage() {
     <div className="w-full max-w-[1000px] mx-auto px-4 sm:px-8 py-8 sm:py-12 space-y-8">
       {/* Miga de Pan */}
       <nav aria-label="Miga de pan" className="flex items-center gap-2 text-xs font-semibold text-neutral-500">
-        <Link href="/" className="hover:text-brand-primary transition-colors">
+        <Link href={routes.getHomeHref()} className="hover:text-brand-primary transition-colors">
           Inicio
         </Link>
         <ChevronRight className="w-3.5 h-3.5 text-neutral-400" />
@@ -95,10 +97,10 @@ export default function TerminosLegalesPage() {
           <div className="pt-4 border-t border-neutral-100 flex flex-wrap items-center justify-between text-xs text-neutral-400 gap-3">
             <span>Última actualización: Octubre 2026</span>
             <div className="flex items-center gap-4">
-              <Link href="/privacidad" className="hover:text-brand-primary underline">
+              <Link href={routes.getPrivacyHref()} className="hover:text-brand-primary underline">
                 Ver Política de Privacidad
               </Link>
-              <Link href="/sucursales" className="hover:text-brand-primary underline">
+              <Link href={routes.getSucursalesHref()} className="hover:text-brand-primary underline">
                 Ver Locales
               </Link>
             </div>
@@ -109,3 +111,19 @@ export default function TerminosLegalesPage() {
   );
 }
 
+export default function TerminosLegalesPage() {
+  return (
+    <Suspense
+      fallback={
+        <div className="flex flex-col items-center justify-center min-h-[40vh] text-text-muted gap-2">
+          <Loader2 className="w-6 h-6 animate-spin text-brand-primary" />
+          <span className="text-xs font-semibold uppercase tracking-wider">
+            Cargando términos legales...
+          </span>
+        </div>
+      }
+    >
+      <TerminosLegalesContent />
+    </Suspense>
+  );
+}

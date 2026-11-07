@@ -11,6 +11,7 @@ import { registerSchema, type RegisterFormData } from "../schemas/registerSchema
 import { useAuthStore } from "../store/useAuthStore";
 import { useCurrentTenantQuery, useTenantStore } from "@/features/tenant";
 import { GoogleSignInButton } from "./GoogleSignInButton";
+import { useTenantRoutes, resolveTenantRouting } from "@/shared/lib/tenant-routing";
 
 interface RegisterFormProps {
   redirectUrl?: string;
@@ -28,6 +29,7 @@ export function RegisterForm({
   const router = useRouter();
   const registerAction = useAuthStore((s) => s.register);
   const { data: tenant } = useCurrentTenantQuery();
+  const routes = useTenantRoutes(tenant?.slug);
   const brandName = tenant?.name || "La Granjita";
   const brandTagline = tenant?.tagline || "Asadero";
   const brandLogo = tenant?.logoUrl || "/images/shared/placeholders/logo-default.png";
@@ -70,8 +72,13 @@ export function RegisterForm({
 
       const loggedUser = useAuthStore.getState().user;
       const tenantSlug = loggedUser?.tenantSlug || activeTenantSlug || "la-granjita";
+      const routing = resolveTenantRouting({
+        explicitSlug: tenantSlug,
+        pathname: typeof window !== "undefined" ? window.location.pathname : "/",
+        hostname: typeof window !== "undefined" ? window.location.hostname : undefined,
+      });
 
-      const destination = redirectUrl || `/${tenantSlug}`;
+      const destination = redirectUrl || routing.getHomeHref();
       router.push(destination);
       router.refresh();
     } else {
@@ -333,7 +340,7 @@ export function RegisterForm({
             </button>
           ) : (
             <Link
-              href="/login?tab=login"
+              href={routes.getLoginHref({ tab: "login", redirect: redirectUrl })}
               className="font-bold text-brand-primary hover:underline"
             >
               Inicia sesión aquí

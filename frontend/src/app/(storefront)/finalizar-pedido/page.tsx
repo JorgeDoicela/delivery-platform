@@ -1,4 +1,6 @@
+import { Suspense } from "react";
 import { CheckoutForm } from "@/features/checkout";
+import { Loader2 } from "lucide-react";
 
 export const metadata = {
   title: "Finalizar Pedido | Checkout",
@@ -17,7 +19,18 @@ export default function FinalizarPedidoPage() {
         </p>
       </div>
 
-      <CheckoutForm />
+      <Suspense
+        fallback={
+          <div className="flex flex-col items-center justify-center min-h-[40vh] text-text-muted gap-2">
+            <Loader2 className="w-6 h-6 animate-spin text-brand-primary" />
+            <span className="text-xs font-semibold uppercase tracking-wider">
+              Cargando formulario de checkout...
+            </span>
+          </div>
+        }
+      >
+        <CheckoutForm />
+      </Suspense>
     </div>
   );
 }

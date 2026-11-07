@@ -4,9 +4,11 @@ import React from "react";
 import { useRouter } from "next/navigation";
 import { ArrowRight } from "lucide-react";
 import { useCartStore } from "../store/useCartStore";
+import { useTenantRoutes } from "@/shared/lib/tenant-routing";
 
 export function CartDrawerSummary() {
   const router = useRouter();
+  const routes = useTenantRoutes();
 
   const getSubtotal = useCartStore((s) => s.getSubtotal);
   const getDeliveryFee = useCartStore((s) => s.getDeliveryFee);
@@ -21,7 +23,7 @@ export function CartDrawerSummary() {
 
   const handleCheckout = () => {
     closeCart();
-    router.push("/finalizar-pedido");
+    router.push(routes.getCheckoutHref());
   };
 
   return (

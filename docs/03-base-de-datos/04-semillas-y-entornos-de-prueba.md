@@ -51,9 +51,8 @@ En entornos de desarrollo local, todas las cuentas predeterminadas se crean con 
 * **Propuesta Gastronomica:** Asadero tradicional de pollos a la brasa y carnes al carbon en Quito.
 * **Plantilla Visual:** `asadero-clasico`
 * **Colores de Marca:** Primario `#E4002B` (rojo vivo), Hover `#C40024`, Acento `#F59E0B` (ambar calido).
-* **Sucursales Activas:**
-  1. `Sucursal #1 (Norte)`: Ubicada en Av. Amazonas y Gaspar de Villarroel (`-0.1782, -78.4845`). Poligono GiST de 8 vertices cubriendo Quito Norte (La Carolina, Inaquito, El Batan).
-  2. `Sucursal #2 (Sur)`: Ubicada en Av. Rodrigo de Chavez y 5 de Junio (`-0.2312, -78.5189`). Poligono GiST de 6 vertices cubriendo Quito Sur (Villa Flora, La Magdalena, San Bartolo).
+* **Sucursal Activa:**
+  1. `Guamaní` (Establecimiento SRI 001): Ubicada en Clodoveo Carrión, Sector Guamaní (Quito Sur) (`-0.332280, -78.557082`). Polígono GiST cubriendo el sur de Quito (Guamaní, Nueva Aurora, Ciudad Quitumbe). Capacidad de hornos configurada a 15 órdenes por ventana de 20 minutos.
 
 ### 4.2. Tenant Secundario: Brasas del Valle (`brasas-del-valle`)
 * **Propuesta Gastronomica:** Parrilla argentina gourmet y cortes Angus madurados.

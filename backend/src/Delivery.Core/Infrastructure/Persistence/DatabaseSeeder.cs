@@ -256,7 +256,7 @@ public static partial class DatabaseSeeder
             }
         }
 
-        // Sucursales y Geocercas PostGIS (establecimientos SRI 001 y 002)
+        // Sucursal única y Geocerca PostGIS (establecimiento SRI 001 - Guamaní)
         var branches = await context.Branches
             .IgnoreQueryFilters()
             .Where(b => b.TenantId == tenant.Id)
@@ -273,16 +273,6 @@ public static partial class DatabaseSeeder
                 new Coordinate(-78.5200, -0.3700),
                 new Coordinate(-78.5900, -0.3700),
                 new Coordinate(-78.5900, -0.2900)
-            });
-
-            var branch2Location = GeometryFactory.CreatePoint(new Coordinate(-78.5180, -0.2300));
-            var branch2Polygon = GeometryFactory.CreatePolygon(new[]
-            {
-                new Coordinate(-78.5400, -0.2001),
-                new Coordinate(-78.4900, -0.2001),
-                new Coordinate(-78.4900, -0.2600),
-                new Coordinate(-78.5400, -0.2600),
-                new Coordinate(-78.5400, -0.2001)
             });
 
             branches = new List<Branch>
@@ -302,27 +292,38 @@ public static partial class DatabaseSeeder
                     OpeningTime = "10:30",
                     ClosingTime = "21:30",
                     IsActive = true
-                },
-                new()
-                {
-                    TenantId = tenant.Id,
-                    Name = "Sucursal #2 (Sur)",
-                    Address = "Av. Rodrigo de Chávez y Maldonado",
-                    Phone = "0987654322",
-                    LocationPoint = branch2Location,
-                    CoveragePolygon = branch2Polygon,
-                    MaxOrdersPerSlot = 15,
-                    SriEstablishmentCode = "002",
-                    SriEmissionPoint = "001",
-                    NextInvoiceSequence = 1,
-                    OpeningTime = "10:30",
-                    ClosingTime = "21:30",
-                    IsActive = true
                 }
             };
 
             await context.Branches.AddRangeAsync(branches);
             await context.SaveChangesAsync();
+        }
+        else
+        {
+            // Limpieza de sucursal obsoleta/demo 'Sucursal #2 (Sur)' en bases de datos existentes
+            var obsoleteBranches = branches.Where(b => b.Name.Contains("Sucursal #2") || b.SriEstablishmentCode == "002").ToList();
+            foreach (var obsolete in obsoleteBranches)
+            {
+                var hasOrders = await context.Orders.IgnoreQueryFilters().AnyAsync(o => o.BranchId == obsolete.Id);
+                if (!hasOrders)
+                {
+                    var relatedTables = await context.DiningTables.IgnoreQueryFilters().Where(dt => dt.BranchId == obsolete.Id).ToListAsync();
+                    context.DiningTables.RemoveRange(relatedTables);
+
+                    var relatedBranchProducts = await context.BranchProducts.IgnoreQueryFilters().Where(bp => bp.BranchId == obsolete.Id).ToListAsync();
+                    context.BranchProducts.RemoveRange(relatedBranchProducts);
+
+                    var relatedMovements = await context.InventoryMovements.IgnoreQueryFilters().Where(im => im.BranchId == obsolete.Id).ToListAsync();
+                    context.InventoryMovements.RemoveRange(relatedMovements);
+
+                    var relatedInventory = await context.InventoryItems.IgnoreQueryFilters().Where(ii => ii.BranchId == obsolete.Id).ToListAsync();
+                    context.InventoryItems.RemoveRange(relatedInventory);
+
+                    context.Branches.Remove(obsolete);
+                    await context.SaveChangesAsync();
+                    branches.Remove(obsolete);
+                }
+            }
         }
 
         var primaryBranch = branches[0];

@@ -8,7 +8,7 @@ import { LogOut } from "lucide-react";
 import { useCurrentTenantQuery, useTenantStore, RESERVED_TENANT_SLUGS } from "@/features/tenant";
 import { AuthGuard, UserRole, useAuthStore } from "@/features/auth";
 import { ThemeToggle } from "@/shared/components/ThemeToggle";
-import { isPlatformHost } from "@/shared/lib/api-client";
+import { useTenantRoutes } from "@/shared/lib/tenant-routing";
 
 function DriverLayoutContent({
   children,
@@ -29,10 +29,11 @@ function DriverLayoutContent({
   const logout = useAuthStore((s) => s.logout);
 
   const activeTenantSlug = urlSlug || tenantSlug || user?.tenantSlug || "la-granjita";
+  const routes = useTenantRoutes(activeTenantSlug);
 
   const handleLogout = async () => {
     await logout();
-    router.push("/login");
+    router.push(routes.getLoginHref());
   };
 
   useEffect(() => {
@@ -44,8 +45,7 @@ function DriverLayoutContent({
   const { data: tenant } = useCurrentTenantQuery(activeTenantSlug);
   const brandName = tenant?.name || "La Granjita";
   const brandLogo = tenant?.logoUrl || "/images/shared/placeholders/logo-default.png";
-  const isPlatform = typeof window !== "undefined" ? isPlatformHost(window.location.hostname) : true;
-  const brandHomeHref = isPlatform ? `/${activeTenantSlug}` : "/";
+  const brandHomeHref = routes.getHomeHref();
 
   return (
     <AuthGuard allowedRoles={[UserRole.SuperAdmin, UserRole.Driver]}>

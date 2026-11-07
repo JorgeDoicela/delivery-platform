@@ -2,7 +2,7 @@
 
 import { Suspense, useEffect, useState } from "react";
 import Link from "next/link";
-import { useSearchParams } from "next/navigation";
+import { useRouter, useSearchParams, usePathname } from "next/navigation";
 import { LoginForm, RegisterForm, useAuthStore } from "@/features/auth";
 import {
   ChevronRight,
@@ -15,9 +15,16 @@ import {
   ArrowRight,
 } from "lucide-react";
 import { useIsMounted } from "@/shared/hooks/useIsMounted";
-import { useCurrentTenantQuery } from "@/features/tenant";
+import { useCurrentTenantQuery, RESERVED_TENANT_SLUGS } from "@/features/tenant";
+import { useTenantRoutes } from "@/shared/lib/tenant-routing";
 
-function LoginContent() {
+interface LoginPageProps {
+  initialSlug?: string;
+}
+
+function LoginContent({ initialSlug }: LoginPageProps) {
+  const router = useRouter();
+  const pathname = usePathname() || "";
   const searchParams = useSearchParams();
   const redirectUrl = searchParams.get("redirect") || undefined;
   const initialMode =
@@ -26,9 +33,18 @@ function LoginContent() {
       : "login";
   const [authMode, setAuthMode] = useState<"login" | "register">(initialMode);
 
+  const rawSlug = pathname.split("/").filter(Boolean)[0];
+  const routeSlug =
+    rawSlug && !RESERVED_TENANT_SLUGS.has(rawSlug.toLowerCase())
+      ? rawSlug
+      : undefined;
+
+  const targetSlug = initialSlug || routeSlug;
+  const { data: tenant } = useCurrentTenantQuery(targetSlug);
+  const routes = useTenantRoutes(targetSlug || tenant?.slug);
+
   const isMounted = useIsMounted();
-  const { data: tenant } = useCurrentTenantQuery();
-  const brandName = tenant?.name || "Mesafy";
+  const brandName = tenant?.name || (routes.isPlatformRoot ? "Mesafy" : "Restaurante");
   const user = useAuthStore((s) => s.user);
   const isAuthenticated = useAuthStore((s) => s.isAuthenticated);
   const logout = useAuthStore((s) => s.logout);
@@ -40,13 +56,14 @@ function LoginContent() {
 
   const handleLogout = async () => {
     await logout();
+    router.push(routes.getLoginHref());
   };
 
   return (
     <div className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-12 space-y-6">
-      {/* 1. Miga de Pan (Breadcrumb estilo KFC) */}
+      {/* 1. Miga de Pan (Breadcrumb) */}
       <nav aria-label="Miga de pan" className="flex items-center gap-2 text-xs font-semibold text-neutral-500">
-        <Link href={tenant?.slug ? `/${tenant.slug}` : "/"} className="hover:text-brand-primary transition-colors">
+        <Link href={routes.getHomeHref()} className="hover:text-brand-primary transition-colors">
           Inicio
         </Link>
         <ChevronRight className="w-3.5 h-3.5 text-neutral-400" />
@@ -60,10 +77,10 @@ function LoginContent() {
         </h1>
       </div>
 
-      {/* 3. Cuadrícula de Dos Columnas estilo KFC con alineación uniforme */}
+      {/* 3. Cuadrícula de Dos Columnas con alineación uniforme */}
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 sm:gap-8 items-stretch pt-2">
-        {/* Columna Izquierda: Banner Promocional + Navegación Lateral alineada abajo */}
-        <div className="lg:col-span-4 flex flex-col justify-between gap-4 h-full">
+        {/* Columna Izquierda (en desktop) / Inferior (en móvil): Banner Promocional + Navegación Lateral */}
+        <div className="order-2 lg:order-1 lg:col-span-4 flex flex-col justify-between gap-4 h-full">
           {/* Banner de Beneficios */}
           <div className="bg-brand-primary text-white rounded-3xl p-6 shadow-sm relative overflow-hidden shrink-0">
             <span className="text-[10px] font-bold tracking-widest uppercase text-brand-accent block mb-1">
@@ -85,10 +102,10 @@ function LoginContent() {
             </button>
           </div>
 
-          {/* Menú Lateral con Iconos Limpios (Alineado al fondo al ras de la tarjeta derecha) */}
+          {/* Menú Lateral con Iconos Limpios */}
           <div className="bg-white border border-neutral-200/90 rounded-3xl p-3 shadow-xs divide-y divide-neutral-100 mt-auto">
             <Link
-              href="/rastreo"
+              href={routes.getRastreoHref()}
               className="flex items-center gap-3.5 px-4 py-3.5 rounded-2xl hover:bg-neutral-50 text-neutral-800 hover:text-brand-primary text-xs font-bold uppercase tracking-wider font-display transition-colors"
             >
               <UtensilsCrossed className="w-4 h-4 text-brand-primary shrink-0" />
@@ -96,7 +113,7 @@ function LoginContent() {
             </Link>
 
             <Link
-              href="/sucursales"
+              href={routes.getSucursalesHref()}
               className="flex items-center gap-3.5 px-4 py-3.5 rounded-2xl hover:bg-neutral-50 text-neutral-800 hover:text-brand-primary text-xs font-bold uppercase tracking-wider font-display transition-colors"
             >
               <Headphones className="w-4 h-4 text-brand-primary shrink-0" />
@@ -104,7 +121,7 @@ function LoginContent() {
             </Link>
 
             <Link
-              href="/terminos"
+              href={routes.getTermsHref()}
               className="flex items-center gap-3.5 px-4 py-3.5 rounded-2xl hover:bg-neutral-50 text-neutral-800 hover:text-brand-primary text-xs font-bold uppercase tracking-wider font-display transition-colors"
             >
               <FileText className="w-4 h-4 text-neutral-500 shrink-0" />
@@ -113,8 +130,8 @@ function LoginContent() {
           </div>
         </div>
 
-        {/* Columna Derecha: Tarjeta Blanca Principal de Estado / Formulario */}
-        <div className="lg:col-span-8 bg-white border border-neutral-200/90 rounded-3xl p-5 sm:p-10 lg:p-12 shadow-sm min-h-[380px] flex flex-col justify-center">
+        {/* Columna Derecha (en desktop) / Superior (en móvil): Tarjeta Blanca Principal de Estado / Formulario */}
+        <div className="order-1 lg:order-2 lg:col-span-8 bg-white border border-neutral-200/90 rounded-3xl p-5 sm:p-10 lg:p-12 shadow-sm min-h-[380px] flex flex-col justify-center">
           {!isMounted ? (
             <div className="flex flex-col items-center justify-center p-8 text-neutral-400 gap-2">
               <Loader2 className="w-6 h-6 animate-spin text-brand-primary" />
@@ -140,7 +157,7 @@ function LoginContent() {
               <div className="flex flex-col sm:flex-row flex-wrap items-stretch sm:items-center justify-center gap-3 pt-4 w-full sm:w-auto">
                 {(user.role === "SuperAdmin" || Number(user.role) === 1) && (
                   <Link
-                    href="/superadmin"
+                    href={routes.getSuperAdminHref()}
                     className="bg-neutral-950 hover:bg-neutral-800 active:scale-95 text-white font-black text-xs uppercase tracking-wider font-display px-6 py-3 rounded-full shadow-md transition-all inline-flex items-center justify-center gap-2 min-h-[44px]"
                   >
                     <span>Consola SuperAdmin</span>
@@ -153,7 +170,7 @@ function LoginContent() {
                   Number(user.role) === 2 ||
                   Number(user.role) === 1) && (
                   <Link
-                    href="/admin/personalizacion"
+                    href={routes.getAdminHref("personalizacion")}
                     className="bg-brand-primary hover:bg-brand-primary-hover active:scale-95 text-white font-black text-xs uppercase tracking-wider font-display px-6 py-3 rounded-full shadow-md shadow-brand-primary/20 transition-all inline-flex items-center justify-center gap-2 min-h-[44px]"
                   >
                     <span>Panel de Marca</span>
@@ -163,7 +180,7 @@ function LoginContent() {
 
                 {(user.role === "Driver" || Number(user.role) === 6) && (
                   <Link
-                    href={`/${user.tenantSlug || tenant?.slug || "la-granjita"}/repartidor`}
+                    href={routes.getDriverHref()}
                     className="bg-brand-primary hover:bg-brand-primary-hover active:scale-95 text-white font-black text-xs uppercase tracking-wider font-display px-6 py-3 rounded-full shadow-md shadow-brand-primary/20 transition-all inline-flex items-center justify-center gap-2 min-h-[44px]"
                   >
                     <span>Ir a Reparto Móvil</span>
@@ -178,7 +195,7 @@ function LoginContent() {
                   Number(user.role) === 1 ||
                   Number(user.role) === 2) && (
                   <Link
-                    href={`/${user.tenantSlug || tenant?.slug || "la-granjita"}/cocina`}
+                    href={routes.getKitchenHref()}
                     className="bg-neutral-800 hover:bg-neutral-700 active:scale-95 text-white font-black text-xs uppercase tracking-wider font-display px-6 py-3 rounded-full shadow-sm transition-all inline-flex items-center justify-center gap-2 min-h-[44px]"
                   >
                     <span>Ir a Cocina KDS</span>
@@ -256,7 +273,7 @@ function LoginContent() {
   );
 }
 
-export default function LoginPage() {
+export default function LoginPage({ initialSlug }: LoginPageProps = {}) {
   return (
     <Suspense
       fallback={
@@ -268,7 +285,7 @@ export default function LoginPage() {
         </div>
       }
     >
-      <LoginContent />
+      <LoginContent initialSlug={initialSlug} />
     </Suspense>
   );
 }
