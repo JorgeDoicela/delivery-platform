@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect } from 'react';
 import { RefreshCw, AlertCircle, PackageCheck, ChefHat, BarChart3 } from 'lucide-react';
 import { useDriverStore } from '../store/useDriverStore';
 import { useDriverHub } from '../hooks/useDriverHub';
@@ -32,8 +32,6 @@ export function DriverDeliveryView({ initialOrderId }: DriverDeliveryViewProps) 
     setActiveTab,
   } = useDriverStore();
 
-  const [isRefreshing, setIsRefreshing] = useState(false);
-
   // Carga inicial del panel operativo
   useEffect(() => {
     fetchDashboard();
@@ -50,33 +48,26 @@ export function DriverDeliveryView({ initialOrderId }: DriverDeliveryViewProps) 
   // Suscripción en tiempo real a SignalR (Cocina y Despacho según sucursal activa)
   const selectedBranchId = useDriverStore((s) => s.selectedBranchId);
   const effectiveBranchId = selectedBranchId !== null ? selectedBranchId : profile?.branchId;
-  useDriverHub({ branchId: effectiveBranchId, enabled: Boolean(profile) });
-
-  const handleManualRefresh = async () => {
-    setIsRefreshing(true);
-    try {
-      await fetchDashboard();
-    } finally {
-      setIsRefreshing(false);
-    }
-  };
+  const { connectionStatus } = useDriverHub({
+    branchId: effectiveBranchId,
+    enabled: Boolean(profile),
+  });
 
   const activeCount = activeOrders.length;
   const availableCount = availableOrders.length;
 
   return (
-    <div className="space-y-4 w-full max-w-4xl mx-auto pb-10">
+    <div className="space-y-4 w-full max-w-4xl mx-auto pb-24 sm:pb-10">
       {/* Cabecera del Repartidor */}
       <DriverHeader
         profile={profile}
         shiftSummary={shiftSummary}
         onToggleAvailability={toggleAvailability}
-        onRefresh={handleManualRefresh}
-        isRefreshing={isRefreshing}
+        connectionStatus={connectionStatus}
       />
 
-      {/* Barra de Navegación por Pestañas Táctiles */}
-      <div className="bg-surface-card border border-surface-border rounded-full p-1.5 flex items-center justify-between gap-1 shadow-xs text-xs font-bold uppercase tracking-wider">
+      {/* Barra de Navegación por Pestañas (Visible en tablet/escritorio; en móvil gobierna el DriverBottomNav) */}
+      <div className="hidden sm:flex bg-surface-card border border-surface-border rounded-full p-1.5 items-center justify-between gap-1 shadow-xs text-xs font-bold uppercase tracking-wider">
         <button
           type="button"
           onClick={() => setActiveTab('active')}

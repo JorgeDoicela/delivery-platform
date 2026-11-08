@@ -10,6 +10,7 @@ import { Loader2, AlertCircle, Eye, EyeOff } from "lucide-react";
 import { registerSchema, type RegisterFormData } from "../schemas/registerSchema";
 import { useAuthStore } from "../store/useAuthStore";
 import { useCurrentTenantQuery, useTenantStore } from "@/features/tenant";
+import { resolvePostLoginRedirect } from "../lib/redirectByRole";
 import { GoogleSignInButton } from "./GoogleSignInButton";
 import { useTenantRoutes, resolveTenantRouting } from "@/shared/lib/tenant-routing";
 
@@ -78,7 +79,11 @@ export function RegisterForm({
         hostname: typeof window !== "undefined" ? window.location.hostname : undefined,
       });
 
-      const destination = redirectUrl || routing.getHomeHref();
+      const destination = resolvePostLoginRedirect({
+        user: loggedUser,
+        redirectUrl,
+        routing,
+      });
       router.push(destination);
       router.refresh();
     } else {

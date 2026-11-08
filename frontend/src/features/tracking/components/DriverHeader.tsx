@@ -1,25 +1,24 @@
 'use client';
 
 import { useState } from 'react';
-import { RefreshCw, Bike, Car, CheckCircle2, PauseCircle, DollarSign, Package, Building2 } from 'lucide-react';
+import { Bike, Car, CheckCircle2, PauseCircle, DollarSign, Package, Building2 } from 'lucide-react';
 import { DriverProfileResponse, DriverShiftSummaryDto } from '@/shared/types/api';
 import { useBranchesQuery, useCurrentTenantQuery } from '@/features/tenant';
 import { useDriverStore } from '../store/useDriverStore';
+import type { DriverConnectionStatus } from '../hooks/useDriverHub';
 
 interface DriverHeaderProps {
   profile: DriverProfileResponse | null;
   shiftSummary: DriverShiftSummaryDto;
   onToggleAvailability: (isAvailable: boolean) => Promise<boolean>;
-  onRefresh: () => void;
-  isRefreshing: boolean;
+  connectionStatus?: DriverConnectionStatus;
 }
 
 export function DriverHeader({
   profile,
   shiftSummary,
   onToggleAvailability,
-  onRefresh,
-  isRefreshing,
+  connectionStatus = 'connected',
 }: DriverHeaderProps) {
   const [isToggling, setIsToggling] = useState(false);
   const isAvailable = profile?.isAvailable ?? true;
@@ -93,15 +92,31 @@ export function DriverHeader({
 
         {/* Acciones y Estado de Disponibilidad */}
         <div className="flex items-center gap-2 self-end sm:self-auto shrink-0">
-          <button
-            type="button"
-            onClick={onRefresh}
-            disabled={isRefreshing}
-            className="p-2.5 rounded-full bg-surface-canvas hover:bg-surface-card-hover border border-surface-border text-text-muted hover:text-text-strong transition-colors cursor-pointer"
-            title="Sincronizar información"
-          >
-            <RefreshCw className={`w-4 h-4 ${isRefreshing ? 'animate-spin text-brand-primary' : ''}`} />
-          </button>
+          {connectionStatus === 'connected' ? (
+            <div
+              className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-status-success/15 border border-status-success/30 text-status-success text-[11px] font-bold uppercase tracking-wider font-mono select-none shadow-xs"
+              title="Sincronización en tiempo real activa vía WebSockets"
+            >
+              <span className="w-2 h-2 rounded-full bg-status-success animate-pulse" />
+              <span>En Vivo</span>
+            </div>
+          ) : connectionStatus === 'reconnecting' ? (
+            <div
+              className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-status-warning/15 border border-status-warning/30 text-status-warning text-[11px] font-bold uppercase tracking-wider font-mono select-none shadow-xs"
+              title="Reconectando con el servidor..."
+            >
+              <span className="w-2 h-2 rounded-full bg-status-warning animate-ping" />
+              <span>Reconectando</span>
+            </div>
+          ) : (
+            <div
+              className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-surface-canvas border border-surface-border text-text-muted text-[11px] font-bold uppercase tracking-wider font-mono select-none shadow-xs"
+              title="Sincronización automática activa"
+            >
+              <span className="w-2 h-2 rounded-full bg-neutral-400" />
+              <span>En Línea</span>
+            </div>
+          )}
 
           <button
             type="button"

@@ -4,10 +4,10 @@ import { useState, useMemo } from "react";
 import { useKitchenOrders } from "../hooks/useKitchenOrders";
 import { KitchenTicketCard } from "./KitchenTicketCard";
 import { OrderStatus } from "@/shared/types/api";
-import { RefreshCw, Volume2, Building2 } from "lucide-react";
+import { Volume2, Building2 } from "lucide-react";
 import { kitchenAlertSound } from "../lib/sound";
 import { useBranchesQuery, useCurrentTenantQuery } from "@/features/tenant";
-import { useAuthStore } from "@/features/auth";
+import { useAuthStore, UserRole } from "@/features/auth";
 
 export function KitchenView() {
   const { data: tenant } = useCurrentTenantQuery();
@@ -24,15 +24,29 @@ export function KitchenView() {
     [branchesData, tenant?.branches]
   );
 
+  const user = useAuthStore((s) => s.user);
+  const isBranchScopedStaff =
+    (user?.role === "KitchenStaff" ||
+      user?.role === UserRole.KitchenStaff ||
+      user?.role === "Cashier" ||
+      user?.role === UserRole.Cashier ||
+      Number(user?.role) === 5 ||
+      Number(user?.role) === 4) &&
+    Boolean(userBranchId);
+
   const [selectedBranchId, setSelectedBranchId] = useState<number>(userBranchId ?? 1);
   const branchId: number =
-    branches.length > 0 && !branches.some((b) => b.id === selectedBranchId)
-      ? (userBranchId && branches.some((b) => b.id === userBranchId)
-          ? userBranchId
-          : branches[0].id)
-      : selectedBranchId;
+    isBranchScopedStaff && userBranchId
+      ? userBranchId
+      : branches.length > 0 && !branches.some((b) => b.id === selectedBranchId)
+        ? (userBranchId && branches.some((b) => b.id === userBranchId)
+            ? userBranchId
+            : branches[0].id)
+        : selectedBranchId;
 
-  const { orders, loading, error, connectionStatus, refresh, advanceOrderStatus } =
+  const activeBranch = branches.find((b) => b.id === branchId);
+
+  const { orders, error, connectionStatus, advanceOrderStatus } =
     useKitchenOrders(branchId);
 
   const confirmedOrders = orders.filter((o) => o.status === OrderStatus.Confirmed);
@@ -56,24 +70,36 @@ export function KitchenView() {
         </div>
 
         <div className="flex flex-wrap items-center gap-2">
-          <div className="flex items-center gap-1.5 bg-surface-card border border-surface-border rounded-full px-3.5 py-1.5 shadow-xs">
-            <Building2 className="h-4 w-4 text-brand-primary" />
-            <select
-              value={branchId}
-              onChange={(e) => setSelectedBranchId(Number(e.target.value))}
-              className="bg-transparent text-xs text-text-strong font-bold uppercase tracking-wider focus:outline-none cursor-pointer"
-            >
-              {branches.map((branch) => (
-                <option
-                  key={branch.id}
-                  value={branch.id}
-                  className="bg-surface-card text-text-strong"
-                >
-                  {branch.name}
-                </option>
-              ))}
-            </select>
-          </div>
+          {isBranchScopedStaff ? (
+            <div className="flex items-center gap-2 bg-surface-card border border-surface-border rounded-full px-3.5 py-1.5 shadow-xs">
+              <Building2 className="h-4 w-4 text-brand-primary" />
+              <span className="text-xs text-text-strong font-bold uppercase tracking-wider">
+                {activeBranch?.name || `Sucursal #${branchId}`}
+              </span>
+              <span className="text-[9px] bg-brand-primary/10 text-brand-primary font-bold uppercase px-2 py-0.5 rounded-full font-mono">
+                Sede Asignada
+              </span>
+            </div>
+          ) : (
+            <div className="flex items-center gap-1.5 bg-surface-card border border-surface-border rounded-full px-3.5 py-1.5 shadow-xs">
+              <Building2 className="h-4 w-4 text-brand-primary" />
+              <select
+                value={branchId}
+                onChange={(e) => setSelectedBranchId(Number(e.target.value))}
+                className="bg-transparent text-xs text-text-strong font-bold uppercase tracking-wider focus:outline-none cursor-pointer"
+              >
+                {branches.map((branch) => (
+                  <option
+                    key={branch.id}
+                    value={branch.id}
+                    className="bg-surface-card text-text-strong"
+                  >
+                    {branch.name}
+                  </option>
+                ))}
+              </select>
+            </div>
+          )}
 
           <button
             onClick={() => kitchenAlertSound.playNewOrderChime()}
@@ -84,16 +110,8 @@ export function KitchenView() {
             <span className="hidden sm:inline">Probar Sonido</span>
           </button>
 
-          <button
-            onClick={() => refresh()}
-            className="flex items-center gap-1.5 px-3.5 py-1.5 bg-surface-card hover:bg-surface-card-hover border border-surface-border rounded-full text-xs font-bold uppercase tracking-wider text-text-strong transition-colors cursor-pointer shadow-xs"
-          >
-            <RefreshCw className={`h-4 w-4 ${loading ? "animate-spin text-brand-primary" : ""}`} />
-            <span className="hidden sm:inline">Refrescar</span>
-          </button>
-
           <div
-            className={`flex items-center gap-1.5 px-3.5 py-1.5 rounded-full text-xs font-bold uppercase tracking-wider border ${
+            className={`flex items-center gap-1.5 px-3.5 py-1.5 rounded-full text-xs font-bold uppercase tracking-wider border shadow-xs ${
               connectionStatus === "connected"
                 ? "bg-status-success/15 text-status-success border-status-success/30"
                 : connectionStatus === "connecting"
@@ -110,7 +128,13 @@ export function KitchenView() {
                   : "bg-status-danger"
               }`}
             />
-            <span className="capitalize">{connectionStatus}</span>
+            <span>
+              {connectionStatus === "connected"
+                ? "En Vivo • KDS"
+                : connectionStatus === "connecting"
+                ? "Reconectando..."
+                : "Sin Conexión"}
+            </span>
           </div>
         </div>
       </div>

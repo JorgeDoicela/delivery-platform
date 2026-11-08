@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { useForm, useWatch } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -11,6 +11,7 @@ import { DeliveryInfoSection } from "./DeliveryInfoSection";
 import { BillingInfoSection } from "./BillingInfoSection";
 import { PaymentMethodSection } from "./PaymentMethodSection";
 import { useCartStore } from "@/features/cart";
+import { useAuthStore } from "@/features/auth";
 import { apiClient } from "@/shared/lib/api-client";
 import { formatCurrency } from "@/shared/lib/utils";
 import { useTenantRoutes } from "@/shared/lib/tenant-routing";
@@ -33,6 +34,7 @@ export function CheckoutForm() {
   const [submitError, setSubmitError] = useState<string | null>(null);
 
   const total = getTotal();
+  const user = useAuthStore((s) => s.user);
 
   const {
     register,
@@ -43,9 +45,9 @@ export function CheckoutForm() {
   } = useForm<CheckoutFormData>({
     resolver: zodResolver(checkoutSchema),
     defaultValues: {
-      customerName: "",
+      customerName: user?.fullName || "",
       customerPhone: "",
-      customerEmail: "",
+      customerEmail: user?.email || "",
       identificationType: "CONSUMIDOR_FINAL",
       identificationNumber: "9999999999999",
       addressStreet: "",
@@ -55,6 +57,15 @@ export function CheckoutForm() {
       cashAmountPaid: undefined,
     },
   });
+
+  useEffect(() => {
+    if (user?.fullName) {
+      setValue("customerName", user.fullName);
+    }
+    if (user?.email) {
+      setValue("customerEmail", user.email);
+    }
+  }, [user, setValue]);
 
   const selectedPaymentMethod = useWatch({ control, name: "paymentMethod" });
   const cashAmountPaid = useWatch({ control, name: "cashAmountPaid" }) || 0;
@@ -120,7 +131,7 @@ export function CheckoutForm() {
   };
 
   return (
-    <form onSubmit={handleSubmit(onSubmit)}>
+    <form onSubmit={handleSubmit(onSubmit)} className="pb-28 lg:pb-0">
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
         {/* Columna Izquierda: Cobertura + Secciones Modulares del Formulario */}
         <div className="lg:col-span-7 space-y-6">
@@ -153,7 +164,7 @@ export function CheckoutForm() {
           <button
             type="submit"
             disabled={isSubmitting || items.length === 0}
-            className="w-full flex items-center justify-center gap-2 bg-brand-primary hover:bg-brand-primary-hover disabled:bg-surface-border disabled:text-text-muted text-white font-black text-sm uppercase tracking-wider py-4 px-8 rounded-full shadow-xl transition-all hover:scale-[1.01] active:scale-95 disabled:active:scale-100 disabled:hover:scale-100 cursor-pointer"
+            className="w-full hidden lg:flex items-center justify-center gap-2 bg-brand-primary hover:bg-brand-primary-hover disabled:bg-surface-border disabled:text-text-muted text-white font-black text-sm uppercase tracking-wider py-4 px-8 rounded-full shadow-xl transition-all hover:scale-[1.01] active:scale-95 disabled:active:scale-100 disabled:hover:scale-100 cursor-pointer"
           >
             {isSubmitting ? (
               <>
@@ -165,6 +176,36 @@ export function CheckoutForm() {
             )}
           </button>
         </div>
+      </div>
+
+      {/* Barra Fija Inferior Móvil para Confirmar Pedido (< lg) */}
+      <div
+        className="fixed bottom-0 left-0 right-0 z-30 bg-surface-card/95 backdrop-blur-md border-t border-surface-border p-3.5 sm:p-4 lg:hidden shadow-2xl flex items-center justify-between gap-3 transition-transform"
+        style={{ paddingBottom: "max(0.75rem, env(safe-area-inset-bottom))" }}
+      >
+        <div className="min-w-0">
+          <span className="text-[10px] uppercase tracking-wider font-bold text-text-muted block font-display">
+            Total ({items.reduce((acc, i) => acc + i.quantity, 0)} {items.reduce((acc, i) => acc + i.quantity, 0) === 1 ? "artículo" : "artículos"})
+          </span>
+          <span className="text-xl font-black text-brand-primary font-mono tabular-nums leading-none">
+            {formatCurrency(total)}
+          </span>
+        </div>
+
+        <button
+          type="submit"
+          disabled={isSubmitting || items.length === 0}
+          className="flex-1 max-w-[240px] flex items-center justify-center gap-2 bg-brand-primary hover:bg-brand-primary-hover disabled:bg-surface-border disabled:text-text-muted text-white font-black text-xs uppercase tracking-wider py-3.5 px-4 rounded-full shadow-lg transition-all active:scale-95 disabled:active:scale-100 cursor-pointer font-display min-h-[44px]"
+        >
+          {isSubmitting ? (
+            <>
+              <Loader2 className="w-4 h-4 animate-spin" />
+              <span>Enviando...</span>
+            </>
+          ) : (
+            <span>Confirmar Pedido</span>
+          )}
+        </button>
       </div>
     </form>
   );

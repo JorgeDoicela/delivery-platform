@@ -9,7 +9,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { Loader2, AlertCircle, Eye, EyeOff } from "lucide-react";
 import { loginSchema, type LoginFormData } from "../schemas/loginSchema";
 import { useAuthStore } from "../store/useAuthStore";
-import { UserRole } from "../types";
+import { resolvePostLoginRedirect } from "../lib/redirectByRole";
 import { useCurrentTenantQuery, useTenantStore } from "@/features/tenant";
 import { GoogleSignInButton } from "./GoogleSignInButton";
 import { useTenantRoutes, resolveTenantRouting } from "@/shared/lib/tenant-routing";
@@ -57,19 +57,6 @@ export function LoginForm({
         useTenantStore.getState().setTenantSlug(loggedUser.tenantSlug);
       }
 
-      const isSuperAdmin =
-        loggedUser?.role === "SuperAdmin" ||
-        loggedUser?.role === UserRole.SuperAdmin ||
-        loggedUser?.roles?.includes("SuperAdmin");
-      const isTenantAdmin =
-        loggedUser?.role === "TenantAdmin" ||
-        loggedUser?.role === UserRole.TenantAdmin ||
-        loggedUser?.roles?.includes("TenantAdmin");
-      const isDriver =
-        loggedUser?.role === "Driver" ||
-        loggedUser?.role === UserRole.Driver ||
-        loggedUser?.roles?.includes("Driver");
-
       const tenantSlug =
         loggedUser?.tenantSlug || useTenantStore.getState().tenantSlug || "la-granjita";
 
@@ -79,22 +66,11 @@ export function LoginForm({
         hostname: typeof window !== "undefined" ? window.location.hostname : undefined,
       });
 
-      const defaultDestination = isSuperAdmin
-        ? "/superadmin"
-        : isTenantAdmin
-          ? routing.getAdminHref("personalizacion")
-          : isDriver
-            ? routing.getDriverHref()
-            : routing.getKitchenHref();
-
-      const isDefaultCocinaConflict =
-        (redirectUrl === "/cocina" || redirectUrl === routing.getKitchenHref()) &&
-        (isDriver || isSuperAdmin || isTenantAdmin);
-
-      const destination =
-        redirectUrl && !isDefaultCocinaConflict
-          ? redirectUrl
-          : defaultDestination;
+      const destination = resolvePostLoginRedirect({
+        user: loggedUser,
+        redirectUrl,
+        routing,
+      });
 
       router.push(destination);
       router.refresh();

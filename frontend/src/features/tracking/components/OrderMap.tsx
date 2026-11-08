@@ -3,10 +3,15 @@
 import { useEffect, useRef, useState } from 'react';
 import { Map, Marker, Popup, NavigationControl, LngLatBounds, setWorkerUrl, type StyleSpecification } from 'maplibre-gl';
 import 'maplibre-gl/dist/maplibre-gl.css';
-import { createDriverDomMarker, createDestinationDomMarker } from './DriverMarker';
-import { Navigation, Compass, Layers } from 'lucide-react';
+import { createDriverDomMarker, createDestinationDomMarker, createBranchDomMarker } from './DriverMarker';
+import { Navigation, Compass, Layers, Store } from 'lucide-react';
 
 interface OrderMapProps {
+  origin?: {
+    latitude: number;
+    longitude: number;
+    label?: string;
+  };
   destination?: {
     latitude: number;
     longitude: number;
@@ -45,14 +50,15 @@ const DEFAULT_MAP_STYLE: StyleSpecification = {
   ],
 };
 
-export function OrderMap({ destination, driverLocation, className = '' }: OrderMapProps) {
+export function OrderMap({ origin, destination, driverLocation, className = '' }: OrderMapProps) {
   const mapContainerRef = useRef<HTMLDivElement>(null);
   const mapInstanceRef = useRef<Map | null>(null);
   const driverMarkerRef = useRef<Marker | null>(null);
   const destinationMarkerRef = useRef<Marker | null>(null);
+  const branchMarkerRef = useRef<Marker | null>(null);
   const initialCenterRef = useRef<[number, number]>([
-    destination?.longitude ?? driverLocation?.longitude ?? -78.4845,
-    destination?.latitude ?? driverLocation?.latitude ?? -0.1782,
+    destination?.longitude ?? origin?.longitude ?? driverLocation?.longitude ?? -78.4845,
+    destination?.latitude ?? origin?.latitude ?? driverLocation?.latitude ?? -0.1782,
   ]);
   const [mapLoaded, setMapLoaded] = useState(false);
 
@@ -96,10 +102,35 @@ export function OrderMap({ destination, driverLocation, className = '' }: OrderM
       driverMarkerRef.current = null;
       destinationMarkerRef.current?.remove();
       destinationMarkerRef.current = null;
+      branchMarkerRef.current?.remove();
+      branchMarkerRef.current = null;
       map.remove();
       mapInstanceRef.current = null;
     };
   }, []);
+
+  // Marcador de Sucursal de Origen
+  useEffect(() => {
+    const map = mapInstanceRef.current;
+    if (!map || !mapLoaded || !origin) return;
+
+    if (!branchMarkerRef.current) {
+      const el = createBranchDomMarker();
+      const label = origin.label || 'Sucursal de Despacho';
+      const popup = new Popup({ offset: 25 }).setHTML(
+        `<div style="font-family: sans-serif; font-size: 12px; font-weight: bold; padding: 4px; color: var(--text-strong, #0f172a);">${label}</div>`
+      );
+
+      const marker = new Marker({ element: el, anchor: 'bottom' })
+        .setLngLat([origin.longitude, origin.latitude])
+        .setPopup(popup)
+        .addTo(map);
+
+      branchMarkerRef.current = marker;
+    } else {
+      branchMarkerRef.current.setLngLat([origin.longitude, origin.latitude]);
+    }
+  }, [origin, mapLoaded]);
 
   // Marcador de Destino
   useEffect(() => {
@@ -122,6 +153,22 @@ export function OrderMap({ destination, driverLocation, className = '' }: OrderM
       destinationMarkerRef.current.setLngLat([destination.longitude, destination.latitude]);
     }
   }, [destination, mapLoaded]);
+
+  // Ajuste inicial de encuadre (Bounds) entre Sucursal y Destino
+  useEffect(() => {
+    const map = mapInstanceRef.current;
+    if (!map || !mapLoaded || !destination || !origin || driverLocation) return;
+
+    const bounds = new LngLatBounds();
+    bounds.extend([origin.longitude, origin.latitude]);
+    bounds.extend([destination.longitude, destination.latitude]);
+
+    map.fitBounds(bounds, {
+      padding: { top: 60, bottom: 60, left: 60, right: 60 },
+      maxZoom: 15,
+      duration: 1000,
+    });
+  }, [origin, destination, driverLocation, mapLoaded]);
 
   // Marcador del Repartidor (Posición en Tiempo Real y Heading)
   useEffect(() => {
@@ -200,6 +247,12 @@ export function OrderMap({ destination, driverLocation, className = '' }: OrderM
           <Layers className="h-3 w-3 sm:h-3.5 sm:w-3.5 text-brand-primary" />
           Rastreo Vectorial
         </span>
+        {origin && (
+          <span className="hidden xs:flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-neutral-900 text-white border border-neutral-700 text-[9px] sm:text-[10px] font-bold uppercase tracking-wider shadow-md">
+            <Store className="h-3 w-3 text-brand-primary" />
+            <span>{origin.label || "Local"}</span>
+          </span>
+        )}
         {driverLocation && (
           <span className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-brand-primary text-white border border-brand-primary-hover text-[9px] sm:text-[10px] font-bold uppercase tracking-wider animate-pulse shadow-md">
             <span className="h-2 w-2 rounded-full bg-white" />
@@ -222,7 +275,11 @@ export function OrderMap({ destination, driverLocation, className = '' }: OrderM
       {!driverLocation && (
         <div className="absolute bottom-3 left-3 right-16 z-10 p-2.5 sm:p-3 rounded-2xl bg-surface-card/90 backdrop-blur-md border border-surface-border text-[10px] sm:text-[11px] text-text-muted flex items-center gap-2">
           <Compass className="h-3.5 w-3.5 text-brand-primary shrink-0" />
-          <span className="line-clamp-2">El mapa mostrará el movimiento en vivo en cuanto el repartidor retire la orden.</span>
+          <span className="line-clamp-2">
+            {origin
+              ? `Preparando en ${origin.label || "la sucursal"}. Verás al repartidor salir en vivo al despachar.`
+              : "El mapa mostrará el movimiento en vivo en cuanto el repartidor retire la orden."}
+          </span>
         </div>
       )}
     </div>

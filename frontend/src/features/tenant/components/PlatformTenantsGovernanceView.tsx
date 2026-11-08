@@ -124,13 +124,13 @@ export function PlatformTenantsGovernanceView() {
         </div>
 
         <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 w-full sm:w-auto shrink-0">
-          <button
-            type="button"
-            onClick={() => refetch()}
-            className="px-4 py-2.5 rounded-full border border-surface-border bg-surface-card hover:bg-surface-card-hover text-xs font-bold uppercase tracking-wider font-display text-text-strong transition-colors cursor-pointer shadow-xs text-center min-h-[44px]"
+          <div
+            className="flex items-center justify-center gap-2 px-4 py-2.5 rounded-full border border-surface-border bg-surface-card text-xs font-bold uppercase tracking-wider font-display text-text-strong shadow-xs min-h-[44px] select-none"
+            title="Gobernanza sincronizada automáticamente en tiempo real"
           >
-            Actualizar
-          </button>
+            <span className="w-2 h-2 rounded-full bg-status-success animate-pulse" />
+            <span>En Línea</span>
+          </div>
 
           <button
             type="button"

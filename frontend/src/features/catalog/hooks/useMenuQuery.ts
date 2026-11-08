@@ -12,7 +12,9 @@ export function useMenuQuery(includeInactive = false, slugOverride?: string | nu
     queryKey: ["catalog", "menu", tenantSlug, includeInactive ? "all" : "active"],
     queryFn: () => apiClient.getActiveMenu(includeInactive, tenantSlug ?? undefined),
     enabled: Boolean(tenantSlug),
-    staleTime: 1000 * 60 * 5,
+    staleTime: includeInactive ? 1000 * 15 : 1000 * 60,
+    refetchOnWindowFocus: true,
+    refetchInterval: includeInactive ? 30000 : false,
     retry: 2,
   });
 }

@@ -11,7 +11,6 @@ import {
     Building2,
     MapPin,
     Phone,
-    RefreshCw,
     Clock,
     AlertTriangle,
     Layers,
@@ -34,9 +33,7 @@ export function BranchManagementView() {
 
     const {
         data: capacitiesData,
-        isFetching,
         dataUpdatedAt,
-        refetch,
     } = useQuery({
         queryKey: ["branch-capacities", branchIdsKey],
         queryFn: async () => {
@@ -52,7 +49,8 @@ export function BranchManagementView() {
             return results;
         },
         enabled: branches.length > 0,
-        refetchInterval: 30000,
+        refetchInterval: 15000,
+        refetchOnWindowFocus: true,
     });
 
     const capacities = capacitiesData ?? {};
@@ -75,17 +73,17 @@ export function BranchManagementView() {
                 </div>
 
                 <div className="flex items-center justify-between sm:justify-end gap-3 w-full sm:w-auto">
-                    <span className="text-[10px] text-text-muted font-mono uppercase tracking-wider truncate">
-                        Actualizado: {dataUpdatedAt ? new Date(dataUpdatedAt).toLocaleTimeString() : "Consultando..."}
-                    </span>
-                    <button
-                        onClick={() => void refetch()}
-                        disabled={isFetching}
-                        className="flex items-center gap-1.5 px-4 py-2 bg-surface-card hover:bg-surface-card-hover border border-surface-border rounded-full text-xs font-bold uppercase tracking-wider text-text-strong transition-all active:scale-95 disabled:opacity-50 cursor-pointer shadow-xs shrink-0"
-                    >
-                        <RefreshCw className={`w-3.5 h-3.5 ${isFetching ? "animate-spin text-brand-primary" : ""}`} />
-                        <span>Refrescar</span>
-                    </button>
+                    <div className="flex items-center gap-2 bg-surface-card border border-surface-border px-3.5 py-1.5 rounded-full shadow-xs">
+                        <span className="w-2 h-2 rounded-full bg-status-success animate-pulse" />
+                        <span className="text-[11px] font-bold uppercase tracking-wider text-text-strong font-display">
+                            Monitoreo en Vivo
+                        </span>
+                        {dataUpdatedAt ? (
+                            <span className="text-[10px] text-text-muted font-mono pl-1 border-l border-surface-border">
+                                {new Date(dataUpdatedAt).toLocaleTimeString()}
+                            </span>
+                        ) : null}
+                    </div>
                 </div>
             </div>
 

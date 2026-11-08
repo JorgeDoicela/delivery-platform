@@ -1,10 +1,11 @@
 "use client";
 
 import { useEffect } from "react";
+import Link from "next/link";
 import { useRouter, usePathname } from "next/navigation";
 import { useAuthStore } from "../store/useAuthStore";
 import { UserRole, type UserRoleName } from "../types";
-import { ShieldAlert, Loader2 } from "lucide-react";
+import { ShieldAlert, Loader2, Store } from "lucide-react";
 import { useIsMounted } from "@/shared/hooks/useIsMounted";
 import { resolveTenantRouting } from "@/shared/lib/tenant-routing";
 
@@ -110,7 +111,48 @@ export function AuthGuard({ children, allowedRoles }: AuthGuardProps) {
     return null;
   }
 
-  // Comprobación de roles permitidos si se especifican
+  // 1. Comprobación de aislamiento Multi-Tenant (salvo SuperAdmin transversal)
+  if (user) {
+    const isSuperAdmin = hasRequiredRole(user.role, user.roles, [
+      UserRole.SuperAdmin,
+      "SuperAdmin",
+    ]);
+
+    const routeResolution = resolveTenantRouting({ pathname });
+    const isTenantScopedRoute =
+      !routeResolution.isPlatformRoot && Boolean(routeResolution.activeTenantSlug);
+
+    if (
+      !isSuperAdmin &&
+      isTenantScopedRoute &&
+      user.tenantSlug &&
+      user.tenantSlug.toLowerCase() !== routeResolution.activeTenantSlug.toLowerCase()
+    ) {
+      return (
+        <div className="flex flex-col items-center justify-center min-h-[60vh] p-6 text-center">
+          <div className="w-12 h-12 rounded-full bg-amber-500/15 border border-amber-500/30 flex items-center justify-center mb-4">
+            <Store className="w-6 h-6 text-amber-500" />
+          </div>
+          <h2 className="text-lg font-bold text-text-strong uppercase tracking-tight">
+            Comercio no autorizado
+          </h2>
+          <p className="text-xs text-text-muted mt-2 max-w-md">
+            Tu cuenta operativa está asignada a &quot;{user.tenantSlug}&quot; y no
+            tienes autorización para acceder o gestionar la consola de &quot;
+            {routeResolution.activeTenantSlug}&quot;.
+          </p>
+          <Link
+            href={`/${user.tenantSlug}`}
+            className="mt-5 px-5 py-2.5 bg-brand-primary hover:bg-brand-primary-hover text-white text-xs font-bold uppercase tracking-wider rounded-full transition-colors cursor-pointer shadow-sm"
+          >
+            Ir a mi restaurante
+          </Link>
+        </div>
+      );
+    }
+  }
+
+  // 2. Comprobación de roles permitidos si se especifican
   if (allowedRoles && allowedRoles.length > 0 && user) {
     const hasRole = hasRequiredRole(user.role, user.roles, allowedRoles);
 

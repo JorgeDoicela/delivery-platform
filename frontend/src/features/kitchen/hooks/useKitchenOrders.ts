@@ -4,6 +4,7 @@ import { useState, useEffect, useCallback } from 'react';
 import * as signalR from '@microsoft/signalr';
 import { apiClient } from '@/shared/lib/api-client';
 import { KitchenOrderTicketDto, OrderStatus } from '@/shared/types/api';
+import { useAuthStore } from '@/features/auth';
 import { kitchenAlertSound } from '../lib/sound';
 
 export function useKitchenOrders(branchId: number) {
@@ -52,8 +53,10 @@ export function useKitchenOrders(branchId: number) {
     const hubUrl = baseUrl.endsWith("/hubs") ? `${baseUrl}/kitchen` : `${baseUrl}/hubs/kitchen`;
 
     const connection = new signalR.HubConnectionBuilder()
-      .withUrl(hubUrl)
-      .withAutomaticReconnect()
+      .withUrl(hubUrl, {
+        accessTokenFactory: () => useAuthStore.getState().accessToken || "",
+      })
+      .withAutomaticReconnect([0, 2000, 5000, 10000, 30000])
       .configureLogging(signalR.LogLevel.None)
       .build();
 
@@ -131,11 +134,29 @@ export function useKitchenOrders(branchId: number) {
     );
 
     // Polling de respaldo cada 20s
-    const pollInterval = setInterval(fetchOrders, 20000);
+    const pollInterval = setInterval(() => {
+      if (typeof document !== 'undefined' && document.visibilityState === 'visible') {
+        void fetchOrders();
+      }
+    }, 20000);
+
+    const handleVisibility = () => {
+      if (typeof document !== 'undefined' && document.visibilityState === 'visible') {
+        void fetchOrders();
+      }
+    };
+    if (typeof window !== 'undefined') {
+      window.addEventListener('visibilitychange', handleVisibility);
+      window.addEventListener('focus', handleVisibility);
+    }
 
     return () => {
       isSubscribed = false;
       clearInterval(pollInterval);
+      if (typeof window !== 'undefined') {
+        window.removeEventListener('visibilitychange', handleVisibility);
+        window.removeEventListener('focus', handleVisibility);
+      }
       void startPromise.finally(async () => {
         if (connection.state === signalR.HubConnectionState.Connected) {
           await connection.invoke('LeaveBranchKitchen', branchId).catch(() => {});

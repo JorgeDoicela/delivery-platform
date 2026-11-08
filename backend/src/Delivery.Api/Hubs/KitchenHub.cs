@@ -11,7 +11,7 @@ public interface IKitchenClient
     Task OrderStatusChanged(string orderId, string status);
 }
 
-[Authorize(Policy = "KitchenOnly")]
+[Authorize(Policy = "OperationalStaffOnly")]
 public class KitchenHub : Hub<IKitchenClient>
 {
     /// <summary>

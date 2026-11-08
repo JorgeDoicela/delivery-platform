@@ -72,3 +72,25 @@ export function createDestinationDomMarker(): HTMLDivElement {
   `;
   return container;
 }
+
+/**
+ * Crea un elemento DOM nativo para el marcador de sucursal / restaurante en MapLibre GL.
+ */
+export function createBranchDomMarker(): HTMLDivElement {
+  const container = document.createElement('div');
+  container.className = 'branch-maplibre-marker';
+  container.innerHTML = `
+    <div style="position: relative; display: flex; flex-direction: column; align-items: center;">
+      <div style="background: #0f172a; color: #ffffff; border-radius: 9999px; width: 34px; height: 34px; display: flex; align-items: center; justify-content: center; border: 2px solid var(--brand-primary, #e4002b); box-shadow: 0 3px 10px rgba(0, 0, 0, 0.35);">
+        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+          <path d="m2 7 4.41-4.41A2 2 0 0 1 7.83 2h8.34a2 2 0 0 1 1.42.59L22 7"></path>
+          <path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"></path>
+          <path d="M15 22v-4a2 2 0 0 0-2-2h-2a2 2 0 0 0-2 2v4"></path>
+          <path d="M2 7h20"></path>
+        </svg>
+      </div>
+      <div style="width: 2px; height: 8px; background: #0f172a;"></div>
+    </div>
+  `;
+  return container;
+}

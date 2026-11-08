@@ -41,6 +41,13 @@ export function MobileBottomNav() {
   const items = useCartStore((s) => s.items);
   const cartCount = items.reduce((acc, i) => acc + i.quantity, 0);
 
+  const isCheckout =
+    pathname.includes("checkout") || pathname.includes("finalizar-pedido");
+
+  if (isCheckout) {
+    return null;
+  }
+
   const isHomeActive =
     pathname === homeHref || (routes.basePath && pathname === routes.basePath);
   const isCatalogActive =

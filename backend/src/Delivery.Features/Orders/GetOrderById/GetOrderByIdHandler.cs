@@ -39,6 +39,8 @@ public sealed record OrderDetailResponse(
     Guid OrderId,
     int BranchId,
     string BranchName,
+    double? BranchLatitude,
+    double? BranchLongitude,
     string CustomerName,
     string CustomerPhone,
     string? CustomerEmail,
@@ -126,6 +128,8 @@ public sealed class GetOrderByIdHandler : IHandler<GetOrderByIdQuery, Result<Ord
             order.Id,
             order.BranchId,
             order.Branch.Name,
+            order.Branch.LocationPoint?.Y, // Latitud de la sucursal
+            order.Branch.LocationPoint?.X, // Longitud de la sucursal
             order.CustomerName,
             order.CustomerPhone,
             order.CustomerEmail,
@@ -133,8 +137,8 @@ public sealed class GetOrderByIdHandler : IHandler<GetOrderByIdQuery, Result<Ord
             order.IdentificationNumber,
             order.AddressStreet,
             order.AddressReference,
-            order.DeliveryLocation?.Y, // Latitud
-            order.DeliveryLocation?.X, // Longitud
+            order.DeliveryLocation?.Y, // Latitud de entrega
+            order.DeliveryLocation?.X, // Longitud de entrega
             order.Subtotal,
             order.DeliveryFee,
             order.Total,

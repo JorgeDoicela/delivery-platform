@@ -25,10 +25,12 @@ export default function CocinaRootPage() {
     <AuthGuard
       allowedRoles={[
         UserRole.KitchenStaff,
+        UserRole.Cashier,
         UserRole.BranchManager,
         UserRole.TenantAdmin,
         UserRole.SuperAdmin,
         'KitchenStaff',
+        'Cashier',
         'BranchManager',
         'TenantAdmin',
         'SuperAdmin',

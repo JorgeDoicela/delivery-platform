@@ -35,6 +35,20 @@ export function useOrderTracking({ orderId }: UseOrderTrackingProps): UseOrderTr
       const data = await apiClient.getOrderById(orderId);
       setOrder(data);
       setError(null);
+      if (data.status === OrderStatus.OnTheWay) {
+        try {
+          const loc = await apiClient.getDriverLocation(orderId);
+          if (loc && typeof loc.latitude === 'number' && typeof loc.longitude === 'number') {
+            setDriverLocation({
+              latitude: loc.latitude,
+              longitude: loc.longitude,
+              heading: loc.heading,
+            });
+          }
+        } catch {
+          // Normal si aún no hay telemetría activa en Redis
+        }
+      }
     } catch {
       setError('No se pudo cargar la orden especificada.');
     } finally {
@@ -49,6 +63,21 @@ export function useOrderTracking({ orderId }: UseOrderTrackingProps): UseOrderTr
       return;
     }
 
+    const fetchCurrentDriverLocation = async () => {
+      try {
+        const loc = await apiClient.getDriverLocation(orderId);
+        if (isSubscribed && loc && typeof loc.latitude === 'number' && typeof loc.longitude === 'number') {
+          setDriverLocation({
+            latitude: loc.latitude,
+            longitude: loc.longitude,
+            heading: loc.heading,
+          });
+        }
+      } catch {
+        // Normal si aún no hay repartidor transmitiendo en Redis GEO
+      }
+    };
+
     const loadInitialOrder = async () => {
       try {
         const data = await apiClient.getOrderById(orderId);
@@ -56,6 +85,9 @@ export function useOrderTracking({ orderId }: UseOrderTrackingProps): UseOrderTr
           setOrder(data);
           setError(null);
           setLoading(false);
+          if (data.status === OrderStatus.OnTheWay) {
+            void fetchCurrentDriverLocation();
+          }
         }
       } catch {
         if (isSubscribed) {
@@ -93,13 +125,21 @@ export function useOrderTracking({ orderId }: UseOrderTrackingProps): UseOrderTr
     // Escucha de transición de estado
     connection.on('OrderStatusChanged', (payload: string | { orderId?: string; status: OrderStatus }) => {
       if (!isSubscribed) return;
+      let nextStatus: OrderStatus | undefined;
       if (typeof payload === 'string') {
         const enumVal = OrderStatus[payload as keyof typeof OrderStatus];
         if (enumVal) {
-          setOrder((prev) => (prev ? { ...prev, status: enumVal } : null));
+          nextStatus = enumVal;
         }
       } else if (payload && typeof payload === 'object' && payload.status) {
-        setOrder((prev) => (prev ? { ...prev, status: payload.status } : null));
+        nextStatus = payload.status;
+      }
+
+      if (nextStatus) {
+        setOrder((prev) => (prev ? { ...prev, status: nextStatus } : null));
+        if (nextStatus === OrderStatus.OnTheWay) {
+          void fetchCurrentDriverLocation();
+        }
       }
     });
 

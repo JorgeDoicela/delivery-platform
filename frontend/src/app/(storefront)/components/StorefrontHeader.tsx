@@ -8,10 +8,7 @@ import {
   Search,
   User,
   Menu,
-  X,
-  Home,
-  Utensils,
-  Clock,
+  LayoutDashboard,
 } from "lucide-react";
 import { CartButtonBadge } from "@/features/cart";
 import {
@@ -20,7 +17,9 @@ import {
   TenantSwitcher,
   useCurrentTenantQuery,
 } from "@/features/tenant";
+import { useAuthStore, UserRole, isUserInRole } from "@/features/auth";
 import { ThemeToggle } from "@/shared/components/ThemeToggle";
+import { StorefrontMobileDrawer } from "./StorefrontMobileDrawer";
 import { useSmartScrollHeader } from "@/shared/hooks/useSmartScrollHeader";
 import { useTenantRoutes } from "@/shared/lib/tenant-routing";
 
@@ -52,6 +51,41 @@ export function StorefrontHeader() {
   const brandLogo = isPlatformRoot
     ? "/images/platform/logo.png"
     : tenant?.logoUrl || "/images/shared/placeholders/logo-default.png";
+
+  const user = useAuthStore((s) => s.user);
+  const isAuthenticated = useAuthStore((s) => s.isAuthenticated);
+  const logout = useAuthStore((s) => s.logout);
+
+  const isSuperAdmin = isUserInRole(user, UserRole.SuperAdmin);
+  const isTenantAdmin = isUserInRole(user, UserRole.TenantAdmin);
+  const isBranchManager = isUserInRole(user, UserRole.BranchManager);
+  const isKitchenStaff = isUserInRole(user, UserRole.KitchenStaff);
+  const isCashier = isUserInRole(user, UserRole.Cashier);
+  const isDriver = isUserInRole(user, UserRole.Driver);
+
+  const operationalHref = isSuperAdmin
+    ? routes.getSuperAdminHref()
+    : isTenantAdmin
+      ? routes.getAdminHref("personalizacion")
+      : isBranchManager
+        ? routes.getAdminHref("inventario")
+        : isKitchenStaff || isCashier
+          ? routes.getKitchenHref()
+          : isDriver
+            ? routes.getDriverHref()
+            : null;
+
+  const operationalLabel = isSuperAdmin
+    ? "SuperAdmin"
+    : isTenantAdmin
+      ? "Administración"
+      : isBranchManager
+        ? "Gestión Local"
+        : isKitchenStaff || isCashier
+          ? "Cocina KDS"
+          : isDriver
+            ? "Repartidor"
+            : null;
 
   // Cerrar menú móvil al navegar
   const [prevPathname, setPrevPathname] = useState(pathname);
@@ -156,14 +190,30 @@ export function StorefrontHeader() {
 
             <ThemeToggle />
 
+            {operationalHref && (
+              <Link
+                href={operationalHref}
+                className="hidden md:inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-neutral-900 hover:bg-neutral-800 text-white text-[11px] font-bold uppercase tracking-wider font-display transition-colors shadow-xs"
+                title={`Acceder a ${operationalLabel}`}
+              >
+                <LayoutDashboard className="w-3.5 h-3.5 text-brand-primary" />
+                <span>{operationalLabel}</span>
+              </Link>
+            )}
+
             <Link
               href={routes.getLoginHref()}
-              className="hidden sm:flex flex-col items-center justify-center text-text-strong hover:text-brand-primary transition-colors px-1 shrink-0"
-              title="Mi Perfil / Iniciar Sesión"
+              className="hidden sm:flex flex-col items-center justify-center text-text-strong hover:text-brand-primary transition-colors px-1 shrink-0 relative"
+              title={isAuthenticated ? `Sesión iniciada: ${user?.fullName}` : "Mi Perfil / Iniciar Sesión"}
             >
-              <User className="w-5 h-5 text-text-strong stroke-[1.8]" />
+              <div className="relative">
+                <User className="w-5 h-5 text-text-strong stroke-[1.8]" />
+                {isAuthenticated && (
+                  <span className="absolute -top-0.5 -right-0.5 w-2 h-2 rounded-full bg-emerald-500 border border-white dark:border-neutral-900" />
+                )}
+              </div>
               <span className="text-[10px] font-semibold text-text-muted leading-none mt-1">
-                Perfil
+                {isAuthenticated ? "Mi Cuenta" : "Perfil"}
               </span>
             </Link>
 
@@ -182,137 +232,25 @@ export function StorefrontHeader() {
         </div>
       </header>
 
-      {/* Drawer Deslizante Móvil */}
-      {isMobileMenuOpen && (
-        <div
-          role="dialog"
-          aria-modal="true"
-          aria-label="Menú de navegación móvil"
-          className="fixed inset-0 z-50 xl:hidden animate-in fade-in duration-200"
-        >
-          <div
-            className="fixed inset-0 bg-neutral-950/60 backdrop-blur-xs transition-opacity"
-            onClick={() => setIsMobileMenuOpen(false)}
-            aria-hidden="true"
-          />
-
-          <div className="fixed inset-y-0 right-0 w-[85vw] max-w-sm bg-surface-card border-l border-surface-border shadow-2xl flex flex-col justify-between p-5 sm:p-6 z-10 animate-in slide-in-from-right duration-300 overflow-y-auto">
-            <div className="space-y-6">
-              {/* Cabecera del Drawer */}
-              <div className="flex items-center justify-between pb-4 border-b border-surface-border">
-                <div className="flex items-center gap-2.5 min-w-0">
-                  <div className="relative w-8 h-8 shrink-0">
-                    <Image
-                      src={brandLogo}
-                      alt={`Logo ${brandName}`}
-                      width={32}
-                      height={32}
-                      className="w-full h-full object-contain"
-                    />
-                  </div>
-                  <div className="min-w-0">
-                    <span className="font-display font-black text-xl uppercase tracking-tight text-brand-primary block leading-none truncate">
-                      {brandName}
-                    </span>
-                    <span className="text-[9px] tracking-widest text-text-muted font-bold uppercase block mt-0.5 truncate">
-                      {brandTagline}
-                    </span>
-                  </div>
-                </div>
-
-                <button
-                  type="button"
-                  onClick={() => setIsMobileMenuOpen(false)}
-                  className="w-9 h-9 rounded-full flex items-center justify-center text-text-muted hover:text-text-strong hover:bg-surface-card-hover transition-colors cursor-pointer shrink-0"
-                  aria-label="Cerrar menú"
-                >
-                  <X className="w-5 h-5" />
-                </button>
-              </div>
-
-              {/* Selector de Comercio o Sucursal en Móvil */}
-              <div className="sm:hidden">
-                <span className="text-[10px] font-bold uppercase tracking-wider text-text-muted block mb-1.5">
-                  {isPlatformRoot ? "Directorio de Marcas:" : "Sucursal Activa:"}
-                </span>
-                {isPlatformRoot ? (
-                  <TenantSwitcher variant="auto" />
-                ) : (
-                  <TenantBranchSelector tenant={tenant} />
-                )}
-              </div>
-
-              {/* Buscador Rápido en Móvil */}
-              <div>
-                <Link
-                  href={catalogHref}
-                  onClick={() => setIsMobileMenuOpen(false)}
-                  className="flex items-center gap-2.5 px-4 py-2.5 w-full bg-surface-canvas hover:bg-surface-card-hover rounded-full transition-colors border border-surface-border text-text-muted group"
-                >
-                  <Search className="w-4 h-4 text-text-muted group-hover:text-brand-primary transition-colors shrink-0" />
-                  <span className="text-xs text-text-muted font-normal truncate">
-                    {isPlatformRoot ? "Buscar restaurantes..." : `Buscar en ${brandName}...`}
-                  </span>
-                </Link>
-              </div>
-
-              {/* Enlaces de Navegación Móvil */}
-              <nav className="space-y-1">
-                <span className="text-[10px] font-bold uppercase tracking-wider text-text-muted block px-3 py-1">
-                  Navegación
-                </span>
-
-                <Link
-                  href={brandHomeHref}
-                  onClick={() => setIsMobileMenuOpen(false)}
-                  className="flex items-center gap-3 px-3.5 py-3 rounded-2xl hover:bg-surface-canvas text-text-strong hover:text-brand-primary font-display font-black text-sm uppercase tracking-wide transition-colors"
-                >
-                  <Home className="w-4 h-4 text-brand-primary shrink-0" />
-                  <span>Inicio</span>
-                </Link>
-
-                <Link
-                  href={catalogHref}
-                  onClick={() => setIsMobileMenuOpen(false)}
-                  className="flex items-center gap-3 px-3.5 py-3 rounded-2xl hover:bg-surface-canvas text-text-strong hover:text-brand-primary font-display font-black text-sm uppercase tracking-wide transition-colors"
-                >
-                  <Utensils className="w-4 h-4 text-brand-primary shrink-0" />
-                  <span>{isPlatformRoot ? "Directorio de Restaurantes" : "Menú & Combos"}</span>
-                </Link>
-
-                <Link
-                  href={routes.getRastreoHref()}
-                  onClick={() => setIsMobileMenuOpen(false)}
-                  className="flex items-center gap-3 px-3.5 py-3 rounded-2xl hover:bg-surface-canvas text-text-strong hover:text-brand-primary font-display font-black text-sm uppercase tracking-wide transition-colors"
-                >
-                  <Clock className="w-4 h-4 text-brand-primary shrink-0" />
-                  <span>Rastrear mi Pedido</span>
-                </Link>
-              </nav>
-            </div>
-
-            {/* Pie del Drawer */}
-            <div className="pt-6 border-t border-surface-border space-y-3">
-              <Link
-                href={routes.getLoginHref()}
-                onClick={() => setIsMobileMenuOpen(false)}
-                className="flex items-center justify-between px-4 py-3 rounded-2xl bg-surface-canvas hover:bg-surface-card-hover border border-surface-border text-text-strong text-xs font-bold uppercase tracking-wider font-display transition-colors"
-              >
-                <div className="flex items-center gap-2.5">
-                  <User className="w-4 h-4 text-brand-primary" />
-                  <span>Mi Perfil / Iniciar Sesión</span>
-                </div>
-                <span className="text-[10px] text-text-muted">&rarr;</span>
-              </Link>
-
-              <div className="flex items-center justify-between px-2 pt-1">
-                <span className="text-[11px] text-text-muted font-medium">Tema Visual:</span>
-                <ThemeToggle />
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
+      {/* Drawer Deslizante Móvil Modularizado */}
+      <StorefrontMobileDrawer
+        isOpen={isMobileMenuOpen}
+        onClose={() => setIsMobileMenuOpen(false)}
+        brandName={brandName}
+        brandTagline={brandTagline}
+        brandLogo={brandLogo}
+        isPlatformRoot={isPlatformRoot}
+        routes={routes}
+        catalogHref={catalogHref}
+        tenant={tenant}
+        isAuthenticated={isAuthenticated}
+        user={user}
+        operationalHref={operationalHref}
+        operationalLabel={operationalLabel}
+        onLogout={async () => {
+          await logout();
+        }}
+      />
     </>
   );
 }

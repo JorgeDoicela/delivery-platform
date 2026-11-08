@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { Loader2, AlertCircle, KeyRound, X } from "lucide-react";
 import { useAuthStore } from "../store/useAuthStore";
 import { useCurrentTenantQuery, useTenantStore } from "@/features/tenant";
+import { resolvePostLoginRedirect } from "../lib/redirectByRole";
 import { resolveTenantRouting } from "@/shared/lib/tenant-routing";
 
 interface GoogleSignInButtonProps {
@@ -84,7 +85,11 @@ export function GoogleSignInButton({
             hostname: typeof window !== "undefined" ? window.location.hostname : undefined,
           });
 
-          const destination = redirectUrl || routing.getHomeHref();
+          const destination = resolvePostLoginRedirect({
+            user: loggedUser,
+            redirectUrl,
+            routing,
+          });
           router.push(destination);
           router.refresh();
         } else {

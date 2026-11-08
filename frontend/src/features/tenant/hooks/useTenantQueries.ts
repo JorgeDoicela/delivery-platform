@@ -98,7 +98,9 @@ export function usePlatformTenantsQuery() {
   return useQuery<PlatformTenantsResponse>({
     queryKey: ["tenant", "platform-list"],
     queryFn: () => apiClient.getPlatformTenants(),
-    staleTime: 1000 * 30,
+    staleTime: 1000 * 15,
+    refetchInterval: 30000,
+    refetchOnWindowFocus: true,
   });
 }
 

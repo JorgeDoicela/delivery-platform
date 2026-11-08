@@ -75,7 +75,7 @@ export function ActiveDeliveryTab({
 
   if (!currentOrder || activeOrders.length === 0) {
     return (
-      <div className="bg-surface-card border border-surface-border rounded-3xl p-8 sm:p-12 text-center shadow-xs space-y-4">
+      <div className="bg-surface-card border border-surface-border rounded-3xl p-8 sm:p-12 text-center shadow-xs space-y-5 my-2">
         <div className="w-16 h-16 rounded-full bg-surface-canvas border border-surface-border mx-auto flex items-center justify-center text-text-muted">
           <PackageCheck className="w-8 h-8" />
         </div>
@@ -83,16 +83,16 @@ export function ActiveDeliveryTab({
           <h3 className="font-display font-black text-xl uppercase tracking-tight text-text-strong">
             Sin Entregas en Curso
           </h3>
-          <p className="text-xs text-text-muted max-w-sm mx-auto mt-1 leading-relaxed">
+          <p className="text-xs text-text-muted max-w-sm mx-auto mt-1.5 leading-relaxed">
             Actualmente no tienes ningún pedido asignado en ruta. Revisa las comandas listas en cocina para iniciar un reparto.
           </p>
         </div>
         <button
           type="button"
           onClick={onGoToAvailable}
-          className="px-6 py-3.5 bg-brand-primary hover:bg-brand-primary-hover text-white text-xs font-bold uppercase tracking-wider rounded-full transition-all active:scale-95 shadow-md cursor-pointer"
+          className="px-6 py-3.5 bg-brand-primary hover:bg-brand-primary-hover text-white text-xs font-bold uppercase tracking-wider rounded-full transition-all active:scale-95 shadow-md cursor-pointer inline-flex items-center justify-center min-h-[44px]"
         >
-          Ver Pedidos Disponibles en Cocina
+          Explorar Comandas Listas en Cocina
         </button>
       </div>
     );

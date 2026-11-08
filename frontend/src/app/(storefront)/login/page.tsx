@@ -3,7 +3,13 @@
 import { Suspense, useEffect, useState } from "react";
 import Link from "next/link";
 import { useRouter, useSearchParams, usePathname } from "next/navigation";
-import { LoginForm, RegisterForm, useAuthStore } from "@/features/auth";
+import {
+  LoginForm,
+  RegisterForm,
+  useAuthStore,
+  UserRole,
+  isUserInRole,
+} from "@/features/auth";
 import {
   ChevronRight,
   UtensilsCrossed,
@@ -154,64 +160,129 @@ function LoginContent({ initialSlug }: LoginPageProps) {
                 </p>
               </div>
 
-              <div className="flex flex-col sm:flex-row flex-wrap items-stretch sm:items-center justify-center gap-3 pt-4 w-full sm:w-auto">
-                {(user.role === "SuperAdmin" || Number(user.role) === 1) && (
-                  <Link
-                    href={routes.getSuperAdminHref()}
-                    className="bg-neutral-950 hover:bg-neutral-800 active:scale-95 text-white font-black text-xs uppercase tracking-wider font-display px-6 py-3 rounded-full shadow-md transition-all inline-flex items-center justify-center gap-2 min-h-[44px]"
-                  >
-                    <span>Consola SuperAdmin</span>
-                    <ArrowRight className="w-3.5 h-3.5" />
-                  </Link>
-                )}
+              {(() => {
+                const isSuperAdmin = isUserInRole(user, UserRole.SuperAdmin);
+                const isTenantAdmin = isUserInRole(user, UserRole.TenantAdmin);
+                const isBranchManager = isUserInRole(user, UserRole.BranchManager);
+                const isCashier = isUserInRole(user, UserRole.Cashier);
+                const isKitchenStaff = isUserInRole(user, UserRole.KitchenStaff);
+                const isDriver = isUserInRole(user, UserRole.Driver);
+                const isCustomer =
+                  !isSuperAdmin &&
+                  !isTenantAdmin &&
+                  !isBranchManager &&
+                  !isCashier &&
+                  !isKitchenStaff &&
+                  !isDriver;
 
-                {(user.role === "TenantAdmin" ||
-                  user.role === "SuperAdmin" ||
-                  Number(user.role) === 2 ||
-                  Number(user.role) === 1) && (
-                  <Link
-                    href={routes.getAdminHref("personalizacion")}
-                    className="bg-brand-primary hover:bg-brand-primary-hover active:scale-95 text-white font-black text-xs uppercase tracking-wider font-display px-6 py-3 rounded-full shadow-md shadow-brand-primary/20 transition-all inline-flex items-center justify-center gap-2 min-h-[44px]"
-                  >
-                    <span>Panel de Marca</span>
-                    <ArrowRight className="w-3.5 h-3.5" />
-                  </Link>
-                )}
+                return (
+                  <div className="flex flex-col sm:flex-row flex-wrap items-stretch sm:items-center justify-center gap-3 pt-4 w-full sm:w-auto">
+                    {/* Botones de SuperAdmin */}
+                    {isSuperAdmin && (
+                      <Link
+                        href={routes.getSuperAdminHref()}
+                        className="bg-neutral-950 hover:bg-neutral-800 active:scale-95 text-white font-black text-xs uppercase tracking-wider font-display px-6 py-3 rounded-full shadow-md transition-all inline-flex items-center justify-center gap-2 min-h-[44px]"
+                      >
+                        <span>Consola SuperAdmin</span>
+                        <ArrowRight className="w-3.5 h-3.5" />
+                      </Link>
+                    )}
 
-                {(user.role === "Driver" || Number(user.role) === 6) && (
-                  <Link
-                    href={routes.getDriverHref()}
-                    className="bg-brand-primary hover:bg-brand-primary-hover active:scale-95 text-white font-black text-xs uppercase tracking-wider font-display px-6 py-3 rounded-full shadow-md shadow-brand-primary/20 transition-all inline-flex items-center justify-center gap-2 min-h-[44px]"
-                  >
-                    <span>Ir a Reparto Móvil</span>
-                    <ArrowRight className="w-3.5 h-3.5" />
-                  </Link>
-                )}
+                    {/* Botones de TenantAdmin */}
+                    {(isTenantAdmin || isSuperAdmin) && (
+                      <Link
+                        href={routes.getAdminHref("personalizacion")}
+                        className="bg-brand-primary hover:bg-brand-primary-hover active:scale-95 text-white font-black text-xs uppercase tracking-wider font-display px-6 py-3 rounded-full shadow-md shadow-brand-primary/20 transition-all inline-flex items-center justify-center gap-2 min-h-[44px]"
+                      >
+                        <span>Panel de Marca & Landing</span>
+                        <ArrowRight className="w-3.5 h-3.5" />
+                      </Link>
+                    )}
 
-                {(user.role === "KitchenStaff" ||
-                  user.role === "SuperAdmin" ||
-                  user.role === "TenantAdmin" ||
-                  Number(user.role) === 5 ||
-                  Number(user.role) === 1 ||
-                  Number(user.role) === 2) && (
-                  <Link
-                    href={routes.getKitchenHref()}
-                    className="bg-neutral-800 hover:bg-neutral-700 active:scale-95 text-white font-black text-xs uppercase tracking-wider font-display px-6 py-3 rounded-full shadow-sm transition-all inline-flex items-center justify-center gap-2 min-h-[44px]"
-                  >
-                    <span>Ir a Cocina KDS</span>
-                    <ArrowRight className="w-3.5 h-3.5" />
-                  </Link>
-                )}
+                    {/* Botones de BranchManager / TenantAdmin / SuperAdmin */}
+                    {(isBranchManager || isTenantAdmin || isSuperAdmin) && (
+                      <>
+                        <Link
+                          href={routes.getAdminHref("inventario")}
+                          className="bg-neutral-900 hover:bg-neutral-800 active:scale-95 text-white font-black text-xs uppercase tracking-wider font-display px-6 py-3 rounded-full shadow-sm transition-all inline-flex items-center justify-center gap-2 min-h-[44px]"
+                        >
+                          <span>Gestión de Inventario</span>
+                          <ArrowRight className="w-3.5 h-3.5" />
+                        </Link>
+                        <Link
+                          href={routes.getAdminHref("sucursales")}
+                          className="bg-neutral-800 hover:bg-neutral-700 active:scale-95 text-white font-black text-xs uppercase tracking-wider font-display px-6 py-3 rounded-full shadow-sm transition-all inline-flex items-center justify-center gap-2 min-h-[44px]"
+                        >
+                          <span>Sucursales & Horarios</span>
+                          <ArrowRight className="w-3.5 h-3.5" />
+                        </Link>
+                      </>
+                    )}
 
-                <button
-                  type="button"
-                  onClick={handleLogout}
-                  className="bg-neutral-100 hover:bg-neutral-200 active:scale-95 text-neutral-800 font-bold text-xs uppercase tracking-wider px-6 py-3 rounded-full transition-colors inline-flex items-center justify-center gap-1.5 cursor-pointer min-h-[44px]"
-                >
-                  <LogOut className="w-3.5 h-3.5" />
-                  <span>Cerrar Sesión</span>
-                </button>
-              </div>
+                    {/* Botones de Cocina KDS / Cajero */}
+                    {(isKitchenStaff ||
+                      isCashier ||
+                      isBranchManager ||
+                      isTenantAdmin ||
+                      isSuperAdmin) && (
+                      <Link
+                        href={routes.getKitchenHref()}
+                        className="bg-neutral-800 hover:bg-neutral-700 active:scale-95 text-white font-black text-xs uppercase tracking-wider font-display px-6 py-3 rounded-full shadow-sm transition-all inline-flex items-center justify-center gap-2 min-h-[44px]"
+                      >
+                        <span>Pantalla de Cocina (KDS)</span>
+                        <ArrowRight className="w-3.5 h-3.5" />
+                      </Link>
+                    )}
+
+                    {/* Botones de Repartidor */}
+                    {isDriver && (
+                      <Link
+                        href={routes.getDriverHref()}
+                        className="bg-brand-primary hover:bg-brand-primary-hover active:scale-95 text-white font-black text-xs uppercase tracking-wider font-display px-6 py-3 rounded-full shadow-md shadow-brand-primary/20 transition-all inline-flex items-center justify-center gap-2 min-h-[44px]"
+                      >
+                        <span>Consola de Repartidor</span>
+                        <ArrowRight className="w-3.5 h-3.5" />
+                      </Link>
+                    )}
+
+                    {/* Botones de Cliente */}
+                    {isCustomer && (
+                      <>
+                        <Link
+                          href={routes.getCatalogHref()}
+                          className="bg-brand-primary hover:bg-brand-primary-hover active:scale-95 text-white font-black text-xs uppercase tracking-wider font-display px-6 py-3 rounded-full shadow-md shadow-brand-primary/20 transition-all inline-flex items-center justify-center gap-2 min-h-[44px]"
+                        >
+                          <span>Ver Menú & Pedir</span>
+                          <ArrowRight className="w-3.5 h-3.5" />
+                        </Link>
+                        <Link
+                          href={routes.getRastreoHref()}
+                          className="bg-neutral-900 hover:bg-neutral-800 active:scale-95 text-white font-black text-xs uppercase tracking-wider font-display px-6 py-3 rounded-full shadow-sm transition-all inline-flex items-center justify-center gap-2 min-h-[44px]"
+                        >
+                          <span>Rastrear mis Pedidos</span>
+                          <ArrowRight className="w-3.5 h-3.5" />
+                        </Link>
+                      </>
+                    )}
+
+                    <Link
+                      href={routes.getHomeHref()}
+                      className="bg-neutral-100 hover:bg-neutral-200 active:scale-95 text-neutral-800 font-bold text-xs uppercase tracking-wider px-5 py-3 rounded-full transition-colors inline-flex items-center justify-center gap-1.5 cursor-pointer min-h-[44px]"
+                    >
+                      <span>Ir a la Tienda</span>
+                    </Link>
+
+                    <button
+                      type="button"
+                      onClick={handleLogout}
+                      className="bg-neutral-100 hover:bg-neutral-200 active:scale-95 text-neutral-800 font-bold text-xs uppercase tracking-wider px-5 py-3 rounded-full transition-colors inline-flex items-center justify-center gap-1.5 cursor-pointer min-h-[44px]"
+                    >
+                      <LogOut className="w-3.5 h-3.5" />
+                      <span>Cerrar Sesión</span>
+                    </button>
+                  </div>
+                );
+              })()}
             </div>
           ) : (
             /* Formulario de Login / Registro con Pestañas */

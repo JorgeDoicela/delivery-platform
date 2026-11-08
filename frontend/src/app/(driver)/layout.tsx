@@ -9,6 +9,7 @@ import { useCurrentTenantQuery, useTenantStore, RESERVED_TENANT_SLUGS } from "@/
 import { AuthGuard, UserRole, useAuthStore } from "@/features/auth";
 import { ThemeToggle } from "@/shared/components/ThemeToggle";
 import { useTenantRoutes } from "@/shared/lib/tenant-routing";
+import { DriverBottomNav } from "./components/DriverBottomNav";
 
 function DriverLayoutContent({
   children,
@@ -91,9 +92,11 @@ function DriverLayoutContent({
           </div>
         </header>
 
-        <main className="flex-1 p-3.5 sm:p-6 overflow-hidden flex flex-col bg-surface-canvas">
+        <main className="flex-1 p-3.5 sm:p-6 overflow-y-auto overflow-x-hidden flex flex-col bg-surface-canvas pb-24 sm:pb-6">
           {children}
         </main>
+
+        <DriverBottomNav routes={routes} />
       </div>
     </AuthGuard>
   );

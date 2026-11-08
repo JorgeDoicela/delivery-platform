@@ -8,3 +8,4 @@ export * from "./components/RegisterForm";
 export * from "./components/GoogleSignInButton";
 export * from "./components/AuthGuard";
 export * from "./components/UserNav";
+export * from "./lib/redirectByRole";

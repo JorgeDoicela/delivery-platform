@@ -1,10 +1,13 @@
 'use client';
 
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import * as signalR from '@microsoft/signalr';
 import { useDriverStore } from '../store/useDriverStore';
+import { useAuthStore } from '@/features/auth';
 import { kitchenAlertSound } from '@/features/kitchen/lib/sound';
 import { OrderStatus } from '@/shared/types/api';
+
+export type DriverConnectionStatus = 'connected' | 'reconnecting' | 'disconnected';
 
 interface UseDriverHubOptions {
   branchId?: number | null;
@@ -12,6 +15,7 @@ interface UseDriverHubOptions {
 }
 
 export function useDriverHub({ branchId, enabled = true }: UseDriverHubOptions = {}) {
+  const [connectionStatus, setConnectionStatus] = useState<DriverConnectionStatus>('disconnected');
   const handleOrderStatusChange = useDriverStore((s) => s.handleOrderStatusChange);
   const fetchDashboard = useDriverStore((s) => s.fetchDashboard);
   const connectionRef = useRef<signalR.HubConnection | null>(null);
@@ -27,12 +31,31 @@ export function useDriverHub({ branchId, enabled = true }: UseDriverHubOptions =
     const hubUrl = baseUrl.endsWith('/hubs') ? `${baseUrl}/kitchen` : `${baseUrl}/hubs/kitchen`;
 
     const connection = new signalR.HubConnectionBuilder()
-      .withUrl(hubUrl)
+      .withUrl(hubUrl, {
+        accessTokenFactory: () => useAuthStore.getState().accessToken || '',
+      })
       .withAutomaticReconnect([0, 2000, 5000, 10000, 30000])
       .configureLogging(signalR.LogLevel.None)
       .build();
 
     connectionRef.current = connection;
+
+    connection.onreconnecting(() => {
+      if (isMounted) setConnectionStatus('reconnecting');
+    });
+
+    connection.onreconnected(async () => {
+      if (!isMounted) return;
+      setConnectionStatus('connected');
+      if (branchId) {
+        await connection.invoke('JoinBranchKitchen', branchId).catch(() => {});
+      }
+      void fetchDashboard();
+    });
+
+    connection.onclose(() => {
+      if (isMounted) setConnectionStatus('disconnected');
+    });
 
     connection.on(
       'OrderStatusChanged',
@@ -55,13 +78,13 @@ export function useDriverHub({ branchId, enabled = true }: UseDriverHubOptions =
             kitchenAlertSound.playNewOrderChime();
           }
           handleOrderStatusChange(orderId, status);
+          void fetchDashboard();
         }
       }
     );
 
     connection.on('ReceiveNewOrder', () => {
-      // Nueva orden en preparación: refrescar para visibilidad de demanda
-      fetchDashboard();
+      void fetchDashboard();
     });
 
     connection
@@ -71,21 +94,48 @@ export function useDriverHub({ branchId, enabled = true }: UseDriverHubOptions =
           await connection.stop().catch(() => {});
           return;
         }
+        setConnectionStatus('connected');
         if (branchId) {
           await connection.invoke('JoinBranchKitchen', branchId).catch(() => {});
         }
       })
       .catch(() => {
-        // En caso de fallo inicial, automatic reconnect reintentará
+        if (isMounted) setConnectionStatus('disconnected');
       });
+
+    // Polling resiliente en segundo plano (cada 25s sólo si la pestaña está activa)
+    const fallbackInterval = setInterval(() => {
+      if (typeof document !== 'undefined' && document.visibilityState === 'visible') {
+        void fetchDashboard();
+      }
+    }, 25000);
+
+    // Revalidación instantánea cuando el repartidor vuelve a enfocar la app
+    const handleVisibilityChange = () => {
+      if (typeof document !== 'undefined' && document.visibilityState === 'visible') {
+        void fetchDashboard();
+      }
+    };
+    if (typeof window !== 'undefined') {
+      window.addEventListener('visibilitychange', handleVisibilityChange);
+      window.addEventListener('focus', handleVisibilityChange);
+    }
 
     return () => {
       isMounted = false;
+      clearInterval(fallbackInterval);
+      if (typeof window !== 'undefined') {
+        window.removeEventListener('visibilitychange', handleVisibilityChange);
+        window.removeEventListener('focus', handleVisibilityChange);
+      }
       if (connectionRef.current) {
         connectionRef.current.stop().catch(() => {});
         connectionRef.current = null;
       }
     };
   }, [branchId, enabled, handleOrderStatusChange, fetchDashboard]);
+
+  return { connectionStatus };
 }
+
 

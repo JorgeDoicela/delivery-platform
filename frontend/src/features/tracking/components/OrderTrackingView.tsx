@@ -19,6 +19,41 @@ const statusLabels: Record<OrderStatus, string> = {
   [OrderStatus.Cancelled]: 'Cancelado',
 };
 
+const statusDescriptions: Record<OrderStatus, { title: string; desc: string }> = {
+  [OrderStatus.Created]: {
+    title: 'Pedido Registrado en Cola',
+    desc: 'Tu comanda ha ingresado al sistema. En breve el equipo de cocina comenzará la preparación.',
+  },
+  [OrderStatus.PendingValidation]: {
+    title: 'Comprobante en Revisión',
+    desc: 'Validando la transferencia bancaria con el restaurante para enviar la comanda a cocina.',
+  },
+  [OrderStatus.Confirmed]: {
+    title: 'Confirmado por el Local',
+    desc: 'El restaurante confirmó tu orden. Pasa a asignación de cocina.',
+  },
+  [OrderStatus.InKitchen]: {
+    title: 'Preparando tus Platillos',
+    desc: 'Nuestros cocineros están horneando y preparando tus productos frescos en este momento.',
+  },
+  [OrderStatus.ReadyForDelivery]: {
+    title: 'Listo y Empacado para Despacho',
+    desc: 'Tu orden está empacada en el mostrador. El motorizado asignado está por retirarla.',
+  },
+  [OrderStatus.OnTheWay]: {
+    title: 'Motorizado en Ruta a tu Puerta',
+    desc: 'El repartidor retiró la comanda y se desplaza hacia tu dirección. Sigue su movimiento en el mapa en vivo.',
+  },
+  [OrderStatus.Delivered]: {
+    title: 'Pedido Entregado con Éxito',
+    desc: 'Tu pedido ha sido recibido en el domicilio indicado.',
+  },
+  [OrderStatus.Cancelled]: {
+    title: 'Orden Cancelada',
+    desc: 'Esta orden fue cancelada. Contacta al soporte si tienes dudas sobre tu pago.',
+  },
+};
+
 interface OrderTrackingViewProps {
   orderId: string;
 }
@@ -107,6 +142,23 @@ export function OrderTrackingView({ orderId }: OrderTrackingViewProps) {
 
             {/* Stepper de Progreso */}
             <StatusTimeline status={order.status as OrderStatus} />
+
+            {/* Banner Descriptivo en Vivo según la Etapa del Despacho */}
+            {statusDescriptions[order.status as OrderStatus] && (
+              <div className="mt-5 p-4 rounded-2xl bg-surface-canvas border border-surface-border flex items-start gap-3 text-xs">
+                <div className="p-2 rounded-xl bg-brand-primary/10 text-brand-primary shrink-0 mt-0.5">
+                  <Truck className="h-4 w-4" />
+                </div>
+                <div className="min-w-0">
+                  <h3 className="font-bold uppercase tracking-wider font-display text-text-strong">
+                    {statusDescriptions[order.status as OrderStatus].title}
+                  </h3>
+                  <p className="text-text-muted mt-0.5 leading-relaxed">
+                    {statusDescriptions[order.status as OrderStatus].desc}
+                  </p>
+                </div>
+              </div>
+            )}
           </div>
 
           {/* Mapa de Rastreo Vectorial MapLibre GL JS */}
@@ -118,6 +170,15 @@ export function OrderTrackingView({ orderId }: OrderTrackingViewProps) {
               </h2>
             </div>
             <OrderMap
+              origin={
+                order.branchLatitude && order.branchLongitude
+                  ? {
+                      latitude: order.branchLatitude,
+                      longitude: order.branchLongitude,
+                      label: order.branchName,
+                    }
+                  : undefined
+              }
               destination={
                 order.deliveryLatitude && order.deliveryLongitude
                   ? { latitude: order.deliveryLatitude, longitude: order.deliveryLongitude }

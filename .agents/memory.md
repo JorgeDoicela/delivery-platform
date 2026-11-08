@@ -37,3 +37,52 @@
   - Rutas dinámicas basadas en `params` Promise de Next.js 16 separan la resolución asíncrona dentro de componentes cargadores envueltos en `<Suspense>`, garantizando prerenderizado estático de 55 páginas sin errores.
 * **Modularización del Storefront Layout (< 400 líneas):**
   - `StorefrontHeader.tsx` (326 líneas), `StorefrontFooter.tsx` (215 líneas), `MobileBottomNav.tsx` (135 líneas) y `layout.tsx` (28 líneas).
+
+## 4. Responsividad Móvil Universal y Barras Inferiores Fijas (Mobile Bottom Navs)
+* **Storefront (`(storefront)`):** Barra fija inferior `MobileBottomNav.tsx` con accesos rápidos a Inicio, Menú, Locales, Rastreo, Bolsa y Perfil; se oculta automáticamente en `/checkout` y `/finalizar-pedido` para dar paso a la barra fija de confirmación. `StorefrontFooter` cuenta con `pb-20 xl:pb-0` para prevenir solapamiento.
+* **Checkout Móvil de Alta Conversión (`CheckoutForm.tsx`):** Dock fijo inferior en pantallas móviles (`fixed bottom-0` con `env(safe-area-inset-bottom)`) que mantiene visible el resumen de artículos, importe total y botón píldora "Confirmar Pedido", eliminando la necesidad de desplazarse hasta el final del formulario.
+* **Dashboard de Operaciones Modularizado (`(dashboard)`):**
+  - `layout.tsx` refactorizado de 471 líneas a 134 líneas dividiéndose en `DashboardHeader.tsx`, `DashboardMobileDrawer.tsx` y `DashboardBottomNav.tsx`.
+  - `DashboardBottomNav.tsx` ofrece navegación táctil inmediata para Cocina KDS, Inventario/Stock, Sucursales, Marca y Gobernanza SuperAdmin con `pb-24 md:pb-6` en el canvas principal.
+* **Reparto Móvil (`(driver)`):** Incorporación de `DriverBottomNav.tsx` para alternar instantáneamente con el pulgar entre "En Ruta", "Cocina" (con badge numérico de comandas listas) y "Mi Turno", además de acceso directo a la tienda pública.
+* **Inventario Modularizado (`InventoryManagerView.tsx`):** Reducido a 334 líneas extrayendo `InventoryDesktopTable.tsx` (174 líneas) y preservando tarjetas móviles táctiles con botones de acción superiores a 42px.
+* **Sincronización en Tiempo Real Continua (Cero Botones Manuales de Recarga):**
+  - Causa Raíz Erradicada: El botón manual de recarga en la cabecera del repartidor (`DriverHeader.tsx`) existía porque `useDriverHub.ts` fallaba al conectar a `/hubs/kitchen` al no enviar el JWT `accessTokenFactory` y porque el Hub requería la política restrictiva `KitchenOnly`.
+  - Backend Unificado (`KitchenHub.cs`): Autorización ampliada a `[Authorize(Policy = "OperationalStaffOnly")]`, permitiendo que cocineros, cajeros, administradores y repartidores se conecten a los eventos de su sucursal (`kitchen_branch_{branchId}`) en tiempo real.
+  - Repartidor Reactivo (`DriverHeader.tsx`, `useDriverHub.ts`, `DriverDeliveryView.tsx`): Botón manual con icono `RefreshCw` eliminado por completo. Reemplazado por suscripción SignalR con `accessTokenFactory`, reconexión automática (`withAutomaticReconnect`), refresco instantáneo ante `OrderStatusChanged` (ej. `ReadyForDelivery` con timbre sonoro) y fallback resiliente cada 25s al enfocar la app (`visibilitychange`). Badge visual "En Vivo" / "Reconectando".
+  - Pantalla KDS (`KitchenView.tsx`, `useKitchenOrders.ts`): Botón redundante de "Refrescar" eliminado. Conexión WebSocket blindada con `accessTokenFactory`, suscripción a `JoinBranchKitchen`, reconexión y fallback de 20s. Badge de estado "En Vivo • KDS".
+  - Sucursales y Redis (`BranchManagementView.tsx`): Botón manual "Refrescar" eliminado. Sustituido por `refetchInterval: 15000` con `refetchOnWindowFocus: true` en React Query y badge "Monitoreo en Vivo" con marca temporal.
+  - Catálogo e Inventario (`useMenuQuery.ts`): Sincronización reactiva con `refetchOnWindowFocus: true` y `refetchInterval: 30000` en modo administración (`includeInactive = true`).
+  - Gobernanza SaaS (`PlatformTenantsGovernanceView.tsx`): Botón manual "Actualizar" eliminado en favor de `refetchInterval: 30000`, `refetchOnWindowFocus: true` y badge "En Línea".
+  - Redirección Determinista (`resolvePostLoginRedirect` en `redirectByRole.ts`): Impide que clientes (`Customer`) sean redirigidos a rutas operativas (`/cocina`, `/admin`, `/superadmin`, `/repartidor`). Despacha a cada rol a su consola primaria (`SuperAdmin` -> `/superadmin`, `TenantAdmin` -> `/admin/personalizacion`, `BranchManager` -> `/admin/inventario`, `KitchenStaff`/`Cashier` -> `/cocina`, `Driver` -> `/repartidor`, `Customer` -> `/`).
+  - Aislamiento Multi-Tenant en Frontend (`AuthGuard.tsx`): Verifica que el usuario pertenezca al `activeTenantSlug` de la URL salvo excepciones de rol transversal (`SuperAdmin`). Bloquea con pantalla sobria de "Comercio no autorizado" con CTA de redirección hacia su propio establecimiento.
+  - Anclaje de Sucursal en KDS (`KitchenView.tsx`): El personal de cocina o caja asignado a una sucursal (`user.branchId`) visualiza un indicador fijo sin permiso para conmutar sucursales ajenas; la conmutación entre locales queda reservada a `BranchManager`, `TenantAdmin` y `SuperAdmin`.
+  - Navegación Dinámica por Rol (`DashboardHeader`, `DashboardBottomNav`, `DashboardMobileDrawer`, `StorefrontHeader`, `StorefrontMobileDrawer` y `login/page.tsx`): "Marca & Landing" restringido exclusivamente a `TenantAdmin` y `SuperAdmin`. Los botones en el perfil reflejan con exactitud las atribuciones de los 7 roles del dominio gastronómico.
+  - Límite de 400 Líneas Preservado: `StorefrontHeader.tsx` (263 líneas) modularizado extrayendo `StorefrontMobileDrawer.tsx` (234 líneas).
+
+## 5. Eliminación Estricta de Duplicidad de Controles y Botones de Navegación
+* **Principio de Única Fuente de Control por Dispositivo:** Queda estrictamente prohibido presentar pestañas, botones o enlaces duplicados simultáneamente entre cabeceras, barras flotantes inferiores y cuerpos de vista.
+* **Repartidor (`DriverDeliveryView.tsx` vs `DriverBottomNav.tsx`):**
+  - La barra de pestañas superior en cápsula (`[ En Curso ]` `[ Cocina ]` `[ Turno ]`) se oculta en móviles mediante `hidden sm:flex`.
+  - En móviles (`< sm`), `DriverBottomNav` es la única interfaz de control táctil con badges en tiempo real. En tablets y escritorio (`>= sm`), la cápsula superior toma el control y la barra inferior permanece oculta (`sm:hidden`).
+  - Se aplicó padding inferior `pb-24 sm:pb-10` en el contenedor y márgenes adecuados en `ActiveDeliveryTab.tsx` para evitar colisiones con docks fijos.
+* **Paneles de Operaciones (`DashboardMobileDrawer.tsx` vs `DashboardBottomNav.tsx`):**
+  - `DashboardBottomNav.tsx` es el canal primario de acceso a módulos (`KDS`, `Stock`, `Locales`, `Marca`, `Admin`, `Tienda`).
+  - En `DashboardMobileDrawer.tsx` se eliminó la lista redundante de módulos operativos. El drawer se destina exclusivamente a gestión de entorno y preferencias: `TenantSwitcher` para SuperAdmin, indicadores de alerta sonora KDS, modo pantalla completa, acceso a tienda y cambio de tema con `ThemeToggle`.
+* **Vitrina Pública (`StorefrontMobileDrawer.tsx` vs `MobileBottomNav.tsx`):**
+  - `MobileBottomNav.tsx` centraliza la navegación habitual (`Inicio`, `Menú`, `Locales`, `Rastreo`, `Bolsa`, `Perfil`).
+  - `StorefrontMobileDrawer.tsx` provee enlaces complementarios que no saturan el dock inferior: `Sucursales & Cobertura`, `Términos y Condiciones`, `Aviso de Privacidad` y selector dinámico de sucursales en pantallas reducidas.
+
+## 6. Telemetría Geoespacial del Repartidor (PostGIS + Redis GEO + SignalR)
+* **División de Responsabilidades:**
+  - PostGIS (PostgreSQL 16 + NetTopologySuite): Persistencia de `Order.DeliveryLocation` (`Point`), geocercas poligonales de sucursales (`Branch.DeliveryPolygon`) con índice espacial GIST y validación de cobertura (`ST_Contains`).
+  - Redis 7 GEO: Ingesta efímera de alta frecuencia (`GEOADD active_drivers:locations`) y rumbo (`driver:{driverId}:heading`) para no saturar PostgreSQL con escrituras masivas cada 3 segundos.
+  - SignalR (`TrackingHub`): Retransmisión push de `ReceiveDriverLocation` al grupo `order_tracking_{orderId}`.
+* **Carga Inmediata y Resiliencia en Cliente (`useOrderTracking.ts`):**
+  - Al montar la vista de rastreo o cambiar la orden a `OnTheWay`, se consulta inmediatamente `apiClient.getDriverLocation(orderId)` (Redis GEO) para pintar al motorizado en el mapa desde el primer milisegundo sin esperar al siguiente pulso de SignalR.
+  - Mantiene la suscripción a eventos WebSocket de SignalR para movimiento continuo y rotación según rumbo (`heading`).
+* **Experiencia de Usuario de Extremo a Extremo (Checkout -> Despacho -> Rastreo):**
+  - Checkout Inteligente (`CheckoutForm.tsx`): Pre-llenado automático de nombre y correo electrónico si el usuario ha iniciado sesión, eliminando fricción.
+  - Geolocalización de Destino (`GeofenceChecker.tsx`): Detección satelital vía GPS nativo o selección visual con pin arrastrable sobre MapLibre GL JS, validado contra el polígono PostGIS de la sucursal (`ST_Contains`).
+  - Mapa Completo Origen-Destino (`OrderMap.tsx`): `GetOrderById` expone `BranchLatitude` y `BranchLongitude` permitiendo renderizar tanto el local de origen como el domicilio de entrega desde el momento de creación del pedido.
+  - Banners Contextuales Dinámicos (`OrderTrackingView.tsx`): Mensajes explicativos en cada fase (`En Cola`, `En Cocina`, `Empacado`, `Motorizado en Ruta`, `Entregado`) que comunican con claridad el avance del pedido.

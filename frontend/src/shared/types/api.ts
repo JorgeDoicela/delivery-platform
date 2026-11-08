@@ -111,6 +111,8 @@ export interface OrderDetailResponse {
   orderId: string;
   branchId: number;
   branchName: string;
+  branchLatitude?: number;
+  branchLongitude?: number;
   customerName: string;
   customerPhone: string;
   customerEmail?: string;
