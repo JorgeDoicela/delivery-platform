@@ -60,18 +60,26 @@ La documentacion tecnica detallada del sistema se encuentra organizada bajo taxo
 * .NET SDK 8.0
 * Node.js 20+ y pnpm 10+
 
-### Paso 1: Iniciar Contenedores de Base de Datos y Cache
-Por defecto, la orquestacion de desarrollo utiliza perfiles (`profiles: ["app", "all"]`), por lo que el comando base levanta exclusivamente la infraestructura de datos (`postgres` y `redis`), dejando libres los puertos `5005` y `3005` para depuracion en el host:
+### Paso 1: Configurar Variables de Entorno (Única Fuente de la Verdad)
+Copiar la plantilla canónica `.env.example` a `.env` en la raíz del proyecto:
+```powershell
+cp .env.example .env
+```
+> [!IMPORTANT]
+> El archivo `.env` en la raíz es la **única fuente de la verdad** para todo el sistema (backend, frontend, base de datos y Nginx). Está protegido e ignorado en Git para repositorios públicos. En producción, reemplace las contraseñas y secretos por valores seguros.
+
+### Paso 2: Iniciar Contenedores de Base de Datos y Cache
+Inicia la infraestructura de datos (`postgres` y `redis`), dejando libres los puertos `5005` y `3005` para depuración nativa en el host:
 ```powershell
 pnpm infra:up
 ```
 O directamente mediante Docker Compose:
 ```powershell
-docker compose up -d
+docker compose up -d postgres redis
 ```
 Verificar que los servicios esten saludables con `pnpm infra:status` o `docker compose ps`.
 
-### Paso 2: Iniciar el Backend (.NET 8)
+### Paso 3: Iniciar el Backend (.NET 8)
 ```powershell
 pnpm dev:backend
 ```
@@ -82,14 +90,25 @@ pnpm dev:backend:watch
 *API disponible en:* `http://localhost:5005`  
 *Swagger UI:* `http://localhost:5005/swagger`
 
-### Paso 3: Iniciar el Frontend (Next.js 16)
+### Paso 4: Iniciar el Frontend (Next.js 16)
 ```powershell
 pnpm dev:frontend
 ```
 *Aplicacion disponible en:* `http://localhost:3005`
 
-> [!NOTE]
-> Si se desea levantar todo el stack en contenedores Docker (incluyendo backend y frontend compilados en contenedores), ejecutar: `pnpm docker:all` (o `docker compose --profile all up -d`).
+### Despliegue en Servidor de Producción (Stack Dockerizado)
+Para desplegar en un servidor nuevo o VPS:
+1. Clonar el repositorio.
+2. Copiar `.env.example` a `.env` y definir las variables de producción (`POSTGRES_PASSWORD`, `REDIS_PASSWORD`, `JWT_SECRET`, `INITIAL_ADMIN_PASSWORD`, `PLATFORM_DOMAIN`).
+3. Ejecutar el despliegue del stack completo:
+```bash
+docker compose up -d --build
+```
+O mediante el script de despliegue automatizado con healthchecks activos y rollback:
+```bash
+./scripts/deploy/deploy.sh all
+```
+El reverse proxy perimetral de Nginx gestionará automáticamente la terminación TLS en los puertos 80 y 443, enrutando `/api/` y `/hubs/` al backend y `/` al frontend.
 
 ---
 

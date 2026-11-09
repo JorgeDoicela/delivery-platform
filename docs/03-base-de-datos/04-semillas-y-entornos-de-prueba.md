@@ -31,17 +31,17 @@ flowchart TD
 
 ## 3. Directorio de Cuentas y Credenciales de Prueba
 
-En entornos de desarrollo local, todas las cuentas predeterminadas se crean con el hash seguro BCrypt de la contrasena `Admin123!`:
+En entornos de desarrollo local, las cuentas sembradas obtienen su contraseña a partir de la variable de entorno `INITIAL_ADMIN_PASSWORD` definida en el archivo `.env` raíz (con fallback a `Admin123!` para suites de pruebas unitarias automatizadas):
 
-| Rol del Sistema | Correo Electronico | Contrasena | Tenant Asignado | Sucursal Asignada | Proposito de Prueba |
+| Rol del Sistema | Correo Electronico | Contrasena (.env) | Tenant Asignado | Sucursal Asignada | Proposito de Prueba |
 | :--- | :--- | :--- | :--- | :--- | :--- |
-| **SuperAdmin** | `jorge@admin.com` | `Admin123!` | Global (`null`) | Global (`null`) | Gestion de franquicias en `/superadmin` |
-| **TenantAdmin** | `esmeralda@lagranjita.com` | `Admin123!` | `la-granjita` | Todas las sedes | Administracion de carta, banners y politicas |
-| **BranchManager**| `gerente.norte@lagranjita.com`| `Admin123!` | `la-granjita` | `1` (Sucursal Norte) | Control de capacidad y turnos de sede norte |
-| **Cashier** | `cajero.norte@lagranjita.com` | `Admin123!` | `la-granjita` | `1` (Sucursal Norte) | Apertura/cierre de turnos y aprobacion de transferencias |
-| **KitchenStaff** | `cocina.norte@lagranjita.com` | `Admin123!` | `la-granjita` | `1` (Sucursal Norte) | Terminal KDS en `/cocina` con alertas de audio |
-| **Driver** | `repartidor@lagranjita.com` | `Admin123!` | `la-granjita` | `1` (Sucursal Norte) | Transmision GPS en `/repartidor` y `/active-delivery` |
-| **TenantAdmin (T2)**| `admin@brasasdelvalle.com`| `Admin123!` | `brasas-del-valle`| Matriz Cumbaya | Validacion de aislamiento multitenant y tema verde |
+| **SuperAdmin** | `jorge@admin.com` | `${INITIAL_ADMIN_PASSWORD}` | Global (`null`) | Global (`null`) | Gestion de franquicias en `/superadmin` |
+| **TenantAdmin** | `esmeralda@lagranjita.com` | `${INITIAL_ADMIN_PASSWORD}` | `la-granjita` | Todas las sedes | Administracion de carta, banners y politicas |
+| **BranchManager**| `gerente.norte@lagranjita.com`| `${INITIAL_ADMIN_PASSWORD}` | `la-granjita` | `1` (Sucursal Norte) | Control de capacidad y turnos de sede norte |
+| **Cashier** | `cajero.norte@lagranjita.com` | `${INITIAL_ADMIN_PASSWORD}` | `la-granjita` | `1` (Sucursal Norte) | Apertura/cierre de turnos y aprobacion de transferencias |
+| **KitchenStaff** | `cocina.norte@lagranjita.com` | `${INITIAL_ADMIN_PASSWORD}` | `la-granjita` | `1` (Sucursal Norte) | Terminal KDS en `/cocina` con alertas de audio |
+| **Driver** | `repartidor@lagranjita.com` | `${INITIAL_ADMIN_PASSWORD}` | `la-granjita` | `1` (Sucursal Norte) | Transmision GPS en `/repartidor` y `/active-delivery` |
+| **TenantAdmin (T2)**| `admin@brasasdelvalle.com`| `${INITIAL_ADMIN_PASSWORD}` | `brasas-del-valle`| Matriz Cumbaya | Validacion de aislamiento multitenant y tema verde |
 
 ---
 
@@ -80,7 +80,29 @@ END $$;
 
 ---
 
-## 6. Procedimiento de Reinicio Limpio de Datos en Desarrollo
+## 6. Motor de Corpus Gastronomico y Validacion (`scripts/db/seed-corpus.ps1`)
+
+Los catalogos oficiales residen en archivos JSON estructurados dentro de `backend/src/Delivery.Core/Infrastructure/Persistence/Corpus/`:
+* `catalog.la-granjita.json`: Menu completo de La Granjita (5 categorias, 3 grupos de modificadores, 33 items con SKU, precio y guarniciones).
+* `catalog.brasas-del-valle.json`: Menu de cortes de carne y parrilladas gourmet para Brasas del Valle.
+
+### 6.1. Estrategia de Carga Resiliente (`CorpusCatalogLoader.cs`)
+1. **Lectura Directa en Disco:** Busca el archivo en rutas relativas del proyecto para reflejar adiciones inmediatas de items en entornos locales de desarrollo.
+2. **Fallback a Recurso Embebido:** Si los archivos no estan presentes como archivos sueltos en el contenedor (como en entornos de produccion o pruebas unitarias aisladas), los lee directamente desde el ensamblado compilado `Delivery.Core.dll` mediante `GetManifestResourceStream`.
+
+### 6.2. Script Operativo de Validacion de Corpus
+Para verificar la integridad de los JSON y la idempotencia de siembra:
+```powershell
+# Validar unicamente sintaxis JSON, SKUs y precios no negativos
+.\scripts\db\seed-corpus.ps1 -ValidateOnly
+
+# Validar y ejecutar la suite completa de pruebas de siembra e idempotencia en .NET
+.\scripts\db\seed-corpus.ps1
+```
+
+---
+
+## 7. Procedimiento de Reinicio Limpio de Datos en Desarrollo
 
 Para restablecer la base de datos a su estado virgen con semillas frescas:
 

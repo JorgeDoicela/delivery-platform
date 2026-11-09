@@ -10,7 +10,7 @@ IFS=$'\n\t'
 
 readonly SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 readonly PROJECT_ROOT="$(cd "${SCRIPT_DIR}/../.." && pwd)"
-readonly COMPOSE_FILE="${PROJECT_ROOT}/docker-compose.prod.yml"
+readonly COMPOSE_FILE="${PROJECT_ROOT}/docker-compose.yml"
 readonly LAST_COMMIT_FILE="${PROJECT_ROOT}/.last_successful_commit"
 readonly PREVIOUS_COMMIT_FILE="${PROJECT_ROOT}/.previous_commit"
 
@@ -32,21 +32,33 @@ cd "$PROJECT_ROOT"
 rollback_image() {
   local service_name="$1"
   local base_name="$2"
-  local full_image
-  full_image="$(docker compose -f "$COMPOSE_FILE" images -q "$service_name" 2>/dev/null || true)"
 
-  # Buscar tag previous por nombre de repositorio o fallback a local
-  if docker image inspect "ghcr.io/jorgedoicela/delivery-platform/${base_name}:previous" >/dev/null 2>&1; then
-    log "Restaurando ghcr.io/jorgedoicela/delivery-platform/${base_name}:previous..."
-    docker tag "ghcr.io/jorgedoicela/delivery-platform/${base_name}:previous" "ghcr.io/jorgedoicela/delivery-platform/${base_name}:latest"
+  # 1. Buscar en el cache de Docker si existe cualquier imagen terminada en ${base_name}:previous
+  local target_image
+  target_image="$(docker images --format '{{.Repository}}:{{.Tag}}' 2>/dev/null | grep -E "(/|^)${base_name}:previous$" | head -n 1 || true)"
+
+  if [ -n "$target_image" ]; then
+    local repo_base="${target_image%:previous}"
+    log "Restaurando snapshot ${target_image} -> ${repo_base}:latest..."
+    docker tag "${target_image}" "${repo_base}:latest"
     docker compose -f "$COMPOSE_FILE" up -d --no-deps "$service_name"
-  elif docker image inspect "${base_name}:previous" >/dev/null 2>&1; then
-    log "Restaurando ${base_name}:previous a latest..."
-    docker tag "${base_name}:previous" "${base_name}:latest"
-    docker compose -f "$COMPOSE_FILE" up -d --no-deps "$service_name"
-  else
-    log "AVISO: No se encontro tag ${base_name}:previous en el cache local."
+    return 0
   fi
+
+  # 2. Fallback a resolver la imagen configurada en Compose
+  local configured_image
+  configured_image="$(docker compose -f "$COMPOSE_FILE" config --images 2>/dev/null | grep -E "${base_name}(:|$)" | head -n 1 || true)"
+  if [ -n "$configured_image" ]; then
+    local conf_base="${configured_image%%:*}"
+    if docker image inspect "${conf_base}:previous" >/dev/null 2>&1; then
+      log "Restaurando ${conf_base}:previous -> ${conf_base}:latest..."
+      docker tag "${conf_base}:previous" "${conf_base}:latest"
+      docker compose -f "$COMPOSE_FILE" up -d --no-deps "$service_name"
+      return 0
+    fi
+  fi
+
+  log "AVISO: No se encontro tag ${base_name}:previous en el cache local de Docker."
 }
 
 case "$TARGET" in
@@ -81,17 +93,34 @@ log "Asegurando ejecucion de contenedores estables..."
 docker compose -f "$COMPOSE_FILE" up -d
 
 # 4. Verificación de salud posterior al rollback
-log "Comprobando salud del backend tras el rollback..."
-sleep 5
+check_container_health() {
+  local container="$1"
+  local max_attempts=8
+  local attempt=1
+  local wait_seconds=3
 
-if docker inspect --format='{{.State.Status}}' delivery-backend-prod 2>/dev/null | grep -Eq "running|healthy"; then
-  log "Backend recuperado exitosamente."
+  while [ "$attempt" -le "$max_attempts" ]; do
+    local status
+    status="$(docker inspect --format='{{if .State.Health}}{{.State.Health.Status}}{{else}}{{.State.Status}}{{end}}' "$container" 2>/dev/null || echo 'not_found')"
+    if [ "$status" = "healthy" ] || [ "$status" = "running" ]; then
+      return 0
+    fi
+    sleep "$wait_seconds"
+    attempt=$((attempt + 1))
+  done
+  return 1
+}
+
+log "Comprobando salud de los servicios tras el rollback..."
+
+if check_container_health "delivery-backend"; then
+  log "Backend operativo tras rollback."
 else
   die "El backend no pudo recuperarse tras el rollback."
 fi
 
-if docker inspect --format='{{.State.Status}}' delivery-frontend-prod 2>/dev/null | grep -Eq "running|healthy"; then
-  log "Frontend recuperado exitosamente."
+if check_container_health "delivery-frontend"; then
+  log "Frontend operativo tras rollback."
 else
   die "El frontend no pudo recuperarse tras el rollback."
 fi

@@ -18,7 +18,28 @@
 **/*.user
 **/*.suo
 **/*.DotSettings.user
-**/.env*.local
+
+# Secretos, Entornos y Certificados
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+*.crt
+*.cert
+*.pfx
+*.p12
+docker/nginx/certs/*
+!docker/nginx/certs/.gitkeep
+
+# Datos y Backups
+docker-data/
+*.dump
+*.backup
+*.sql
+!scripts/db/*.sql
+
+# Cobertura y Logs
 **/coverage
 **/.vs
 **/.idea
@@ -26,3 +47,4 @@
 **/*.log
 **/.DS_Store
 Thumbs.db
+

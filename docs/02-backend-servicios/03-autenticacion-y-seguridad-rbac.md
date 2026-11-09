@@ -155,7 +155,7 @@ sequenceDiagram
 
 ### 3.1. Estructura de Claims
 
-El token de acceso es firmado mediante el algoritmo **HMAC-SHA256 (HS256)** utilizando una clave secreta simetrica configurable de al menos 256 bits (`Jwt:SecretKey`).
+El token de acceso es firmado mediante el algoritmo **HMAC-SHA256 (HS256)** utilizando una clave secreta simetrica configurable de al menos 256 bits inyectada desde la variable de entorno `JWT_SECRET` (o `Jwt__SecretKey` en `.env`). Por politica de repositorio publico seguro, esta clave nunca reside en `appsettings.json`.
 
 | Claim | Estandar / Clave | Descripcion | Ejemplo |
 | :--- | :--- | :--- | :--- |
@@ -276,6 +276,40 @@ La suite de pruebas en `AuthHandlerTests.cs` y las pruebas de arquitectura en `V
 * Rotacion criptografica exitosa del refresh token con invalidacion del token precedente.
 * Cero dependencias cruzadas entre las rebanadas de `Delivery.Features.Auth.*`.
 * Cumplimiento estricto de convenciones de nombres de VSA (sin sufijos prohibidos `Service`, `Repository` o `Manager` en la capa de caracteristicas).
+
+---
+
+## 7. Politica Perimetral de CORS y Origenes Permitidos
+
+Para mitigar riesgos de CSRF y fuga de tokens de sesion con credenciales (`AllowCredentials()`), el backend implementa una politica de validacion dinamica de origenes en `Program.cs` vinculada a la variable `PLATFORM_DOMAIN` (o `NEXT_PUBLIC_PLATFORM_DOMAIN`):
+
+```csharp
+policy.SetIsOriginAllowed(origin =>
+{
+    if (string.IsNullOrWhiteSpace(origin)) return false;
+    if (!Uri.TryCreate(origin, UriKind.Absolute, out var uri)) return false;
+    var host = uri.Host;
+
+    // 1. Origenes locales de desarrollo
+    if (host.Equals("localhost", StringComparison.OrdinalIgnoreCase) ||
+        host.Equals("127.0.0.1", StringComparison.OrdinalIgnoreCase))
+        return true;
+
+    // 2. Origenes explícitamente configurados en Cors:AllowedOrigins
+    if (allowedOrigins.Any(ao => string.Equals(ao, origin, StringComparison.OrdinalIgnoreCase)))
+        return true;
+
+    // 3. Dominio raiz de produccion y subdominios dinamicos de tenants (*.mesafy.doicela.dev)
+    if (host.Equals(platformDomain, StringComparison.OrdinalIgnoreCase) ||
+        host.EndsWith("." + platformDomain, StringComparison.OrdinalIgnoreCase))
+        return true;
+
+    return false;
+})
+.AllowAnyHeader()
+.AllowAnyMethod()
+.AllowCredentials();
+```
 
 ---
 

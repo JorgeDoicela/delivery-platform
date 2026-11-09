@@ -1,51 +1,73 @@
-# 01. Infraestructura Local con Docker Compose
+# 01. Infraestructura Docker Compose y Orquestación Unificada
 
-## 1. Descripcion General
-La persistencia y el motor de cache local estan orquestados mediante Docker Compose en el archivo `docker-compose.yml` en la raiz del repositorio.
+## 1. Descripción General
+La persistencia, el motor de caché, la API backend, el frontend web y el proxy perimetral Nginx están orquestados bajo un **único archivo canónico: `docker-compose.yml`** en la raíz del repositorio. Este manifiesto gobierna tanto el entorno de desarrollo local como el despliegue automatizado en servidores de producción.
 
-## 2. Definicion de Servicios
+Toda la parametrización de puertos, contraseñas y claves criptográficas se alimenta exclusivamente del archivo `.env` en la raíz (Única Fuente de la Verdad).
+
+---
+
+## 2. Definición Canónica de Servicios
+
+```mermaid
+flowchart TD
+    ENV[".env (ÚNICA FUENTE DE LA VERDAD)"] --> COMPOSE["docker-compose.yml (MANIFIESTO ÚNICO)"]
+    
+    COMPOSE --> POSTGRES["delivery-postgres<br/>PostGIS 16-3.4 (Puerto 5432)"]
+    COMPOSE --> REDIS["delivery-redis<br/>Redis 7-alpine (Puerto 6379)"]
+    COMPOSE --> BACKEND["delivery-backend<br/>.NET 8 Web API (Puerto 5005)"]
+    COMPOSE --> FRONTEND["delivery-frontend<br/>Next.js 16 (Puerto 3005)"]
+    COMPOSE --> NGINX["delivery-nginx<br/>Reverse Proxy TLS (Puertos 80/443)"]
+```
 
 ### 2.1. Base de Datos Principal: `delivery-postgres`
 * **Imagen:** `postgis/postgis:16-3.4`
-* **Puerto Expuesto:** `5432:5432`
+* **Contenedor:** `delivery-postgres`
+* **Enlace y Puerto:** `${POSTGRES_BIND_IP:-127.0.0.1}:${POSTGRES_PORT:-5432}:5432` (aislado a localhost en producción).
 * **Variables de Entorno:**
-  - `POSTGRES_DB=delivery`
-  - `POSTGRES_USER=postgres`
-  - `POSTGRES_PASSWORD=postgres_dev_password`
-* **Volumen Persistente:** `postgres_data:/var/lib/postgresql/data`
-* **Script de Inicializacion:** `scripts/db/init-postgis.sql` montado en `/docker-entrypoint-initdb.d/01-init-postgis.sql:ro` (extensiones PostGIS y uuid-ossp).
-* **Mecanismo de Healthcheck:**
+  - `POSTGRES_DB=${POSTGRES_DB:-delivery}`
+  - `POSTGRES_USER=${POSTGRES_USER:-postgres}`
+  - `POSTGRES_PASSWORD=${POSTGRES_PASSWORD:?Definir POSTGRES_PASSWORD en .env}`
+* **Volumen Persistente:** `delivery_postgres_data:/var/lib/postgresql/data`
+* **Script de Inicialización:** `scripts/db/init-postgis.sql` montado en `/docker-entrypoint-initdb.d/01-init-postgis.sql:ro` (extensiones `postgis` y `uuid-ossp`).
+* **Healthcheck:**
   ```yaml
-  test: ["CMD-SHELL", "pg_isready -U postgres -d delivery"]
+  test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-postgres} -d ${POSTGRES_DB:-delivery}"]
   interval: 5s
   timeout: 5s
   retries: 5
+  start_period: 10s
   ```
 
-### 2.2. Motor de Cache y GEO: `delivery-redis`
+### 2.2. Motor de Caché y GEO: `delivery-redis`
 * **Imagen:** `redis:7-alpine`
-* **Puerto Expuesto:** `6379:6379`
-* **Comando de Arranque:** `redis-server --requirepass redis_dev_password`
-* **Volumen Persistente:** `redis_data:/data`
-* **Mecanismo de Healthcheck:**
+* **Contenedor:** `delivery-redis`
+* **Enlace y Puerto:** `${REDIS_BIND_IP:-127.0.0.1}:${REDIS_PORT:-6379}:6379` (aislado a localhost en producción).
+* **Comando de Arranque:** `redis-server --requirepass ${REDIS_PASSWORD:?Definir REDIS_PASSWORD en .env} --appendonly yes`
+* **Volumen Persistente:** `delivery_redis_data:/data`
+* **Healthcheck:**
   ```yaml
-  test: ["CMD", "redis-cli", "-a", "redis_dev_password", "ping"]
+  test: ["CMD", "redis-cli", "-a", "${REDIS_PASSWORD}", "ping"]
   interval: 5s
   timeout: 5s
   retries: 5
+  start_period: 5s
   ```
 
 ### 2.3. Backend API .NET 8: `delivery-backend`
-* **Imagen:** `delivery-backend:latest` (construida desde `backend/Dockerfile`)
-* **Perfiles Docker Compose:** `["app", "all"]`
-* **Puerto Expuesto:** `5005:5005`
+* **Imagen:** `${BACKEND_IMAGE:-${IMAGE_REGISTRY_PREFIX:-ghcr.io/jorgedoicela/delivery-platform}/delivery-backend:latest}`
+* **Contenedor:** `delivery-backend`
+* **Puerto:** `${API_BIND_IP:-127.0.0.1}:${API_PORT:-5005}:5005`
 * **Variables de Entorno:**
-  - `ASPNETCORE_ENVIRONMENT=Development`
+  - `ASPNETCORE_ENVIRONMENT=${ASPNETCORE_ENVIRONMENT:-Production}`
   - `ASPNETCORE_URLS=http://+:5005`
-  - `ConnectionStrings__DefaultConnection=Host=postgres;Port=5432;Database=delivery;Username=postgres;Password=postgres_dev_password`
-  - `ConnectionStrings__Redis=redis:6379,password=redis_dev_password`
+  - `ConnectionStrings__DefaultConnection=Host=postgres;Port=5432;Database=${POSTGRES_DB:-delivery};Username=${POSTGRES_USER:-postgres};Password=${POSTGRES_PASSWORD:?Definir POSTGRES_PASSWORD en .env}`
+  - `ConnectionStrings__Redis=redis:6379,password=${REDIS_PASSWORD:?Definir REDIS_PASSWORD en .env}`
+  - `Jwt__SecretKey=${JWT_SECRET:?Definir JWT_SECRET en .env}`
+  - `INITIAL_ADMIN_PASSWORD=${INITIAL_ADMIN_PASSWORD:?Definir INITIAL_ADMIN_PASSWORD en .env}`
+  - `GOOGLE_CLIENT_ID=${GOOGLE_CLIENT_ID:-}`
 * **Dependencias:** `postgres` y `redis` en estado saludable (`service_healthy`).
-* **Mecanismo de Healthcheck:**
+* **Healthcheck:**
   ```yaml
   test: ["CMD", "curl", "-f", "http://127.0.0.1:5005/health"]
   interval: 10s
@@ -55,62 +77,86 @@ La persistencia y el motor de cache local estan orquestados mediante Docker Comp
   ```
 
 ### 2.4. Frontend Web Next.js 16: `delivery-frontend`
-* **Imagen:** `delivery-frontend:latest` (construida desde `frontend/Dockerfile`)
-* **Perfiles Docker Compose:** `["app", "all"]`
-* **Puerto Expuesto:** `3005:3005`
+* **Imagen:** `${FRONTEND_IMAGE:-${IMAGE_REGISTRY_PREFIX:-ghcr.io/jorgedoicela/delivery-platform}/delivery-frontend:latest}`
+* **Contenedor:** `delivery-frontend`
+* **Puerto:** `${FRONTEND_BIND_IP:-127.0.0.1}:${PORT:-3005}:3005`
 * **Variables de Entorno:**
   - `NODE_ENV=production`
   - `PORT=3005`
   - `HOSTNAME=0.0.0.0`
-  - `NEXT_PUBLIC_API_URL=http://localhost:5005`
-  - `NEXT_PUBLIC_WS_URL=http://localhost:5005/hubs`
+  - `INTERNAL_API_URL=${INTERNAL_API_URL:-http://backend:5005}`
+  - `NEXT_PUBLIC_API_URL=${NEXT_PUBLIC_API_URL:-}`
+  - `NEXT_PUBLIC_WS_URL=${NEXT_PUBLIC_WS_URL:-}`
+  - `NEXT_PUBLIC_PLATFORM_DOMAIN=${NEXT_PUBLIC_PLATFORM_DOMAIN:-mesafy.doicela.dev}`
+  - `NEXT_PUBLIC_GOOGLE_CLIENT_ID=${NEXT_PUBLIC_GOOGLE_CLIENT_ID:-}`
 * **Dependencias:** `backend` en estado saludable (`service_healthy`).
-* **Mecanismo de Healthcheck:**
+* **Healthcheck:**
   ```yaml
-  test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://127.0.0.1:3005/api/health"]
+  test: ["CMD", "curl", "-f", "http://127.0.0.1:3005/api/health"]
   interval: 10s
-  timeout: 5s
-  retries: 5
-  start_period: 15s
+  timeout: 3s
+  retries: 3
+  start_period: 20s
+  ```
+
+### 2.5. Proxy Perimetral TLS: `delivery-nginx`
+* **Imagen:** `${NGINX_IMAGE:-${IMAGE_REGISTRY_PREFIX:-ghcr.io/jorgedoicela/delivery-platform}/delivery-nginx:latest}`
+* **Contenedor:** `delivery-nginx`
+* **Puertos Expuestos:** `80:80` (HTTP) y `443:443` (HTTPS).
+* **Volúmenes:** `./docker/nginx/certs:/etc/nginx/certs`
+* **Variables de Entorno:**
+  - `PLATFORM_DOMAIN=${PLATFORM_DOMAIN:-${NEXT_PUBLIC_PLATFORM_DOMAIN:-mesafy.doicela.dev}}`
+* **Dependencias:** `frontend` y `backend` en estado saludable (`service_healthy`).
+* **Healthcheck:**
+  ```yaml
+  test: ["CMD", "curl", "-f", "http://127.0.0.1/health"]
+  interval: 10s
+  timeout: 3s
+  retries: 3
+  start_period: 10s
   ```
 
 ---
 
-## 3. Arquitectura de Perfiles y Flujo de Desarrollo
+## 3. Flujo de Desarrollo y Ciclo de Vida
 
-Para evitar conflictos de enlace de sockets (`SocketException 10048: Address already in use`) en los puertos locales `5005` y `3005` al depurar en el host, la orquestacion de Docker Compose implementa segregacion por **Perfiles de Docker Compose**:
+Para garantizar máxima velocidad de desarrollo sin conflictos de puertos en el host:
 
-* **Infraestructura Base (Sin perfil asignado):** Los servicios `postgres` y `redis` pertenecen al perfil predeterminado. Al ejecutar `docker compose up -d`, únicamente se inician la base de datos y la caché, permitiendo que la API (.NET) y la Web (Next.js) se ejecuten y depuren nativamente en la máquina del desarrollador.
-* **Stack Completo en Contenedores (`profile all`):** Los servicios `backend` y `frontend` requieren la activación explícita del perfil (`--profile all`).
+1. **Modo Híbrido con Auto-Recarga en Host (Recomendado):**  
+   Inicia la persistencia en Docker y ejecuta la API y el Frontend directamente en tu sistema operativo:
+   * `pnpm infra:up`: Inicia exclusivamente `postgres` y `redis` (`docker compose up -d postgres redis`).
+   * `pnpm dev:backend:watch`: Inicia la API con `dotnet watch` y recarga en caliente (~200ms).
+   * `pnpm dev:frontend`: Inicia Next.js con Fast Refresh en el puerto `3005`.
+
+2. **Modo 100% Contenedorizado:**  
+   Inicia el stack completo de 5 servicios mediante `pnpm docker:all` (`docker compose up -d`).
 
 ---
 
-## 4. Comandos Estandarizados de Gestion y Ciclo de Vida
-
-Se proporcionan scripts npm en el `package.json` de la raíz para estandarizar el ciclo de vida del entorno:
+## 4. Comandos Estandarizados en `package.json`
 
 | Comando | Acción Técnica |
 | :--- | :--- |
-| `pnpm infra:up` | Levanta únicamente `postgres` y `redis` en segundo plano (`docker compose up -d`). |
+| `pnpm infra:up` | Levanta únicamente `postgres` y `redis` (`docker compose up -d postgres redis`). |
 | `pnpm infra:down` | Detiene y remueve los contenedores de infraestructura (`docker compose down`). |
 | `pnpm infra:status` | Consulta el estado y salud activa de los contenedores (`docker compose ps`). |
-| `pnpm dev:backend` | Inicia la API de .NET 8 localmente en el puerto `5005` conectándose a la BD y Redis. |
+| `pnpm dev:backend` | Inicia la API de .NET 8 localmente en el puerto `5005`. |
 | `pnpm dev:backend:watch` | Inicia la API con recarga en caliente continua (`dotnet watch`). |
-| `pnpm dev:frontend` | Inicia el frontend de Next.js en el puerto `3005` (`pnpm --filter frontend dev`). |
-| `pnpm docker:all` | Compila y levanta los 4 contenedores en Docker (`docker compose --profile all up -d`). |
+| `pnpm dev:frontend` | Inicia el frontend de Next.js en el puerto `3005`. |
+| `pnpm docker:all` | Compila y levanta todo el stack en Docker (`docker compose up -d`). |
 
 ---
 
-## 5. Scripts de Operacion y Despliegue en Produccion
-Para la gestion del ciclo de vida en servidores remotos y contingencias de produccion, los scripts operativos residen en `scripts/deploy/`:
-* `scripts/deploy/deploy.sh`: Automatizacion de despliegue con verificacion activa de health checks y fallback.
-* `scripts/deploy/rollback.sh`: Reversion inmediata a imagenes Docker con etiqueta `:previous`.
+## 5. Scripts de Operación y Despliegue en Producción
+Para la gestión del ciclo de vida en servidores remotos y contingencias de producción, los scripts operativos residen en `scripts/deploy/`:
+* `scripts/deploy/deploy.sh`: Automatización de despliegue con verificación activa de health checks, preservación de snapshots `:previous` y limpieza automática `prune`.
+* `scripts/deploy/rollback.sh`: Reversión inmediata a imágenes Docker con etiqueta `:previous`.
 
-Consulte la guia detallada de CI/CD y despliegue continuo en [03-guia-despliegue-devops.md](./03-guia-despliegue-devops.md).
+Consulte la guía detallada de CI/CD y despliegue continuo en [03-guia-despliegue-devops.md](./03-guia-despliegue-devops.md).
 
 ---
 
-## Navegacion de Documentacion
-* **Anterior:** [03. Herramienta Movil del Repartidor y Telemetria GPS](../04-frontend-web/03-pantalla-repartidor-gps.md)
-* **Siguiente:** [02. Empaquetado Movil con Capacitor](./02-empaquetado-capacitor.md)
-* **Indice General:** [README Principal](../../README.md)
+## Navegación de Documentación
+* **Anterior:** [03. Herramienta Móvil del Repartidor y Telemetría GPS](../04-frontend-web/03-pantalla-repartidor-gps.md)
+* **Siguiente:** [02. Empaquetado Móvil con Capacitor](./02-empaquetado-capacitor.md)
+* **Índice General:** [README Principal](../../README.md)

@@ -31,7 +31,7 @@ El sistema opera bajo un pipeline continuo y desacoplado mediante GitHub Actions
 [ Servidor de Producción ]
        │  git fetch & reset hard origin/main
        │  Taggeo de imágenes actuales como :previous
-       │  docker compose -f docker-compose.prod.yml build & up -d
+       │  docker compose build & up -d
        │  Sondeo activo de healthchecks (18 intentos x 5s)
        │
        ├─► [Exitoso] ──► Registra commit en .last_successful_commit
@@ -42,67 +42,121 @@ El sistema opera bajo un pipeline continuo y desacoplado mediante GitHub Actions
 
 ---
 
-## 2. Matriz de Secretos en GitHub Actions
+## 2. Matriz de Secretos y Variables en GitHub Actions
 
-Para habilitar el despliegue automático, configure los siguientes secretos en el repositorio de GitHub:  
-**Ruta:** `Configuracion del Repositorio` -> `Secrets and variables` -> `Actions` -> `New repository secret`
+Para habilitar el despliegue automático hacia un nuevo servidor o VPS, configure los siguientes secretos y variables en el repositorio de GitHub:  
+**Ruta:** `Configuracion del Repositorio` -> `Settings` -> `Secrets and variables` -> `Actions`
+
+### 2.1. Secretos Obligatorios (`Repository secrets`)
 
 | Nombre del Secreto | Descripción | Ejemplo / Formato |
 | :--- | :--- | :--- |
-| `SSH_HOST` | Dirección IP pública o nombre de dominio del servidor de producción. | `198.51.100.24` o `servidor.delivery.com` |
-| `SSH_USER` | Usuario del servidor con permisos de ejecución en Docker y Git. | `deploy` o `ubuntu` |
-| `SSH_KEY` | Clave privada SSH sin frase de paso (formato OpenSSH). | Contenido completo de `~/.ssh/id_ed25519` |
-| `SSH_PORT` | Puerto de escucha del servicio SSH en el servidor remoto. | `22` (o puerto personalizado) |
-| `DEPLOY_PATH` | Ruta absoluta donde se encuentra clonado el proyecto en el servidor. | `/opt/delivery-platform` |
+| `SSH_HOST` | Dirección IP pública o nombre de host del nuevo servidor. | `198.51.100.24` o `servidor.mesafy.dev` |
+| `SSH_USER` | Usuario del servidor con permisos en Docker y Git. | `deploy` |
+| `SSH_KEY` | Clave privada SSH sin contraseña (formato OpenSSH ed25519 o RSA). | Contenido completo de `~/.ssh/id_ed25519` |
+| `SSH_PORT` | Puerto del demonio SSH en el servidor remoto. | `22` (o puerto personalizado) |
+| `DEPLOY_PATH` | Ruta absoluta de despliegue en el sistema de archivos del servidor. | `/opt/delivery-platform` |
+
+### 2.2. Secretos y Variables Opcionales
+
+| Nombre | Tipo | Descripción | Valor por Defecto |
+| :--- | :--- | :--- | :--- |
+| `GHCR_PAT` | Secret | Token personal de GitHub (PAT) con alcance `read:packages` si el repositorio de imágenes es privado. | `${{ secrets.GITHUB_TOKEN }}` |
+| `PLATFORM_DOMAIN` | Variable | Dominio canónico de la plataforma frontend. | `mesafy.doicela.dev` |
+| `NEXT_PUBLIC_GOOGLE_CLIENT_ID` | Variable | Client ID de Google Identity Services para autenticación federada en frontend. | Vacío (Opcional) |
 
 ---
 
-## 3. Preparación Inicial del Servidor de Producción
+## 3. Preparación Inicial y Migración a un Nuevo Servidor (Checklist)
 
-Ejecute los siguientes pasos una única vez en el servidor destino:
+Para aprovisionar un servidor nuevo (Ubuntu 22.04 / 24.04 LTS o Debian 12) desde cero:
 
 ### 3.1. Requisitos de Software
-Asegúrese de contar con Docker Engine v24+, Docker Compose v2 y Git instalados:
+Instale Docker Engine oficial (v24+), Docker Compose (v2+) y Git:
 ```bash
-docker --version
-docker compose version
-git --version
+sudo apt update && sudo apt install -y curl git ufw
+curl -fsSL https://get.docker.com | sudo sh
+sudo systemctl enable --now docker
 ```
 
-### 3.2. Usuario de Despliegue y Permisos de Docker
-Evite desplegar directamente como `root`. Cree un usuario dedicado con pertenencia al grupo `docker`:
+### 3.2. Configuración de Usuario Dedicado de Despliegue
+Cree el usuario de servicio `deploy` y agréguelo al grupo `docker` para evitar operar como `root`:
 ```bash
+sudo adduser --disabled-password --gecos "" deploy
 sudo usermod -aG docker deploy
+
+# Configurar directorio SSH para autenticacion por clave
+sudo mkdir -p /home/deploy/.ssh
+sudo chmod 700 /home/deploy/.ssh
+# Agregar la clave publica autorizada (id_ed25519.pub)
+echo "ssh-ed25519 AAAAC3... clave_publica_despliegue" | sudo tee /home/deploy/.ssh/authorized_keys
+sudo chmod 600 /home/deploy/.ssh/authorized_keys
+sudo chown -R deploy:deploy /home/deploy/.ssh
 ```
 
-### 3.3. Clonado Inicial del Repositorio
+### 3.3. Configuración de Firewall Perimetral (UFW)
+Asegure que los servicios internos (BD PostgreSQL 5432 y Redis 6379) permanezcan inaccesibles desde internet:
+```bash
+sudo ufw default deny incoming
+sudo ufw default allow outgoing
+sudo ufw allow 22/tcp comment 'SSH'
+sudo ufw allow 80/tcp comment 'HTTP Nginx'
+sudo ufw allow 443/tcp comment 'HTTPS Nginx'
+sudo ufw --force enable
+```
+
+### 3.4. Preparación del Directorio de Despliegue
 ```bash
 sudo mkdir -p /opt/delivery-platform
 sudo chown -R deploy:deploy /opt/delivery-platform
-cd /opt/delivery-platform
-git clone https://github.com/JorgeDoicela/delivery-platform.git .
 ```
 
-### 3.4. Archivo de Variables de Entorno (`.env`)
+### 3.5. Archivo de Variables de Entorno (`.env`) en el Nuevo Servidor
 Cree el archivo `/opt/delivery-platform/.env` con permisos restringidos (`chmod 600 .env`):
+```bash
+cd /opt/delivery-platform
+cp .env.example .env # o crearlo manualmente si es primera ejecucion
+chmod 600 .env
+```
+Contenido de `/opt/delivery-platform/.env` adaptado para producción:
 ```ini
-# Configuración de Base de Datos PostgreSQL + PostGIS
+# Puertos y Seguridad de Red
+HTTP_PORT=80
+HTTPS_PORT=443
+PORT=3005
+API_PORT=5005
+POSTGRES_PORT=5432
+REDIS_PORT=6379
+# Enlaces locales seguros: impide exposicion a internet de BD, Redis, Backend y Frontend
+POSTGRES_BIND_IP=127.0.0.1
+REDIS_BIND_IP=127.0.0.1
+API_BIND_IP=127.0.0.1
+FRONTEND_BIND_IP=127.0.0.1
+
+# Registro de Contenedores
+IMAGE_REGISTRY_PREFIX=ghcr.io/jorgedoicela/delivery-platform
+
+# Base de Datos PostgreSQL 16 + PostGIS
 POSTGRES_DB=delivery
 POSTGRES_USER=postgres
-POSTGRES_PASSWORD=Definir_Password_Seguro_Postgres_Prod
-POSTGRES_PORT=5432
+POSTGRES_PASSWORD=GenerarPasswordAleatorioSeguro_Postgres_32Chars!
 
-# Configuración de Redis
-REDIS_PASSWORD=Definir_Password_Seguro_Redis_Prod
-REDIS_PORT=6379
+# Cache y GEO Redis 7
+REDIS_PASSWORD=GenerarPasswordAleatorioSeguro_Redis_32Chars!
 
-# Puertos de Servicios Web
-API_PORT=5005
-PORT=3005
+# Backend API (.NET 8)
+ASPNETCORE_ENVIRONMENT=Production
+JWT_SECRET=GenerarClaveAleatoriaCriptograficaMinimo32Caracteres!
+JWT_ISSUER=DeliveryPlatform.Api
+JWT_AUDIENCE=DeliveryPlatform.Clients
+INITIAL_ADMIN_PASSWORD=GenerarAdminPasswordProduccion123!
 
-# URLs Públicas para el Frontend
-NEXT_PUBLIC_API_URL=https://api.tudominio.com
-NEXT_PUBLIC_WS_URL=https://api.tudominio.com
+# Frontend Web y Plataforma (Next.js 16)
+NEXT_PUBLIC_PLATFORM_DOMAIN=mesafy.doicela.dev
+NEXT_PUBLIC_API_URL=
+NEXT_PUBLIC_WS_URL=
+NEXT_PUBLIC_MAP_STYLE_URL=https://demotiles.maplibre.org/style.json
+INTERNAL_API_URL=http://backend:5005
 ```
 
 ---

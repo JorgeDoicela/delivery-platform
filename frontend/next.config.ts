@@ -1,4 +1,38 @@
+import fs from "node:fs";
+import path from "node:path";
 import type { NextConfig } from "next";
+
+// Única fuente de la verdad: Cargar variables de entorno desde el .env canónico de la raíz
+const candidatePaths = [
+  path.resolve(process.cwd(), "../.env"),
+  path.resolve(process.cwd(), ".env"),
+];
+for (const envCandidate of candidatePaths) {
+  if (fs.existsSync(envCandidate)) {
+    try {
+      const content = fs.readFileSync(envCandidate, "utf-8");
+      for (const line of content.split("\n")) {
+        const trimmed = line.trim();
+        if (!trimmed || trimmed.startsWith("#") || !trimmed.includes("=")) continue;
+        const idx = trimmed.indexOf("=");
+        const key = trimmed.slice(0, idx).trim();
+        let val = trimmed.slice(idx + 1).trim();
+        if (
+          (val.startsWith('"') && val.endsWith('"') && val.length >= 2) ||
+          (val.startsWith("'") && val.endsWith("'") && val.length >= 2)
+        ) {
+          val = val.slice(1, -1);
+        }
+        if (typeof process.env[key] === "undefined" || process.env[key] === "") {
+          process.env[key] = val;
+        }
+      }
+      break;
+    } catch {
+      // Ignorar fallos de lectura en runtime aislado
+    }
+  }
+}
 
 const nextConfig: NextConfig = {
   /* config options here */

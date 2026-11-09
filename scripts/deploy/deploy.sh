@@ -10,7 +10,7 @@ IFS=$'\n\t'
 
 readonly SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 readonly PROJECT_ROOT="$(cd "${SCRIPT_DIR}/../.." && pwd)"
-readonly COMPOSE_FILE="${PROJECT_ROOT}/docker-compose.prod.yml"
+readonly COMPOSE_FILE="${PROJECT_ROOT}/docker-compose.yml"
 readonly ENV_FILE="${PROJECT_ROOT}/.env"
 readonly ROLLBACK_SCRIPT="${SCRIPT_DIR}/rollback.sh"
 readonly LAST_COMMIT_FILE="${PROJECT_ROOT}/.last_successful_commit"
@@ -41,7 +41,7 @@ fi
 TARGET="${1:-all}"
 
 # Si la infraestructura base no está activa, forzar despliegue completo 'all'
-if ! docker ps --format '{{.Names}}' | grep -q "^delivery-postgres-prod$"; then
+if ! docker ps --format '{{.Names}}' | grep -q "^delivery-postgres$"; then
   log "La infraestructura base no está corriendo activamente. Forzando despliegue completo 'all' para asegurar inicialización."
   TARGET="all"
 fi
@@ -74,22 +74,31 @@ done
 # 4. Descarga inmutable y despliegue según el target
 case "$TARGET" in
   backend)
-    log "Descargando imagen actualizada del servicio BACKEND desde GHCR..."
-    docker compose -f "$COMPOSE_FILE" pull backend
+    log "Descargando imagen actualizada del servicio BACKEND..."
+    if ! docker compose -f "$COMPOSE_FILE" pull backend; then
+      log "Aviso: No se pudo descargar la imagen remota. Compilando localmente..."
+      docker compose -f "$COMPOSE_FILE" build backend
+    fi
     docker compose -f "$COMPOSE_FILE" up -d --no-deps backend
-    SERVICES_TO_CHECK=("delivery-backend-prod")
+    SERVICES_TO_CHECK=("delivery-backend")
     ;;
   frontend)
-    log "Descargando imagen actualizada del servicio FRONTEND desde GHCR..."
-    docker compose -f "$COMPOSE_FILE" pull frontend
+    log "Descargando imagen actualizada del servicio FRONTEND..."
+    if ! docker compose -f "$COMPOSE_FILE" pull frontend; then
+      log "Aviso: No se pudo descargar la imagen remota. Compilando localmente..."
+      docker compose -f "$COMPOSE_FILE" build frontend
+    fi
     docker compose -f "$COMPOSE_FILE" up -d --no-deps frontend
-    SERVICES_TO_CHECK=("delivery-frontend-prod")
+    SERVICES_TO_CHECK=("delivery-frontend")
     ;;
   all|infra)
-    log "Descargando imagenes actualizadas del stack completo desde GHCR..."
-    docker compose -f "$COMPOSE_FILE" pull
+    log "Descargando imagenes actualizadas del stack completo..."
+    if ! docker compose -f "$COMPOSE_FILE" pull; then
+      log "Aviso: No se pudieron descargar imagenes remotas. Compilando localmente..."
+      docker compose -f "$COMPOSE_FILE" build
+    fi
     docker compose -f "$COMPOSE_FILE" up -d --remove-orphans
-    SERVICES_TO_CHECK=("delivery-postgres-prod" "delivery-redis-prod" "delivery-backend-prod" "delivery-frontend-prod" "delivery-nginx-prod")
+    SERVICES_TO_CHECK=("delivery-postgres" "delivery-redis" "delivery-backend" "delivery-frontend" "delivery-nginx")
     ;;
   *)
     die "Target desconocido: ${TARGET}. Opciones validas: all, backend, frontend, infra"
@@ -150,6 +159,11 @@ fi
 
 # 7. Despliegue confirmado y exitoso
 echo "$CURRENT_COMMIT" > "$LAST_COMMIT_FILE"
+
+# Limpieza preventiva de imagenes intermedias huerfanas (ahorro de disco en servidor)
+log "Limpiando capas de imagenes obsoletas huerfanas..."
+docker image prune -f >/dev/null 2>&1 || true
+
 log "Despliegue completado con exito. Todos los servicios estan saludables."
 log "Commit registrado como exitoso: ${CURRENT_COMMIT}"
 exit 0

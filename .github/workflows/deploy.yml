@@ -123,7 +123,8 @@ jobs:
           build-args: |
             NEXT_PUBLIC_API_URL=
             NEXT_PUBLIC_WS_URL=
-            NEXT_PUBLIC_PLATFORM_DOMAIN=mesafy.doicela.dev
+            NEXT_PUBLIC_PLATFORM_DOMAIN=${{ vars.PLATFORM_DOMAIN || 'mesafy.doicela.dev' }}
+            NEXT_PUBLIC_GOOGLE_CLIENT_ID=${{ vars.NEXT_PUBLIC_GOOGLE_CLIENT_ID || '' }}
           tags: |
             ${{ steps.meta.outputs.prefix }}/delivery-frontend:latest
             ${{ steps.meta.outputs.prefix }}/delivery-frontend:${{ github.sha }}
@@ -150,27 +151,29 @@ jobs:
     steps:
       - name: Ejecutar despliegue remoto via SSH
         uses: appleboy/ssh-action@v1.2.0
-        env:
-          CR_PAT: ${{ secrets.GITHUB_TOKEN }}
-          ACTOR: ${{ github.actor }}
         with:
           host: ${{ secrets.SSH_HOST }}
           username: ${{ secrets.SSH_USER }}
           key: ${{ secrets.SSH_KEY }}
           port: ${{ secrets.SSH_PORT || 22 }}
           script_stop: true
-          envs: TARGET,CR_PAT,ACTOR
           script: |
             set -euo pipefail
             DEPLOY_DIR="${{ secrets.DEPLOY_PATH }}"
             TARGET="${{ needs.pre-deploy-validation.outputs.deploy_target }}"
 
-            test -d "${DEPLOY_DIR}" || git clone "https://github.com/${{ github.repository }}.git" "${DEPLOY_DIR}"
+            echo "[CI/CD] Verificando instalacion de repositorio en ${DEPLOY_DIR}..."
+            if [ ! -d "${DEPLOY_DIR}/.git" ]; then
+              echo "[CI/CD] Clonando repositorio en servidor de destino..."
+              mkdir -p "${DEPLOY_DIR}"
+              git clone "https://github.com/${{ github.repository }}.git" "${DEPLOY_DIR}"
+            fi
+
             cd "${DEPLOY_DIR}"
             test -f .env || cp .env.example .env
 
             echo "[CI/CD] Autenticando Docker con GitHub Container Registry..."
-            echo "$CR_PAT" | docker login ghcr.io -u "$ACTOR" --password-stdin || true
+            echo "${{ secrets.GHCR_PAT || secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u "${{ github.actor }}" --password-stdin || true
 
             echo "[CI/CD] Actualizando manifiestos y scripts desde origin/main..."
             git fetch origin main

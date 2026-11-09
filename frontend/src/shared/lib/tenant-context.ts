@@ -14,6 +14,14 @@ export const PLATFORM_HOSTS = new Set([
   "platform.mesafy.com",
 ]);
 
+if (typeof process !== "undefined" && process.env?.NEXT_PUBLIC_PLATFORM_DOMAIN) {
+  const envDomain = process.env.NEXT_PUBLIC_PLATFORM_DOMAIN.toLowerCase().trim();
+  if (envDomain) {
+    PLATFORM_HOSTS.add(envDomain);
+    PLATFORM_HOSTS.add(`www.${envDomain}`);
+  }
+}
+
 export function isPlatformHost(hostname?: string): boolean {
   if (!hostname) return true;
   const cleanHost = hostname.split(":")[0].toLowerCase().trim();

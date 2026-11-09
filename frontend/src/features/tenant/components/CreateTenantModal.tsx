@@ -29,7 +29,7 @@ const INITIAL_FORM: CreateTenantCommand = {
   primaryBranchAddress: "",
   adminFullName: "",
   adminEmail: "",
-  adminPassword: "Admin123!",
+  adminPassword: "",
   logoUrl: "/images/shared/placeholders/logo-default.png",
   landingLayoutTemplate: "asadero-clasico",
   heroBannerImageUrl: "/images/shared/placeholders/dish-default.webp",

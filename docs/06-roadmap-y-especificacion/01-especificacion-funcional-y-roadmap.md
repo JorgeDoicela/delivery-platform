@@ -433,7 +433,7 @@ Para asegurar la integridad contable, auditoría fiscal del SRI y reportes hist�
 
 ### 11.3. Esquema de Despliegue y Orquestación
 - [x] **Contenedores de Desarrollo:** `docker-compose.yml` (PostgreSQL 16 + PostGIS, Redis 7).
-- [x] **Contenedores de Producción:** `docker-compose.prod.yml` con healthchecks activos y reinicio automático.
+- [x] **Contenedores de Producción:** `docker-compose.yml` con healthchecks activos y reinicio automático.
 - [x] **Scripts de Despliegue y Rollback:** `scripts/deploy/deploy.sh` y `scripts/deploy/rollback.sh`.
 - [x] **Pipelines de CI/CD:** GitHub Actions (`ci.yml`, `deploy.yml`, `rollback.yml`).
 - [ ] **Infraestructura Cloud Final (AWS / VPS Producción):** Aprovisionamiento en servidor final con dominio y certificados SSL.

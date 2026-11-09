@@ -27,6 +27,8 @@ docker/nginx/certs/*
 **/publish/
 **/publish-output/
 **/artifacts/
+**/appsettings.*.json
+!**/appsettings.json
 *.user
 *.userosscache
 *.suo

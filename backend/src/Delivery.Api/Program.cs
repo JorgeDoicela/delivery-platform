@@ -17,11 +17,24 @@ using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using StackExchange.Redis;
 
+LoadDotEnvFromAncestors();
+
 var builder = WebApplication.CreateBuilder(args);
 
 // 1. Configuración de Base de Datos PostgreSQL con NetTopologySuite (PostGIS)
-var connectionString = builder.Configuration.GetConnectionString("DefaultConnection")
-    ?? throw new InvalidOperationException("Cadena de conexión 'DefaultConnection' no encontrada.");
+// Prioridad: Variable inyectada por Docker (ConnectionStrings__DefaultConnection) -> Composición desde variables .env
+var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
+if (string.IsNullOrWhiteSpace(connectionString))
+{
+    var pgHost = Environment.GetEnvironmentVariable("POSTGRES_HOST") ?? "localhost";
+    var pgPort = Environment.GetEnvironmentVariable("POSTGRES_PORT") ?? "5432";
+    var pgDb = Environment.GetEnvironmentVariable("POSTGRES_DB") ?? "delivery";
+    var pgUser = Environment.GetEnvironmentVariable("POSTGRES_USER") ?? "postgres";
+    var pgPass = Environment.GetEnvironmentVariable("POSTGRES_PASSWORD")
+        ?? throw new InvalidOperationException("La variable 'POSTGRES_PASSWORD' no está configurada en el archivo .env.");
+
+    connectionString = $"Host={pgHost};Port={pgPort};Database={pgDb};Username={pgUser};Password={pgPass}";
+}
 
 builder.Services.AddScoped<TenantContext>();
 builder.Services.AddScoped<ITenantContext>(sp => sp.GetRequiredService<TenantContext>());
@@ -37,7 +50,16 @@ builder.Services.AddDbContext<AppDbContext>(options =>
 });
 
 // 2. Configuración de Redis (Caché, Idempotencia y GEO tracking)
-var redisConnectionString = builder.Configuration.GetConnectionString("Redis") ?? "localhost:6379";
+var redisConnectionString = builder.Configuration.GetConnectionString("Redis");
+if (string.IsNullOrWhiteSpace(redisConnectionString))
+{
+    var redisHost = Environment.GetEnvironmentVariable("REDIS_HOST") ?? "localhost";
+    var redisPort = Environment.GetEnvironmentVariable("REDIS_PORT") ?? "6379";
+    var redisPass = Environment.GetEnvironmentVariable("REDIS_PASSWORD")
+        ?? throw new InvalidOperationException("La variable 'REDIS_PASSWORD' no está configurada en el archivo .env.");
+
+    redisConnectionString = $"{redisHost}:{redisPort},password={redisPass},abortConnect=false";
+}
 builder.Services.AddSingleton<IConnectionMultiplexer>(_ => ConnectionMultiplexer.Connect(redisConnectionString));
 
 // 3. Inyección de dependencias de Vertical Slices
@@ -50,14 +72,8 @@ var jwtOptions = jwtSection.Get<JwtOptions>() ?? new JwtOptions();
 
 if (string.IsNullOrWhiteSpace(jwtOptions.SecretKey))
 {
-    if (builder.Environment.IsDevelopment())
-    {
-        jwtOptions.SecretKey = "DeliveryPlatformSecretKeyVerySecureAtLeast256BitsLongForSha256!";
-    }
-    else
-    {
-        throw new InvalidOperationException("Jwt:SecretKey no está configurada. En producción debe suministrarse mediante la variable de entorno JWT_SECRET.");
-    }
+    jwtOptions.SecretKey = Environment.GetEnvironmentVariable("JWT_SECRET")
+        ?? throw new InvalidOperationException("La variable 'JWT_SECRET' no está configurada en el archivo .env.");
 }
 
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
@@ -121,6 +137,10 @@ builder.Services.AddHangfireServer(options =>
 var allowedOrigins = builder.Configuration.GetSection("Cors:AllowedOrigins").Get<string[]>()
     ?? ["http://localhost:3005", "http://127.0.0.1:3005", "https://pedidos.delivery.com"];
 
+var platformDomain = Environment.GetEnvironmentVariable("NEXT_PUBLIC_PLATFORM_DOMAIN")
+    ?? Environment.GetEnvironmentVariable("PLATFORM_DOMAIN")
+    ?? "mesafy.doicela.dev";
+
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowFrontend", policy =>
@@ -138,14 +158,20 @@ builder.Services.AddCors(options =>
                 return true;
             }
 
-            // 2. Orígenes configurados en Cors:AllowedOrigins
+            // 2. Orígenes explícitamente configurados en Cors:AllowedOrigins
             if (allowedOrigins.Any(ao => string.Equals(ao, origin, StringComparison.OrdinalIgnoreCase)))
             {
                 return true;
             }
 
-            // 3. Orígenes de producción bajo el dominio raíz de plataforma o dominios registrados
-            return uri.Scheme is "http" or "https";
+            // 3. Orígenes de producción bajo el dominio raíz de la plataforma o sus subdominios
+            if (host.Equals(platformDomain, StringComparison.OrdinalIgnoreCase) ||
+                host.EndsWith("." + platformDomain, StringComparison.OrdinalIgnoreCase))
+            {
+                return true;
+            }
+
+            return false;
         })
         .AllowAnyHeader()
         .AllowAnyMethod()
@@ -233,3 +259,49 @@ app.MapHub<KitchenHub>("/hubs/kitchen");
 app.MapHub<TrackingHub>("/hubs/tracking");
 
 app.Run();
+
+// ==============================================================================
+// Única Fuente de la Verdad: Cargador automático del archivo .env canónico de la raíz
+// ==============================================================================
+static void LoadDotEnvFromAncestors()
+{
+    try
+    {
+        var dir = new DirectoryInfo(Directory.GetCurrentDirectory());
+        while (dir != null)
+        {
+            var candidate = Path.Combine(dir.FullName, ".env");
+            if (File.Exists(candidate))
+            {
+                foreach (var line in File.ReadAllLines(candidate))
+                {
+                    var trimmed = line.Trim();
+                    if (string.IsNullOrEmpty(trimmed) || trimmed.StartsWith('#') || !trimmed.Contains('='))
+                        continue;
+
+                    var idx = trimmed.IndexOf('=');
+                    var key = trimmed[..idx].Trim();
+                    var val = trimmed[(idx + 1)..].Trim();
+
+                    if ((val.StartsWith('"') && val.EndsWith('"') && val.Length >= 2) ||
+                        (val.StartsWith('\'') && val.EndsWith('\'') && val.Length >= 2))
+                    {
+                        val = val[1..^1];
+                    }
+
+                    // Preserva variables ya inyectadas por el sistema operativo o Docker
+                    if (string.IsNullOrEmpty(Environment.GetEnvironmentVariable(key)))
+                    {
+                        Environment.SetEnvironmentVariable(key, val);
+                    }
+                }
+                break;
+            }
+            dir = dir.Parent;
+        }
+    }
+    catch
+    {
+        // En entornos de despliegue donde no exista el archivo en disco, omite de forma defensiva
+    }
+}
