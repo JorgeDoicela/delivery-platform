@@ -83,7 +83,7 @@ END $$;
 ## 6. Motor de Corpus Gastronomico y Validacion (`scripts/db/seed-corpus.ps1`)
 
 Los catalogos oficiales residen en archivos JSON estructurados dentro de `backend/src/Delivery.Core/Infrastructure/Persistence/Corpus/`:
-* `catalog.la-granjita.json`: Menu completo de La Granjita (5 categorias, 3 grupos de modificadores, 33 items con SKU, precio y guarniciones).
+* `catalog.la-granjita.json`: Menu real extraido del sistema comercial de La Granjita (6 categorias comerciales: `Combos`, `Pollos y Medios`, `Personales`, `Porciones`, `Extras`, `Bebidas`; 3 grupos de modificadores: `Elección de Guarnición`, `Tipo de Ají`, `Bebidas Opcionales`; 49 productos comerciales con SKU limpio, precios reales, fotos de alta resolucion y 40 recetas ligadas al despiece en octavos de pollo crudo y consumibles).
 * `catalog.brasas-del-valle.json`: Menu de cortes de carne y parrilladas gourmet para Brasas del Valle.
 
 ### 6.1. Estrategia de Carga Resiliente (`CorpusCatalogLoader.cs`)

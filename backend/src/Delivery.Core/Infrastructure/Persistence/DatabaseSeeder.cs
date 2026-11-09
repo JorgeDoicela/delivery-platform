@@ -330,19 +330,30 @@ public static partial class DatabaseSeeder
 
         await SeedOperationalUsersAsync(context, tenant.Id, primaryBranch.Id, "lagranjita.com");
 
+        var defaultTableNames = Enumerable.Range(1, 8).Select(i => $"Mesa {i}").ToArray();
+
         foreach (var branch in branches)
         {
-            if (!await context.DiningTables.IgnoreQueryFilters().AnyAsync(dt => dt.BranchId == branch.Id))
-            {
-                var tables = Enumerable.Range(1, 8).Select(i => new DiningTable
+            var existingTableNames = await context.DiningTables.IgnoreQueryFilters()
+                .Where(dt => dt.BranchId == branch.Id)
+                .Select(dt => dt.Name)
+                .ToListAsync();
+
+            var existingSet = new HashSet<string>(existingTableNames, StringComparer.OrdinalIgnoreCase);
+            var tablesToAdd = defaultTableNames
+                .Where(name => !existingSet.Contains(name))
+                .Select(name => new DiningTable
                 {
                     TenantId = tenant.Id,
                     BranchId = branch.Id,
-                    Name = $"Mesa {i}",
+                    Name = name,
                     IsActive = true
-                }).ToList();
+                })
+                .ToList();
 
-                await context.DiningTables.AddRangeAsync(tables);
+            if (tablesToAdd.Count > 0)
+            {
+                await context.DiningTables.AddRangeAsync(tablesToAdd);
                 await context.SaveChangesAsync();
             }
         }

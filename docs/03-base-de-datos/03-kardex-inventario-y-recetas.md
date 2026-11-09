@@ -21,16 +21,26 @@ flowchart TD
 
 ### 2.1. Desglose de Insumos por Receta Estandar
 
-Cada sucursal gestiona su propio inventario fisico en [`InventoryItems`](./01-modelo-datos-postgis.md#tabla-inventoryitems). Las recetas asociadas en [`ProductRecipes`](./01-modelo-datos-postgis.md#tabla-productrecipes) definen el consumo exacto de materia prima por unidad de producto vendido:
+Cada sucursal gestiona su propio inventario fisico en [`InventoryItems`](./01-modelo-datos-postgis.md#tabla-inventoryitems). Las recetas asociadas en [`ProductRecipes`](./01-modelo-datos-postgis.md#tabla-productrecipes) definen el consumo exacto de materia prima por unidad de producto vendido, parametrizadas segun las recetas de produccion del asadero:
 
 | Producto Comercial (`Product`) | Insumo Consumido (`InventoryItem`) | SKU del Insumo | Cantidad Deducida (`QuantityUsed`) | Unidad de Medida |
 | :--- | :--- | :--- | :--- | :--- |
-| **Combo 1: 1/4 de Pollo** | Pollo Crudo Marinado | `INS-POLLO-OCT` | `2.000` | Octavos |
-| **Combo 1: 1/4 de Pollo** | Contenedor Termico Despacho | `INS-CONT-TERM` | `1.000` | Unidad |
-| **Combo 2: 1/2 Pollo** | Pollo Crudo Marinado | `INS-POLLO-OCT` | `4.000` | Octavos |
-| **Combo 2: 1/2 Pollo** | Contenedor Termico Despacho | `INS-CONT-TERM` | `1.000` | Unidad |
-| **Super Combo Asador Familiar (1 Pollo Entero)** | Pollo Crudo Marinado | `INS-POLLO-OCT` | `8.000` | Octavos |
-| **Super Combo Asador Familiar (1 Pollo Entero)** | Contenedor Termico Despacho | `INS-CONT-TERM` | `1.000` | Unidad |
+| **Octavo de Pollo Personal** | Pollo Crudo (Octavos) | `INS-POLLO-OCT` | `1.000` | Octavos |
+| **Octavo de Pollo Personal** | Cola Personal (Botella Vidrio) | `INS-BEB-COLA-PERS-VID` | `1.000` | Unidad |
+| **Cuarto de Pollo Completo** | Pollo Crudo (Octavos) | `INS-POLLO-OCT` | `2.000` | Octavos |
+| **Cuarto de Pollo Completo** | Cola Personal (Botella Vidrio) | `INS-BEB-COLA-PERS-VID` | `1.000` | Unidad |
+| **Cuarto de Pollo Para Llevar** | Pollo Crudo (Octavos) | `INS-POLLO-OCT` | `2.000` | Octavos |
+| **Cuarto de Pollo Para Llevar** | Contenedor Termico Para Llevar | `INS-CONT-TERM` | `1.000` | Unidad |
+| **Cuarto de Pollo Para Llevar** | Cola Personal (Plastico PET) | `INS-BEB-COLA-PERS-PET` | `1.000` | Unidad |
+| **Medio Pollo Completo** | Pollo Crudo (Octavos) | `INS-POLLO-OCT` | `4.000` | Octavos |
+| **Pollo Completo Tradicional** | Pollo Crudo (Octavos) | `INS-POLLO-OCT` | `8.000` | Octavos |
+| **Pollo y Medio Completo** | Pollo Crudo (Octavos) | `INS-POLLO-OCT` | `12.000` | Octavos |
+| **Super Promo 2x1 (2 Pollos)** | Pollo Crudo (Octavos) | `INS-POLLO-OCT` | `16.000` | Octavos |
+| **Combo Familiar 8 (2.5 Pollos)** | Pollo Crudo (Octavos) | `INS-POLLO-OCT` | `20.000` | Octavos |
+| **Combo 1 (Pollo y Medio + 2L)** | Pollo Crudo (Octavos) | `INS-POLLO-OCT` | `12.000` | Octavos |
+| **Combo 1 (Pollo y Medio + 2L)** | Cola Familiar 2 Litros | `INS-BEB-COLA-2L` | `1.000` | Unidad |
+| **Salchipapa Clásica + Cola** | Salchicha Especial | `INS-SALCHICHA` | `1.000` | Unidad |
+| **Salchipapa Clásica + Cola** | Cola Personal (Botella Vidrio) | `INS-BEB-COLA-PERS-VID` | `1.000` | Unidad |
 | **Parrillada Imperial al Quebracho** | Corte Bife de Chorizo Angus | `INS-BIFE-ANGUS` | `0.400` | Kilogramos |
 | **Parrillada Imperial al Quebracho** | Chorizo Parrillero Argentino | `INS-CHOR-ARG` | `2.000` | Unidades |
 

@@ -16,65 +16,68 @@ public static partial class DatabaseSeeder
             supplier = new Supplier
             {
                 TenantId = tenantId,
-                Name = "Avícola Procesadora Nacional S.A.",
-                TaxId = "1790012345001",
-                Phone = "022456789",
-                Email = "pedidos@avicolanacional.ec",
-                Address = "Panamericana Norte Km 14, Quito",
+                Name = "Avícola La Pradera S.A.",
+                TaxId = "1792003571001",
+                Phone = "022331122",
+                Email = "pedidos@lapradera.ec",
+                Address = "Av. General Rumiñahui, Sangolquí, Pichincha",
                 IsActive = true
             };
             await context.Suppliers.AddAsync(supplier);
             await context.SaveChangesAsync();
         }
 
+        var catalogSpecs = new (string Sku, string Name, string Unit, decimal Stock, decimal MinStock, decimal Cost)[]
+        {
+            ("INS-POLLO-OCT", "Pollo Crudo (Octavos)", "OCTAVO", 500m, 50m, 0.73m),
+            ("INS-CONT-TERM", "Contenedor Térmico Para Llevar", "UNIDAD", 1000m, 200m, 0.14m),
+            ("INS-BEB-COLA-PERS-VID", "Cola Personal (Botella Vidrio)", "UNIDAD", 240m, 48m, 0.23m),
+            ("INS-BEB-COLA-PERS-PET", "Cola Personal (Plástico PET)", "UNIDAD", 240m, 48m, 0.21m),
+            ("INS-BEB-COLA-MED", "Cola Mediana 500ml", "UNIDAD", 120m, 24m, 0.50m),
+            ("INS-BEB-COLA-1L", "Cola 1 Litro", "UNIDAD", 100m, 20m, 0.75m),
+            ("INS-BEB-COLA-2L", "Cola Familiar 2 Litros", "UNIDAD", 80m, 16m, 3.83m),
+            ("INS-SALCHICHA", "Salchicha Especial", "UNIDAD", 300m, 50m, 0.22m),
+            ("INS-HUEVO", "Huevo Fresco de Granja", "UNIDAD", 360m, 60m, 0.125m),
+            ("INS-AGUA", "Agua Purificada Personal", "UNIDAD", 150m, 30m, 0.25m),
+            ("INS-TARRINA-GRANDE", "Tarrina Grande Térmica (TG)", "UNIDAD", 500m, 100m, 0.05m),
+            ("INS-PAPA-5KG", "Papas Seleccionadas (Bolsa 5kg)", "BOLSA", 50m, 10m, 3.50m)
+        };
+
         foreach (var branch in branches)
         {
-            if (!await context.InventoryItems.IgnoreQueryFilters().AnyAsync(i => i.BranchId == branch.Id))
-            {
-                var items = new List<InventoryItem>
-                {
-                    new()
-                    {
-                        TenantId = tenantId,
-                        BranchId = branch.Id,
-                        Sku = "INS-POLLO-OCT",
-                        Name = "Pollo Crudo (Octavos)",
-                        UnitOfMeasure = "OCTAVO",
-                        CurrentStock = 400m,
-                        MinAlertStock = 50m,
-                        CostPrice = 0.73m,
-                        IsActive = true
-                    },
-                    new()
-                    {
-                        TenantId = tenantId,
-                        BranchId = branch.Id,
-                        Sku = "INS-PAPA-5KG",
-                        Name = "Papas Rústicas (Bolsa 5kg)",
-                        UnitOfMeasure = "BOLSA",
-                        CurrentStock = 50m,
-                        MinAlertStock = 10m,
-                        CostPrice = 3.50m,
-                        IsActive = true
-                    },
-                    new()
-                    {
-                        TenantId = tenantId,
-                        BranchId = branch.Id,
-                        Sku = "INS-CONT-TERM",
-                        Name = "Contenedor Térmico Para Llevar",
-                        UnitOfMeasure = "UNIDAD",
-                        CurrentStock = 1000m,
-                        MinAlertStock = 200m,
-                        CostPrice = 0.14m,
-                        IsActive = true
-                    }
-                };
+            var existingItems = await context.InventoryItems.IgnoreQueryFilters()
+                .Where(i => i.BranchId == branch.Id)
+                .ToListAsync();
 
-                await context.InventoryItems.AddRangeAsync(items);
+            var existingBySku = existingItems.ToDictionary(i => i.Sku, StringComparer.OrdinalIgnoreCase);
+            var newItems = new List<InventoryItem>();
+
+            foreach (var spec in catalogSpecs)
+            {
+                if (!existingBySku.TryGetValue(spec.Sku, out var item))
+                {
+                    item = new InventoryItem
+                    {
+                        TenantId = tenantId,
+                        BranchId = branch.Id,
+                        Sku = spec.Sku,
+                        Name = spec.Name,
+                        UnitOfMeasure = spec.Unit,
+                        CurrentStock = spec.Stock,
+                        MinAlertStock = spec.MinStock,
+                        CostPrice = spec.Cost,
+                        IsActive = true
+                    };
+                    newItems.Add(item);
+                }
+            }
+
+            if (newItems.Count > 0)
+            {
+                await context.InventoryItems.AddRangeAsync(newItems);
                 await context.SaveChangesAsync();
 
-                var movements = items.Select(item => new InventoryMovement
+                var movements = newItems.Select(item => new InventoryMovement
                 {
                     TenantId = tenantId,
                     BranchId = branch.Id,
@@ -85,7 +88,7 @@ public static partial class DatabaseSeeder
                     StockBefore = 0m,
                     StockAfter = item.CurrentStock,
                     UnitCostSnapshot = item.CostPrice,
-                    Notes = $"Carga inicial de inventario ({branch.Name})",
+                    Notes = $"Carga inicial de inventario real ({branch.Name})",
                     CreatedAt = DateTime.UtcNow
                 }).ToList();
 
@@ -335,12 +338,11 @@ public static partial class DatabaseSeeder
 
             var inventoryBySku = inventoryItems.ToDictionary(i => i.Sku, StringComparer.OrdinalIgnoreCase);
 
-            var existingRecipeKeys = await context.ProductRecipes
+            var existingRecipes = await context.ProductRecipes
                 .Where(pr => productIds.Contains(pr.ProductId))
-                .Select(pr => $"{pr.ProductId}_{pr.InventoryItemId}")
                 .ToListAsync();
 
-            var recipeSet = new HashSet<string>(existingRecipeKeys);
+            var recipeMap = existingRecipes.ToDictionary(pr => $"{pr.ProductId}_{pr.InventoryItemId}");
             var newRecipes = new List<ProductRecipe>();
 
             foreach (var prodSpec in corpus.Products)
@@ -352,15 +354,20 @@ public static partial class DatabaseSeeder
                         if (inventoryBySku.TryGetValue(recipeSpec.InventorySku, out var item))
                         {
                             var key = $"{product.Id}_{item.Id}";
-                            if (!recipeSet.Contains(key))
+                            if (recipeMap.TryGetValue(key, out var existingRec))
                             {
-                                newRecipes.Add(new ProductRecipe
+                                existingRec.QuantityUsed = recipeSpec.QuantityUsed;
+                            }
+                            else
+                            {
+                                var newRecipe = new ProductRecipe
                                 {
                                     ProductId = product.Id,
                                     InventoryItemId = item.Id,
                                     QuantityUsed = recipeSpec.QuantityUsed
-                                });
-                                recipeSet.Add(key);
+                                };
+                                newRecipes.Add(newRecipe);
+                                recipeMap[key] = newRecipe;
                             }
                         }
                     }
@@ -370,8 +377,8 @@ public static partial class DatabaseSeeder
             if (newRecipes.Count > 0)
             {
                 await context.ProductRecipes.AddRangeAsync(newRecipes);
-                await context.SaveChangesAsync();
             }
+            await context.SaveChangesAsync();
         }
 
         return true;
