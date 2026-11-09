@@ -47,6 +47,8 @@ public class TenantResolutionMiddleware
                 path.Equals("/api/tenants/current", StringComparison.OrdinalIgnoreCase) ||
                 path.Equals("/api/branches", StringComparison.OrdinalIgnoreCase) ||
                 (path.Equals("/api/catalog/menu", StringComparison.OrdinalIgnoreCase) && !includeInactive) ||
+                path.Equals("/api/catalog/popular", StringComparison.OrdinalIgnoreCase) ||
+                path.Equals("/api/catalog/bestsellers", StringComparison.OrdinalIgnoreCase) ||
                 (path.StartsWith("/api/orders/", StringComparison.OrdinalIgnoreCase) &&
                  !path.EndsWith("/history", StringComparison.OrdinalIgnoreCase)))) ||
             (HttpMethods.IsPost(method) && (

@@ -1,10 +1,8 @@
 "use client";
 
-import { useMemo } from "react";
 import Link from "next/link";
-import { useMenuQuery } from "../hooks/useMenuQuery";
+import { usePopularProductsQuery } from "../hooks/usePopularProductsQuery";
 import { ProductCard } from "./ProductCard";
-import { getPopularProducts } from "../lib/catalogFilter";
 import { useTenantRoutes } from "@/shared/lib/tenant-routing";
 import { ArrowRight, AlertTriangle, RefreshCw } from "lucide-react";
 
@@ -17,14 +15,12 @@ export function PopularProductsSection({
   tenantSlug,
   limit = 8,
 }: PopularProductsSectionProps) {
-  const { data, isLoading, isError, refetch } = useMenuQuery(false, tenantSlug);
+  const { data: popularProducts, isLoading, isError, refetch } = usePopularProductsQuery(
+    limit,
+    30,
+    tenantSlug
+  );
   const routes = useTenantRoutes(tenantSlug);
-
-  const popularProducts = useMemo(() => {
-    if (!data?.categories) return [];
-    return getPopularProducts(data.categories, limit);
-  }, [data, limit]);
-
   const menuUrl = routes.getCatalogHref();
 
   if (isLoading) {
@@ -47,7 +43,7 @@ export function PopularProductsSection({
     );
   }
 
-  if (isError || !data) {
+  if (isError || !popularProducts || popularProducts.length === 0) {
     return (
       <div className="bg-surface-card border border-surface-border rounded-3xl p-8 sm:p-12 text-center space-y-4 shadow-xs">
         <div className="w-12 h-12 rounded-2xl bg-surface-canvas border border-surface-border flex items-center justify-center text-brand-primary mx-auto">
@@ -104,4 +100,3 @@ export function PopularProductsSection({
     </div>
   );
 }
-

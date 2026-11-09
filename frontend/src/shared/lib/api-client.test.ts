@@ -115,6 +115,27 @@ describe('apiClient - RFC 7807 Error Handling', () => {
     );
   });
 
+  it('correctly queries popular bestsellers products with limit and days parameters', async () => {
+    const mockPopular = [{ id: 1, name: 'Pollo Asado', basePrice: 14.5, totalSold: 120 }];
+    global.fetch = vi.fn().mockResolvedValue({
+      ok: true,
+      status: 200,
+      json: async () => mockPopular,
+    } as unknown as Response);
+
+    const result = await apiClient.getPopularProducts(6, 14, 'la-granjita');
+    expect(result).toHaveLength(1);
+    expect(global.fetch).toHaveBeenCalledWith(
+      expect.stringContaining('/api/catalog/popular?limit=6&days=14'),
+      expect.objectContaining({
+        method: 'GET',
+        headers: expect.objectContaining({
+          'X-Tenant-Slug': 'la-granjita',
+        }),
+      })
+    );
+  });
+
   it('resolves tenant slug from dynamic storefront pathname before localStorage and returns null on platform root', () => {
     window.localStorage.setItem('delivery_active_tenant_slug', 'la-granjita');
     window.history.pushState({}, '', '/brasas-del-valle');

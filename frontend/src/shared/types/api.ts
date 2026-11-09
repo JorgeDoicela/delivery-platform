@@ -24,6 +24,7 @@ export interface MenuProductDto {
   imageUrl: string;
   category: string;
   isActive: boolean;
+  totalSold?: number;
   modifierGroups: MenuModifierGroupDto[];
 }
 

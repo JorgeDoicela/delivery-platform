@@ -5,6 +5,7 @@ using Delivery.Features;
 using Delivery.Features.Branches.GetBranchCapacity;
 using Delivery.Features.Branches.ResolveBranch;
 using Delivery.Features.Catalog.GetActiveMenu;
+using Delivery.Features.Catalog.GetPopularProducts;
 using Delivery.Features.Catalog.ToggleProductStatus;
 using Delivery.Features.Catalog.UpsertProduct;
 using Delivery.Features.Common.Endpoints;
@@ -45,6 +46,7 @@ public class VerticalSliceArchitectureRegistrationTests
         registeredServiceTypes.Should().Contain(typeof(GetActiveMenuHandler));
         registeredServiceTypes.Should().Contain(typeof(ToggleProductStatusHandler));
         registeredServiceTypes.Should().Contain(typeof(UpsertProductHandler));
+        registeredServiceTypes.Should().Contain(typeof(GetPopularProductsHandler));
         registeredServiceTypes.Should().Contain(typeof(GetActiveKitchenOrdersHandler));
         registeredServiceTypes.Should().Contain(typeof(CreateOrderHandler));
         registeredServiceTypes.Should().Contain(typeof(GetOrderByIdHandler));
@@ -69,9 +71,9 @@ public class VerticalSliceArchitectureRegistrationTests
         // Act
         services.AddDeliveryFeatures();
 
-        // Assert: Deben registrarse exactamente 30 endpoints autónomos (13 operativos + 6 de autenticación + 7 de tenants y sucursales + 4 de motorizados)
+        // Assert: Deben registrarse exactamente 31 endpoints autónomos
         var endpointDescriptors = services.Where(s => s.ServiceType == typeof(IEndpoint)).ToList();
-        endpointDescriptors.Should().HaveCount(30);
+        endpointDescriptors.Should().HaveCount(31);
 
         var endpointImplementationTypes = endpointDescriptors.Select(d => d.ImplementationType).ToHashSet();
         endpointImplementationTypes.Should().Contain(typeof(ResolveBranchEndpoint));
@@ -81,6 +83,7 @@ public class VerticalSliceArchitectureRegistrationTests
         endpointImplementationTypes.Should().Contain(typeof(GetActiveMenuEndpoint));
         endpointImplementationTypes.Should().Contain(typeof(ToggleProductStatusEndpoint));
         endpointImplementationTypes.Should().Contain(typeof(UpsertProductEndpoint));
+        endpointImplementationTypes.Should().Contain(typeof(Delivery.Features.Catalog.GetPopularProducts.GetPopularProductsEndpoint));
         endpointImplementationTypes.Should().Contain(typeof(GetActiveKitchenOrdersEndpoint));
         endpointImplementationTypes.Should().Contain(typeof(CreateOrderEndpoint));
         endpointImplementationTypes.Should().Contain(typeof(GetOrderByIdEndpoint));

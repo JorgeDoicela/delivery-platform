@@ -264,7 +264,18 @@ El backend de la plataforma esta construido en .NET 8 utilizando C# 12 y Minimal
   }
   ```
 
-#### 2.2.2. Alternar Disponibilidad de Producto (`PUT /api/catalog/products/{id}/status`)
+#### 2.2.2. Platos Populares y Mas Vendidos (`GET /api/catalog/popular`)
+* **Parametros de Consulta Opcionales:**
+  * `limit`: Cantidad maxima de productos a retornar (por defecto 8, maximo 50).
+  * `days`: Ventana movil de historial de ventas en dias (por defecto 30 dias).
+* **Cabecera Multitenant:** `X-Tenant-Slug: <slug>` (permite consumo publico no autenticado desde vitrinas `/[slug]`).
+* **Mecanismo de Agregacion y Resiliencia:**
+  1. **Cache Redis (TTL 30 min):** Consulta `catalog:popular:{tenantId}:{limit}:{days}` para descarga de base de datos.
+  2. **Agregacion SQL en PostgreSQL:** Suma de `OrderItems.Quantity` en ordenes no canceladas dentro de la ventana de dias.
+  3. **Arranque en Frio (Cold-Start):** Si el volumen de ventas historicas del establecimiento no alcanza el `limit`, se completa de forma transparente con los productos insignes activos ordenados por prioridad de categoria y precio, garantizando que la vitrina nunca muestre secciones vacias.
+* **Respuesta Exitosa (200 OK):** Array de `MenuProductDto` con campo `totalSold`.
+
+#### 2.2.3. Alternar Disponibilidad de Producto (`PUT /api/catalog/products/{id}/status`)
 * **Descripcion:** Habilita o deshabilita operativamente un producto para suspender temporalmente su venta en cocina o vitrina.
 * **Payload de Entrada:**
   ```json
@@ -282,7 +293,7 @@ El backend de la plataforma esta construido en .NET 8 utilizando C# 12 y Minimal
   }
   ```
 
-#### 2.2.3. Creacion y Edicion de Producto con Imagen Propia (`POST /api/catalog/products` y `PUT /api/catalog/products/{id}`)
+#### 2.2.4. Creacion y Edicion de Producto con Imagen Propia (`POST /api/catalog/products` y `PUT /api/catalog/products/{id}`)
 * **Descripcion:** Registra un nuevo producto o actualiza nombre, descripcion, categoria, precio base e imagen personalizada (`imageUrl`) dentro del catalogo aislado del establecimiento activo.
 * **Payload de Entrada:** `{"name": "Parrillada Especial", "description": "Cortes selectos...", "basePrice": 24.50, "category": "Parrilladas", "imageUrl": "https://.../plato.webp", "isActive": true}`
 * **Respuesta Exitosa (200 OK):** Retorna `UpsertProductResponse`.

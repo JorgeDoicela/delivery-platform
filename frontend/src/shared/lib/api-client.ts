@@ -239,7 +239,7 @@ export const apiClient = {
         return handleResponse<BranchCapacityResponse>(res);
     },
 
-    // 2. Catálogo: Menú activo y combos
+    // 2. Catálogo: Menú activo y platos más vendidos
     async getActiveMenu(
         includeInactive = false,
         tenantSlugOverride?: string
@@ -251,6 +251,23 @@ export const apiClient = {
             cache: "no-store",
         });
         return handleResponse<ActiveMenuResponse>(res);
+    },
+
+    async getPopularProducts(
+        limit = 8,
+        days = 30,
+        tenantSlugOverride?: string
+    ): Promise<MenuProductDto[]> {
+        const params = new URLSearchParams();
+        if (limit) params.set("limit", String(limit));
+        if (days) params.set("days", String(days));
+        const qs = params.toString() ? `?${params.toString()}` : "";
+        const res = await fetch(`${getApiBaseUrl()}/api/catalog/popular${qs}`, {
+            method: "GET",
+            headers: buildHeaders(undefined, tenantSlugOverride),
+            cache: "no-store",
+        });
+        return handleResponse<MenuProductDto[]>(res);
     },
 
     // 3. Órdenes: Creación transaccional con idempotencia

@@ -7,4 +7,5 @@ export { InventoryManagerView } from "./components/InventoryManagerView";
 export { OrderModeSelector } from "./components/OrderModeSelector";
 export { PromotionalBanners } from "./components/PromotionalBanners";
 export { useMenuQuery } from "./hooks/useMenuQuery";
+export { usePopularProductsQuery } from "./hooks/usePopularProductsQuery";
 
