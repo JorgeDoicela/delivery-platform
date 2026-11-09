@@ -85,7 +85,16 @@
         "Término de Cocción",
         "Salsa & Chimichurri"
       ],
-      "recipes": []
+      "recipes": [
+        {
+          "inventorySku": "INS-BIFE-ANGUS",
+          "quantityUsed": 0.400
+        },
+        {
+          "inventorySku": "INS-CHOR-ARG",
+          "quantityUsed": 2.000
+        }
+      ]
     },
     {
       "sku": "COR-BIF-01",
@@ -101,7 +110,12 @@
         "Término de Cocción",
         "Salsa & Chimichurri"
       ],
-      "recipes": []
+      "recipes": [
+        {
+          "inventorySku": "INS-BIFE-ANGUS",
+          "quantityUsed": 0.400
+        }
+      ]
     },
     {
       "sku": "COR-CHU-01",
@@ -116,7 +130,16 @@
       "modifierGroups": [
         "Salsa & Chimichurri"
       ],
-      "recipes": []
+      "recipes": [
+        {
+          "inventorySku": "INS-COST-CERDO",
+          "quantityUsed": 0.500
+        },
+        {
+          "inventorySku": "INS-CHOR-ARG",
+          "quantityUsed": 1.000
+        }
+      ]
     }
   ]
 }

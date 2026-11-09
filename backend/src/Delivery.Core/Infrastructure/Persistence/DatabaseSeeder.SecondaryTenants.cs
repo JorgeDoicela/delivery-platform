@@ -230,7 +230,111 @@ public static partial class DatabaseSeeder
 
         await SeedOperationalUsersAsync(context, tenant.Id, branch.Id, emailDomain);
 
-        // Prioriza la ingesta declarativa desde el corpus estructurado por marca
+        // 1. Mesas de salón para el tenant secundario (idempotente)
+        var secondaryTableNames = Enumerable.Range(1, 6).Select(i => $"Mesa {i}").ToList();
+        var existingSecondaryTables = await context.DiningTables.IgnoreQueryFilters()
+            .Where(dt => dt.BranchId == branch.Id)
+            .Select(dt => dt.Name)
+            .ToListAsync();
+
+        var existingTableSet = new HashSet<string>(existingSecondaryTables, StringComparer.OrdinalIgnoreCase);
+        var tablesToAdd = secondaryTableNames
+            .Where(name => !existingTableSet.Contains(name))
+            .Select(name => new DiningTable
+            {
+                TenantId = tenant.Id,
+                BranchId = branch.Id,
+                Name = name,
+                IsActive = true
+            })
+            .ToList();
+
+        if (tablesToAdd.Count > 0)
+        {
+            await context.DiningTables.AddRangeAsync(tablesToAdd);
+            await context.SaveChangesAsync();
+        }
+
+        // 2. Proveedor e insumos de inventario para el tenant secundario
+        var secondarySupplier = await context.Suppliers.IgnoreQueryFilters()
+            .FirstOrDefaultAsync(s => s.TenantId == tenant.Id);
+
+        if (secondarySupplier == null)
+        {
+            secondarySupplier = new Supplier
+            {
+                TenantId = tenant.Id,
+                Name = "Frigorífico & Carnes del Valle S.A.S.",
+                TaxId = "1793100200001",
+                Phone = "022890123",
+                Email = "proveeduria@carnesdelvalle.ec",
+                Address = "Av. Interoceánica Km 11, Cumbayá",
+                IsActive = true
+            };
+            await context.Suppliers.AddAsync(secondarySupplier);
+            await context.SaveChangesAsync();
+        }
+
+        var secondaryItemSpecs = new (string Sku, string Name, string Unit, decimal Stock, decimal MinStock, decimal Cost)[]
+        {
+            ("INS-BIFE-ANGUS", "Corte Bife de Chorizo Angus (Kg)", "KG", 120m, 20m, 9.50m),
+            ("INS-CHOR-ARG", "Chorizo Parrillero Argentino", "UNIDAD", 300m, 40m, 0.85m),
+            ("INS-COST-CERDO", "Costillar de Cerdo Madurado (Kg)", "KG", 80m, 15m, 6.20m),
+            ("INS-PAPA-5KG", "Papas Rústicas al Romero (Bolsa 5kg)", "BOLSA", 40m, 10m, 3.50m)
+        };
+
+        var existingSecondaryItems = await context.InventoryItems.IgnoreQueryFilters()
+            .Where(i => i.BranchId == branch.Id)
+            .ToListAsync();
+
+        var existingSecondaryBySku = existingSecondaryItems.ToDictionary(i => i.Sku, StringComparer.OrdinalIgnoreCase);
+        var newSecondaryItems = new List<InventoryItem>();
+
+        foreach (var spec in secondaryItemSpecs)
+        {
+            if (!existingSecondaryBySku.TryGetValue(spec.Sku, out var item))
+            {
+                item = new InventoryItem
+                {
+                    TenantId = tenant.Id,
+                    BranchId = branch.Id,
+                    Sku = spec.Sku,
+                    Name = spec.Name,
+                    UnitOfMeasure = spec.Unit,
+                    CurrentStock = spec.Stock,
+                    MinAlertStock = spec.MinStock,
+                    CostPrice = spec.Cost,
+                    IsActive = true
+                };
+                newSecondaryItems.Add(item);
+            }
+        }
+
+        if (newSecondaryItems.Count > 0)
+        {
+            await context.InventoryItems.AddRangeAsync(newSecondaryItems);
+            await context.SaveChangesAsync();
+
+            var movements = newSecondaryItems.Select(item => new InventoryMovement
+            {
+                TenantId = tenant.Id,
+                BranchId = branch.Id,
+                InventoryItemId = item.Id,
+                SupplierId = secondarySupplier.Id,
+                MovementType = "COMPRA_PROVEEDOR",
+                QuantityDelta = item.CurrentStock,
+                StockBefore = 0m,
+                StockAfter = item.CurrentStock,
+                UnitCostSnapshot = item.CostPrice,
+                Notes = $"Carga inicial de inventario parrillero ({branch.Name})",
+                CreatedAt = DateTime.UtcNow
+            }).ToList();
+
+            await context.InventoryMovements.AddRangeAsync(movements);
+            await context.SaveChangesAsync();
+        }
+
+        // 3. Prioriza la ingesta declarativa desde el corpus estructurado por marca
         var seededFromCorpus = await SeedCatalogFromCorpusAsync(context, tenant.Id, slug, new List<Branch> { branch });
         if (seededFromCorpus)
         {
