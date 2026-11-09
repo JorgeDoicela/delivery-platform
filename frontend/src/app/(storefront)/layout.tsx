@@ -14,7 +14,7 @@ export default function StorefrontLayout({
       <Suspense fallback={null}>
         <StorefrontHeader />
       </Suspense>
-      <main className="flex-1 w-full pb-20 xl:pb-0">{children}</main>
+      <main className="flex-1 w-full">{children}</main>
       <Suspense fallback={null}>
         <StorefrontFooter />
       </Suspense>

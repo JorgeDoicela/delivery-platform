@@ -28,6 +28,7 @@ describe("useSmartScrollHeader", () => {
     container = document.createElement("div");
     document.body.appendChild(container);
     vi.stubGlobal("scrollY", 0);
+    vi.stubGlobal("innerWidth", 1024);
     vi.stubGlobal("requestAnimationFrame", (cb: FrameRequestCallback) => {
       cb(0);
       return 1;
@@ -59,6 +60,19 @@ describe("useSmartScrollHeader", () => {
     expect(
       document.documentElement.style.getPropertyValue("--storefront-header-offset")
     ).toBe("76px");
+  });
+
+  it("debe sincronizar offset de 52px en pantallas moviles", () => {
+    vi.stubGlobal("innerWidth", 390);
+    const root = createRoot(container);
+
+    act(() => {
+      root.render(<TestComponent onStateChange={() => {}} />);
+    });
+
+    expect(
+      document.documentElement.style.getPropertyValue("--storefront-header-offset")
+    ).toBe("52px");
   });
 
   it("debe ocultarse al hacer scroll hacia abajo superando el umbral", () => {

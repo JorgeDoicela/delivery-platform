@@ -21,12 +21,25 @@ export function useSmartScrollHeader(options: SmartScrollHeaderOptions = {}) {
 
   // Sincroniza dinámicamente la variable CSS global para elementos sticky dependientes (ej. subnav de categorías)
   useEffect(() => {
-    if (typeof document !== "undefined") {
+    if (typeof document === "undefined") return;
+
+    const updateOffset = () => {
+      const isMobile =
+        typeof window !== "undefined" &&
+        window.innerWidth > 0 &&
+        window.innerWidth < 640;
+      const height = isMobile ? "52px" : "76px";
+
       document.documentElement.style.setProperty(
         "--storefront-header-offset",
-        isVisible ? "76px" : "0px"
+        isVisible ? height : "0px"
       );
-    }
+    };
+
+    updateOffset();
+
+    window.addEventListener("resize", updateOffset);
+    return () => window.removeEventListener("resize", updateOffset);
   }, [isVisible]);
 
   useEffect(() => {

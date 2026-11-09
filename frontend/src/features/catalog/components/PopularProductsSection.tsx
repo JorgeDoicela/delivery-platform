@@ -5,6 +5,7 @@ import Link from "next/link";
 import { useMenuQuery } from "../hooks/useMenuQuery";
 import { ProductCard } from "./ProductCard";
 import { getPopularProducts } from "../lib/catalogFilter";
+import { useTenantRoutes } from "@/shared/lib/tenant-routing";
 import { ArrowRight, AlertTriangle, RefreshCw } from "lucide-react";
 
 interface PopularProductsSectionProps {
@@ -17,27 +18,28 @@ export function PopularProductsSection({
   limit = 8,
 }: PopularProductsSectionProps) {
   const { data, isLoading, isError, refetch } = useMenuQuery(false, tenantSlug);
+  const routes = useTenantRoutes(tenantSlug);
 
   const popularProducts = useMemo(() => {
     if (!data?.categories) return [];
     return getPopularProducts(data.categories, limit);
   }, [data, limit]);
 
-  const menuUrl = tenantSlug ? `/${tenantSlug}/menu` : "/menu";
+  const menuUrl = routes.getCatalogHref();
 
   if (isLoading) {
     return (
-      <div className="space-y-6">
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-5">
+      <div className="space-y-4 sm:space-y-6">
+        <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-2.5 sm:gap-5">
           {[1, 2, 3, 4, 5, 6, 7, 8].map((i) => (
             <div
               key={i}
-              className="h-80 bg-surface-card border border-surface-border rounded-3xl p-5 animate-pulse space-y-4"
+              className="h-64 sm:h-80 bg-surface-card border border-surface-border rounded-2xl sm:rounded-3xl p-3 sm:p-5 animate-pulse space-y-3 sm:space-y-4"
             >
-              <div className="h-44 w-full bg-surface-canvas rounded-2xl" />
-              <div className="h-5 w-3/4 bg-surface-border rounded" />
-              <div className="h-4 w-full bg-surface-border rounded" />
-              <div className="h-9 w-full bg-surface-border rounded-full mt-4" />
+              <div className="h-28 sm:h-44 w-full bg-surface-canvas rounded-xl sm:rounded-2xl" />
+              <div className="h-4 sm:h-5 w-3/4 bg-surface-border rounded" />
+              <div className="h-3 sm:h-4 w-full bg-surface-border rounded" />
+              <div className="h-7 sm:h-9 w-full bg-surface-border rounded-full mt-2 sm:mt-4" />
             </div>
           ))}
         </div>
@@ -72,32 +74,29 @@ export function PopularProductsSection({
   }
 
   return (
-    <div className="space-y-6">
-      {/* Cabecera de la Sección según Patrón 4.5 de delivery-estilos */}
-      <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4">
-        <div>
-          <span className="text-[11px] font-bold uppercase tracking-widest text-brand-primary block mb-1 font-sans">
-            Los Más Pedidos &bull; Favoritos del Asador
-          </span>
-          <h2 className="text-3xl sm:text-4xl font-black text-text-strong uppercase tracking-wide font-display">
+    <div className="space-y-4 sm:space-y-6">
+      {/* Cabecera de la Sección: Centrada y ordenada en móvil, a los extremos en escritorio */}
+      <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-2.5 sm:gap-4 text-center sm:text-left items-center sm:items-start">
+        <div className="max-w-xl mx-auto sm:mx-0">
+          <h2 className="text-xl sm:text-4xl font-black text-brand-primary uppercase tracking-wide font-display">
             Platos Más Populares
           </h2>
-          <p className="text-xs sm:text-sm text-text-muted mt-1 max-w-xl">
+          <p className="text-xs sm:text-sm text-text-strong mt-0.5 sm:mt-1 max-w-xl">
             Nuestras especialidades al carbón y combos más aclamados por los clientes.
           </p>
         </div>
 
         <Link
           href={menuUrl}
-          className="inline-flex items-center gap-1.5 self-start sm:self-auto bg-surface-card hover:bg-surface-card-hover text-text-strong hover:text-brand-primary text-xs font-bold uppercase tracking-wider px-4.5 py-2.5 rounded-full transition-all duration-200 group shrink-0 shadow-xs hover:shadow-md font-display"
+          className="inline-flex items-center gap-1.5 self-center sm:self-auto bg-surface-card hover:bg-surface-card-hover text-text-strong hover:text-brand-primary text-[11px] sm:text-xs font-bold uppercase tracking-wider px-3.5 py-1.5 sm:px-4.5 sm:py-2.5 rounded-full transition-all duration-200 group shrink-0 shadow-xs hover:shadow-md font-display"
         >
           <span>Ver Menú Completo</span>
-          <ArrowRight className="w-3.5 h-3.5 transition-transform group-hover:translate-x-1" />
+          <ArrowRight className="w-3 h-3 sm:w-3.5 sm:h-3.5 transition-transform group-hover:translate-x-1" />
         </Link>
       </div>
 
-      {/* Grid de Productos Más Populares (4 columnas compactas) */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-5">
+      {/* Grid de Productos Más Populares: 2 columnas en móvil, 4 en escritorio */}
+      <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3.5 sm:gap-5">
         {popularProducts.map((product) => (
           <ProductCard key={product.id} product={product} />
         ))}

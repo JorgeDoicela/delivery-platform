@@ -131,7 +131,7 @@ export function resolveTenantRouting(
     if (isPlatformRoot && !pathSlug) {
       return "/#restaurantes";
     }
-    const base = basePath ? `${basePath}#catalogo` : "/#catalogo";
+    const base = basePath ? `${basePath}/menu` : "/menu";
     return appendBranchQuery(base, branchId);
   };
 

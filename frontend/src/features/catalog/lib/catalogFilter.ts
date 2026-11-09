@@ -1,40 +1,27 @@
 import type { MenuProductDto, MenuCategoryDto } from "@/shared/types/api";
+import { searchCatalogProducts, normalizeSearchText } from "./catalogSearchEngine";
+
+export { searchCatalogProducts, normalizeSearchText };
 
 /**
  * Normaliza una cadena removiendo acentos y convirtiendo a minúsculas
  */
 export function normalizeCatalogText(text: string): string {
-  return text
-    .toLowerCase()
-    .normalize("NFD")
-    .replace(/[\u0300-\u036f]/g, "")
-    .trim();
+  return normalizeSearchText(text);
 }
 
 /**
- * Filtra productos por término de búsqueda comparando con nombre, descripción o categoría
+ * Filtra productos por término de búsqueda utilizando el algoritmo profesional de búsqueda gastronómica:
+ * - Tolerancia a fallos tipográficos (Damerau-Levenshtein)
+ * - Multi-token scoring y ponderación jerárquica
+ * - Stemming en español y sinónimos gastronómicos
+ * - Búsqueda en nombre, categoría, modificadores y descripción
  */
 export function filterProductsBySearch(
   products: MenuProductDto[],
   query: string
 ): MenuProductDto[] {
-  if (!query || !query.trim()) {
-    return products;
-  }
-
-  const normalizedQuery = normalizeCatalogText(query);
-
-  return products.filter((product) => {
-    const name = normalizeCatalogText(product.name);
-    const desc = normalizeCatalogText(product.description || "");
-    const cat = normalizeCatalogText(product.category || "");
-
-    return (
-      name.includes(normalizedQuery) ||
-      desc.includes(normalizedQuery) ||
-      cat.includes(normalizedQuery)
-    );
-  });
+  return searchCatalogProducts(products, query);
 }
 
 /**
@@ -101,21 +88,10 @@ export function getPopularProducts(
       }
     });
 
-    if (p.modifierGroups && p.modifierGroups.length > 0) {
-      score += 5;
-    }
-
-    if (p.basePrice >= 4.0) {
-      score += 5;
-    }
-
     return { product: p, score };
   });
 
-  scored.sort(
-    (a, b) => b.score - a.score || b.product.basePrice - a.product.basePrice
-  );
+  scored.sort((a, b) => b.score - a.score);
 
   return scored.slice(0, limit).map((s) => s.product);
 }
-

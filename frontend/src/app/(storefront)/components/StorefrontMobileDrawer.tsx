@@ -4,7 +4,6 @@ import React from "react";
 import Link from "next/link";
 import Image from "next/image";
 import {
-  Search,
   User as UserIcon,
   X,
   Building2,
@@ -26,7 +25,6 @@ interface StorefrontMobileDrawerProps {
   brandLogo: string;
   isPlatformRoot: boolean;
   routes: TenantRoutingResolution;
-  catalogHref: string;
   tenant?: TenantStorefrontConfigDto | null;
   isAuthenticated: boolean;
   user: AuthenticatedUserLike | null | undefined;
@@ -43,7 +41,6 @@ export function StorefrontMobileDrawer({
   brandLogo,
   isPlatformRoot,
   routes,
-  catalogHref,
   tenant,
   isAuthenticated,
   user,
@@ -110,20 +107,6 @@ export function StorefrontMobileDrawer({
             ) : (
               <TenantBranchSelector tenant={tenant} />
             )}
-          </div>
-
-          {/* Buscador Rápido en Móvil */}
-          <div>
-            <Link
-              href={catalogHref}
-              onClick={onClose}
-              className="flex items-center gap-2.5 px-4 py-2.5 w-full bg-surface-canvas hover:bg-surface-card-hover rounded-full transition-colors border border-surface-border text-text-muted group"
-            >
-              <Search className="w-4 h-4 text-text-muted group-hover:text-brand-primary transition-colors shrink-0" />
-              <span className="text-xs text-text-muted font-normal truncate">
-                {isPlatformRoot ? "Buscar restaurantes..." : `Buscar en ${brandName}...`}
-              </span>
-            </Link>
           </div>
 
           {/* Enlaces de Información y Soporte (Sin duplicar la barra fija inferior) */}

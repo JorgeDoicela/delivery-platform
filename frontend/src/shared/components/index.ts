@@ -6,3 +6,10 @@ export {
   type ScrollAreaVariant,
 } from "./ScrollArea";
 
+export {
+  SelectDropdown,
+  type SelectDropdownProps,
+  type SelectDropdownOption,
+} from "./SelectDropdown";
+
+export { ThemeToggle } from "./ThemeToggle";

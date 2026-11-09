@@ -21,14 +21,14 @@ export function PromotionalBanners({
   if (banners.length === 0) return null;
 
   return (
-    <section className="w-full py-2">
-      <div className="max-w-[1240px] mx-auto grid grid-cols-1 md:grid-cols-2 gap-5 sm:gap-6">
+    <section className="w-full py-1 sm:py-2">
+      <div className="max-w-[1240px] mx-auto grid grid-cols-1 md:grid-cols-2 gap-2.5 sm:gap-6">
         {banners.map((banner, idx) => {
           const isSlate = banner.themeVariant === "slate";
           return (
             <div
               key={`${banner.id}-${idx}`}
-              className={`relative overflow-hidden rounded-3xl p-6 sm:p-8 flex flex-col justify-between text-white shadow-xl min-h-[280px] sm:min-h-[320px] group ${
+              className={`relative overflow-hidden rounded-xl sm:rounded-3xl p-3.5 sm:p-8 flex flex-col justify-between text-white shadow-sm sm:shadow-xl min-h-[125px] sm:min-h-[320px] group ${
                 isSlate ? "bg-slate-950" : "bg-neutral-950"
               }`}
             >
@@ -47,27 +47,27 @@ export function PromotionalBanners({
                 <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent" />
               </div>
 
-              <div className="space-y-3 relative z-10 max-w-md sm:max-w-lg">
-                <h3 className="text-2xl sm:text-3xl font-black uppercase tracking-tight leading-tight text-white drop-shadow-md font-display">
+              <div className="space-y-1 sm:space-y-3 relative z-10 max-w-[250px] xs:max-w-xs sm:max-w-lg">
+                <h3 className="text-sm sm:text-3xl font-black uppercase tracking-tight leading-snug text-white drop-shadow-md font-display">
                   {banner.title}
                 </h3>
-                <p className="text-xs sm:text-sm text-white/90 leading-relaxed font-medium drop-shadow">
+                <p className="text-[10px] sm:text-sm text-white/90 leading-tight font-medium drop-shadow line-clamp-1 sm:line-clamp-none">
                   {banner.subtitle}
                 </p>
               </div>
 
-              <div className="pt-6 relative z-10">
+              <div className="pt-2 sm:pt-6 relative z-10">
                 <Link
                   href={banner.ctaHref || "#catalogo"}
                   suppressHydrationWarning
-                  className={`inline-flex items-center gap-2 text-xs font-black uppercase tracking-wider px-6 py-3 rounded-full transition-all shadow-md active:scale-95 hover:scale-105 ${
+                  className={`inline-flex items-center gap-1.5 sm:gap-2 text-[10px] sm:text-xs font-black uppercase tracking-wider px-3.5 py-1.5 sm:px-6 sm:py-3 rounded-full transition-all shadow-xs sm:shadow-md active:scale-95 hover:scale-105 ${
                     idx % 2 === 1
                       ? "bg-white hover:bg-neutral-100 text-brand-primary"
                       : "bg-brand-primary hover:bg-brand-primary-hover text-white"
                   }`}
                 >
                   <span>{banner.ctaText || "Ver Más"}</span>
-                  <ArrowRight className="w-3.5 h-3.5" />
+                  <ArrowRight className="w-3 h-3 sm:w-3.5 sm:h-3.5" />
                 </Link>
               </div>
             </div>

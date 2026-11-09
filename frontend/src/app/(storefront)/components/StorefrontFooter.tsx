@@ -37,11 +37,11 @@ export function StorefrontFooter() {
   return (
     <footer
       id="footer-info"
-      className="bg-surface-card text-text-muted text-xs border-t border-surface-border mt-8 sm:mt-10 transition-colors duration-200 pb-20 xl:pb-0"
+      className="bg-surface-card text-text-muted text-xs border-t border-surface-border mt-4 sm:mt-10 transition-colors duration-200 pb-16 sm:pb-6 xl:pb-0"
     >
       <div
         className={`w-full px-4 sm:px-8 md:px-12 lg:px-16 ${
-          isPlatformRoot ? "max-w-7xl mx-auto py-8 sm:py-10" : "py-5 sm:py-6"
+          isPlatformRoot ? "max-w-7xl mx-auto py-6 sm:py-10" : "py-3 sm:py-6"
         }`}
       >
         {isPlatformRoot ? (
@@ -127,10 +127,10 @@ export function StorefrontFooter() {
             </div>
           </div>
         ) : (
-          <div className="flex flex-col lg:flex-row items-center justify-between gap-5 pb-1">
+          <div className="flex flex-col lg:flex-row items-center justify-between gap-2.5 sm:gap-5 pb-1">
             {/* 1. Marca a la izquierda */}
-            <div className="flex items-center gap-2.5 shrink-0">
-              <div className="relative w-8 h-8 shrink-0">
+            <div className="flex items-center gap-2 sm:gap-2.5 shrink-0">
+              <div className="relative w-7 h-7 sm:w-8 sm:h-8 shrink-0">
                 <Image
                   src={brandLogo}
                   alt={`Logo ${brandName}`}
@@ -139,13 +139,13 @@ export function StorefrontFooter() {
                   className="w-full h-full object-contain"
                 />
               </div>
-              <span className="font-black text-xl tracking-tight text-text-strong uppercase font-display leading-none">
+              <span className="font-black text-lg sm:text-xl tracking-tight text-text-strong uppercase font-display leading-none">
                 {brandName}
               </span>
             </div>
 
             {/* 2. Mensaje Informativo Central */}
-            <div className="flex items-center justify-center gap-2 text-xs text-text-muted text-center py-0.5">
+            <div className="flex items-center justify-center gap-2 text-[11px] sm:text-xs text-text-muted text-center py-0">
               <span className="font-semibold text-text-strong font-display uppercase tracking-wider">
                 {tenant?.tagline || "Sabor Tradicional a la Brasa"}
               </span>
@@ -156,7 +156,7 @@ export function StorefrontFooter() {
             </div>
 
             {/* 3. Contacto directo a la derecha */}
-            <div className="flex flex-wrap items-center justify-center lg:justify-end gap-x-5 gap-y-1 text-xs text-text-muted shrink-0">
+            <div className="flex flex-wrap items-center justify-center lg:justify-end gap-x-4 sm:gap-x-5 gap-y-1 text-[11px] sm:text-xs text-text-muted shrink-0">
               {tenant?.contactPhone && (
                 <a
                   href={`tel:${tenant.contactPhone}`}
@@ -184,7 +184,7 @@ export function StorefrontFooter() {
         )}
 
         {/* Sub-footer unificado */}
-        <div className="mt-3 flex flex-col sm:flex-row items-center justify-between gap-2.5 text-[11px] text-text-subtle">
+        <div className="mt-2 sm:mt-3 pt-2 sm:pt-2.5 border-t border-surface-border/40 flex flex-col sm:flex-row items-center justify-between gap-1.5 sm:gap-2.5 text-[10px] sm:text-[11px] text-text-subtle">
           <div className="text-center sm:text-left">
             <span>
               © {currentYear} {brandName}.

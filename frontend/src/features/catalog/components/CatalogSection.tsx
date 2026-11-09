@@ -3,32 +3,51 @@
 import { useState, useMemo } from "react";
 import { useMenuQuery } from "../hooks/useMenuQuery";
 import { ProductCard } from "./ProductCard";
-import {
-  filterProductsBySearch,
-  calculateTotalCatalogProducts,
-} from "../lib/catalogFilter";
+import { filterProductsBySearch } from "../lib/catalogFilter";
 import { AlertTriangle, RefreshCw, Search, X, Utensils } from "lucide-react";
+import { SelectDropdown } from "@/shared/components";
 
 interface CatalogSectionProps {
   tenantSlug?: string;
 }
+
+const POPULAR_SEARCH_SUGGESTIONS = ["Pollo", "Combos", "Bebidas", "Papas", "Alitas"];
 
 export function CatalogSection({ tenantSlug }: CatalogSectionProps = {}) {
   const { data, isLoading, isError, refetch } = useMenuQuery(false, tenantSlug);
   const [selectedCategory, setSelectedCategory] = useState<string>("TODOS");
   const [searchQuery, setSearchQuery] = useState<string>("");
 
-  const totalProductsCount = useMemo(() => {
-    if (!data?.categories) return 0;
-    return calculateTotalCatalogProducts(data.categories);
-  }, [data]);
-
-  // Filtrado reactivo en tiempo real con normalización de acentos
+  // Algoritmo profesional de búsqueda gastronómica: tolerancia tipográfica, multi-token y scoring jerárquico
   const searchResults = useMemo(() => {
     if (!data?.categories || !searchQuery.trim()) return null;
     const all = data.categories.flatMap((c) => c.products);
     return filterProductsBySearch(all, searchQuery);
   }, [data, searchQuery]);
+
+  const allCategories = useMemo(() => {
+    if (!data?.categories) return [];
+    return [
+      { name: "TODOS" },
+      ...data.categories.map((c) => ({
+        name: c.categoryName,
+      })),
+    ];
+  }, [data]);
+
+  const PRIMARY_VISIBLE_LIMIT = 8;
+  const visibleCategories = useMemo(
+    () => allCategories.slice(0, PRIMARY_VISIBLE_LIMIT),
+    [allCategories]
+  );
+  const overflowCategories = useMemo(
+    () =>
+      allCategories.slice(PRIMARY_VISIBLE_LIMIT).map((cat) => ({
+        value: cat.name,
+        label: cat.name,
+      })),
+    [allCategories]
+  );
 
   if (isLoading) {
     return (
@@ -78,47 +97,42 @@ export function CatalogSection({ tenantSlug }: CatalogSectionProps = {}) {
     );
   }
 
-  const allCategories = [
-    { name: "TODOS", count: totalProductsCount },
-    ...data.categories.map((c) => ({
-      name: c.categoryName,
-      count: c.products.length,
-    })),
-  ];
-
   return (
-    <div className="space-y-8">
+    <div className="space-y-4 sm:space-y-6">
       {/* Barra de Control Sticky: Buscador Integrado + Subnav de Categorías */}
       <div
-        style={{ top: "var(--storefront-header-offset, 76px)" }}
-        className="sticky z-20 bg-surface-canvas/95 backdrop-blur-md pt-2 pb-4 border-b border-surface-border space-y-3.5 transition-[top] duration-300"
+        style={{ top: "var(--storefront-header-offset, 52px)" }}
+        className="sticky z-20 bg-surface-canvas pt-1 sm:pt-2 pb-1.5 sm:pb-2.5 space-y-2 sm:space-y-2.5 transition-[top] duration-300"
       >
         {/* Fila Superior: Buscador Gastronómico en Tiempo Real */}
         <div className="relative w-full max-w-md">
-          <Search className="w-4 h-4 text-text-muted absolute left-4 top-1/2 -translate-y-1/2 pointer-events-none" />
+          <Search className="w-3.5 h-3.5 text-text-muted absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none" />
           <input
             type="text"
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
+            onKeyDown={(e) => {
+              if (e.key === "Escape") setSearchQuery("");
+            }}
             placeholder="Buscar por plato, combo o bebida..."
-            className="w-full pl-11 pr-10 py-2.5 rounded-full text-xs sm:text-sm bg-surface-card focus:ring-2 focus:ring-brand-primary text-text-strong placeholder:text-text-muted transition-all shadow-xs outline-hidden"
+            className="w-full pl-9 pr-9 py-1.5 sm:py-2 rounded-full text-xs sm:text-sm bg-surface-card border border-surface-border focus:ring-2 focus:ring-brand-primary text-text-strong placeholder:text-text-muted transition-all outline-hidden"
           />
           {searchQuery && (
             <button
               type="button"
               onClick={() => setSearchQuery("")}
               aria-label="Limpiar búsqueda"
-              className="absolute right-3 top-1/2 -translate-y-1/2 p-1 rounded-full text-text-muted hover:text-text-strong hover:bg-surface-card-hover transition-colors"
+              className="absolute right-2.5 top-1/2 -translate-y-1/2 p-1 rounded-full text-text-muted hover:text-text-strong hover:bg-surface-card-hover transition-colors cursor-pointer"
             >
-              <X className="w-4 h-4" />
+              <X className="w-3.5 h-3.5" />
             </button>
           )}
         </div>
 
-        {/* Fila Inferior: Píldoras de Categorías con Contador */}
+        {/* Fila Inferior: Píldoras de Categorías y Selector Desplegable Profesional (...) agrupados de forma continua */}
         {!searchQuery && (
-          <div className="flex items-center gap-2 overflow-x-auto pb-1 scrollbar-none">
-            {allCategories.map((cat) => {
+          <div className="flex items-center gap-1.5 sm:gap-2 overflow-x-auto pb-0.5 scrollbar-none">
+            {visibleCategories.map((cat) => {
               const isSelected = selectedCategory === cat.name;
 
               return (
@@ -126,25 +140,26 @@ export function CatalogSection({ tenantSlug }: CatalogSectionProps = {}) {
                   key={cat.name}
                   type="button"
                   onClick={() => setSelectedCategory(cat.name)}
-                  className={`inline-flex items-center gap-1.5 px-4 sm:px-5 py-2 rounded-full text-xs font-black uppercase tracking-wider font-display transition-all whitespace-nowrap cursor-pointer shrink-0 ${
+                  className={`inline-flex items-center gap-1.5 px-3.5 sm:px-4 py-1.5 rounded-full text-[11px] sm:text-xs font-black uppercase tracking-wider font-display transition-all whitespace-nowrap cursor-pointer shrink-0 ${
                     isSelected
-                      ? "bg-brand-primary text-white shadow-xs scale-[1.02]"
-                      : "bg-surface-card text-text-strong hover:bg-surface-card-hover shadow-2xs hover:shadow-xs"
+                      ? "bg-brand-primary text-white scale-[1.02]"
+                      : "bg-surface-card text-text-strong hover:bg-surface-card-hover border border-surface-border"
                   }`}
                 >
                   <span>{cat.name}</span>
-                  <span
-                    className={`text-[10px] font-mono px-1.5 py-0.2 rounded-full font-bold ${
-                      isSelected
-                        ? "bg-white/20 text-white"
-                        : "bg-surface-canvas text-text-muted"
-                    }`}
-                  >
-                    {cat.count}
-                  </span>
                 </button>
               );
             })}
+
+            {overflowCategories.length > 0 && (
+              <SelectDropdown
+                options={overflowCategories}
+                value={selectedCategory}
+                onChange={(cat) => setSelectedCategory(cat)}
+                align="left"
+                triggerAriaLabel="Ver más categorías del menú"
+              />
+            )}
           </div>
         )}
       </div>
@@ -162,21 +177,42 @@ export function CatalogSection({ tenantSlug }: CatalogSectionProps = {}) {
           </div>
 
           {searchResults.length === 0 ? (
-            <div className="bg-surface-card border border-surface-border rounded-3xl p-10 sm:p-14 text-center space-y-3">
-              <Utensils className="w-8 h-8 text-text-muted mx-auto stroke-1" />
-              <p className="text-sm font-bold text-text-strong">
-                No encontramos platos que coincidan con &ldquo;{searchQuery}&rdquo;
-              </p>
-              <p className="text-xs text-text-muted max-w-sm mx-auto">
-                Prueba con otro término como &ldquo;pollo&rdquo;, &ldquo;broaster&rdquo;, &ldquo;arroz&rdquo; o &ldquo;cola&rdquo;.
-              </p>
-              <button
-                type="button"
-                onClick={() => setSearchQuery("")}
-                className="mt-2 inline-flex items-center gap-2 bg-surface-canvas hover:bg-surface-card-hover border border-surface-border text-text-strong text-xs font-bold font-display uppercase tracking-wider px-5 py-2.5 rounded-full transition-all"
-              >
-                Ver Todo el Menú
-              </button>
+            <div className="bg-surface-card border border-surface-border rounded-3xl p-8 sm:p-12 text-center space-y-4">
+              <div className="w-12 h-12 rounded-2xl bg-surface-canvas border border-surface-border flex items-center justify-center text-text-muted mx-auto">
+                <Utensils className="w-6 h-6 stroke-1 text-text-muted" />
+              </div>
+              <div className="space-y-1">
+                <p className="text-sm font-bold text-text-strong">
+                  No encontramos platos que coincidan con &ldquo;{searchQuery}&rdquo;
+                </p>
+                <p className="text-xs text-text-muted max-w-sm mx-auto">
+                  Prueba buscando por tipo de comida o selecciona una sugerencia rápida:
+                </p>
+              </div>
+
+              {/* Sugerencias Rápidas Clickeables */}
+              <div className="flex flex-wrap items-center justify-center gap-1.5 pt-1">
+                {POPULAR_SEARCH_SUGGESTIONS.map((tag) => (
+                  <button
+                    key={tag}
+                    type="button"
+                    onClick={() => setSearchQuery(tag)}
+                    className="px-3 py-1 rounded-full text-xs font-display font-bold uppercase tracking-wider bg-surface-canvas hover:bg-surface-card-hover border border-surface-border text-text-strong transition-all cursor-pointer"
+                  >
+                    {tag}
+                  </button>
+                ))}
+              </div>
+
+              <div className="pt-2">
+                <button
+                  type="button"
+                  onClick={() => setSearchQuery("")}
+                  className="inline-flex items-center gap-2 bg-neutral-900 hover:bg-neutral-800 text-white text-xs font-bold font-display uppercase tracking-wider px-5 py-2.5 rounded-full transition-all cursor-pointer"
+                >
+                  Ver Todo el Menú
+                </button>
+              </div>
             </div>
           ) : (
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-7">
@@ -194,15 +230,10 @@ export function CatalogSection({ tenantSlug }: CatalogSectionProps = {}) {
 
             return (
               <section key={category.categoryName} className="space-y-5">
-                <div className="flex items-center justify-between pb-1">
-                  <div className="flex items-center gap-2.5">
-                    <h3 className="text-xl sm:text-2xl font-black text-text-strong uppercase tracking-tight font-display">
-                      {category.categoryName}
-                    </h3>
-                    <span className="text-xs text-text-muted font-mono font-bold bg-surface-card px-2.5 py-0.5 rounded-full shadow-2xs">
-                      {category.products.length}
-                    </span>
-                  </div>
+                <div className="flex items-center justify-center text-center pb-2">
+                  <h3 className="text-2xl sm:text-3xl lg:text-4xl font-black text-brand-primary uppercase tracking-tight font-display">
+                    {category.categoryName}
+                  </h3>
                 </div>
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-7">
@@ -225,17 +256,39 @@ export function CatalogSection({ tenantSlug }: CatalogSectionProps = {}) {
 
             if (products.length === 0) {
               return (
-                <div className="bg-surface-card border border-surface-border rounded-2xl p-8 text-center text-text-muted text-xs font-medium">
-                  No hay productos disponibles en esta categoría en este momento.
+                <div className="bg-surface-card border border-surface-border rounded-2xl p-8 text-center text-text-muted text-xs font-medium space-y-3">
+                  <p>No hay productos disponibles en esta categoría en este momento.</p>
+                  <button
+                    type="button"
+                    onClick={() => setSelectedCategory("TODOS")}
+                    className="inline-flex items-center gap-2 bg-surface-canvas hover:bg-surface-card-hover border border-surface-border text-text-strong text-xs font-bold font-display uppercase tracking-wider px-4 py-2 rounded-full transition-all cursor-pointer"
+                  >
+                    Ver Todo el Menú
+                  </button>
                 </div>
               );
             }
 
             return (
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-7">
-                {products.map((product) => (
-                  <ProductCard key={product.id} product={product} />
-                ))}
+              <div className="space-y-5">
+                <div className="flex flex-col sm:flex-row items-center justify-center relative pb-2 text-center">
+                  <h3 className="text-2xl sm:text-3xl lg:text-4xl font-black text-brand-primary uppercase tracking-tight font-display">
+                    {currentCat?.categoryName}
+                  </h3>
+                  <button
+                    type="button"
+                    onClick={() => setSelectedCategory("TODOS")}
+                    className="sm:absolute sm:right-0 text-xs font-bold text-text-muted hover:text-brand-primary uppercase tracking-wider font-display transition-colors cursor-pointer mt-1 sm:mt-0"
+                  >
+                    Ver Todo el Menú
+                  </button>
+                </div>
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-7">
+                  {products.map((product) => (
+                    <ProductCard key={product.id} product={product} />
+                  ))}
+                </div>
               </div>
             );
           })()}

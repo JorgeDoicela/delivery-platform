@@ -5,7 +5,6 @@ import Link from "next/link";
 import Image from "next/image";
 import { usePathname } from "next/navigation";
 import {
-  Search,
   User,
   Menu,
   LayoutDashboard,
@@ -116,14 +115,25 @@ export function StorefrontHeader() {
             : "-translate-y-full opacity-0 pointer-events-none"
         } ${
           isScrolled
-            ? "shadow-md bg-surface-card/95 backdrop-blur-md"
-            : "shadow-xs"
+            ? "bg-surface-card/95 backdrop-blur-md"
+            : ""
         }`}
       >
-        <div className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 h-[66px] sm:h-[76px] flex items-center justify-between gap-2 sm:gap-6">
-          <div className="flex items-center gap-4 lg:gap-7 min-w-0 shrink">
+        <div className="max-w-7xl mx-auto px-2.5 sm:px-6 lg:px-8 h-[52px] sm:h-[76px] flex items-center justify-between gap-2 sm:gap-6">
+          <div className="flex items-center gap-2 sm:gap-4 lg:gap-7 min-w-0 shrink">
+            {/* Disparador de menú (3 líneas) al lado izquierdo antes del logo en pantallas < xl */}
+            <button
+              type="button"
+              onClick={() => setIsMobileMenuOpen(true)}
+              className="p-1.5 -ml-1 sm:-ml-2 rounded-full text-text-strong hover:bg-surface-card-hover cursor-pointer shrink-0 transition-colors xl:hidden"
+              aria-label="Abrir menú de navegación"
+            >
+              <Menu className="w-5 h-5 sm:w-6 sm:h-6" />
+            </button>
+
+            {/* Logo y Nombre de Marca */}
             <Link href={brandHomeHref} className="flex items-center gap-2 sm:gap-2.5 group min-w-0 shrink">
-              <div className="relative w-8 h-8 sm:w-10 sm:h-10 shrink-0">
+              <div className="relative w-7 h-7 sm:w-10 sm:h-10 shrink-0">
                 <Image
                   src={brandLogo}
                   alt={`Logo ${brandName}`}
@@ -136,13 +146,13 @@ export function StorefrontHeader() {
               <div className="min-w-0">
                 <span
                   data-display-brand
-                  className="font-black text-xl sm:text-[26px] tracking-tight text-brand-primary block leading-none uppercase font-display truncate max-w-[130px] sm:max-w-none"
+                  className="font-black text-lg sm:text-[26px] tracking-tight text-brand-primary block leading-none uppercase font-display truncate max-w-[150px] sm:max-w-none"
                   suppressHydrationWarning
                 >
                   {brandName}
                 </span>
                 <span
-                  className="text-[9px] sm:text-[10px] tracking-widest text-text-muted font-bold uppercase block mt-0.5 truncate hidden xs:block"
+                  className="text-[9px] sm:text-[10px] tracking-widest text-text-muted font-bold uppercase mt-0.5 truncate hidden sm:block"
                   suppressHydrationWarning
                 >
                   {brandTagline}
@@ -176,18 +186,6 @@ export function StorefrontHeader() {
               )}
             </div>
 
-            <div className="hidden lg:flex items-center">
-              <Link
-                href={catalogHref}
-                className="flex items-center gap-2.5 px-4 py-2 w-48 xl:w-64 bg-surface-canvas hover:bg-surface-card-hover rounded-full transition-colors border border-surface-border text-text-muted group"
-              >
-                <Search className="w-4 h-4 text-text-muted group-hover:text-brand-primary transition-colors shrink-0" />
-                <span className="text-xs sm:text-sm text-text-muted font-normal truncate">
-                  {isPlatformRoot ? "Buscar restaurantes..." : `Buscar en ${brandName}...`}
-                </span>
-              </Link>
-            </div>
-
             <ThemeToggle />
 
             {operationalHref && (
@@ -218,16 +216,6 @@ export function StorefrontHeader() {
             </Link>
 
             <CartButtonBadge />
-
-            {/* Disparador de Menú Móvil en pantallas < xl */}
-            <button
-              type="button"
-              onClick={() => setIsMobileMenuOpen(true)}
-              className="p-1.5 sm:p-2 rounded-full text-text-strong hover:bg-surface-card-hover xl:hidden cursor-pointer shrink-0 transition-colors"
-              aria-label="Abrir menú de navegación"
-            >
-              <Menu className="w-6 h-6" />
-            </button>
           </div>
         </div>
       </header>
@@ -241,7 +229,6 @@ export function StorefrontHeader() {
         brandLogo={brandLogo}
         isPlatformRoot={isPlatformRoot}
         routes={routes}
-        catalogHref={catalogHref}
         tenant={tenant}
         isAuthenticated={isAuthenticated}
         user={user}

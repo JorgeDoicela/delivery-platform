@@ -18,11 +18,11 @@ export function AsaderoClassicLandingLayout({
   tenant,
 }: AsaderoClassicLandingLayoutProps) {
   return (
-    <div className="w-full pb-12 space-y-12">
+    <div className="w-full pb-4 sm:pb-12 space-y-8 sm:space-y-14">
       {/* 1. Hero Slider Panorámico */}
       <CatalogHero tenant={tenant} />
 
-      <div className="w-full px-4 sm:px-8 lg:px-12 space-y-12">
+      <div className="w-full px-3.5 sm:px-8 lg:px-12 space-y-10 sm:space-y-16 md:space-y-20">
         {/* 2. Selector de Modalidad (Delivery / Salón / Takeout) */}
         <OrderModeSelector />
 
@@ -32,12 +32,10 @@ export function AsaderoClassicLandingLayout({
         {/* 4. Platos Más Pedidos y Populares de la Landing */}
         <section
           id="catalogo"
-          className="max-w-[1240px] mx-auto pt-4 w-full"
+          className="max-w-[1240px] mx-auto w-full"
         >
           <PopularProductsSection tenantSlug={tenant?.slug} limit={8} />
         </section>
-
-
 
         {/* 5. Ubicación, Casa Matriz y Cobertura Geolocalizada */}
         <StorefrontBranchShowcase tenant={tenant} />
