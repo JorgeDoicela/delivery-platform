@@ -1,3 +1,4 @@
+import Fuse, { type IFuseOptions } from "fuse.js";
 import type { MenuProductDto } from "@/shared/types/api";
 
 /**
@@ -58,7 +59,6 @@ export function stemSpanishWord(word: string): string {
   }
 
   // En español, la inmensa mayoría de sustantivos culinarios forman el plural agregando 's'
-  // (ej. "papas" -> "papa", "alitas" -> "alita", "bebidas" -> "bebida", "carnes" -> "carne", "postres" -> "postre")
   if (word.endsWith("s") && !word.endsWith("ss") && word.length > 3) {
     const prevChar = word.charAt(word.length - 2);
     if ("aeiou".includes(prevChar)) {
@@ -77,7 +77,6 @@ export function calculateLevenshteinDistance(a: string, b: string): number {
   if (a.length === 0) return b.length;
   if (b.length === 0) return a.length;
 
-  // Asegura que 'b' sea la cadena más corta para minimizar uso de memoria
   if (a.length < b.length) {
     const temp = a;
     a = b;
@@ -107,7 +106,6 @@ export function calculateLevenshteinDistance(a: string, b: string): number {
       );
     }
 
-    // Intercambia filas
     const swap = prevRow;
     prevRow = currRow;
     currRow = swap;
@@ -116,48 +114,16 @@ export function calculateLevenshteinDistance(a: string, b: string): number {
   return prevRow[bLen];
 }
 
-/**
- * Evalúa si dos tokens coinciden de forma exacta, por prefijo o difusa (typo tolerance).
- * Devuelve un score de coincidencia (0 si no coincide).
- */
-function evaluateTokenMatch(queryToken: string, targetToken: string): number {
-  if (queryToken === targetToken) {
-    return 1.0; // Coincidencia exacta
-  }
-
-  // Coincidencia con stemming
-  const stemmedQuery = stemSpanishWord(queryToken);
-  const stemmedTarget = stemSpanishWord(targetToken);
-  if (stemmedQuery === stemmedTarget) {
-    return 0.95;
-  }
-
-  // Prefijo (el usuario aún está escribiendo, ej: "hamb" -> "hamburguesa")
-  if (targetToken.startsWith(queryToken) && queryToken.length >= 3) {
-    return 0.85;
-  }
-
-  // Tolerancia a errores tipográficos según longitud del token
-  const queryLen = queryToken.length;
-  if (queryLen < 4) {
-    // Para palabras de 1 a 3 letras (ej. "te", "pan", "1/4"), no permitimos errores tipográficos
-    return 0;
-  }
-
-  const maxAllowedDistance = queryLen <= 6 ? 1 : 2;
-  const distance = calculateLevenshteinDistance(queryToken, targetToken);
-
-  if (distance <= maxAllowedDistance) {
-    // Puntuación proporcional a la cercanía
-    return 0.7 - distance * 0.15;
-  }
-
-  return 0;
+interface IndexedProduct {
+  product: MenuProductDto;
+  normName: string;
+  name: string;
+  normCategory: string;
+  stemmedWords: string[];
+  normModifiers: string[];
+  normDescription: string;
 }
 
-/**
- * Extrae y normaliza los modificadores e ingredientes de un producto para indexación.
- */
 function extractModifierKeywords(product: MenuProductDto): string[] {
   if (!product.modifierGroups || product.modifierGroups.length === 0) return [];
   const keywords: string[] = [];
@@ -172,18 +138,13 @@ function extractModifierKeywords(product: MenuProductDto): string[] {
   return keywords;
 }
 
-export interface SearchResultItem {
-  product: MenuProductDto;
-  score: number;
-}
-
 /**
- * Algoritmo profesional de búsqueda gastronómica en memoria:
- * - Tolerancia a fallos tipográficos (Levenshtein adaptativo).
- * - Búsqueda multi-token con ponderación por campos (nombre > categoría > modificadores > descripción).
- * - Stemming singular/plural culinario en español.
- * - Soporte para sinónimos gastronómicos comunes.
- * - Rendimiento sub-milisegundo con cero dependencias pesadas de terceros.
+ * Motor de búsqueda profesional gastronómico basado en Fuse.js:
+ * - Tolerancia a fallos tipográficos y coincidencias difusas (Fuzzy Search).
+ * - Coincidencia instantánea por prefijo y subcadenas desde 1 o 2 letras (ej. "po" -> "Pollo").
+ * - Soporte multi-token ponderado (Nombre > Categoría > Modificadores > Descripción).
+ * - Normalización de acentos/diacríticos y sinónimos gastronómicos.
+ * - Stemming singular/plural en español.
  */
 export function searchCatalogProducts(
   products: MenuProductDto[],
@@ -192,114 +153,127 @@ export function searchCatalogProducts(
   if (!products || products.length === 0) return [];
   if (!rawQuery || !rawQuery.trim()) return products;
 
-  // 1. Normalización y expansión de la consulta
   let cleanQuery = normalizeSearchText(rawQuery);
   if (!cleanQuery) return products;
 
   // Reemplazo de sinónimos directos en la consulta
   for (const [key, replacement] of Object.entries(CULINARY_SYNONYMS)) {
-    if (cleanQuery === key || cleanQuery.startsWith(key + " ") || cleanQuery.endsWith(" " + key)) {
+    if (
+      cleanQuery === key ||
+      cleanQuery.startsWith(key + " ") ||
+      cleanQuery.endsWith(" " + key) ||
+      cleanQuery.includes(" " + key + " ")
+    ) {
       cleanQuery = cleanQuery.replace(new RegExp(`\\b${key}\\b`, "g"), replacement);
     }
   }
 
-  const queryTokens = cleanQuery.split(/\s+/).filter(Boolean);
-  if (queryTokens.length === 0) return products;
-
-  const results: SearchResultItem[] = [];
-
-  for (const product of products) {
+  // Prepara documentos enriquecidos para indexación en Fuse
+  const indexedList: IndexedProduct[] = products.map((product) => {
     const normName = normalizeSearchText(product.name);
-    const normDesc = normalizeSearchText(product.description || "");
     const normCat = normalizeSearchText(product.category || "");
+    const normDesc = normalizeSearchText(product.description || "");
     const modKeywords = extractModifierKeywords(product);
 
-    let score = 0;
+    // Extrae palabras para normalización con stemming
+    const allWords = `${normName} ${normCat} ${normDesc} ${modKeywords.join(" ")}`
+      .split(/\s+/)
+      .filter((w) => w.length > 2);
+    const stemmedWords = Array.from(new Set(allWords.map(stemSpanishWord)));
 
-    // A. Bonificación por Coincidencia Exacta de la Frase Completa
-    if (normName === cleanQuery) {
-      score += 250;
-    } else if (normName.startsWith(cleanQuery)) {
-      score += 120;
-    } else if (normName.includes(cleanQuery)) {
-      score += 80;
-    }
+    return {
+      product,
+      name: product.name,
+      normName,
+      normCategory: normCat,
+      stemmedWords,
+      normModifiers: modKeywords,
+      normDescription: normDesc,
+    };
+  });
 
-    if (normCat.includes(cleanQuery)) {
-      score += 60;
-    }
+  const isShortQuery = cleanQuery.length <= 3;
 
-    if (normDesc.includes(cleanQuery)) {
-      score += 30;
-    }
+  // 1. Coincidencias directas por subcadena (exact match en nombre, categoría, modificadores o descripción)
+  const directMatches = indexedList.filter((item) => {
+    return (
+      item.normName.includes(cleanQuery) ||
+      item.normCategory.includes(cleanQuery) ||
+      item.normDescription.includes(cleanQuery) ||
+      item.normModifiers.some((mod) => mod.includes(cleanQuery))
+    );
+  });
 
-    // B. Evaluación Multi-Token (cada palabra de la búsqueda aporta valor)
-    const nameWords = normName.split(/\s+/);
-    const catWords = normCat.split(/\s+/);
-    const descWords = normDesc.split(/\s+/);
+  // Si la consulta es corta (ej. "po", "aji", "pan"), priorizar coincidencias directas para evitar falsos positivos
+  if (isShortQuery && directMatches.length > 0) {
+    return directMatches
+      .sort((a, b) => {
+        const aStarts = a.normName.startsWith(cleanQuery);
+        const bStarts = b.normName.startsWith(cleanQuery);
+        if (aStarts && !bStarts) return -1;
+        if (!aStarts && bStarts) return 1;
+        return a.normName.localeCompare(b.normName);
+      })
+      .map((item) => item.product);
+  }
 
-    let matchedTokensCount = 0;
+  const fuseOptions: IFuseOptions<IndexedProduct> = {
+    keys: [
+      { name: "normName", weight: 0.45 },
+      { name: "name", weight: 0.25 },
+      { name: "stemmedWords", weight: 0.15 },
+      { name: "normCategory", weight: 0.15 },
+      { name: "normModifiers", weight: 0.1 },
+      { name: "normDescription", weight: 0.05 },
+    ],
+    threshold: isShortQuery ? 0.15 : 0.35,
+    distance: 100,
+    minMatchCharLength: 1,
+    ignoreLocation: true,
+    includeScore: true,
+    shouldSort: true,
+    findAllMatches: true,
+  };
 
-    for (const qToken of queryTokens) {
-      let bestTokenScore = 0;
+  const fuse = new Fuse(indexedList, fuseOptions);
 
-      // 1. Coincidencia en Nombre (peso x40)
-      for (const w of nameWords) {
-        const match = evaluateTokenMatch(qToken, w);
-        if (match > bestTokenScore) {
-          bestTokenScore = match * 40;
-        }
+  // 2. Búsqueda principal con Fuse.js
+  let fuseResults = fuse.search(cleanQuery);
+
+  // 3. Si es búsqueda multi-palabra y no arrojó resultados, prueba con tokens stemmed
+  if (fuseResults.length === 0) {
+    const queryTokens = cleanQuery.split(/\s+/).filter(Boolean);
+    if (queryTokens.length > 0) {
+      const stemmedQuery = queryTokens.map(stemSpanishWord).join(" ");
+      if (stemmedQuery !== cleanQuery) {
+        fuseResults = fuse.search(stemmedQuery);
       }
-
-      // 2. Coincidencia en Categoría (peso x30)
-      for (const w of catWords) {
-        const match = evaluateTokenMatch(qToken, w);
-        const catScore = match * 30;
-        if (catScore > bestTokenScore) {
-          bestTokenScore = catScore;
-        }
-      }
-
-      // 3. Coincidencia en Modificadores / Opciones (peso x20)
-      for (const mod of modKeywords) {
-        const modWords = mod.split(/\s+/);
-        for (const mw of modWords) {
-          const match = evaluateTokenMatch(qToken, mw);
-          const modScore = match * 20;
-          if (modScore > bestTokenScore) {
-            bestTokenScore = modScore;
-          }
-        }
-      }
-
-      // 4. Coincidencia en Descripción (peso x15)
-      for (const w of descWords) {
-        const match = evaluateTokenMatch(qToken, w);
-        const descScore = match * 15;
-        if (descScore > bestTokenScore) {
-          bestTokenScore = descScore;
-        }
-      }
-
-      if (bestTokenScore > 0) {
-        matchedTokensCount++;
-        score += bestTokenScore;
-      }
-    }
-
-    // C. Bonificación especial si coinciden TODOS los tokens de la búsqueda
-    if (matchedTokensCount === queryTokens.length) {
-      score += 50;
-    }
-
-    // D. Umbral mínimo de relevancia: al menos un token debe haber coincidido
-    if (score > 0 && matchedTokensCount > 0) {
-      results.push({ product, score });
     }
   }
 
-  // Ordenar por score descendente (mayor relevancia primero)
-  results.sort((a, b) => b.score - a.score);
+  // 4. Combinar coincidencias directas y resultados Fuse preservando el orden de relevancia
+  const combinedMap = new Map<number, { product: MenuProductDto; score: number }>();
+
+  for (const item of directMatches) {
+    let score = 0.05;
+    if (item.normName.startsWith(cleanQuery)) {
+      score = 0.01;
+    } else if (item.normName.includes(cleanQuery)) {
+      score = 0.03;
+    }
+    combinedMap.set(item.product.id, { product: item.product, score });
+  }
+
+  for (const res of fuseResults) {
+    const existing = combinedMap.get(res.item.product.id);
+    const resScore = res.score ?? 0.2;
+    if (!existing || resScore < existing.score) {
+      combinedMap.set(res.item.product.id, { product: res.item.product, score: resScore });
+    }
+  }
+
+  const results = Array.from(combinedMap.values());
+  results.sort((a, b) => a.score - b.score);
 
   return results.map((r) => r.product);
 }

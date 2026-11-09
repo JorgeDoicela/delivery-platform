@@ -18,12 +18,14 @@ interface LoginFormProps {
   redirectUrl?: string;
   embedded?: boolean;
   onSwitchToRegister?: () => void;
+  onSwitchToForgotPassword?: () => void;
 }
 
 export function LoginForm({
   redirectUrl,
   embedded = false,
   onSwitchToRegister,
+  onSwitchToForgotPassword,
 }: LoginFormProps) {
   const router = useRouter();
   const login = useAuthStore((s) => s.login);
@@ -159,12 +161,30 @@ export function LoginForm({
 
       {/* Campo: Contraseña con Visor Interactivo */}
       <div className="space-y-1.5">
-        <label
-          htmlFor="password"
-          className="block text-[11px] font-bold text-neutral-700 uppercase tracking-wider"
-        >
-          Contraseña
-        </label>
+        <div className="flex items-center justify-between">
+          <label
+            htmlFor="password"
+            className="block text-[11px] font-bold text-neutral-700 uppercase tracking-wider"
+          >
+            Contraseña
+          </label>
+          {onSwitchToForgotPassword ? (
+            <button
+              type="button"
+              onClick={onSwitchToForgotPassword}
+              className="text-[11px] font-bold text-brand-primary hover:underline cursor-pointer"
+            >
+              ¿Olvidaste tu contraseña?
+            </button>
+          ) : (
+            <Link
+              href={routes.getLoginHref({ tab: "forgot-password", redirect: redirectUrl })}
+              className="text-[11px] font-bold text-brand-primary hover:underline"
+            >
+              ¿Olvidaste tu contraseña?
+            </Link>
+          )}
+        </div>
         <div className="relative">
           <input
             id="password"
@@ -212,18 +232,6 @@ export function LoginForm({
           <span>Acceder al Sistema</span>
         )}
       </button>
-
-      {/* Separador para autenticación federada */}
-      <div className="relative my-2">
-        <div className="absolute inset-0 flex items-center">
-          <div className="w-full border-t border-neutral-200" />
-        </div>
-        <div className="relative flex justify-center text-xs uppercase">
-          <span className="bg-white px-3 text-neutral-400 font-bold text-[10px] tracking-wider font-mono">
-            o continúa con
-          </span>
-        </div>
-      </div>
 
       <GoogleSignInButton redirectUrl={redirectUrl} />
 

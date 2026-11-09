@@ -1,7 +1,10 @@
 using System.Reflection;
+using Delivery.Core.Contracts.Emails;
+using Delivery.Core.Infrastructure.Emails;
 using Delivery.Features.Common.Endpoints;
 using Delivery.Features.Common.Handlers;
 using Delivery.Features.Common.Security;
+using Delivery.Features.Common.Services;
 using FluentValidation;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -18,6 +21,11 @@ public static class DependencyInjection
         services.AddSingleton<IPasswordHasher, BCryptPasswordHasher>();
         services.AddSingleton<ITokenProvider, JwtTokenProvider>();
         services.AddScoped<Delivery.Features.Auth.GoogleAuth.IGoogleTokenValidator, Delivery.Features.Auth.GoogleAuth.GoogleTokenValidator>();
+
+        // 0.1 Servicios de Mensajería y Correo Electrónico SMTP
+        services.AddSingleton<IEmailTemplateEngine, HtmlEmailTemplateEngine>();
+        services.AddScoped<IEmailService, MailKitSmtpEmailService>();
+        services.AddScoped<IBackgroundEmailQueue, HangfireBackgroundEmailQueue>();
 
         // 1. Registro automático de Validadores FluentValidation
         services.AddValidatorsFromAssembly(assembly);

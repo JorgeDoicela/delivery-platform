@@ -52,13 +52,13 @@ public class RegisterHandlerTests
         var handler = new RegisterHandler(context, fakeTenantContext, mockHasher.Object, mockTokenProvider.Object);
 
         var command = new RegisterCommand(
-            "Maria Lopez",
-            "maria.lopez@example.com",
-            "0998877665",
-            "Password123!",
-            "la-granjita",
-            "CEDULA",
-            "1712345678");
+            Email: "maria.lopez@example.com",
+            Password: "Password123!",
+            FullName: "Maria Lopez",
+            Phone: "0998877665",
+            TenantSlug: "la-granjita",
+            IdentificationType: "CEDULA",
+            IdentificationNumber: "1712345678");
 
         var result = await handler.Handle(command);
 
@@ -84,6 +84,48 @@ public class RegisterHandlerTests
     }
 
     [Fact]
+    public async Task RegisterHandler_ShouldSucceed_WithOnlyEmailAndPassword()
+    {
+        var dbName = Guid.NewGuid().ToString();
+        await using var context = new AppDbContext(CreateOptions(dbName));
+        await DatabaseSeeder.SeedAsync(context);
+
+        var tenant = await context.Tenants.FirstAsync(t => t.Slug == "la-granjita");
+        var fakeTenantContext = new FakeTenantContext
+        {
+            TenantId = tenant.Id,
+            TenantSlug = tenant.Slug
+        };
+
+        var mockHasher = new Mock<IPasswordHasher>();
+        mockHasher.Setup(h => h.Hash(It.IsAny<string>())).Returns("hashed_password_123");
+
+        var mockTokenProvider = new Mock<ITokenProvider>();
+        mockTokenProvider.Setup(t => t.GenerateAccessToken(It.IsAny<User>(), It.IsAny<IEnumerable<Role>>(), It.IsAny<Guid?>(), It.IsAny<int?>()))
+            .Returns(("access_token_abc", DateTime.UtcNow.AddHours(1)));
+        mockTokenProvider.Setup(t => t.GenerateRefreshToken())
+            .Returns(("raw_refresh_token", "hash_refresh_token", DateTime.UtcNow.AddDays(7)));
+
+        var handler = new RegisterHandler(context, fakeTenantContext, mockHasher.Object, mockTokenProvider.Object);
+
+        var command = new RegisterCommand(
+            Email: "solo.correo@example.com",
+            Password: "Password123!");
+
+        var result = await handler.Handle(command);
+
+        result.IsSuccess.Should().BeTrue();
+        result.Value.User.Email.Should().Be("solo.correo@example.com");
+        result.Value.User.FullName.Should().Be("solo.correo");
+
+        var savedUser = await context.Users
+            .FirstOrDefaultAsync(u => u.Email == "solo.correo@example.com");
+
+        savedUser.Should().NotBeNull();
+        savedUser!.Phone.Should().BeEmpty();
+    }
+
+    [Fact]
     public async Task RegisterHandler_ShouldFail_WhenEmailAlreadyRegistered()
     {
         var dbName = Guid.NewGuid().ToString();
@@ -104,11 +146,11 @@ public class RegisterHandlerTests
 
         // Intentar registrar el email de un usuario ya existente en el seeder (jorge@admin.com)
         var command = new RegisterCommand(
-            "Admin Duplicado",
-            "jorge@admin.com",
-            "0999999999",
-            "Password123!",
-            "la-granjita");
+            Email: "jorge@admin.com",
+            Password: "Password123!",
+            FullName: "Admin Duplicado",
+            Phone: "0999999999",
+            TenantSlug: "la-granjita");
 
         var result = await handler.Handle(command);
 

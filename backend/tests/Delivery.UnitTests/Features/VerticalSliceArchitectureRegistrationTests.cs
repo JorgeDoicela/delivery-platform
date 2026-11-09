@@ -55,6 +55,11 @@ public class VerticalSliceArchitectureRegistrationTests
         registeredServiceTypes.Should().Contain(typeof(IngestDriverLocationHandler));
         registeredServiceTypes.Should().Contain(typeof(GetDriverLocationHandler));
         registeredServiceTypes.Should().Contain(typeof(Delivery.Features.Branches.UpdateBranchOperatingHours.UpdateBranchOperatingHoursHandler));
+        registeredServiceTypes.Should().Contain(typeof(Delivery.Features.Emails.SendTestEmail.SendTestEmailHandler));
+        registeredServiceTypes.Should().Contain(typeof(Delivery.Features.Auth.ForgotPassword.ForgotPasswordHandler));
+        registeredServiceTypes.Should().Contain(typeof(Delivery.Features.Auth.ResetPassword.ResetPasswordHandler));
+        registeredServiceTypes.Should().Contain(typeof(Delivery.Features.Auth.VerifyEmail.VerifyEmailHandler));
+        registeredServiceTypes.Should().Contain(typeof(Delivery.Features.Auth.ResendVerification.ResendVerificationHandler));
 
         // Verificar registro de interfaces IHandler<,>
         registeredServiceTypes.Should().Contain(typeof(Delivery.Features.Common.Handlers.IHandler<CreateOrderCommand, Result<CreateOrderResponse>>));
@@ -71,9 +76,9 @@ public class VerticalSliceArchitectureRegistrationTests
         // Act
         services.AddDeliveryFeatures();
 
-        // Assert: Deben registrarse exactamente 31 endpoints autónomos
+        // Assert: Deben registrarse exactamente 36 endpoints autónomos
         var endpointDescriptors = services.Where(s => s.ServiceType == typeof(IEndpoint)).ToList();
-        endpointDescriptors.Should().HaveCount(31);
+        endpointDescriptors.Should().HaveCount(36);
 
         var endpointImplementationTypes = endpointDescriptors.Select(d => d.ImplementationType).ToHashSet();
         endpointImplementationTypes.Should().Contain(typeof(ResolveBranchEndpoint));
@@ -107,6 +112,11 @@ public class VerticalSliceArchitectureRegistrationTests
         endpointImplementationTypes.Should().Contain(typeof(Delivery.Features.Drivers.UpdateDriverStatus.UpdateDriverStatusEndpoint));
         endpointImplementationTypes.Should().Contain(typeof(Delivery.Features.Drivers.GetDriverOrders.GetDriverOrdersEndpoint));
         endpointImplementationTypes.Should().Contain(typeof(Delivery.Features.Drivers.ClaimDriverOrder.ClaimDriverOrderEndpoint));
+        endpointImplementationTypes.Should().Contain(typeof(Delivery.Features.Emails.SendTestEmail.SendTestEmailEndpoint));
+        endpointImplementationTypes.Should().Contain(typeof(Delivery.Features.Auth.ForgotPassword.ForgotPasswordEndpoint));
+        endpointImplementationTypes.Should().Contain(typeof(Delivery.Features.Auth.ResetPassword.ResetPasswordEndpoint));
+        endpointImplementationTypes.Should().Contain(typeof(Delivery.Features.Auth.VerifyEmail.VerifyEmailEndpoint));
+        endpointImplementationTypes.Should().Contain(typeof(Delivery.Features.Auth.ResendVerification.ResendVerificationEndpoint));
     }
 
     [Fact]

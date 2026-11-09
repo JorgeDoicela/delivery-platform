@@ -3,6 +3,7 @@ using Delivery.Api.Hubs;
 using Delivery.Api.Middlewares;
 using Delivery.Api.Multitenancy;
 using Delivery.Api.Realtime;
+using Delivery.Core.Contracts.Emails;
 using Delivery.Core.Contracts.Realtime;
 using Delivery.Core.Domain.Common;
 using Delivery.Core.Infrastructure.Persistence;
@@ -65,16 +66,48 @@ builder.Services.AddSingleton<IConnectionMultiplexer>(_ => ConnectionMultiplexer
 // 3. Inyección de dependencias de Vertical Slices
 builder.Services.AddDeliveryFeatures();
 
+// 3.1 Configuración de SMTP para Correo Electrónico Transaccional y Notificaciones
+var smtpSection = builder.Configuration.GetSection(SmtpOptions.SectionName);
+builder.Services.Configure<SmtpOptions>(options =>
+{
+    smtpSection.Bind(options);
+
+    var envHost = Environment.GetEnvironmentVariable("SMTP_HOST");
+    if (!string.IsNullOrWhiteSpace(envHost)) options.Host = envHost;
+
+    var envPort = Environment.GetEnvironmentVariable("SMTP_PORT");
+    if (!string.IsNullOrWhiteSpace(envPort) && int.TryParse(envPort, out var p)) options.Port = p;
+
+    var envUser = Environment.GetEnvironmentVariable("SMTP_USER");
+    if (!string.IsNullOrWhiteSpace(envUser)) options.UserName = envUser;
+
+    var envPass = Environment.GetEnvironmentVariable("SMTP_PASSWORD");
+    if (!string.IsNullOrWhiteSpace(envPass)) options.Password = envPass;
+
+    var envSecure = Environment.GetEnvironmentVariable("SMTP_SECURE");
+    if (!string.IsNullOrWhiteSpace(envSecure) && bool.TryParse(envSecure, out var sec)) options.EnableSsl = sec;
+
+    var envFromEmail = Environment.GetEnvironmentVariable("SMTP_FROM_EMAIL");
+    if (!string.IsNullOrWhiteSpace(envFromEmail)) options.SenderEmail = envFromEmail;
+
+    var envFromName = Environment.GetEnvironmentVariable("SMTP_FROM_NAME");
+    if (!string.IsNullOrWhiteSpace(envFromName)) options.SenderName = envFromName;
+});
+
 // 4. Configuración de Autenticación JWT y RBAC
 var jwtSection = builder.Configuration.GetSection(JwtOptions.SectionName);
-builder.Services.Configure<JwtOptions>(jwtSection);
-var jwtOptions = jwtSection.Get<JwtOptions>() ?? new JwtOptions();
+var jwtSecretKey = Environment.GetEnvironmentVariable("JWT_SECRET")
+    ?? jwtSection["SecretKey"]
+    ?? throw new InvalidOperationException("La variable 'JWT_SECRET' no está configurada en el archivo .env.");
 
-if (string.IsNullOrWhiteSpace(jwtOptions.SecretKey))
+builder.Services.Configure<JwtOptions>(options =>
 {
-    jwtOptions.SecretKey = Environment.GetEnvironmentVariable("JWT_SECRET")
-        ?? throw new InvalidOperationException("La variable 'JWT_SECRET' no está configurada en el archivo .env.");
-}
+    jwtSection.Bind(options);
+    options.SecretKey = jwtSecretKey;
+});
+
+var jwtOptions = jwtSection.Get<JwtOptions>() ?? new JwtOptions();
+jwtOptions.SecretKey = jwtSecretKey;
 
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     .AddJwtBearer(options =>

@@ -12,7 +12,8 @@ public record UserAuthInfoDto(
     string? TenantSlug,
     int? BranchId,
     bool IsActive,
-    List<string> Roles);
+    List<string> Roles,
+    bool IsEmailVerified = false);
 
 public record LoginResponse(
     string AccessToken,

@@ -1,4 +1,6 @@
 using Delivery.Core.Common;
+using Delivery.Core.Contracts.Emails;
+using Delivery.Core.Contracts.Emails.Models;
 using Delivery.Core.Contracts.Realtime;
 using Delivery.Core.Domain.Enums;
 using Delivery.Core.Infrastructure.Persistence;
@@ -59,17 +61,20 @@ public sealed class UpdateOrderStatusHandler : IHandler<UpdateOrderStatusCommand
     private readonly IValidator<UpdateOrderStatusCommand> _validator;
     private readonly ITrackingNotifier _trackingNotifier;
     private readonly IKitchenNotifier _kitchenNotifier;
+    private readonly IBackgroundEmailQueue? _emailQueue;
 
     public UpdateOrderStatusHandler(
         AppDbContext context,
         IValidator<UpdateOrderStatusCommand> validator,
         ITrackingNotifier trackingNotifier,
-        IKitchenNotifier kitchenNotifier)
+        IKitchenNotifier kitchenNotifier,
+        IBackgroundEmailQueue? emailQueue = null)
     {
         _context = context;
         _validator = validator;
         _trackingNotifier = trackingNotifier;
         _kitchenNotifier = kitchenNotifier;
+        _emailQueue = emailQueue;
     }
 
     public async Task<Result<UpdateOrderStatusResponse>> Handle(UpdateOrderStatusCommand command, CancellationToken cancellationToken = default)
@@ -124,6 +129,60 @@ public sealed class UpdateOrderStatusHandler : IHandler<UpdateOrderStatusCommand
         // Notificaciones en tiempo real (Canal de Tracking de cliente y Pantallas KDS de cocina)
         await _trackingNotifier.NotifyOrderStatusChangedAsync(order.Id, order.Status, cancellationToken);
         await _kitchenNotifier.NotifyOrderStatusChangedAsync(order.Id, order.Status, cancellationToken);
+
+        // Notificación de cambio de estado de comanda por correo electrónico mediante Hangfire
+        if (_emailQueue != null && !string.IsNullOrWhiteSpace(order.CustomerEmail))
+        {
+            var tenant = order.TenantId != Guid.Empty
+                ? await _context.Tenants.AsNoTracking().FirstOrDefaultAsync(t => t.Id == order.TenantId, cancellationToken)
+                : null;
+
+            var brand = tenant != null
+                ? new BrandEmailContext
+                {
+                    BrandName = tenant.Name,
+                    BrandTagline = tenant.Tagline,
+                    PrimaryColor = tenant.BrandPrimaryColor ?? "#E4002B",
+                    LogoUrl = tenant.LogoUrl,
+                    SupportEmail = tenant.ContactEmail,
+                    SupportPhone = tenant.ContactPhone
+                }
+                : BrandEmailContext.DefaultPlatform;
+
+            var (statusTitle, statusDesc) = command.NewStatus switch
+            {
+                OrderStatus.InKitchen => ("Tu orden está en cocina", "Nuestros maestros de la brasa están preparando tus especialidades al carbón."),
+                OrderStatus.ReadyForDelivery => ("Tu pedido está listo y empacado", "Tu orden ha sido empaquetada con sellos térmicos de seguridad y espera asignación de despacho."),
+                OrderStatus.OnTheWay => ("¡El repartidor va en camino!", "Tu pedido salió de la sucursal y se dirige a tu dirección. Puedes rastrear su ubicación satelital en vivo."),
+                OrderStatus.Delivered => ("Pedido entregado exitosamente", "Tu orden ha sido entregada. ¡Muchas gracias por tu preferencia y buen provecho!"),
+                OrderStatus.Cancelled => ("Pedido cancelado", string.IsNullOrEmpty(command.Reason) ? "Tu pedido ha sido cancelado. Comunícate con nosotros si requieres asistencia." : $"Motivo: {command.Reason}"),
+                _ => ($"Estado de comanda: {command.NewStatus}", "Tu orden ha recibido una actualización en el sistema.")
+            };
+
+            var emailModel = new OrderStatusChangedEmailModel
+            {
+                Brand = brand,
+                OrderNumber = order.OrderNumber,
+                OrderId = order.Id,
+                CustomerName = order.CustomerName,
+                PreviousStatus = previousStatus.ToString(),
+                CurrentStatus = command.NewStatus.ToString(),
+                StatusTitle = statusTitle,
+                StatusDescription = statusDesc,
+                TrackingUrl = $"https://mesafy.doicela.dev/{tenant?.Slug ?? "la-granjita"}/rastreo/{order.Id}",
+                Total = order.Total,
+                UpdatedAt = order.UpdatedAt.GetValueOrDefault(DateTime.UtcNow)
+            };
+
+            _emailQueue.EnqueueTemplatedEmail(
+                order.CustomerEmail,
+                order.CustomerName,
+                $"Actualización de Pedido #{order.OrderNumber}: {statusTitle} - {brand.BrandName}",
+                EmailTemplateType.OrderStatusChanged,
+                emailModel,
+                order.TenantId
+            );
+        }
 
         return Result.Success(new UpdateOrderStatusResponse(
             order.Id,

@@ -30,6 +30,8 @@ export interface AuthUser {
   tenantSlug?: string | null;
   branchId: string | number | null;
   isActive: boolean;
+  isEmailVerified?: boolean;
+  emailVerifiedAt?: string | null;
 }
 
 export interface LoginResponse {
@@ -39,10 +41,10 @@ export interface LoginResponse {
 }
 
 export interface RegisterRequest {
-  fullName: string;
   email: string;
-  phone: string;
   password: string;
+  fullName?: string;
+  phone?: string;
   tenantSlug?: string;
   identificationType?: string;
   identificationNumber?: string;
@@ -61,6 +63,48 @@ export interface RefreshTokenResponse {
   accessToken: string;
   user: AuthUser;
   expiresAt: string;
+}
+
+export interface ForgotPasswordRequest {
+  email: string;
+  tenantSlug?: string;
+}
+
+export interface ForgotPasswordResponse {
+  message: string;
+}
+
+export interface ResetPasswordRequest {
+  email: string;
+  token: string;
+  newPassword: string;
+  tenantSlug?: string;
+}
+
+export interface ResetPasswordResponse {
+  success: boolean;
+  message: string;
+}
+
+export interface VerifyEmailRequest {
+  token: string;
+  email?: string;
+}
+
+export interface VerifyEmailResponse {
+  success: boolean;
+  message: string;
+  email?: string;
+  fullName?: string;
+}
+
+export interface ResendVerificationRequest {
+  email: string;
+  tenantSlug?: string;
+}
+
+export interface ResendVerificationResponse {
+  message: string;
 }
 
 export type AuthStatus = "idle" | "loading" | "error" | "success";

@@ -386,6 +386,40 @@ namespace Delivery.Core.Infrastructure.Persistence.Migrations
                     b.ToTable("Drivers", (string)null);
                 });
 
+            modelBuilder.Entity("Delivery.Core.Domain.Entities.EmailVerificationToken", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("CreatedByIp")
+                        .HasMaxLength(45)
+                        .HasColumnType("character varying(45)");
+
+                    b.Property<DateTime>("ExpiresAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("TokenHash")
+                        .IsRequired()
+                        .HasMaxLength(255)
+                        .HasColumnType("character varying(255)");
+
+                    b.Property<DateTime?>("UsedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<Guid>("UserId")
+                        .HasColumnType("uuid");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("EmailVerificationTokens", (string)null);
+                });
+
             modelBuilder.Entity("Delivery.Core.Domain.Entities.InventoryItem", b =>
                 {
                     b.Property<int>("Id")
@@ -910,6 +944,40 @@ namespace Delivery.Core.Infrastructure.Persistence.Migrations
                     b.ToTable("OrderItemModifiers", (string)null);
                 });
 
+            modelBuilder.Entity("Delivery.Core.Domain.Entities.PasswordResetToken", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("CreatedByIp")
+                        .HasMaxLength(45)
+                        .HasColumnType("character varying(45)");
+
+                    b.Property<DateTime>("ExpiresAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("TokenHash")
+                        .IsRequired()
+                        .HasMaxLength(255)
+                        .HasColumnType("character varying(255)");
+
+                    b.Property<DateTime?>("UsedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<Guid>("UserId")
+                        .HasColumnType("uuid");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("PasswordResetTokens", (string)null);
+                });
+
             modelBuilder.Entity("Delivery.Core.Domain.Entities.Product", b =>
                 {
                     b.Property<int>("Id")
@@ -1290,6 +1358,10 @@ namespace Delivery.Core.Infrastructure.Persistence.Migrations
 
                     b.HasKey("Id");
 
+                    b.HasIndex("CustomDomain")
+                        .IsUnique()
+                        .HasFilter("\"CustomDomain\" IS NOT NULL");
+
                     b.HasIndex("TenantId")
                         .IsUnique();
 
@@ -1310,6 +1382,9 @@ namespace Delivery.Core.Infrastructure.Persistence.Migrations
                         .HasMaxLength(200)
                         .HasColumnType("character varying(200)");
 
+                    b.Property<DateTime?>("EmailVerifiedAt")
+                        .HasColumnType("timestamp with time zone");
+
                     b.Property<string>("FullName")
                         .IsRequired()
                         .HasMaxLength(150)
@@ -1317,6 +1392,11 @@ namespace Delivery.Core.Infrastructure.Persistence.Migrations
 
                     b.Property<bool>("IsActive")
                         .HasColumnType("boolean");
+
+                    b.Property<bool>("IsEmailVerified")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("boolean")
+                        .HasDefaultValue(false);
 
                     b.Property<string>("PasswordHash")
                         .IsRequired()
@@ -1512,6 +1592,17 @@ namespace Delivery.Core.Infrastructure.Persistence.Migrations
                         .IsRequired();
 
                     b.Navigation("Tenant");
+
+                    b.Navigation("User");
+                });
+
+            modelBuilder.Entity("Delivery.Core.Domain.Entities.EmailVerificationToken", b =>
+                {
+                    b.HasOne("Delivery.Core.Domain.Entities.User", "User")
+                        .WithMany("EmailVerificationTokens")
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
                     b.Navigation("User");
                 });
@@ -1735,6 +1826,17 @@ namespace Delivery.Core.Infrastructure.Persistence.Migrations
                     b.Navigation("OrderItem");
                 });
 
+            modelBuilder.Entity("Delivery.Core.Domain.Entities.PasswordResetToken", b =>
+                {
+                    b.HasOne("Delivery.Core.Domain.Entities.User", "User")
+                        .WithMany("PasswordResetTokens")
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("User");
+                });
+
             modelBuilder.Entity("Delivery.Core.Domain.Entities.Product", b =>
                 {
                     b.HasOne("Delivery.Core.Domain.Entities.Category", "CategoryEntity")
@@ -1946,6 +2048,10 @@ namespace Delivery.Core.Infrastructure.Persistence.Migrations
 
             modelBuilder.Entity("Delivery.Core.Domain.Entities.User", b =>
                 {
+                    b.Navigation("EmailVerificationTokens");
+
+                    b.Navigation("PasswordResetTokens");
+
                     b.Navigation("RefreshTokens");
 
                     b.Navigation("UserRoles");

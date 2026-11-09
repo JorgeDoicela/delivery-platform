@@ -144,7 +144,8 @@ public class LoginHandler : IHandler<LoginCommand, Result<LoginResponse>>
             user.Tenant?.Slug ?? (user.TenantId.HasValue ? tenant.Slug : null),
             primaryBranchId,
             user.IsActive,
-            roleNames);
+            roleNames,
+            user.IsEmailVerified);
 
         var response = new LoginResponse(accessToken, rawRefreshToken, accessExpiresAt, userDto);
         return Result.Success(response);

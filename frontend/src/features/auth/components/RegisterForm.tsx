@@ -46,9 +46,7 @@ export function RegisterForm({
   } = useForm<RegisterFormData>({
     resolver: zodResolver(registerSchema),
     defaultValues: {
-      fullName: "",
       email: "",
-      phone: "",
       password: "",
       confirmPassword: "",
     },
@@ -59,10 +57,10 @@ export function RegisterForm({
     const activeTenantSlug = tenant?.slug || useTenantStore.getState().tenantSlug || undefined;
 
     const success = await registerAction({
-      fullName: data.fullName,
       email: data.email,
-      phone: data.phone,
       password: data.password,
+      fullName: data.fullName,
+      phone: data.phone,
       tenantSlug: activeTenantSlug,
     });
 
@@ -143,32 +141,6 @@ export function RegisterForm({
         </div>
       )}
 
-      {/* Nombre Completo */}
-      <div className="space-y-1.5">
-        <label
-          htmlFor="reg-fullName"
-          className="block text-[11px] font-bold text-neutral-700 uppercase tracking-wider"
-        >
-          Nombre Completo
-        </label>
-        <input
-          id="reg-fullName"
-          type="text"
-          autoComplete="name"
-          disabled={isSubmitting}
-          aria-invalid={Boolean(errors.fullName)}
-          aria-describedby={errors.fullName ? "reg-fullName-error" : undefined}
-          {...register("fullName")}
-          placeholder="Ej. Juan Pérez"
-          className="w-full min-h-[46px] px-4 py-2 bg-neutral-50 border border-neutral-200 hover:border-neutral-300 focus:bg-white focus:border-brand-primary focus:ring-1 focus:ring-brand-primary focus:outline-none rounded-xl text-sm text-neutral-900 placeholder:text-neutral-400 transition-all disabled:opacity-50 shadow-2xs outline-none"
-        />
-        {errors.fullName && (
-          <p id="reg-fullName-error" className="text-xs text-red-600 font-medium">
-            {errors.fullName.message}
-          </p>
-        )}
-      </div>
-
       {/* Correo Electrónico */}
       <div className="space-y-1.5">
         <label
@@ -191,32 +163,6 @@ export function RegisterForm({
         {errors.email && (
           <p id="reg-email-error" className="text-xs text-red-600 font-medium">
             {errors.email.message}
-          </p>
-        )}
-      </div>
-
-      {/* Teléfono Celular */}
-      <div className="space-y-1.5">
-        <label
-          htmlFor="reg-phone"
-          className="block text-[11px] font-bold text-neutral-700 uppercase tracking-wider"
-        >
-          Teléfono Celular
-        </label>
-        <input
-          id="reg-phone"
-          type="tel"
-          autoComplete="tel"
-          disabled={isSubmitting}
-          aria-invalid={Boolean(errors.phone)}
-          aria-describedby={errors.phone ? "reg-phone-error" : undefined}
-          {...register("phone")}
-          placeholder="+593 99 123 4567"
-          className="w-full min-h-[46px] px-4 py-2 bg-neutral-50 border border-neutral-200 hover:border-neutral-300 focus:bg-white focus:border-brand-primary focus:ring-1 focus:ring-brand-primary focus:outline-none rounded-xl text-sm text-neutral-900 placeholder:text-neutral-400 transition-all disabled:opacity-50 shadow-2xs outline-none"
-        />
-        {errors.phone && (
-          <p id="reg-phone-error" className="text-xs text-red-600 font-medium">
-            {errors.phone.message}
           </p>
         )}
       </div>
@@ -316,18 +262,6 @@ export function RegisterForm({
           <span>Registrarme y Continuar</span>
         )}
       </button>
-
-      {/* Separador para autenticación federada */}
-      <div className="relative my-2">
-        <div className="absolute inset-0 flex items-center">
-          <div className="w-full border-t border-neutral-200" />
-        </div>
-        <div className="relative flex justify-center text-xs uppercase">
-          <span className="bg-white px-3 text-neutral-400 font-bold text-[10px] tracking-wider font-mono">
-            o continúa con
-          </span>
-        </div>
-      </div>
 
       <GoogleSignInButton redirectUrl={redirectUrl} />
 

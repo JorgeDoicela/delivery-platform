@@ -19,6 +19,8 @@ export interface SelectDropdownProps<T extends string = string> {
   align?: "left" | "right";
   className?: string;
   menuClassName?: string;
+  buttonClassName?: string;
+  isActive?: boolean;
 }
 
 const emptySubscribe = () => () => {};
@@ -32,6 +34,8 @@ export function SelectDropdown<T extends string = string>({
   align = "left",
   className = "",
   menuClassName = "",
+  buttonClassName = "",
+  isActive,
 }: SelectDropdownProps<T>) {
   const [isOpen, setIsOpen] = useState(false);
   const isMounted = useSyncExternalStore(
@@ -44,7 +48,7 @@ export function SelectDropdown<T extends string = string>({
   const menuRef = useRef<HTMLDivElement>(null);
 
   const selectedOption = options.find((opt) => opt.value === value);
-  const isSelectedWithin = Boolean(selectedOption);
+  const isSelectedWithin = isActive !== undefined ? isActive : Boolean(selectedOption);
 
   const updatePosition = useCallback(() => {
     if (!buttonRef.current) return;
@@ -136,7 +140,7 @@ export function SelectDropdown<T extends string = string>({
           isSelectedWithin
             ? "bg-brand-primary text-white scale-[1.02]"
             : "bg-surface-card text-text-strong hover:bg-surface-card-hover border border-surface-border"
-        }`}
+        } ${buttonClassName}`}
       >
         {triggerLabel ? (
           triggerLabel

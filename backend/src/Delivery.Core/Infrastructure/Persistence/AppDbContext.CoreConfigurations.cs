@@ -67,6 +67,8 @@ public partial class AppDbContext
             u.Property(x => x.PasswordHash).HasMaxLength(255).IsRequired();
             u.Property(x => x.FullName).HasMaxLength(150).IsRequired();
             u.Property(x => x.Phone).HasMaxLength(30);
+            u.Property(x => x.IsEmailVerified).HasDefaultValue(false);
+            u.Property(x => x.EmailVerifiedAt);
 
             u.HasIndex(x => new { x.TenantId, x.Email }).IsUnique();
 
@@ -123,6 +125,36 @@ public partial class AppDbContext
                 .OnDelete(DeleteBehavior.Cascade);
 
             rt.HasQueryFilter(x => CurrentTenantId == null || x.User.TenantId == null || x.User.TenantId == CurrentTenantId);
+        });
+
+        modelBuilder.Entity<PasswordResetToken>(prt =>
+        {
+            prt.ToTable("PasswordResetTokens");
+            prt.HasKey(x => x.Id);
+            prt.Property(x => x.TokenHash).HasMaxLength(255).IsRequired();
+            prt.Property(x => x.CreatedByIp).HasMaxLength(45);
+
+            prt.HasOne(x => x.User)
+                .WithMany(x => x.PasswordResetTokens)
+                .HasForeignKey(x => x.UserId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            prt.HasQueryFilter(x => CurrentTenantId == null || x.User.TenantId == null || x.User.TenantId == CurrentTenantId);
+        });
+
+        modelBuilder.Entity<EmailVerificationToken>(evt =>
+        {
+            evt.ToTable("EmailVerificationTokens");
+            evt.HasKey(x => x.Id);
+            evt.Property(x => x.TokenHash).HasMaxLength(255).IsRequired();
+            evt.Property(x => x.CreatedByIp).HasMaxLength(45);
+
+            evt.HasOne(x => x.User)
+                .WithMany(x => x.EmailVerificationTokens)
+                .HasForeignKey(x => x.UserId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            evt.HasQueryFilter(x => CurrentTenantId == null || x.User.TenantId == null || x.User.TenantId == CurrentTenantId);
         });
 
         // -------------------------------------------------------------

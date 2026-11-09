@@ -1,5 +1,7 @@
 using Delivery.Core.Common;
 using Delivery.Core.Contracts;
+using Delivery.Core.Contracts.Emails;
+using Delivery.Core.Contracts.Emails.Models;
 using Delivery.Core.Contracts.Realtime;
 using Delivery.Core.Domain.Entities;
 using Delivery.Core.Domain.Enums;
@@ -108,17 +110,20 @@ public sealed class CreateOrderHandler : IHandler<CreateOrderCommand, Result<Cre
     private readonly IValidator<CreateOrderCommand> _validator;
     private readonly IConnectionMultiplexer _redis;
     private readonly IKitchenNotifier _kitchenNotifier;
+    private readonly IBackgroundEmailQueue? _emailQueue;
 
     public CreateOrderHandler(
         AppDbContext context,
         IValidator<CreateOrderCommand> validator,
         IConnectionMultiplexer redis,
-        IKitchenNotifier kitchenNotifier)
+        IKitchenNotifier kitchenNotifier,
+        IBackgroundEmailQueue? emailQueue = null)
     {
         _context = context;
         _validator = validator;
         _redis = redis;
         _kitchenNotifier = kitchenNotifier;
+        _emailQueue = emailQueue;
     }
 
     public async Task<Result<CreateOrderResponse>> Handle(CreateOrderCommand request, CancellationToken cancellationToken = default)
@@ -324,6 +329,61 @@ public sealed class CreateOrderHandler : IHandler<CreateOrderCommand, Result<Cre
 
         // Notificación en tiempo real al Kitchen Display System (KDS) de la sucursal
         await _kitchenNotifier.NotifyNewOrderAsync(branch.Id, ticket, cancellationToken);
+
+        // Despacho asíncrono y resiliente de correo de confirmación de pedido mediante Hangfire
+        if (_emailQueue != null && !string.IsNullOrWhiteSpace(order.CustomerEmail))
+        {
+            var tenant = branch.TenantId != Guid.Empty
+                ? await _context.Tenants.AsNoTracking().FirstOrDefaultAsync(t => t.Id == branch.TenantId, cancellationToken)
+                : null;
+
+            var brand = tenant != null
+                ? new BrandEmailContext
+                {
+                    BrandName = tenant.Name,
+                    BrandTagline = tenant.Tagline,
+                    PrimaryColor = tenant.BrandPrimaryColor ?? "#E4002B",
+                    LogoUrl = tenant.LogoUrl,
+                    SupportEmail = tenant.ContactEmail,
+                    SupportPhone = tenant.ContactPhone
+                }
+                : BrandEmailContext.DefaultPlatform;
+
+            var emailModel = new OrderConfirmationEmailModel
+            {
+                Brand = brand,
+                OrderNumber = order.OrderNumber,
+                OrderId = order.Id,
+                CustomerName = order.CustomerName,
+                CreatedAt = order.CreatedAt,
+                BranchName = branch.Name,
+                AddressStreet = order.AddressStreet,
+                AddressReference = order.AddressReference,
+                PaymentMethod = order.PaymentMethod.ToString(),
+                EstimatedDeliveryTime = estimatedTime,
+                TrackingUrl = $"https://mesafy.doicela.dev/{tenant?.Slug ?? "la-granjita"}/rastreo/{order.Id}",
+                Items = order.Items.Select(i => new OrderItemEmailDto(
+                    i.ProductNameSnapshot,
+                    i.Quantity,
+                    i.UnitPriceSnapshot,
+                    (i.UnitPriceSnapshot + i.Modifiers.Sum(m => m.PriceSnapshot)) * i.Quantity,
+                    string.Join(", ", i.Modifiers.Select(m => m.ModifierNameSnapshot))
+                )).ToList(),
+                Subtotal = order.Subtotal,
+                DeliveryFee = order.DeliveryFee,
+                DiscountAmount = order.DiscountAmount,
+                Total = order.Total
+            };
+
+            _emailQueue.EnqueueTemplatedEmail(
+                order.CustomerEmail,
+                order.CustomerName,
+                $"Confirmación de Pedido #{order.OrderNumber} - {brand.BrandName}",
+                EmailTemplateType.OrderConfirmation,
+                emailModel,
+                order.TenantId
+            );
+        }
 
         return Result.Success(new CreateOrderResponse(
             order.Id,

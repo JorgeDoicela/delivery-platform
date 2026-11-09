@@ -39,5 +39,17 @@ public static class AuthErrors
     public static readonly Error GoogleEmailNotVerified = new(
         "Auth.GoogleEmailNotVerified",
         "La cuenta de Google no tiene un correo electrónico verificado.");
+
+    public static readonly Error InvalidOrExpiredResetToken = new(
+        "Auth.InvalidOrExpiredResetToken",
+        "El enlace o token de recuperación es inválido, ha expirado o ya fue utilizado.");
+
+    public static readonly Error InvalidOrExpiredVerificationToken = new(
+        "Auth.InvalidOrExpiredVerificationToken",
+        "El enlace o token de verificación es inválido, ha expirado o ya fue utilizado.");
+
+    public static readonly Error EmailAlreadyVerified = new(
+        "Auth.EmailAlreadyVerified",
+        "El correo electrónico ya ha sido verificado previamente.");
 }
 

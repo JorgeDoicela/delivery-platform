@@ -11,6 +11,14 @@ import type {
   RegisterResponse,
   GoogleAuthRequest,
   GoogleAuthResponse,
+  ForgotPasswordRequest,
+  ForgotPasswordResponse,
+  ResetPasswordRequest,
+  ResetPasswordResponse,
+  VerifyEmailRequest,
+  VerifyEmailResponse,
+  ResendVerificationRequest,
+  ResendVerificationResponse,
 } from "../types";
 import type { LoginFormData } from "../schemas/loginSchema";
 
@@ -119,6 +127,62 @@ export const authApi = {
       credentials: "include",
     });
     return handleAuthResponse<AuthUser>(res);
+  },
+
+  async forgotPassword(data: ForgotPasswordRequest): Promise<ForgotPasswordResponse> {
+    const tenantSlug = getApiClientTenantSlug();
+    const res = await fetch(`${getApiBaseUrl()}/api/v1/auth/forgot-password`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        ...(tenantSlug ? { "X-Tenant-Slug": tenantSlug } : {}),
+      },
+      credentials: "include",
+      body: JSON.stringify({ ...data, tenantSlug: data.tenantSlug || tenantSlug }),
+    });
+    return handleAuthResponse<ForgotPasswordResponse>(res);
+  },
+
+  async resetPassword(data: ResetPasswordRequest): Promise<ResetPasswordResponse> {
+    const tenantSlug = getApiClientTenantSlug();
+    const res = await fetch(`${getApiBaseUrl()}/api/v1/auth/reset-password`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        ...(tenantSlug ? { "X-Tenant-Slug": tenantSlug } : {}),
+      },
+      credentials: "include",
+      body: JSON.stringify({ ...data, tenantSlug: data.tenantSlug || tenantSlug }),
+    });
+    return handleAuthResponse<ResetPasswordResponse>(res);
+  },
+
+  async verifyEmail(data: VerifyEmailRequest): Promise<VerifyEmailResponse> {
+    const tenantSlug = getApiClientTenantSlug();
+    const res = await fetch(`${getApiBaseUrl()}/api/v1/auth/verify-email`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        ...(tenantSlug ? { "X-Tenant-Slug": tenantSlug } : {}),
+      },
+      credentials: "include",
+      body: JSON.stringify(data),
+    });
+    return handleAuthResponse<VerifyEmailResponse>(res);
+  },
+
+  async resendVerification(data: ResendVerificationRequest): Promise<ResendVerificationResponse> {
+    const tenantSlug = getApiClientTenantSlug();
+    const res = await fetch(`${getApiBaseUrl()}/api/v1/auth/resend-verification`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        ...(tenantSlug ? { "X-Tenant-Slug": tenantSlug } : {}),
+      },
+      credentials: "include",
+      body: JSON.stringify({ ...data, tenantSlug: data.tenantSlug || tenantSlug }),
+    });
+    return handleAuthResponse<ResendVerificationResponse>(res);
   },
 
   async logout(): Promise<void> {

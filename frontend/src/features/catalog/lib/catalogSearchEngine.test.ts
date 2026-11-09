@@ -158,6 +158,12 @@ describe("catalogSearchEngine", () => {
       expect(res[0].name).toBe("Gaseosa Coca-Cola 2L");
     });
 
+    it("debe encontrar productos por prefijos cortos mientras el usuario escribe (ej. 'po')", () => {
+      const res = searchCatalogProducts(mockMenu, "po");
+      expect(res.length).toBeGreaterThan(0);
+      expect(res[0].name).toBe("Pollo Asado Completo");
+    });
+
     it("debe retornar arreglo vacío ante búsquedas sin coincidencia", () => {
       const res = searchCatalogProducts(mockMenu, "sushi roll tempura xyz");
       expect(res).toHaveLength(0);

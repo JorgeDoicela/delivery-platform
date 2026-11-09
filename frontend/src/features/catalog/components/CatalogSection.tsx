@@ -1,10 +1,10 @@
 "use client";
 
-import { useState, useMemo } from "react";
+import { useState, useMemo, useRef, useEffect } from "react";
 import { useMenuQuery } from "../hooks/useMenuQuery";
 import { ProductCard } from "./ProductCard";
 import { filterProductsBySearch } from "../lib/catalogFilter";
-import { AlertTriangle, RefreshCw, Search, X, Utensils } from "lucide-react";
+import { AlertTriangle, RefreshCw, Search, X, Utensils, LayoutGrid, ChevronDown } from "lucide-react";
 import { SelectDropdown } from "@/shared/components";
 
 interface CatalogSectionProps {
@@ -17,6 +17,15 @@ export function CatalogSection({ tenantSlug }: CatalogSectionProps = {}) {
   const { data, isLoading, isError, refetch } = useMenuQuery(false, tenantSlug);
   const [selectedCategory, setSelectedCategory] = useState<string>("TODOS");
   const [searchQuery, setSearchQuery] = useState<string>("");
+  const pillRefs = useRef<Map<string, HTMLButtonElement>>(new Map());
+
+  // Sincronizar y centrar píldora activa en el scroll horizontal ante selecciones vía dropdown
+  useEffect(() => {
+    const activeEl = pillRefs.current.get(selectedCategory);
+    if (activeEl) {
+      activeEl.scrollIntoView({ behavior: "smooth", inline: "center", block: "nearest" });
+    }
+  }, [selectedCategory]);
 
   // Algoritmo profesional de búsqueda gastronómica: tolerancia tipográfica, multi-token y scoring jerárquico
   const searchResults = useMemo(() => {
@@ -35,19 +44,13 @@ export function CatalogSection({ tenantSlug }: CatalogSectionProps = {}) {
     ];
   }, [data]);
 
-  const PRIMARY_VISIBLE_LIMIT = 8;
-  const visibleCategories = useMemo(
-    () => allCategories.slice(0, PRIMARY_VISIBLE_LIMIT),
-    [allCategories]
-  );
-  const overflowCategories = useMemo(
-    () =>
-      allCategories.slice(PRIMARY_VISIBLE_LIMIT).map((cat) => ({
-        value: cat.name,
-        label: cat.name,
-      })),
-    [allCategories]
-  );
+  const dropdownOptions = useMemo(() => {
+    return allCategories.map((cat) => ({
+      value: cat.name,
+      label: cat.name === "TODOS" ? "Ver Todo el Menú" : cat.name,
+    }));
+  }, [allCategories]);
+
 
   if (isLoading) {
     return (
@@ -57,13 +60,16 @@ export function CatalogSection({ tenantSlug }: CatalogSectionProps = {}) {
             <div key={i} className="h-9 w-28 bg-surface-border animate-pulse rounded-full" />
           ))}
         </div>
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-          {[1, 2, 3, 4, 5, 6].map((i) => (
-            <div key={i} className="h-72 bg-surface-card border border-surface-border rounded-3xl p-5 animate-pulse space-y-4">
-              <div className="h-36 w-full bg-surface-canvas rounded-2xl" />
-              <div className="h-5 w-3/4 bg-surface-border rounded" />
-              <div className="h-4 w-full bg-surface-border rounded" />
-              <div className="h-8 w-full bg-surface-border rounded-full mt-4" />
+        <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-2.5 sm:gap-5">
+          {[1, 2, 3, 4, 5, 6, 7, 8].map((i) => (
+            <div
+              key={i}
+              className="h-64 sm:h-80 bg-surface-card border border-surface-border rounded-2xl sm:rounded-3xl p-3 sm:p-5 animate-pulse space-y-3 sm:space-y-4"
+            >
+              <div className="h-28 sm:h-44 w-full bg-surface-canvas rounded-xl sm:rounded-2xl" />
+              <div className="h-4 sm:h-5 w-3/4 bg-surface-border rounded" />
+              <div className="h-3 sm:h-4 w-full bg-surface-border rounded" />
+              <div className="h-7 sm:h-9 w-full bg-surface-border rounded-full mt-2 sm:mt-4" />
             </div>
           ))}
         </div>
@@ -129,37 +135,65 @@ export function CatalogSection({ tenantSlug }: CatalogSectionProps = {}) {
           )}
         </div>
 
-        {/* Fila Inferior: Píldoras de Categorías y Selector Desplegable Profesional (...) agrupados de forma continua */}
+        {/* Fila Inferior: En móvil Menú Desplegable Único; en PC Píldoras Directas */}
         {!searchQuery && (
-          <div className="flex items-center gap-1.5 sm:gap-2 overflow-x-auto pb-0.5 scrollbar-none">
-            {visibleCategories.map((cat) => {
-              const isSelected = selectedCategory === cat.name;
-
-              return (
-                <button
-                  key={cat.name}
-                  type="button"
-                  onClick={() => setSelectedCategory(cat.name)}
-                  className={`inline-flex items-center gap-1.5 px-3.5 sm:px-4 py-1.5 rounded-full text-[11px] sm:text-xs font-black uppercase tracking-wider font-display transition-all whitespace-nowrap cursor-pointer shrink-0 ${
-                    isSelected
-                      ? "bg-brand-primary text-white scale-[1.02]"
-                      : "bg-surface-card text-text-strong hover:bg-surface-card-hover border border-surface-border"
-                  }`}
-                >
-                  <span>{cat.name}</span>
-                </button>
-              );
-            })}
-
-            {overflowCategories.length > 0 && (
+          <div className="w-full">
+            {/* Móvil (< sm): Selector Desplegable Único (1 sola línea, sin duplicidad ni desplazamiento horizontal) */}
+            <div className="block sm:hidden w-full">
               <SelectDropdown
-                options={overflowCategories}
+                options={dropdownOptions}
                 value={selectedCategory}
                 onChange={(cat) => setSelectedCategory(cat)}
                 align="left"
-                triggerAriaLabel="Ver más categorías del menú"
+                className="w-full block"
+                buttonClassName="w-full !justify-between px-4 py-2"
+                menuClassName="w-[calc(100vw-28px)] max-w-none"
+                isActive={selectedCategory !== "TODOS"}
+                triggerAriaLabel="Seleccionar categoría del menú"
+                triggerLabel={
+                  <span className="flex items-center justify-between w-full">
+                    <span className="flex items-center gap-2">
+                      <LayoutGrid className="w-3.5 h-3.5 shrink-0" />
+                      <span className="text-xs uppercase tracking-wide">
+                        {selectedCategory === "TODOS"
+                          ? "Todas las Categorías"
+                          : selectedCategory}
+                      </span>
+                    </span>
+                    <ChevronDown className="w-3.5 h-3.5 shrink-0 opacity-70" />
+                  </span>
+                }
               />
-            )}
+            </div>
+
+            {/* PC / Escritorio (>= sm): Píldoras de Categorías con Scroll Horizontal Fluido */}
+            <div className="hidden sm:flex items-center gap-2 overflow-x-auto pb-0.5 scrollbar-none w-full">
+              {allCategories.map((cat) => {
+                const isSelected = selectedCategory === cat.name;
+
+                return (
+                  <button
+                    key={cat.name}
+                    ref={(el) => {
+                      if (el) {
+                        pillRefs.current.set(cat.name, el);
+                      } else {
+                        pillRefs.current.delete(cat.name);
+                      }
+                    }}
+                    type="button"
+                    onClick={() => setSelectedCategory(cat.name)}
+                    className={`inline-flex items-center gap-1.5 px-3.5 sm:px-4 py-1.5 rounded-full text-[11px] sm:text-xs font-black uppercase tracking-wider font-display transition-all whitespace-nowrap cursor-pointer shrink-0 ${
+                      isSelected
+                        ? "bg-brand-primary text-white scale-[1.02]"
+                        : "bg-surface-card text-text-strong hover:bg-surface-card-hover border border-surface-border"
+                    }`}
+                  >
+                    <span>{cat.name}</span>
+                  </button>
+                );
+              })}
+            </div>
           </div>
         )}
       </div>
@@ -215,7 +249,7 @@ export function CatalogSection({ tenantSlug }: CatalogSectionProps = {}) {
               </div>
             </div>
           ) : (
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-7">
+            <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3.5 sm:gap-5">
               {searchResults.map((product) => (
                 <ProductCard key={product.id} product={product} />
               ))}
@@ -236,7 +270,7 @@ export function CatalogSection({ tenantSlug }: CatalogSectionProps = {}) {
                   </h3>
                 </div>
 
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-7">
+                <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3.5 sm:gap-5">
                   {category.products.map((product) => (
                     <ProductCard key={product.id} product={product} />
                   ))}
@@ -284,7 +318,7 @@ export function CatalogSection({ tenantSlug }: CatalogSectionProps = {}) {
                   </button>
                 </div>
 
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-7">
+                <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3.5 sm:gap-5">
                   {products.map((product) => (
                     <ProductCard key={product.id} product={product} />
                   ))}

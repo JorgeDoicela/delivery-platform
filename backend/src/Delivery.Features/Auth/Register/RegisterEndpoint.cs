@@ -20,14 +20,14 @@ public class RegisterEndpoint : IEndpoint
         {
             var ipAddress = httpContext.Connection.RemoteIpAddress?.ToString();
             var command = new RegisterCommand(
-                request.FullName,
-                request.Email,
-                request.Phone,
-                request.Password,
-                request.TenantSlug,
-                request.IdentificationType,
-                request.IdentificationNumber,
-                ipAddress);
+                Email: request.Email,
+                Password: request.Password,
+                FullName: request.FullName,
+                Phone: request.Phone,
+                TenantSlug: request.TenantSlug,
+                IdentificationType: request.IdentificationType,
+                IdentificationNumber: request.IdentificationNumber,
+                IpAddress: ipAddress);
 
             var validationResult = await validator.ValidateAsync(command, cancellationToken);
             if (!validationResult.IsValid)

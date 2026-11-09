@@ -6,19 +6,21 @@ import { useRouter, useSearchParams, usePathname } from "next/navigation";
 import {
   LoginForm,
   RegisterForm,
+  ForgotPasswordForm,
+  ResetPasswordForm,
+  VerifyEmailView,
   useAuthStore,
   UserRole,
   isUserInRole,
 } from "@/features/auth";
 import {
-  ChevronRight,
-  UtensilsCrossed,
-  Headphones,
   FileText,
   UserCheck,
   Loader2,
   LogOut,
   ArrowRight,
+  Mail,
+  CheckCircle2,
 } from "lucide-react";
 import { useIsMounted } from "@/shared/hooks/useIsMounted";
 import { useCurrentTenantQuery, RESERVED_TENANT_SLUGS } from "@/features/tenant";
@@ -33,11 +35,30 @@ function LoginContent({ initialSlug }: LoginPageProps) {
   const pathname = usePathname() || "";
   const searchParams = useSearchParams();
   const redirectUrl = searchParams.get("redirect") || undefined;
+  const tabParam = searchParams.get("tab") || searchParams.get("mode") || "";
+  const tokenParam = searchParams.get("token") || "";
+  const emailParam = searchParams.get("email") || "";
+
+  const isVerifyEmail =
+    tabParam === "verify-email" ||
+    (Boolean(tokenParam) && tabParam !== "reset-password");
+
   const initialMode =
-    searchParams.get("tab") === "register" || searchParams.get("mode") === "register"
-      ? "register"
-      : "login";
-  const [authMode, setAuthMode] = useState<"login" | "register">(initialMode);
+    isVerifyEmail
+      ? "verify-email"
+      : tokenParam || tabParam === "reset-password"
+        ? "reset-password"
+        : tabParam === "forgot-password"
+          ? "forgot-password"
+          : tabParam === "register"
+            ? "register"
+            : "login";
+
+  const [authMode, setAuthMode] = useState<
+    "login" | "register" | "forgot-password" | "reset-password" | "verify-email"
+  >(initialMode);
+  const [activeEmail, setActiveEmail] = useState(emailParam);
+  const [activeToken] = useState(tokenParam);
 
   const rawSlug = pathname.split("/").filter(Boolean)[0];
   const routeSlug =
@@ -67,65 +88,19 @@ function LoginContent({ initialSlug }: LoginPageProps) {
 
   return (
     <div className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-12 space-y-6">
-      {/* 1. Miga de Pan (Breadcrumb) */}
-      <nav aria-label="Miga de pan" className="flex items-center gap-2 text-xs font-semibold text-neutral-500">
-        <Link href={routes.getHomeHref()} className="hover:text-brand-primary transition-colors">
-          Inicio
-        </Link>
-        <ChevronRight className="w-3.5 h-3.5 text-neutral-400" />
-        <span className="text-neutral-900 font-bold">Perfil</span>
-      </nav>
-
-      {/* 2. Titular Principal en Barlow Condensed */}
+      {/* 1. Titular Principal en Barlow Condensed */}
       <div>
         <h1 className="text-3xl sm:text-4xl font-black text-neutral-950 uppercase tracking-tight font-display">
           Hola, bienvenido/a a {brandName}
         </h1>
       </div>
 
-      {/* 3. Cuadrícula de Dos Columnas con alineación uniforme */}
+      {/* 2. Cuadrícula de Dos Columnas con alineación uniforme */}
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 sm:gap-8 items-stretch pt-2">
-        {/* Columna Izquierda (en desktop) / Inferior (en móvil): Banner Promocional + Navegación Lateral */}
-        <div className="order-2 lg:order-1 lg:col-span-4 flex flex-col justify-between gap-4 h-full">
-          {/* Banner de Beneficios */}
-          <div className="bg-brand-primary text-white rounded-3xl p-6 shadow-sm relative overflow-hidden shrink-0">
-            <span className="text-[10px] font-bold tracking-widest uppercase text-brand-accent block mb-1">
-              Programa de Clientes
-            </span>
-            <h2 className="text-xl font-black uppercase tracking-tight font-display leading-tight mb-2">
-              Únete a Beneficios {brandName}
-            </h2>
-            <p className="text-xs text-white/90 leading-relaxed font-sans mb-4">
-              Acumula pedidos en cada compra directa, accede a promociones exclusivas y rastrea tus despachos en tiempo real.
-            </p>
-            <button
-              type="button"
-              onClick={() => setAuthMode(authMode === "login" ? "register" : "login")}
-              className="bg-white text-brand-primary hover:bg-neutral-100 active:scale-95 text-xs font-black uppercase tracking-wider font-display px-5 py-2.5 rounded-full shadow-xs transition-all cursor-pointer inline-flex items-center gap-2"
-            >
-              <span>{authMode === "login" ? "Crear Cuenta de Cliente" : "Ya Tengo una Cuenta"}</span>
-              <ArrowRight className="w-3.5 h-3.5" />
-            </button>
-          </div>
-
-          {/* Menú Lateral con Iconos Limpios */}
-          <div className="bg-white border border-neutral-200/90 rounded-3xl p-3 shadow-xs divide-y divide-neutral-100 mt-auto">
-            <Link
-              href={routes.getRastreoHref()}
-              className="flex items-center gap-3.5 px-4 py-3.5 rounded-2xl hover:bg-neutral-50 text-neutral-800 hover:text-brand-primary text-xs font-bold uppercase tracking-wider font-display transition-colors"
-            >
-              <UtensilsCrossed className="w-4 h-4 text-brand-primary shrink-0" />
-              <span>Pedidos & Rastreo</span>
-            </Link>
-
-            <Link
-              href={routes.getSucursalesHref()}
-              className="flex items-center gap-3.5 px-4 py-3.5 rounded-2xl hover:bg-neutral-50 text-neutral-800 hover:text-brand-primary text-xs font-bold uppercase tracking-wider font-display transition-colors"
-            >
-              <Headphones className="w-4 h-4 text-brand-primary shrink-0" />
-              <span>Contactos & Locales</span>
-            </Link>
-
+        {/* Columna Izquierda (en desktop) / Inferior (en móvil): Navegación Lateral */}
+        <div className="order-2 lg:order-1 lg:col-span-4 flex flex-col justify-start gap-4">
+          {/* Enlace a Términos y Condiciones */}
+          <div className="bg-white border border-neutral-200/90 rounded-3xl p-3 shadow-xs">
             <Link
               href={routes.getTermsHref()}
               className="flex items-center gap-3.5 px-4 py-3.5 rounded-2xl hover:bg-neutral-50 text-neutral-800 hover:text-brand-primary text-xs font-bold uppercase tracking-wider font-display transition-colors"
@@ -145,7 +120,7 @@ function LoginContent({ initialSlug }: LoginPageProps) {
                 Verificando sesión...
               </span>
             </div>
-          ) : isAuthenticated && user ? (
+          ) : isAuthenticated && user && authMode !== "verify-email" ? (
             /* Vista Autenticada con Perfil Activo */
             <div className="flex flex-col items-center text-center space-y-4 py-2">
               <div className="w-16 h-16 rounded-full bg-neutral-100 border border-neutral-200 flex items-center justify-center text-neutral-900 shadow-xs">
@@ -155,10 +130,43 @@ function LoginContent({ initialSlug }: LoginPageProps) {
                 <h2 className="text-2xl font-black uppercase tracking-tight text-neutral-950 font-display">
                   {user.fullName}
                 </h2>
-                <p className="text-xs text-neutral-500 mt-1 font-mono">
-                  {user.email} • Rol: <strong className="text-brand-primary uppercase">{String(user.role)}</strong>
+                <p className="text-xs text-neutral-500 mt-1 font-mono inline-flex items-center gap-1.5 flex-wrap justify-center">
+                  <span>{user.email}</span>
+                  <span>•</span>
+                  <span>Rol: <strong className="text-brand-primary uppercase">{String(user.role)}</strong></span>
+                  <span>•</span>
+                  {user.isEmailVerified ? (
+                    <span className="inline-flex items-center gap-1 text-emerald-600 font-bold">
+                      <CheckCircle2 className="w-3.5 h-3.5" />
+                      <span>Verificado</span>
+                    </span>
+                  ) : (
+                    <span className="text-neutral-500 font-bold">
+                      Sin verificar
+                    </span>
+                  )}
                 </p>
               </div>
+
+              {!user.isEmailVerified && (
+                <div className="w-full max-w-md mx-auto p-4 bg-neutral-50 border border-neutral-200 rounded-2xl text-xs text-neutral-800 text-left flex items-start gap-3 shadow-xs">
+                  <Mail className="w-4 h-4 text-neutral-700 shrink-0 mt-0.5" />
+                  <div className="space-y-1">
+                    <p className="font-bold">Correo pendiente de verificación</p>
+                    <p className="text-neutral-600">
+                      Te enviamos un correo con un enlace de activación al registrarte.
+                    </p>
+                    <button
+                      type="button"
+                      onClick={() => setAuthMode("verify-email")}
+                      className="text-brand-primary font-bold hover:underline inline-flex items-center gap-1 pt-1"
+                    >
+                      <span>Validar código o reenviar enlace</span>
+                      <ArrowRight className="w-3 h-3" />
+                    </button>
+                  </div>
+                </div>
+              )}
 
               {(() => {
                 const isSuperAdmin = isUserInRole(user, UserRole.SuperAdmin);
@@ -285,54 +293,75 @@ function LoginContent({ initialSlug }: LoginPageProps) {
               })()}
             </div>
           ) : (
-            /* Formulario de Login / Registro con Pestañas */
+            /* Formulario de Login / Registro / Recuperación */
             <div className="w-full max-w-md mx-auto py-2">
-              <div className="flex items-center p-1 bg-neutral-100 rounded-full mb-6 border border-neutral-200">
-                <button
-                  type="button"
-                  onClick={() => setAuthMode("login")}
-                  className={`flex-1 py-2 text-center text-xs font-bold uppercase tracking-wider font-display rounded-full transition-all cursor-pointer ${
-                    authMode === "login"
-                      ? "bg-white text-neutral-950 shadow-xs"
-                      : "text-neutral-500 hover:text-neutral-900"
-                  }`}
-                >
-                  Iniciar Sesión
-                </button>
-                <button
-                  type="button"
-                  onClick={() => setAuthMode("register")}
-                  className={`flex-1 py-2 text-center text-xs font-bold uppercase tracking-wider font-display rounded-full transition-all cursor-pointer ${
-                    authMode === "register"
-                      ? "bg-white text-neutral-950 shadow-xs"
-                      : "text-neutral-500 hover:text-neutral-900"
-                  }`}
-                >
-                  Crear Cuenta
-                </button>
-              </div>
-
               <div className="mb-6 pb-3 border-b border-neutral-100">
                 <h2 className="text-2xl font-black uppercase tracking-tight text-neutral-950 font-display">
-                  {authMode === "login" ? "Iniciar Sesión" : "Crear Nueva Cuenta"}
+                  {authMode === "login"
+                    ? "Iniciar Sesión"
+                    : authMode === "register"
+                      ? "Crear Nueva Cuenta"
+                      : authMode === "forgot-password"
+                        ? "Recuperar Contraseña"
+                        : authMode === "reset-password"
+                          ? "Restablecer Contraseña"
+                          : "Verificar Correo Electrónico"}
                 </h2>
                 <p className="text-xs text-neutral-500 mt-1">
                   {authMode === "login"
                     ? "Accede a tu cuenta para gestionar pedidos, cocina o administración."
-                    : `Regístrate en ${brandName} para disfrutar pedidos en línea y seguimiento satelital.`}
+                    : authMode === "register"
+                      ? `Regístrate en ${brandName} para disfrutar pedidos en línea y seguimiento satelital.`
+                      : authMode === "forgot-password"
+                        ? "Ingresa tu correo electrónico registrado y te enviaremos un enlace seguro con instrucciones."
+                        : authMode === "reset-password"
+                          ? "Ingresa tu nueva contraseña para recuperar el acceso a tu cuenta."
+                          : `Confirma tu cuenta registrada en ${brandName} para habilitar pedidos y notificaciones.`}
                 </p>
               </div>
 
-              {authMode === "login" ? (
+              {authMode === "login" && (
                 <LoginForm
                   redirectUrl={redirectUrl}
                   embedded={true}
                   onSwitchToRegister={() => setAuthMode("register")}
+                  onSwitchToForgotPassword={() => setAuthMode("forgot-password")}
                 />
-              ) : (
+              )}
+
+              {authMode === "register" && (
                 <RegisterForm
                   redirectUrl={redirectUrl}
                   embedded={true}
+                  onSwitchToLogin={() => setAuthMode("login")}
+                />
+              )}
+
+              {authMode === "forgot-password" && (
+                <ForgotPasswordForm
+                  embedded={true}
+                  onSwitchToLogin={() => setAuthMode("login")}
+                  onSwitchToReset={(email) => {
+                    setActiveEmail(email);
+                    setAuthMode("reset-password");
+                  }}
+                />
+              )}
+
+              {authMode === "reset-password" && (
+                <ResetPasswordForm
+                  embedded={true}
+                  initialEmail={activeEmail}
+                  initialToken={activeToken}
+                  onSwitchToLogin={() => setAuthMode("login")}
+                />
+              )}
+
+              {authMode === "verify-email" && (
+                <VerifyEmailView
+                  embedded={true}
+                  initialToken={activeToken}
+                  initialEmail={activeEmail || user?.email}
                   onSwitchToLogin={() => setAuthMode("login")}
                 />
               )}

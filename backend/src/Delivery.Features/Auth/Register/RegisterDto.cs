@@ -1,10 +1,10 @@
 namespace Delivery.Features.Auth.Register;
 
 public record RegisterRequest(
-    string FullName,
     string Email,
-    string Phone,
     string Password,
+    string? FullName = null,
+    string? Phone = null,
     string? TenantSlug = null,
     string? IdentificationType = null,
     string? IdentificationNumber = null);
@@ -19,7 +19,8 @@ public record UserAuthInfoDto(
     string? TenantSlug,
     int? BranchId,
     bool IsActive,
-    List<string> Roles);
+    List<string> Roles,
+    bool IsEmailVerified = false);
 
 public record RegisterResponse(
     string AccessToken,

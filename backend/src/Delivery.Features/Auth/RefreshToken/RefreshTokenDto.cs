@@ -12,7 +12,8 @@ public record RefreshUserAuthInfoDto(
     string? TenantSlug,
     int? BranchId,
     bool IsActive,
-    List<string> Roles);
+    List<string> Roles,
+    bool IsEmailVerified = false);
 
 public record RefreshTokenResponse(
     string AccessToken,

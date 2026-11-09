@@ -5,7 +5,19 @@ import {
   setApiClientAccessToken,
   setApiClientTenantSlug,
 } from "@/shared/lib/api-client";
-import type { AuthState, AuthUser, AuthStatus, RegisterRequest, GoogleAuthRequest } from "../types";
+import type {
+  AuthState,
+  AuthUser,
+  AuthStatus,
+  RegisterRequest,
+  GoogleAuthRequest,
+  ForgotPasswordRequest,
+  ResetPasswordRequest,
+  VerifyEmailRequest,
+  VerifyEmailResponse,
+  ResendVerificationRequest,
+  ResendVerificationResponse,
+} from "../types";
 import type { LoginFormData } from "../schemas/loginSchema";
 
 const SESSION_STORAGE_KEY = "delivery_has_session";
@@ -39,6 +51,10 @@ interface AuthActions {
   login: (credentials: LoginFormData) => Promise<boolean>;
   register: (data: RegisterRequest) => Promise<boolean>;
   loginWithGoogle: (data: GoogleAuthRequest) => Promise<boolean>;
+  forgotPassword: (data: ForgotPasswordRequest) => Promise<{ success: boolean; message: string }>;
+  resetPassword: (data: ResetPasswordRequest) => Promise<{ success: boolean; message: string }>;
+  verifyEmail: (data: VerifyEmailRequest) => Promise<VerifyEmailResponse>;
+  resendVerification: (data: ResendVerificationRequest) => Promise<ResendVerificationResponse>;
   logout: () => Promise<void>;
   checkAuth: () => Promise<boolean>;
   setAccessToken: (token: string | null) => void;
@@ -187,6 +203,72 @@ export const useAuthStore = create<AuthStore>()(
             error: message,
           });
           return false;
+        }
+      },
+
+      forgotPassword: async (data) => {
+        set({ status: "loading", error: null });
+        try {
+          const response = await authApi.forgotPassword(data);
+          set({ status: "success", error: null });
+          return { success: true, message: response.message };
+        } catch (err: unknown) {
+          const message =
+            err instanceof Error ? err.message : "Error al solicitar restablecimiento de contraseña.";
+          set({ status: "error", error: message });
+          return { success: false, message };
+        }
+      },
+
+      resetPassword: async (data) => {
+        set({ status: "loading", error: null });
+        try {
+          const response = await authApi.resetPassword(data);
+          set({ status: "success", error: null });
+          return { success: response.success, message: response.message };
+        } catch (err: unknown) {
+          const message =
+            err instanceof Error ? err.message : "Error al restablecer la contraseña.";
+          set({ status: "error", error: message });
+          return { success: false, message };
+        }
+      },
+
+      verifyEmail: async (data) => {
+        set({ status: "loading", error: null });
+        try {
+          const response = await authApi.verifyEmail(data);
+          const currentUser = get().user;
+          if (currentUser) {
+            set({
+              user: {
+                ...currentUser,
+                isEmailVerified: true,
+                emailVerifiedAt: new Date().toISOString(),
+              },
+            });
+          }
+          set({ status: "success", error: null });
+          return response;
+        } catch (err: unknown) {
+          const message =
+            err instanceof Error ? err.message : "Error al verificar el correo electrónico.";
+          set({ status: "error", error: message });
+          throw err;
+        }
+      },
+
+      resendVerification: async (data) => {
+        set({ status: "loading", error: null });
+        try {
+          const response = await authApi.resendVerification(data);
+          set({ status: "success", error: null });
+          return response;
+        } catch (err: unknown) {
+          const message =
+            err instanceof Error ? err.message : "Error al reenviar el correo de verificación.";
+          set({ status: "error", error: message });
+          throw err;
         }
       },
 
