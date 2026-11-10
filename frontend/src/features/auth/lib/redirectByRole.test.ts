@@ -48,20 +48,20 @@ describe("redirectByRole", () => {
   });
 
   describe("resolvePostLoginRedirect", () => {
-    it("redirects Customer to home or safe non-operational redirectUrl", () => {
+    it("redirects Customer to login dashboard or safe non-operational redirectUrl", () => {
       const customer = { role: UserRole.Customer };
       expect(
         resolvePostLoginRedirect({ user: customer, routing })
-      ).toBe(routing.getHomeHref());
+      ).toBe(routing.getLoginHref());
 
-      // Previene que el Customer sea enviado a /cocina
+      // Previene que el Customer sea enviado a /cocina y lo mantiene en /login
       expect(
         resolvePostLoginRedirect({
           user: customer,
           redirectUrl: "/la-granjita/cocina",
           routing,
         })
-      ).toBe(routing.getHomeHref());
+      ).toBe(routing.getLoginHref());
 
       // Permite redirect a catálogo o checkout
       expect(

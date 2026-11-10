@@ -27,6 +27,40 @@ public static class DependencyInjection
         services.AddScoped<IEmailService, MailKitSmtpEmailService>();
         services.AddScoped<IBackgroundEmailQueue, HangfireBackgroundEmailQueue>();
 
+        // 0.2 Servicios de Chatbot WhatsApp Cloud API e IA Conversacional
+        services.AddOptions<Delivery.Features.Chatbot.WhatsAppWebhook.WhatsAppChatbotOptions>()
+            .Configure(options =>
+            {
+                var envPhoneId = Environment.GetEnvironmentVariable("WHATSAPP_PHONE_NUMBER_ID");
+                if (!string.IsNullOrWhiteSpace(envPhoneId)) options.PhoneNumberId = envPhoneId;
+
+                var envWabaId = Environment.GetEnvironmentVariable("WHATSAPP_BUSINESS_ACCOUNT_ID");
+                if (!string.IsNullOrWhiteSpace(envWabaId)) options.BusinessAccountId = envWabaId;
+
+                var envToken = Environment.GetEnvironmentVariable("WHATSAPP_ACCESS_TOKEN");
+                if (!string.IsNullOrWhiteSpace(envToken)) options.AccessToken = envToken;
+
+                var envVerifyToken = Environment.GetEnvironmentVariable("WHATSAPP_VERIFY_TOKEN");
+                if (!string.IsNullOrWhiteSpace(envVerifyToken)) options.VerifyToken = envVerifyToken;
+
+                var envDeepSeekKey = Environment.GetEnvironmentVariable("DEEPSEEK_API_KEY");
+                if (!string.IsNullOrWhiteSpace(envDeepSeekKey)) options.DeepSeekApiKey = envDeepSeekKey;
+
+                var envGeminiKey = Environment.GetEnvironmentVariable("GEMINI_API_KEY");
+                if (!string.IsNullOrWhiteSpace(envGeminiKey)) options.GeminiApiKey = envGeminiKey;
+
+                var envDomain = Environment.GetEnvironmentVariable("PLATFORM_DOMAIN");
+                if (!string.IsNullOrWhiteSpace(envDomain)) options.PlatformDomain = envDomain;
+            });
+
+        services.AddSingleton<Delivery.Features.Chatbot.WhatsAppWebhook.IConversationStore, Delivery.Features.Chatbot.WhatsAppWebhook.RedisConversationStore>();
+        services.AddScoped<Delivery.Features.Chatbot.WhatsAppWebhook.ITenantKnowledgeProvider, Delivery.Features.Chatbot.WhatsAppWebhook.TenantKnowledgeProvider>();
+        services.AddScoped<Delivery.Features.Chatbot.WhatsAppWebhook.DeepSeekAiEngine>();
+        services.AddScoped<Delivery.Features.Chatbot.WhatsAppWebhook.GeminiAiEngine>();
+        services.AddScoped<Delivery.Features.Chatbot.WhatsAppWebhook.IChatbotAiEngine, Delivery.Features.Chatbot.WhatsAppWebhook.ResilientChatbotAiEngine>();
+        services.AddScoped<Delivery.Features.Chatbot.WhatsAppWebhook.IWhatsAppClient, Delivery.Features.Chatbot.WhatsAppWebhook.WhatsAppClient>();
+        services.AddScoped<Delivery.Features.Chatbot.WhatsAppWebhook.IWhatsAppWebhookProcessor, Delivery.Features.Chatbot.WhatsAppWebhook.WhatsAppWebhookProcessor>();
+
         // 1. Registro automático de Validadores FluentValidation
         services.AddValidatorsFromAssembly(assembly);
 

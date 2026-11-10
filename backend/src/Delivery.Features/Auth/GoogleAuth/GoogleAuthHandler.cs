@@ -112,6 +112,7 @@ public class GoogleAuthHandler : IHandler<GoogleAuthCommand, Result<GoogleAuthRe
                 Phone = string.Empty,
                 PasswordHash = string.Empty, // Autenticación federada delegada a Google OpenID Connect
                 IsActive = true,
+                IsEmailVerified = true, // Correo validado criptográficamente por Google Identity
                 CreatedAt = DateTime.UtcNow
             };
 
@@ -142,7 +143,7 @@ public class GoogleAuthHandler : IHandler<GoogleAuthCommand, Result<GoogleAuthRe
                     Email = user.Email,
                     Phone = user.Phone,
                     IdentificationType = "CONSUMIDOR_FINAL",
-                    IdentificationNumber = "9999999999999",
+                    IdentificationNumber = $"CF-{user.Id:N}"[..18],
                     CreatedAt = DateTime.UtcNow,
                     TotalOrdersCount = 0
                 };
@@ -155,13 +156,18 @@ public class GoogleAuthHandler : IHandler<GoogleAuthCommand, Result<GoogleAuthRe
             user.Tenant = tenant;
         }
 
-        // 5. Verificación de estado de cuenta
+        // 5. Verificación de estado de cuenta y confirmación de correo
         if (!user.IsActive)
         {
             return Result.Failure<GoogleAuthResponse>(AuthErrors.UserInactive);
         }
 
-        // 6. Extracción de roles para generación de token
+        if (!user.IsEmailVerified)
+        {
+            user.IsEmailVerified = true;
+        }
+
+        // 6. Extracción de roles y resolución de sucursal primaria
         var rolesList = user.UserRoles
             .Select(ur => ur.Role)
             .Where(r => r != null)
@@ -173,8 +179,10 @@ public class GoogleAuthHandler : IHandler<GoogleAuthCommand, Result<GoogleAuthRe
             rolesList.Add(customerRoleEntity ?? new Role { Id = Role.Customer, Name = "Customer", Description = "Cliente Comensal" });
         }
 
-        // 7. Generación de Access Token (JWT) y Refresh Token
-        var (accessToken, accessExpiresAt) = _tokenProvider.GenerateAccessToken(user, rolesList, tenant.Id, null);
+        var primaryBranchId = user.UserRoles.FirstOrDefault(ur => ur.BranchId.HasValue)?.BranchId;
+
+        // 7. Generación de Access Token (JWT) y Refresh Token respetando Tenant y Sucursal
+        var (accessToken, accessExpiresAt) = _tokenProvider.GenerateAccessToken(user, rolesList, user.TenantId, primaryBranchId);
         var (rawRefreshToken, tokenHash, refreshExpiresAt) = _tokenProvider.GenerateRefreshToken();
 
         var refreshTokenEntity = new RefreshTokenEntity
@@ -201,10 +209,11 @@ public class GoogleAuthHandler : IHandler<GoogleAuthCommand, Result<GoogleAuthRe
             primaryRole,
             user.TenantId,
             user.Tenant?.Slug ?? tenant.Slug,
-            null,
+            primaryBranchId,
             user.IsActive,
             roleNames,
-            googlePayload.Picture);
+            googlePayload.Picture,
+            user.IsEmailVerified);
 
         return Result.Success(new GoogleAuthResponse(
             accessToken,

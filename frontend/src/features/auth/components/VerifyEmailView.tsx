@@ -38,6 +38,7 @@ export function VerifyEmailView({
   const routes = useTenantRoutes(tenant?.slug);
   const verifyEmailAction = useAuthStore((s) => s.verifyEmail);
   const resendVerificationAction = useAuthStore((s) => s.resendVerification);
+  const isAuthenticated = useAuthStore((s) => s.isAuthenticated);
 
   const [isVerifyingAuto, setIsVerifyingAuto] = useState<boolean>(Boolean(initialToken));
   const [autoVerifyError, setAutoVerifyError] = useState<string | null>(null);
@@ -390,7 +391,7 @@ export function VerifyEmailView({
         </form>
       )}
 
-      {/* Enlace de regreso al login */}
+      {/* Enlace de regreso al login o a la cuenta */}
       <div className="text-center pt-2">
         {onSwitchToLogin ? (
           <button
@@ -398,14 +399,14 @@ export function VerifyEmailView({
             onClick={onSwitchToLogin}
             className="text-xs text-neutral-500 hover:text-neutral-900 font-bold uppercase tracking-wider transition-colors"
           >
-            Volver a Iniciar Sesión
+            {isAuthenticated ? "Volver a mi cuenta" : "Volver a Iniciar Sesión"}
           </button>
         ) : (
           <Link
             href={routes.getLoginHref()}
             className="text-xs text-neutral-500 hover:text-neutral-900 font-bold uppercase tracking-wider transition-colors"
           >
-            Volver a Iniciar Sesión
+            {isAuthenticated ? "Volver a mi cuenta" : "Volver a Iniciar Sesión"}
           </Link>
         )}
       </div>

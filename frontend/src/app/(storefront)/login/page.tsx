@@ -14,7 +14,6 @@ import {
   isUserInRole,
 } from "@/features/auth";
 import {
-  FileText,
   UserCheck,
   Loader2,
   LogOut,
@@ -87,33 +86,17 @@ function LoginContent({ initialSlug }: LoginPageProps) {
   };
 
   return (
-    <div className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-12 space-y-6">
+    <div className="w-full max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-12 space-y-6">
       {/* 1. Titular Principal en Barlow Condensed */}
-      <div>
+      <div className="text-center sm:text-left">
         <h1 className="text-3xl sm:text-4xl font-black text-neutral-950 uppercase tracking-tight font-display">
           Hola, bienvenido/a a {brandName}
         </h1>
       </div>
 
-      {/* 2. Cuadrícula de Dos Columnas con alineación uniforme */}
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 sm:gap-8 items-stretch pt-2">
-        {/* Columna Izquierda (en desktop) / Inferior (en móvil): Navegación Lateral */}
-        <div className="order-2 lg:order-1 lg:col-span-4 flex flex-col justify-start gap-4">
-          {/* Enlace a Términos y Condiciones */}
-          <div className="bg-white border border-neutral-200/90 rounded-3xl p-3 shadow-xs">
-            <Link
-              href={routes.getTermsHref()}
-              className="flex items-center gap-3.5 px-4 py-3.5 rounded-2xl hover:bg-neutral-50 text-neutral-800 hover:text-brand-primary text-xs font-bold uppercase tracking-wider font-display transition-colors"
-            >
-              <FileText className="w-4 h-4 text-neutral-500 shrink-0" />
-              <span>Términos y Condiciones</span>
-            </Link>
-          </div>
-        </div>
-
-        {/* Columna Derecha (en desktop) / Superior (en móvil): Tarjeta Blanca Principal de Estado / Formulario */}
-        <div className="order-1 lg:order-2 lg:col-span-8 bg-white border border-neutral-200/90 rounded-3xl p-5 sm:p-10 lg:p-12 shadow-sm min-h-[380px] flex flex-col justify-center">
-          {!isMounted ? (
+      {/* 2. Tarjeta Blanca Principal de Estado / Formulario */}
+      <div className="bg-white border border-neutral-200/90 rounded-3xl p-5 sm:p-10 lg:p-12 shadow-sm min-h-[380px] flex flex-col justify-center">
+        {!isMounted ? (
             <div className="flex flex-col items-center justify-center p-8 text-neutral-400 gap-2">
               <Loader2 className="w-6 h-6 animate-spin text-brand-primary" />
               <span className="text-xs font-semibold uppercase tracking-wider">
@@ -368,7 +351,6 @@ function LoginContent({ initialSlug }: LoginPageProps) {
             </div>
           )}
         </div>
-      </div>
     </div>
   );
 }

@@ -76,9 +76,9 @@ public class VerticalSliceArchitectureRegistrationTests
         // Act
         services.AddDeliveryFeatures();
 
-        // Assert: Deben registrarse exactamente 36 endpoints autónomos
+        // Assert: Deben registrarse exactamente 37 endpoints autónomos
         var endpointDescriptors = services.Where(s => s.ServiceType == typeof(IEndpoint)).ToList();
-        endpointDescriptors.Should().HaveCount(36);
+        endpointDescriptors.Should().HaveCount(37);
 
         var endpointImplementationTypes = endpointDescriptors.Select(d => d.ImplementationType).ToHashSet();
         endpointImplementationTypes.Should().Contain(typeof(ResolveBranchEndpoint));
@@ -117,6 +117,7 @@ public class VerticalSliceArchitectureRegistrationTests
         endpointImplementationTypes.Should().Contain(typeof(Delivery.Features.Auth.ResetPassword.ResetPasswordEndpoint));
         endpointImplementationTypes.Should().Contain(typeof(Delivery.Features.Auth.VerifyEmail.VerifyEmailEndpoint));
         endpointImplementationTypes.Should().Contain(typeof(Delivery.Features.Auth.ResendVerification.ResendVerificationEndpoint));
+        endpointImplementationTypes.Should().Contain(typeof(Delivery.Features.Chatbot.WhatsAppWebhook.WhatsAppWebhookEndpoint));
     }
 
     [Fact]

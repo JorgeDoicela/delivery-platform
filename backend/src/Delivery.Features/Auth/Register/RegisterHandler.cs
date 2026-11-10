@@ -144,7 +144,9 @@ public class RegisterHandler : IHandler<RegisterCommand, Result<RegisterResponse
                     Phone = newUser.Phone,
                     Email = newUser.Email,
                     IdentificationType = request.IdentificationType ?? "CONSUMIDOR_FINAL",
-                    IdentificationNumber = request.IdentificationNumber ?? "9999999999999",
+                    IdentificationNumber = !string.IsNullOrWhiteSpace(request.IdentificationNumber)
+                        ? request.IdentificationNumber.Trim()
+                        : $"CF-{newUser.Id:N}"[..18],
                     CreatedAt = DateTime.UtcNow,
                     TotalOrdersCount = 0
                 };

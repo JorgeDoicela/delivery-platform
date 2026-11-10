@@ -149,6 +149,6 @@ export function resolvePostLoginRedirect(params: {
     return redirectUrl;
   }
 
-  return routing.getHomeHref();
+  return routing.getLoginHref();
 }
 

@@ -133,14 +133,16 @@ sequenceDiagram
     API->>Handler: Ejecuta GoogleAuthCommand
     Handler->>Validator: ValidateAsync(idToken)
     Validator->>Google: GET oauth2.googleapis.com/tokeninfo?id_token=...
-    Google-->>Validator: Payload JSON (sub, email, email_verified, name)
+    Google-->>Validator: Payload JSON (sub, email, email_verified, name, aud)
     Validator-->>Handler: Result.Success(GoogleTokenPayload)
-    Handler->>DB: Busca User por email verificado
+    Handler->>DB: Busca User por email verificado (IgnoreQueryFilters)
     alt Usuario no existe (Primer acceso JIT)
-        Handler->>DB: Crea User (Customer, PasswordHash en blanco)
-        Handler->>DB: Crea Customer en directorio comercial SRI
+        Handler->>DB: Crea User (Rol: Customer, IsEmailVerified: true)
+        Handler->>DB: Crea Customer con IdentificationNumber: CF-{userId}
+    else Usuario existe
+        Handler->>DB: Asegura IsEmailVerified: true
     end
-    Handler->>TokenProv: GenerateAccessToken(user, roles, tenantId)
+    Handler->>TokenProv: GenerateAccessToken(user, roles, tenantId, branchId)
     TokenProv-->>Handler: Access Token JWT (15 min)
     Handler->>TokenProv: GenerateRefreshToken()
     TokenProv-->>Handler: Raw Token + Hash SHA-256
@@ -254,7 +256,9 @@ La funcionalidad de seguridad se encuentra dividida en 6 rebanadas verticales in
    - Registro de comensales con rol `Customer`, alta en directorio SRI del tenant y emision de sesion inmediata.
 3. **GoogleAuth:** `Delivery.Features.Auth.GoogleAuth`
    - Endpoint: `POST /api/v1/auth/google`
-   - Verificacion de Google ID Token (OpenID Connect), aprovisionamiento Just-In-Time de cliente y emision de sesion.
+   - Verificacion criptografica de Google ID Token (OpenID Connect) con soporte FedCM, aprovisionamiento Just-In-Time de cuenta comensal con correo verificado (`IsEmailVerified = true`), resolucion determinista de directorio fiscal y emision de sesion JWT.
+   - **Manejo de Unicidad Fiscal:** A los clientes autenticados via Google se les asigna `IdentificationNumber = $"CF-{user.Id:N}"[..18]` de tipo `CONSUMIDOR_FINAL`. Esto evita colisiones con el indice unico `IX_Customers_TenantId_IdentificationNumber` de PostgreSQL cuando multiples clientes operan en el mismo tenant sin haber ingresado cedula/RUC todavia.
+   - **Integracion Frontend:** SDK Google Identity Services (GIS) configurado con `renderButton` para soporte universal de popups y modo incognito, complementado con fallback accesible y desacoplado en `GoogleDevAuthModal.tsx`.
 4. **RefreshToken:** `Delivery.Features.Auth.RefreshToken`
    - Endpoint: `POST /api/v1/auth/refresh`
    - Extraccion del token desde cookie o cabecera, rotacion atomica y emision de nuevo par de credenciales.
@@ -264,6 +268,17 @@ La funcionalidad de seguridad se encuentra dividida en 6 rebanadas verticales in
 6. **RevokeToken (Logout):** `Delivery.Features.Auth.RevokeToken`
    - Endpoint: `POST /api/v1/auth/logout`
    - Invalida el refresh token en base de datos y expira inmediatamente la cookie `HttpOnly`.
+
+### 5.1. Registro de Diagnóstico y Causas Raíz Resueltas (Google OAuth)
+
+| Incidente / Síntoma | Causa Raíz Identificada | Solución Arquitectónica Aplicada |
+| :--- | :--- | :--- |
+| **`Client ID is not found (403)`** | Se había copiado por error el `Client Secret` (`GOCSPX-...`) en lugar del `Client ID` (`...apps.googleusercontent.com`) en las variables de entorno. | Centralización canónica de variables en `.env` en la raíz con el `Client ID` correcto `747427996536-srqjcuroq0m7r9knu7dotqlefc7qp1oc.apps.googleusercontent.com`. |
+| **`The given origin is not allowed for the given client ID`** | Google Cloud Console no tenía autorizado `http://localhost:3005` y los cambios no se habían persistido en la consola (botón "Guardar" pendiente). Adicionalmente, la red CDN de Google requiere un tiempo de propagación de 5 a 15 minutos. | Registro explícito de los orígenes JavaScript (`http://localhost:3005`, `http://localhost`, `http://127.0.0.1:3005`, dominios de producción) y persistencia consolidada en Google Cloud. |
+| **Google One Tap bloqueado / Sin popup al hacer clic** | Se invocaba `window.google.accounts.id.prompt()` en el `onClick` de un botón HTML personalizado. La API `prompt()` corresponde exclusivamente al banner flotante superior (One Tap), el cual se suprime automáticamente si no hay cookies de sesión activas (ej. modo incógnito) o tras cierres previos. | Implementación del método oficial `google.accounts.id.renderButton()`. Google monta su iframe con botón píldora que abre directamente la ventana emergente nativa de selección de cuentas. |
+| **Error de Hidratación React (`<form> cannot be descendant of <form>`)** | El modal de pruebas de Google Auth contenía una etiqueta `<form>` y estaba incrustado dentro del `<form>` de `LoginForm`. | Sustitución del `<form>` interno del modal por contenedores `<div>` accesibles con control de tecla `Enter` y extracción modular a `GoogleDevAuthModal.tsx`. |
+| **`DbUpdateException: 23505 duplicate key value violates unique constraint "IX_Customers_TenantId_IdentificationNumber"`** | En la creación Just-In-Time de clientes dentro de `GoogleAuthHandler`, se asignaba estáticamente `IdentificationNumber = "9999999999999"` (Consumidor Final). Al existir un índice único sobre `(TenantId, IdentificationNumber)`, cualquier segundo usuario que iniciara sesión con Google en el mismo restaurante colisionaba en PostgreSQL arrojando error 500. | Generación determinista y única de identificación para clientes sin cédula fiscal: `IdentificationNumber = $"CF-{user.Id:N}"[..18]`. Garantiza unicidad absoluta por cliente y tenant. |
+| **Advertencia FedCM en consola del navegador** | Google Identity Services deprecó los flujos tradicionales de cookies de terceros y requiere la especificación Federated Credential Management. | Activación explícita de `use_fedcm_for_prompt: true` en la inicialización del SDK de Google. |
 
 ---
 

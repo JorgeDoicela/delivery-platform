@@ -1,5 +1,6 @@
 import type {
     ActiveMenuResponse,
+    MenuProductDto,
     BranchCoverageDto,
     BranchCapacityResponse,
     BranchDetailDto,

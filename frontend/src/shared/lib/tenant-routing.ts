@@ -19,7 +19,7 @@ export interface TenantRoutingResolution {
   getHomeHref: (branchId?: number | string | null) => string;
   getCatalogHref: (branchId?: number | string | null) => string;
   getLoginHref: (options?: {
-    tab?: "login" | "register";
+    tab?: "login" | "register" | "forgot-password" | "reset-password" | "verify-email";
     redirect?: string;
   }) => string;
   getRegisterHref: (options?: { redirect?: string }) => string;
@@ -136,7 +136,7 @@ export function resolveTenantRouting(
   };
 
   const getLoginHref = (opts?: {
-    tab?: "login" | "register";
+    tab?: "login" | "register" | "forgot-password" | "reset-password" | "verify-email";
     redirect?: string;
   }): string => {
     const url = basePath ? `${basePath}/login` : "/login";

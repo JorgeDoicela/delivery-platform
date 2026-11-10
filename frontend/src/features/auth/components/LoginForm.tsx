@@ -74,7 +74,14 @@ export function LoginForm({
         routing,
       });
 
-      router.push(destination);
+      if (
+        typeof window !== "undefined" &&
+        window.location.pathname === destination
+      ) {
+        router.replace(destination);
+      } else {
+        router.push(destination);
+      }
       router.refresh();
     } else {
       const currentError = useAuthStore.getState().error;

@@ -15,7 +15,8 @@ public record GoogleUserInfoDto(
     int? BranchId,
     bool IsActive,
     List<string> Roles,
-    string? Picture = null);
+    string? Picture = null,
+    bool IsEmailVerified = true);
 
 public record GoogleAuthResponse(
     string AccessToken,

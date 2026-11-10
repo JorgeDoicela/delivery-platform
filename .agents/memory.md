@@ -86,3 +86,55 @@
   - Geolocalización de Destino (`GeofenceChecker.tsx`): Detección satelital vía GPS nativo o selección visual con pin arrastrable sobre MapLibre GL JS, validado contra el polígono PostGIS de la sucursal (`ST_Contains`).
   - Mapa Completo Origen-Destino (`OrderMap.tsx`): `GetOrderById` expone `BranchLatitude` y `BranchLongitude` permitiendo renderizar tanto el local de origen como el domicilio de entrega desde el momento de creación del pedido.
   - Banners Contextuales Dinámicos (`OrderTrackingView.tsx`): Mensajes explicativos en cada fase (`En Cola`, `En Cocina`, `Empacado`, `Motorizado en Ruta`, `Entregado`) que comunican con claridad el avance del pedido.
+
+## 7. Flujo de Autenticación y Verificación de Correo (Opción 1 - E-Commerce de Baja Fricción)
+* **Acceso Inmediato al Registrarse:**
+  - Tras enviar el formulario de registro (`RegisterForm.tsx`), el backend crea la cuenta con `IsEmailVerified = false`, genera un token criptográfico seguro de 64 caracteres con vigencia de 24 horas y encola el correo vía SMTP.
+  - El frontend autentica de inmediato al cliente con JWT/refresh token y lo redirige a la tienda (`/la-granjita`) o a la URL previa (`redirectUrl`) sin forzarlo a detenerse en una pantalla de espera obligatoria, maximizando la conversión y evitando el abandono de carritos por demoras en la entrega de correos.
+* **Verificación Asíncrona Resiliente (`VerifyEmailView.tsx` y `login/page.tsx`):**
+  - Si un usuario no verificado entra a su sesión (`/login`), se le muestra un indicador claro y una alerta contextual con la opción de validar el código o solicitar un nuevo correo de activación con cooldown de 60 segundos.
+  - Al pulsar el enlace del correo (`/[slug]/login?tab=verify-email&token=...`) o ingresar manualmente el token, `VerifyEmailView` valida el token mediante `verifyEmailAction`, actualiza `isEmailVerified = true` reactivamente en `useAuthStore` y ofrece un botón de retorno a su cuenta.
+* **Diseño del Portal de Acceso (`login/page.tsx`):**
+  - Tarjeta centralizada y sobria (`max-w-4xl mx-auto`), sin columnas huérfanas ni botones descontextualizados.
+  - Navegación coherente que adapta los enlaces ("Volver a mi cuenta" vs "Volver a Iniciar Sesión") según el estado de autenticación del usuario.
+
+## 8. Autenticación Federada Google OAuth 2.0 y Directorio de Clientes SRI
+* **Flujo Seguro OpenID Connect con Google Identity Services (GIS):**
+  - El frontend inicializa el SDK oficial (`window.google.accounts.id`) con soporte obligatorio FedCM (`use_fedcm_for_prompt: true`).
+  - Utiliza `google.accounts.id.renderButton()` montado sobre contenedor para desplegar la ventana emergente oficial de Google con diseño de píldora que respeta el sistema de diseño de Mesafy.
+  - Dispone de un candado `hasInitializedRef` para evitar inicializaciones duplicadas en React StrictMode.
+  - Al autenticar, Google entrega un ID Token criptográfico que el cliente despacha al endpoint `POST /api/v1/auth/google`.
+* **Validación Backend e Inclusión de Reclamos (`GoogleAuthHandler.cs`):**
+  - `GoogleTokenValidator` valida el token contra `https://oauth2.googleapis.com/tokeninfo`, comprobando audiencia (`aud`/`azp`) contra `GOOGLE_CLIENT_ID` y verificando que el correo esté validado por Google (`email_verified = true`).
+  - Al validar, el backend marca `user.IsEmailVerified = true` automáticamente, aprovisiona el rol `Customer` y resuelve la sucursal primaria.
+  - El JWT generado incluye `tenant_id` y `branch_id` para garantizar el aislamiento Multi-Tenant estricto.
+* **Resolución de Colisión de Clave Única en Directorio Fiscal (`Customers`):**
+  - Causa Raíz Erradicada: La tabla `Customers` cuenta con un índice único `IX_Customers_TenantId_IdentificationNumber`. Anteriormente, los registros creados sin cédula asignaban el valor estático `"9999999999999"` (Consumidor Final), lo que provocaba colisiones con código PostgreSQL 23505 al registrar un segundo usuario en el mismo tenant.
+  - Solución Arquitectónica Definitiva: Tanto `GoogleAuthHandler` como `RegisterHandler` generan identificadores deterministas únicos `$"CF-{user.Id:N}"[..18]`, reservando `"9999999999999"` exclusivamente para la cabecera de facturas anónimas y permitiendo que ilimitados clientes operen en la plataforma sin colisiones.
+* **Componente Modular y Desacoplado (< 400 líneas):**
+  - `GoogleSignInButton.tsx` (279 líneas) contiene la lógica de conexión con Google Identity Services y manejo de credenciales.
+  - Diálogo de pruebas y diagnóstico extraído a `GoogleDevAuthModal.tsx` (159 líneas).
+* **Política de Redirección Post-Login de Clientes (`redirectByRole.ts`):**
+  - Si un usuario con rol `Customer` inicia sesión o se registra sin parámetro `redirect` explícito, el sistema no fuerza la redirección al home del restaurante (`/la-granjita`), sino que lo mantiene en su portal de cuenta (`/login` o `/[slug]/login`), desplegando de inmediato la vista de bienvenida con sus datos, estado verificado y botones de acción rápida. Si existe un parámetro `redirect` seguro (ej. `/checkout`), se respeta dicha ruta de destino.
+
+## 9. Chatbot WhatsApp Cloud API e IA Conversacional Multi-Tenant (DeepSeek & Google Gemini)
+* **Arquitectura Vertical Slice (`Delivery.Features.Chatbot.WhatsAppWebhook`):**
+  - Todo el subsistema reside de forma autónoma en una única vertical slice respetando las pruebas de fronteras de arquitectura (VSA).
+  - Prohibición estricta de nombres con sufijo `Service`, `Manager` o `Repository`; empleo de `Engine`, `Client`, `Provider` y `Processor`.
+* **Aislamiento Multi-Tenant y Multi-Sucursal (`TenantKnowledgeProvider`):**
+  - Inyección dinámica en el System Prompt de la identidad del tenant, sucursales físicas (dirección, teléfonos, horarios de atención) y menú categorizado con precios exactos en USD.
+  - Resolución inteligente de pedidos: si el usuario menciona un ticket (ej. `#1001` o `pedido 1001`), el provider consulta `AppDbContext.Orders` para informar el estado en tiempo real (`En Cocina`, `En Camino con motorizado`, `Entregado`) junto con el enlace de rastreo satelital.
+* **Motor de IA Resiliente (`ResilientChatbotAiEngine`):**
+  - Motor Primario: `DeepSeekAiEngine` consumiendo `https://api.deepseek.com/chat/completions` con modelo `deepseek-chat` (alta eficiencia, costo ultra reducido y compatibilidad estándar OpenAI).
+  - Motor de Respaldo: `GeminiAiEngine` conmutando de forma automática y transparente a `gemini-2.0-flash` ante cualquier error o saturación de DeepSeek.
+* **Persistencia e Idempotencia en Redis 7 (`RedisConversationStore`):**
+  - Deduplicación estricta de mensajes Meta (`whatsapp:dedup:{messageId}`) con TTL de 10 minutos para prevenir bucles de procesamiento redundante.
+  - Memoria conversacional multi-turno por cliente y tenant (`whatsapp:conv:{tenantId}:{customerPhone}`) con TTL deslizante de 30 minutos y límite de 10 mensajes para optimización de tokens.
+* **Despacho y Webhooks (`WhatsAppWebhookEndpoint`):**
+  - Handshake GET validando `hub.mode == "subscribe"` y `hub.verify_token == WHATSAPP_VERIFY_TOKEN`.
+  - Ingesta POST que responde HTTP 200 inmediatamente a Meta y delega el procesamiento asíncrono en segundo plano (`IWhatsAppWebhookProcessor`) garantizando el cumplimiento de SLAs de entrega.
+* **Estrategia de Transición a Producción y Desacoplamiento Total:**
+  - Configuración 100% parametrizada vía variables de entorno (`WHATSAPP_PHONE_NUMBER_ID`, `WHATSAPP_BUSINESS_ACCOUNT_ID`, `WHATSAPP_ACCESS_TOKEN`, `WHATSAPP_VERIFY_TOKEN`, `DEEPSEEK_API_KEY`, `GEMINI_API_KEY`) e inyectadas al contenedor en `docker-compose.yml`.
+  - Fase 1 (Validación Productiva): Se utiliza el número de prueba de Meta (`1349339028273599`) apuntando al dominio oficial de producción (`https://api.mesafy.doicela.dev/api/v1/webhooks/whatsapp`) para verificar Nginx, terminación TLS, base de datos y SignalR sin afectar líneas personales activas.
+  - Fase 2 (Número Comercial Físico): Al adquirir el chip/SIM dedicado para el restaurante, el alta se realiza en Meta Business Manager y se actualiza exclusivamente `WHATSAPP_PHONE_NUMBER_ID` en el `.env` del servidor, sin necesidad de recompilaciones ni cambios en el código fuente.
+
