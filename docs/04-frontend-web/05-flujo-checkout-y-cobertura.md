@@ -49,6 +49,14 @@ sequenceDiagram
 
 A traves del componente [`GeofenceChecker.tsx`](../../frontend/src/features/checkout/components/GeofenceChecker.tsx), el sistema garantiza que ningun pedido a domicilio se admita sin tener una sucursal fisica asignada:
 
+### 3.1. Integracion con Libreta de Direcciones Guardadas y Autocompletado
+
+Para clientes con cuenta activa, el componente [`DeliveryInfoSection.tsx`](../../frontend/src/features/checkout/components/DeliveryInfoSection.tsx) se sincroniza directamente con `useAccountStore`:
+* **Seleccion One-Click:** Expone chips de acceso rapido para las direcciones registradas por el usuario (*Casa*, *Oficina*, etc.).
+* **Autocompletado de Formulario:** Inyecta en una sola interaccion la calle principal, numeracion y referencias de entrega.
+* **Resolucion Espacial Inmediata:** Si la direccion guardada contiene coordenadas GPS (`latitude`, `longitude`), dispara automaticamente la evaluacion del poligono de cobertura de la sucursal activa en PostGIS mediante `POST /api/geofencing/resolve`.
+* **Datos Fiscales Pre-cargados:** Inicializa el telefono y los datos tributarios del SRI (`identificationType`, `identificationNumber`) reduciendo la tasa de abandono en el checkout.
+
 1. **Resolucion por Coordenadas Satelitales:**
    El cliente puede usar el boton de geolocalizacion automatica (`navigator.geolocation.getCurrentPosition`) o arrastrar manualmente el marcador sobre el mapa vectorial MapLibre GL JS.
 2. **Evaluacion en Backend (`POST /api/geofencing/resolve`):**
