@@ -49,19 +49,28 @@ public sealed class UpdateConsentSettingsHandler : IHandler<UpdateConsentSetting
             return Result.Failure<bool>(new Error("Account.PhoneRequired", "Debes registrar un número de teléfono en tu perfil para habilitar el canal de WhatsApp."));
         }
 
-        var tenantId = _context.CurrentTenantId ?? user.TenantId;
-        if (!tenantId.HasValue)
+        var explicitTenantId = _context.CurrentTenantId ?? user.TenantId;
+        List<Guid> targetTenantIds;
+
+        if (explicitTenantId.HasValue)
         {
-            var fallbackTenant = await _context.Tenants.AsNoTracking().FirstOrDefaultAsync(cancellationToken);
-            tenantId = fallbackTenant?.Id;
+            targetTenantIds = [explicitTenantId.Value];
+        }
+        else
+        {
+            targetTenantIds = await _context.Tenants
+                .AsNoTracking()
+                .Where(t => t.IsActive)
+                .Select(t => t.Id)
+                .ToListAsync(cancellationToken);
         }
 
-        if (tenantId.HasValue)
+        foreach (var tenantId in targetTenantIds)
         {
             if (request.WhatsAppConsent)
             {
                 await _consentTracker.RegisterConsentAsync(
-                    tenantId.Value,
+                    tenantId,
                     user.Phone,
                     $"portal-{Guid.NewGuid():N}",
                     cancellationToken
@@ -70,7 +79,7 @@ public sealed class UpdateConsentSettingsHandler : IHandler<UpdateConsentSetting
             else
             {
                 await _consentTracker.RevokeConsentAsync(
-                    tenantId.Value,
+                    tenantId,
                     user.Phone,
                     cancellationToken
                 );

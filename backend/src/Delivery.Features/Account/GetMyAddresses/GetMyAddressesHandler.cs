@@ -78,3 +78,4 @@ public sealed class GetMyAddressesEndpoint : IEndpoint
         .ProducesProblem(StatusCodes.Status401Unauthorized);
     }
 }
+

@@ -142,3 +142,4 @@ export const accountApi = {
 function getApiEndOrdersUrl(): string {
   return `${getApiBaseUrl()}/api/v1/account/orders`;
 }
+

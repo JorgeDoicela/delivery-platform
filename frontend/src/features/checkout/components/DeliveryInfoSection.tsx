@@ -1,15 +1,55 @@
 "use client";
 
-import type { UseFormRegister, FieldErrors } from "react-hook-form";
+import { useEffect } from "react";
+import type { UseFormRegister, UseFormSetValue, FieldErrors } from "react-hook-form";
 import type { CheckoutFormData } from "../schemas/checkoutSchema";
-import { User } from "lucide-react";
+import { User, MapPin, Bookmark } from "lucide-react";
+import { useAccountStore } from "@/features/account";
+import { useAuthStore } from "@/features/auth";
 
 interface DeliveryInfoSectionProps {
   register: UseFormRegister<CheckoutFormData>;
+  setValue?: UseFormSetValue<CheckoutFormData>;
+  onLocationSelect?: (lat: number, lng: number) => void;
   errors: FieldErrors<CheckoutFormData>;
 }
 
-export function DeliveryInfoSection({ register, errors }: DeliveryInfoSectionProps) {
+export function DeliveryInfoSection({
+  register,
+  setValue,
+  onLocationSelect,
+  errors,
+}: DeliveryInfoSectionProps) {
+  const isAuthenticated = useAuthStore((s) => s.isAuthenticated);
+  const addresses = useAccountStore((s) => s.addresses);
+  const fetchAddresses = useAccountStore((s) => s.fetchAddresses);
+
+  useEffect(() => {
+    if (isAuthenticated) {
+      fetchAddresses();
+    }
+  }, [isAuthenticated, fetchAddresses]);
+
+  const handleSelectSavedAddress = (addr: (typeof addresses)[0]) => {
+    if (!setValue) return;
+
+    const fullStreet = addr.buildingNumber
+      ? `${addr.street} #${addr.buildingNumber}`
+      : addr.street;
+    setValue("addressStreet", fullStreet);
+
+    const refParts: string[] = [];
+    if (addr.secondaryStreet) refParts.push(`Intersección: ${addr.secondaryStreet}`);
+    if (addr.reference) refParts.push(addr.reference);
+    if (refParts.length > 0) {
+      setValue("addressReference", refParts.join(". "));
+    }
+
+    if (addr.latitude && addr.longitude && onLocationSelect) {
+      onLocationSelect(addr.latitude, addr.longitude);
+    }
+  };
+
   return (
     <div className="bg-surface-card rounded-2xl border border-surface-border p-5 space-y-4 shadow-sm">
       <div className="flex items-center gap-2 pb-3 border-b border-surface-border-subtle">
@@ -23,6 +63,33 @@ export function DeliveryInfoSection({ register, errors }: DeliveryInfoSectionPro
           </p>
         </div>
       </div>
+
+      {/* Selector rápido de direcciones guardadas para clientes autenticados */}
+      {isAuthenticated && addresses.length > 0 && (
+        <div className="p-3 bg-surface-canvas rounded-xl border border-surface-border space-y-2">
+          <div className="flex items-center gap-1.5 text-[11px] font-bold text-text-muted uppercase tracking-wider">
+            <Bookmark className="w-3.5 h-3.5 text-brand-primary" />
+            <span>Usar Dirección Guardada:</span>
+          </div>
+          <div className="flex flex-wrap gap-2">
+            {addresses.map((addr) => (
+              <button
+                key={addr.id}
+                type="button"
+                onClick={() => handleSelectSavedAddress(addr)}
+                className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold bg-surface-card hover:bg-surface-card-hover border border-surface-border hover:border-brand-primary text-text-strong transition-colors cursor-pointer"
+                title={`${addr.street} (Clic para autocompletar)`}
+              >
+                <MapPin className="w-3 h-3 text-brand-primary" />
+                <span>{addr.label}</span>
+                {addr.isDefault && (
+                  <span className="text-[9px] font-bold text-text-muted uppercase">(Predeterminada)</span>
+                )}
+              </button>
+            ))}
+          </div>
+        </div>
+      )}
 
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
         <div>

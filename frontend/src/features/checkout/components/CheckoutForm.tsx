@@ -12,6 +12,7 @@ import { BillingInfoSection } from "./BillingInfoSection";
 import { PaymentMethodSection } from "./PaymentMethodSection";
 import { useCartStore } from "@/features/cart";
 import { useAuthStore } from "@/features/auth";
+import { useAccountStore } from "@/features/account";
 import { apiClient } from "@/shared/lib/api-client";
 import { formatCurrency } from "@/shared/lib/utils";
 import { useTenantRoutes } from "@/shared/lib/tenant-routing";
@@ -35,6 +36,9 @@ export function CheckoutForm() {
 
   const total = getTotal();
   const user = useAuthStore((s) => s.user);
+  const isAuthenticated = useAuthStore((s) => s.isAuthenticated);
+  const profile = useAccountStore((s) => s.profile);
+  const fetchProfile = useAccountStore((s) => s.fetchProfile);
 
   const {
     register,
@@ -59,13 +63,29 @@ export function CheckoutForm() {
   });
 
   useEffect(() => {
+    if (isAuthenticated && !profile) {
+      fetchProfile();
+    }
+  }, [isAuthenticated, profile, fetchProfile]);
+
+  useEffect(() => {
     if (user?.fullName) {
       setValue("customerName", user.fullName);
     }
     if (user?.email) {
       setValue("customerEmail", user.email);
     }
-  }, [user, setValue]);
+    if (profile) {
+      if (profile.fullName) setValue("customerName", profile.fullName);
+      if (profile.phone) setValue("customerPhone", profile.phone);
+      if (profile.identificationType === "CEDULA" || profile.identificationType === "RUC") {
+        setValue("identificationType", profile.identificationType);
+        if (profile.identificationNumber) {
+          setValue("identificationNumber", profile.identificationNumber);
+        }
+      }
+    }
+  }, [user, profile, setValue]);
 
   const selectedPaymentMethod = useWatch({ control, name: "paymentMethod" });
   const cashAmountPaid = useWatch({ control, name: "cashAmountPaid" }) || 0;
@@ -137,7 +157,12 @@ export function CheckoutForm() {
         <div className="lg:col-span-7 space-y-6">
           <GeofenceChecker onLocationResolved={handleLocationResolved} />
 
-          <DeliveryInfoSection register={register} errors={errors} />
+          <DeliveryInfoSection
+            register={register}
+            setValue={setValue}
+            onLocationSelect={handleLocationResolved}
+            errors={errors}
+          />
 
           <BillingInfoSection register={register} setValue={setValue} errors={errors} />
 

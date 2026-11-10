@@ -48,3 +48,4 @@ public sealed class ChangePasswordEndpoint : IEndpoint
         .ProducesProblem(StatusCodes.Status404NotFound);
     }
 }
+

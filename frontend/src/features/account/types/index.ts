@@ -42,6 +42,7 @@ export interface AccountOrderSummary {
   orderNumber: number;
   tenantSlug: string;
   tenantName: string;
+  branchId: number;
   branchName: string;
   status: number;
   statusText: string;
@@ -88,3 +89,4 @@ export interface ChangePasswordPayload {
 export interface UpdateConsentPayload {
   whatsAppConsent: boolean;
 }
+

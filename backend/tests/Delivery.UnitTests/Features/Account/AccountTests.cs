@@ -325,6 +325,7 @@ public class AccountTests
         result.IsSuccess.Should().BeTrue();
         result.Value.Orders.Should().HaveCount(1);
         result.Value.Orders[0].OrderNumber.Should().Be(1001);
+        result.Value.Orders[0].BranchId.Should().Be(branch.Id);
         result.Value.Orders[0].StatusText.Should().Be("Confirmada");
         result.Value.Orders[0].IsActive.Should().BeTrue();
         result.Value.Orders[0].Items.Should().HaveCount(1);

@@ -212,3 +212,4 @@ public sealed class UpsertAddressEndpoint : IEndpoint
         .ProducesProblem(StatusCodes.Status404NotFound);
     }
 }
+

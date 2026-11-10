@@ -47,8 +47,8 @@ export function AccountOrdersSection() {
       });
     });
 
-    // Redirigir al menú del establecimiento
-    router.push(`/${order.tenantSlug}`);
+    // Redirigir al menú del establecimiento sincronizando la sucursal exacta del pedido
+    router.push(`/${order.tenantSlug}?branch=${order.branchId}`);
   };
 
   if (isLoadingOrders) {

@@ -21,3 +21,4 @@ public interface ICustomerConsentTracker
     /// </summary>
     Task RevokeConsentAsync(Guid tenantId, string customerPhone, CancellationToken ct = default);
 }
+

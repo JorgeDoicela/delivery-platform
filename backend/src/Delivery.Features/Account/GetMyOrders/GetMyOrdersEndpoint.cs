@@ -48,3 +48,4 @@ public sealed class GetMyOrdersEndpoint : IEndpoint
         .ProducesProblem(StatusCodes.Status401Unauthorized);
     }
 }
+

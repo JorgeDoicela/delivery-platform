@@ -121,3 +121,4 @@ export function AccountDashboardView({ tenantSlug }: AccountDashboardViewProps) 
     </div>
   );
 }
+

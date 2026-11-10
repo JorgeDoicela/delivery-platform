@@ -88,3 +88,4 @@ public sealed class DeleteAddressEndpoint : IEndpoint
         .ProducesProblem(StatusCodes.Status404NotFound);
     }
 }
+

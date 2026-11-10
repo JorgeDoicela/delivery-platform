@@ -133,3 +133,4 @@ describe("useAccountStore", () => {
     expect(useAccountStore.getState().profile?.hasWhatsAppConsent).toBe(true);
   });
 });
+
