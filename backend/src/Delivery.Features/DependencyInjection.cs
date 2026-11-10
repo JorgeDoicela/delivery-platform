@@ -27,6 +27,9 @@ public static class DependencyInjection
         services.AddScoped<IEmailService, MailKitSmtpEmailService>();
         services.AddScoped<IBackgroundEmailQueue, HangfireBackgroundEmailQueue>();
 
+        // 0.1.1 Almacenamiento y Optimización de Archivos/Imágenes (WebP)
+        services.AddScoped<Delivery.Core.Contracts.Storage.IAvatarStorage, LocalAvatarStorage>();
+
         // 0.2 Servicios de Chatbot WhatsApp Cloud API e IA Conversacional
         services.AddOptions<Delivery.Features.Chatbot.WhatsAppWebhook.WhatsAppChatbotOptions>()
             .Configure(options =>

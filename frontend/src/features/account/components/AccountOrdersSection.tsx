@@ -123,7 +123,7 @@ export function AccountOrdersSection() {
             {/* Cabecera del pedido */}
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-neutral-100 pb-4">
               <div>
-                <div className="flex items-center gap-3">
+                <div className="flex flex-wrap items-center gap-2 sm:gap-2.5">
                   <span className="font-mono text-sm font-black text-neutral-900 tracking-tight">
                     #{order.orderNumber}
                   </span>
@@ -140,21 +140,21 @@ export function AccountOrdersSection() {
                     {order.statusText}
                   </span>
                 </div>
-                <div className="flex items-center gap-4 mt-1.5 text-xs text-neutral-500">
+                <div className="flex flex-wrap items-center gap-x-4 gap-y-1 mt-1.5 text-xs text-neutral-500">
                   <span className="flex items-center gap-1">
-                    <Clock className="w-3.5 h-3.5 text-neutral-400" />
-                    {orderDate}
+                    <Clock className="w-3.5 h-3.5 text-neutral-400 shrink-0" />
+                    <span>{orderDate}</span>
                   </span>
                   <span className="flex items-center gap-1">
-                    <MapPin className="w-3.5 h-3.5 text-neutral-400" />
-                    {order.branchName}
+                    <MapPin className="w-3.5 h-3.5 text-neutral-400 shrink-0" />
+                    <span>{order.branchName}</span>
                   </span>
                 </div>
               </div>
 
               {/* Total */}
-              <div className="text-left sm:text-right">
-                <span className="text-xs uppercase font-bold text-neutral-400 block">
+              <div className="text-left sm:text-right pt-2 sm:pt-0 border-t sm:border-t-0 border-neutral-100">
+                <span className="text-[11px] uppercase font-bold text-neutral-400 block">
                   Total Pagado
                 </span>
                 <span className="text-xl font-black text-neutral-900 font-display">
@@ -172,13 +172,13 @@ export function AccountOrdersSection() {
                 {order.items.map((item, idx) => (
                   <div
                     key={idx}
-                    className="flex items-center justify-between py-1.5 text-xs"
+                    className="flex items-center justify-between py-1.5 text-xs gap-3"
                   >
-                    <span className="text-neutral-800">
+                    <span className="text-neutral-800 break-words">
                       <strong className="font-bold">{item.quantity}x</strong>{" "}
                       {item.productName}
                     </span>
-                    <span className="font-mono font-medium text-neutral-600">
+                    <span className="font-mono font-medium text-neutral-600 shrink-0">
                       ${item.subtotal.toFixed(2)}
                     </span>
                   </div>
@@ -188,17 +188,17 @@ export function AccountOrdersSection() {
 
             {/* Dirección de entrega */}
             {order.addressStreet && (
-              <div className="text-xs text-neutral-500 flex items-center gap-1.5">
+              <div className="text-xs text-neutral-500 flex items-center gap-1.5 break-words">
                 <MapPin className="w-3.5 h-3.5 text-neutral-400 shrink-0" />
                 <span>Entregado en: <strong className="text-neutral-700">{order.addressStreet}</strong></span>
               </div>
             )}
 
             {/* Acciones del pedido */}
-            <div className="flex flex-wrap items-center gap-3 pt-2">
+            <div className="flex flex-col sm:flex-row flex-wrap items-stretch sm:items-center gap-2.5 pt-2">
               <Link
-                href={`/${order.tenantSlug}/pedidos/${order.orderId}`}
-                className="inline-flex items-center gap-2 bg-neutral-900 hover:bg-neutral-800 active:scale-95 text-white font-black text-xs uppercase tracking-wider font-display px-6 py-2.5 rounded-full transition-all min-h-[44px]"
+                href={`/${order.tenantSlug}/rastreo/${order.orderId}`}
+                className="inline-flex items-center justify-center gap-2 bg-neutral-900 hover:bg-neutral-800 active:scale-95 text-white font-black text-xs uppercase tracking-wider font-display px-6 py-2.5 rounded-full transition-all min-h-[44px]"
               >
                 <span>{order.isActive ? "Rastrear Pedido en Vivo" : "Ver Resumen"}</span>
                 <ExternalLink className="w-3.5 h-3.5" />
@@ -207,7 +207,7 @@ export function AccountOrdersSection() {
               <button
                 type="button"
                 onClick={() => handleReorder(order)}
-                className="inline-flex items-center gap-2 bg-neutral-100 hover:bg-neutral-200 active:scale-95 text-neutral-800 font-bold text-xs uppercase tracking-wider px-5 py-2.5 rounded-full transition-colors min-h-[44px] cursor-pointer"
+                className="inline-flex items-center justify-center gap-2 bg-neutral-100 hover:bg-neutral-200 active:scale-95 text-neutral-800 font-bold text-xs uppercase tracking-wider px-5 py-2.5 rounded-full transition-colors min-h-[44px] cursor-pointer"
               >
                 <RotateCcw className="w-3.5 h-3.5" />
                 <span>Pedir Nuevamente</span>

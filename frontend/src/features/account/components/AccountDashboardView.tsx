@@ -64,10 +64,37 @@ export function AccountDashboardView({ tenantSlug }: AccountDashboardViewProps) 
       <AccountHeader profile={profile} isLoading={isLoadingProfile} />
 
       {/* Grid: Navegación de pestañas + Contenido */}
-      <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
-        {/* Menú Lateral */}
-        <aside className="lg:col-span-1 space-y-2">
-          <nav className="bg-white border border-neutral-200 rounded-3xl p-3 space-y-1 shadow-xs">
+      <div className="grid grid-cols-1 lg:grid-cols-4 gap-6 lg:gap-8">
+        {/* Navegación Responsive: Horizontal táctil en móvil/tablet, Sidebar vertical en desktop */}
+        <aside className="lg:col-span-1 space-y-3">
+          {/* Versión Móvil/Tablet: Píldoras deslizantes con scroll horizontal suave */}
+          <div className="lg:hidden -mx-4 px-4 sm:mx-0 sm:px-0">
+            <nav className="flex items-center gap-2 overflow-x-auto pb-2 scrollbar-none [scrollbar-width:none] [-ms-overflow-style:none]">
+              {TABS.map((tab) => {
+                const Icon = tab.icon;
+                const isActive = activeTab === tab.id;
+
+                return (
+                  <button
+                    key={tab.id}
+                    type="button"
+                    onClick={() => setActiveTab(tab.id)}
+                    className={`inline-flex items-center gap-2 px-4 py-2.5 rounded-full text-xs font-bold whitespace-nowrap transition-all shrink-0 min-h-[44px] cursor-pointer ${
+                      isActive
+                        ? "bg-neutral-900 text-white shadow-xs font-display uppercase tracking-wider"
+                        : "bg-white border border-neutral-200 text-neutral-700 hover:bg-neutral-50 active:scale-95"
+                    }`}
+                  >
+                    <Icon className="w-3.5 h-3.5 shrink-0" />
+                    <span>{tab.label}</span>
+                  </button>
+                );
+              })}
+            </nav>
+          </div>
+
+          {/* Versión Desktop: Menú lateral estructurado */}
+          <nav className="hidden lg:block bg-white border border-neutral-200 rounded-3xl p-3 space-y-1 shadow-xs sticky top-24">
             {TABS.map((tab) => {
               const Icon = tab.icon;
               const isActive = activeTab === tab.id;

@@ -137,6 +137,39 @@ export const accountApi = {
     });
     return handleAccountResponse<boolean>(res);
   },
+
+  async uploadAvatar(file: File): Promise<{ avatarUrl: string }> {
+    const formData = new FormData();
+    formData.append("file", file);
+
+    const headers: Record<string, string> = {};
+    const token = getApiClientAccessToken();
+    if (token) {
+      headers["Authorization"] = `Bearer ${token}`;
+    }
+    const slug = getApiClientTenantSlug();
+    if (slug) {
+      headers["X-Tenant-Slug"] = slug;
+    }
+
+    const res = await fetch(`${getApiBaseUrl()}/api/v1/account/avatar`, {
+      method: "POST",
+      headers,
+      credentials: "include",
+      body: formData,
+    });
+    return handleAccountResponse<{ avatarUrl: string }>(res);
+  },
+
+  async deleteAvatar(): Promise<boolean> {
+    const res = await fetch(`${getApiBaseUrl()}/api/v1/account/avatar`, {
+      method: "DELETE",
+      headers: buildHeaders(),
+      credentials: "include",
+    });
+    await handleAccountResponse<unknown>(res);
+    return true;
+  },
 };
 
 function getApiEndOrdersUrl(): string {

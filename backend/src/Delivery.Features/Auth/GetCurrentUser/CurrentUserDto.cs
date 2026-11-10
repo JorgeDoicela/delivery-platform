@@ -10,5 +10,6 @@ public record UserInfoDto(
     string? TenantSlug,
     int? BranchId,
     string? BranchName,
-    List<string> Roles);
+    List<string> Roles,
+    string? AvatarUrl = null);
 

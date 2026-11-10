@@ -245,7 +245,8 @@ public class RegisterHandler : IHandler<RegisterCommand, Result<RegisterResponse
             null,
             true,
             new List<string> { "Customer" },
-            newUser.IsEmailVerified);
+            newUser.IsEmailVerified,
+            newUser.AvatarUrl);
 
         var response = new RegisterResponse(accessToken, rawRefreshToken, accessExpiresAt, userDto);
         return Result.Success(response);

@@ -13,7 +13,8 @@ public record UserAuthInfoDto(
     int? BranchId,
     bool IsActive,
     List<string> Roles,
-    bool IsEmailVerified = false);
+    bool IsEmailVerified = false,
+    string? AvatarUrl = null);
 
 public record LoginResponse(
     string AccessToken,

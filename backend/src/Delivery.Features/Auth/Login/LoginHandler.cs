@@ -145,7 +145,8 @@ public class LoginHandler : IHandler<LoginCommand, Result<LoginResponse>>
             primaryBranchId,
             user.IsActive,
             roleNames,
-            user.IsEmailVerified);
+            user.IsEmailVerified,
+            user.AvatarUrl);
 
         var response = new LoginResponse(accessToken, rawRefreshToken, accessExpiresAt, userDto);
         return Result.Success(response);

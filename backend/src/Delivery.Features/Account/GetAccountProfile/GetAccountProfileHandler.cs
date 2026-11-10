@@ -83,7 +83,8 @@ public sealed class GetAccountProfileHandler : IHandler<GetAccountProfileQuery, 
             user.CreatedAt,
             totalOrders,
             activeOrders,
-            consentActive
+            consentActive,
+            user.AvatarUrl
         );
 
         return Result.Success(dto);

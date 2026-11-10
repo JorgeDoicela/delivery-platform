@@ -36,7 +36,8 @@ public sealed record AccountProfileDto(
     DateTime CreatedAt,
     int TotalOrdersCount,
     int ActiveOrdersCount,
-    bool WhatsAppConsentActive
+    bool WhatsAppConsentActive,
+    string? AvatarUrl = null
 );
 
 public sealed record AccountAddressDto(

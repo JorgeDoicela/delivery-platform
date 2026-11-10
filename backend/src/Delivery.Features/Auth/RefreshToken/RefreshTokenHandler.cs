@@ -84,7 +84,8 @@ public class RefreshTokenHandler : IHandler<RefreshTokenCommand, Result<RefreshT
             primaryBranchId,
             user.IsActive,
             roleNames,
-            user.IsEmailVerified);
+            user.IsEmailVerified,
+            user.AvatarUrl);
 
         var response = new RefreshTokenResponse(newAccessToken, newRawToken, accessExpiresAt, userDto);
         return Result.Success(response);

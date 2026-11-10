@@ -84,9 +84,9 @@ public class VerticalSliceArchitectureRegistrationTests
         // Act
         services.AddDeliveryFeatures();
 
-        // Assert: Deben registrarse exactamente 45 endpoints autónomos
+        // Assert: Deben registrarse exactamente 47 endpoints autónomos
         var endpointDescriptors = services.Where(s => s.ServiceType == typeof(IEndpoint)).ToList();
-        endpointDescriptors.Should().HaveCount(45);
+        endpointDescriptors.Should().HaveCount(47);
 
         var endpointImplementationTypes = endpointDescriptors.Select(d => d.ImplementationType).ToHashSet();
         endpointImplementationTypes.Should().Contain(typeof(ResolveBranchEndpoint));
@@ -134,6 +134,8 @@ public class VerticalSliceArchitectureRegistrationTests
         endpointImplementationTypes.Should().Contain(typeof(Delivery.Features.Account.UpsertAddress.UpsertAddressEndpoint));
         endpointImplementationTypes.Should().Contain(typeof(Delivery.Features.Account.DeleteAddress.DeleteAddressEndpoint));
         endpointImplementationTypes.Should().Contain(typeof(Delivery.Features.Account.UpdateConsentSettings.UpdateConsentSettingsEndpoint));
+        endpointImplementationTypes.Should().Contain(typeof(Delivery.Features.Account.UploadAvatar.UploadAvatarEndpoint));
+        endpointImplementationTypes.Should().Contain(typeof(Delivery.Features.Account.UploadAvatar.DeleteAvatarEndpoint));
     }
 
     [Fact]

@@ -15,6 +15,7 @@ export interface AccountProfile {
   hasWhatsAppConsent: boolean;
   activeOrdersCount: number;
   totalOrdersCount: number;
+  avatarUrl?: string | null;
 }
 
 export interface AccountAddress {

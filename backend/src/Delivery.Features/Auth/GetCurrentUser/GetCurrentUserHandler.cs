@@ -48,7 +48,8 @@ public class GetCurrentUserHandler : IHandler<GetCurrentUserQuery, Result<UserIn
             user.Tenant?.Slug,
             primaryUserRole?.BranchId,
             primaryUserRole?.Branch?.Name,
-            roles);
+            roles,
+            user.AvatarUrl);
 
         return Result.Success(dto);
     }

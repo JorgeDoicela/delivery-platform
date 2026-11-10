@@ -90,6 +90,7 @@ public partial class AppDbContext
             u.Property(x => x.Phone).HasMaxLength(30);
             u.Property(x => x.IdentificationType).HasMaxLength(20);
             u.Property(x => x.IdentificationNumber).HasMaxLength(20);
+            u.Property(x => x.AvatarUrl).HasMaxLength(500);
             u.Property(x => x.IsEmailVerified).HasDefaultValue(false);
             u.Property(x => x.EmailVerifiedAt);
 

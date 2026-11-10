@@ -12,18 +12,27 @@ import {
   useAuthStore,
   UserRole,
   isUserInRole,
+  resolvePostLoginRedirect,
 } from "@/features/auth";
 import {
-  UserCheck,
   Loader2,
   LogOut,
   ArrowRight,
+  ArrowLeft,
   Mail,
   CheckCircle2,
+  User,
+  ShoppingBag,
+  Compass,
+  ChefHat,
+  Truck,
+  LayoutDashboard,
+  Store,
 } from "lucide-react";
 import { useIsMounted } from "@/shared/hooks/useIsMounted";
 import { useCurrentTenantQuery, RESERVED_TENANT_SLUGS } from "@/features/tenant";
 import { useTenantRoutes } from "@/shared/lib/tenant-routing";
+import { getApiBaseUrl } from "@/shared/lib/api-client";
 
 interface LoginPageProps {
   initialSlug?: string;
@@ -80,6 +89,19 @@ function LoginContent({ initialSlug }: LoginPageProps) {
     checkAuth();
   }, [checkAuth]);
 
+  // Si el usuario ya está autenticado y no está en modo de verificación de correo,
+  // redirigir automáticamente a su destino natural (su cuenta o redirectUrl).
+  useEffect(() => {
+    if (isMounted && isAuthenticated && user && authMode !== "verify-email") {
+      const destination = resolvePostLoginRedirect({
+        user,
+        redirectUrl,
+        routing: routes,
+      });
+      router.replace(destination);
+    }
+  }, [isMounted, isAuthenticated, user, authMode, redirectUrl, routes, router]);
+
   const handleLogout = async () => {
     await logout();
     router.push(routes.getLoginHref());
@@ -88,9 +110,16 @@ function LoginContent({ initialSlug }: LoginPageProps) {
   return (
     <div className="w-full max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-12 space-y-6">
       {/* 1. Titular Principal en Barlow Condensed */}
-      <div className="text-center sm:text-left">
+      <div className="text-center sm:text-left space-y-1">
+        <span className="text-[11px] font-bold uppercase tracking-widest text-brand-primary block">
+          {isAuthenticated && user && authMode !== "verify-email"
+            ? "Sesión de Usuario Activa"
+            : "Acceso Seguro"}
+        </span>
         <h1 className="text-3xl sm:text-4xl font-black text-neutral-950 uppercase tracking-tight font-display">
-          Hola, bienvenido/a a {brandName}
+          {isAuthenticated && user && authMode !== "verify-email"
+            ? `Tu Cuenta en ${brandName}`
+            : `Hola, bienvenido/a a ${brandName}`}
         </h1>
       </div>
 
@@ -135,45 +164,66 @@ function LoginContent({ initialSlug }: LoginPageProps) {
                           : null;
 
               return (
-                <div className="flex flex-col items-center text-center space-y-4 py-2">
-                  <div className="w-16 h-16 rounded-full bg-neutral-100 border border-neutral-200 flex items-center justify-center text-neutral-900 shadow-xs">
-                    <UserCheck className="w-8 h-8 text-brand-primary" />
-                  </div>
-                  <div>
-                    <h2 className="text-2xl font-black uppercase tracking-tight text-neutral-950 font-display">
-                      {user.fullName}
-                    </h2>
-                    <p className="text-xs text-neutral-500 mt-1 font-mono inline-flex items-center gap-1.5 flex-wrap justify-center">
-                      <span>{user.email}</span>
-                      {!isCustomer && staffRoleLabel && (
-                        <>
-                          <span>•</span>
-                          <span>
-                            Cargo: <strong className="text-brand-primary uppercase">{staffRoleLabel}</strong>
-                          </span>
-                        </>
-                      )}
-                      <span>•</span>
-                      {user.isEmailVerified ? (
-                        <span className="inline-flex items-center gap-1 text-emerald-600 font-bold">
-                          <CheckCircle2 className="w-3.5 h-3.5" />
-                          <span>Verificado</span>
-                        </span>
+                <div className="space-y-6">
+                  {/* Encabezado de Usuario Activo */}
+                  <div className="flex flex-col sm:flex-row items-center sm:items-start gap-4 pb-6 border-b border-neutral-100">
+                    <div className="w-16 h-16 rounded-2xl bg-neutral-950 text-white flex items-center justify-center font-black text-2xl font-display shadow-sm shrink-0 overflow-hidden border border-neutral-200">
+                      {user.avatarUrl ? (
+                        /* eslint-disable-next-line @next/next/no-img-element */
+                        <img
+                          src={
+                            user.avatarUrl.startsWith("http")
+                              ? user.avatarUrl
+                              : `${getApiBaseUrl()}${user.avatarUrl.startsWith("/") ? user.avatarUrl : `/${user.avatarUrl}`}`
+                          }
+                          alt={user.fullName}
+                          className="w-full h-full object-cover"
+                        />
+                      ) : user.fullName ? (
+                        user.fullName.charAt(0).toUpperCase()
                       ) : (
-                        <span className="text-neutral-500 font-bold">
-                          Sin verificar
-                        </span>
+                        <User className="w-8 h-8" />
                       )}
-                    </p>
+                    </div>
+                    <div className="text-center sm:text-left space-y-1">
+                      <div className="flex flex-wrap items-center justify-center sm:justify-start gap-2">
+                        <h2 className="text-2xl font-black text-neutral-950 font-display tracking-tight">
+                          {user.fullName || "Cliente"}
+                        </h2>
+                        {user.isEmailVerified ? (
+                          <span className="inline-flex items-center gap-1 text-[11px] font-bold text-emerald-700 bg-emerald-50 border border-emerald-200 px-2.5 py-0.5 rounded-full">
+                            <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600" />
+                            <span>Verificado</span>
+                          </span>
+                        ) : (
+                          <span className="text-[11px] font-bold text-amber-700 bg-amber-50 border border-amber-200 px-2.5 py-0.5 rounded-full">
+                            Sin verificar
+                          </span>
+                        )}
+                      </div>
+                      <p className="text-xs text-neutral-500 font-mono">
+                        {user.email}
+                        {!isCustomer && staffRoleLabel && (
+                          <span className="ml-2 font-sans font-bold text-neutral-700">
+                            • Cargo: <span className="text-brand-primary">{staffRoleLabel}</span>
+                          </span>
+                        )}
+                      </p>
+                      <div className="flex items-center justify-center sm:justify-start gap-2 pt-1 text-xs text-neutral-500">
+                        <Loader2 className="w-3.5 h-3.5 animate-spin text-brand-primary" />
+                        <span>Redirigiendo a tu espacio personal... o selecciona una opción:</span>
+                      </div>
+                    </div>
                   </div>
 
+                  {/* Alerta de correo no verificado si aplica */}
                   {!user.isEmailVerified && (
-                    <div className="w-full max-w-md mx-auto p-4 bg-neutral-50 border border-neutral-200 rounded-2xl text-xs text-neutral-800 text-left flex items-start gap-3 shadow-xs">
-                      <Mail className="w-4 h-4 text-neutral-700 shrink-0 mt-0.5" />
+                    <div className="p-4 bg-amber-50 border border-amber-200 rounded-2xl text-xs text-amber-900 flex items-start gap-3">
+                      <Mail className="w-4 h-4 text-amber-700 shrink-0 mt-0.5" />
                       <div className="space-y-1">
                         <p className="font-bold">Correo pendiente de verificación</p>
-                        <p className="text-neutral-600">
-                          Te enviamos un correo con un enlace de activación al registrarte.
+                        <p className="text-amber-800">
+                          Te enviamos un enlace de activación a tu correo al momento del registro.
                         </p>
                         <button
                           type="button"
@@ -187,116 +237,199 @@ function LoginContent({ initialSlug }: LoginPageProps) {
                     </div>
                   )}
 
-                  <div className="flex flex-col sm:flex-row flex-wrap items-stretch sm:items-center justify-center gap-3 pt-4 w-full sm:w-auto">
-                    {/* Botones de SuperAdmin */}
+                  {/* Cuadrícula de Acciones Rápidas (Quick Actions Grid) */}
+                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                    {/* Tarjeta Mi Cuenta */}
+                    <Link
+                      href={routes.getAccountHref()}
+                      className="group bg-neutral-50 hover:bg-white border border-neutral-200 hover:border-brand-primary/40 rounded-2xl p-5 shadow-xs hover:shadow-md transition-all flex flex-col justify-between space-y-4"
+                    >
+                      <div className="space-y-3">
+                        <div className="w-10 h-10 rounded-xl bg-white border border-neutral-200 flex items-center justify-center text-neutral-900 group-hover:bg-brand-primary group-hover:text-white group-hover:border-transparent transition-colors">
+                          <User className="w-5 h-5" />
+                        </div>
+                        <div>
+                          <h3 className="font-black text-neutral-950 font-display text-lg uppercase tracking-tight group-hover:text-brand-primary transition-colors">
+                            Mi Cuenta & Perfil
+                          </h3>
+                          <p className="text-xs text-neutral-500 mt-1 line-clamp-2">
+                            Gestiona tus pedidos, direcciones de entrega guardadas y seguridad.
+                          </p>
+                        </div>
+                      </div>
+                      <div className="flex items-center gap-1 text-xs font-bold text-brand-primary uppercase tracking-wider font-display pt-2 border-t border-neutral-100">
+                        <span>Ir al portal</span>
+                        <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-1 transition-transform" />
+                      </div>
+                    </Link>
+
+                    {/* Tarjeta Menú & Pedidos */}
+                    <Link
+                      href={routes.getCatalogHref()}
+                      className="group bg-neutral-50 hover:bg-white border border-neutral-200 hover:border-brand-primary/40 rounded-2xl p-5 shadow-xs hover:shadow-md transition-all flex flex-col justify-between space-y-4"
+                    >
+                      <div className="space-y-3">
+                        <div className="w-10 h-10 rounded-xl bg-white border border-neutral-200 flex items-center justify-center text-neutral-900 group-hover:bg-brand-primary group-hover:text-white group-hover:border-transparent transition-colors">
+                          <ShoppingBag className="w-5 h-5" />
+                        </div>
+                        <div>
+                          <h3 className="font-black text-neutral-950 font-display text-lg uppercase tracking-tight group-hover:text-brand-primary transition-colors">
+                            Ver Menú & Pedir
+                          </h3>
+                          <p className="text-xs text-neutral-500 mt-1 line-clamp-2">
+                            Explora platos, combos familiares y promociones activas de {brandName}.
+                          </p>
+                        </div>
+                      </div>
+                      <div className="flex items-center gap-1 text-xs font-bold text-brand-primary uppercase tracking-wider font-display pt-2 border-t border-neutral-100">
+                        <span>Explorar carta</span>
+                        <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-1 transition-transform" />
+                      </div>
+                    </Link>
+
+                    {/* Tarjeta Rastreo */}
+                    <Link
+                      href={routes.getRastreoHref()}
+                      className="group bg-neutral-50 hover:bg-white border border-neutral-200 hover:border-brand-primary/40 rounded-2xl p-5 shadow-xs hover:shadow-md transition-all flex flex-col justify-between space-y-4"
+                    >
+                      <div className="space-y-3">
+                        <div className="w-10 h-10 rounded-xl bg-white border border-neutral-200 flex items-center justify-center text-neutral-900 group-hover:bg-brand-primary group-hover:text-white group-hover:border-transparent transition-colors">
+                          <Compass className="w-5 h-5" />
+                        </div>
+                        <div>
+                          <h3 className="font-black text-neutral-950 font-display text-lg uppercase tracking-tight group-hover:text-brand-primary transition-colors">
+                            Rastreo Satelital
+                          </h3>
+                          <p className="text-xs text-neutral-500 mt-1 line-clamp-2">
+                            Seguimiento en tiempo real de tus pedidos en preparación y entrega.
+                          </p>
+                        </div>
+                      </div>
+                      <div className="flex items-center gap-1 text-xs font-bold text-brand-primary uppercase tracking-wider font-display pt-2 border-t border-neutral-100">
+                        <span>Consultar estado</span>
+                        <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-1 transition-transform" />
+                      </div>
+                    </Link>
+
+                    {/* Tarjetas adicionales para Staff Operativo */}
                     {isSuperAdmin && (
                       <Link
                         href={routes.getSuperAdminHref()}
-                        className="bg-neutral-950 hover:bg-neutral-800 active:scale-95 text-white font-black text-xs uppercase tracking-wider font-display px-6 py-3 rounded-full shadow-md transition-all inline-flex items-center justify-center gap-2 min-h-[44px]"
+                        className="group bg-neutral-950 text-white rounded-2xl p-5 shadow-sm hover:bg-neutral-900 transition-all flex flex-col justify-between space-y-4"
                       >
-                        <span>Consola SuperAdmin</span>
-                        <ArrowRight className="w-3.5 h-3.5" />
+                        <div className="space-y-3">
+                          <div className="w-10 h-10 rounded-xl bg-white/10 flex items-center justify-center text-white">
+                            <LayoutDashboard className="w-5 h-5" />
+                          </div>
+                          <div>
+                            <h3 className="font-black text-white font-display text-lg uppercase tracking-tight">
+                              Consola SuperAdmin
+                            </h3>
+                            <p className="text-xs text-neutral-400 mt-1">
+                              Gestión global de inquilinos, métricas y suscripciones.
+                            </p>
+                          </div>
+                        </div>
+                        <div className="flex items-center gap-1 text-xs font-bold text-white uppercase tracking-wider font-display pt-2 border-t border-white/10">
+                          <span>Entrar a consola</span>
+                          <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-1 transition-transform" />
+                        </div>
                       </Link>
                     )}
 
-                    {/* Botones de TenantAdmin */}
-                    {(isTenantAdmin || isSuperAdmin) && (
+                    {(isTenantAdmin || isBranchManager) && (
                       <Link
                         href={routes.getAdminHref("personalizacion")}
-                        className="bg-brand-primary hover:bg-brand-primary-hover active:scale-95 text-white font-black text-xs uppercase tracking-wider font-display px-6 py-3 rounded-full shadow-md shadow-brand-primary/20 transition-all inline-flex items-center justify-center gap-2 min-h-[44px]"
+                        className="group bg-neutral-900 text-white rounded-2xl p-5 shadow-sm hover:bg-neutral-800 transition-all flex flex-col justify-between space-y-4"
                       >
-                        <span>Panel de Marca & Landing</span>
-                        <ArrowRight className="w-3.5 h-3.5" />
+                        <div className="space-y-3">
+                          <div className="w-10 h-10 rounded-xl bg-white/10 flex items-center justify-center text-white">
+                            <Store className="w-5 h-5" />
+                          </div>
+                          <div>
+                            <h3 className="font-black text-white font-display text-lg uppercase tracking-tight">
+                              Panel de Restaurante
+                            </h3>
+                            <p className="text-xs text-neutral-400 mt-1">
+                              Inventario, sucursales y personalización de marca.
+                            </p>
+                          </div>
+                        </div>
+                        <div className="flex items-center gap-1 text-xs font-bold text-white uppercase tracking-wider font-display pt-2 border-t border-white/10">
+                          <span>Gestionar negocio</span>
+                          <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-1 transition-transform" />
+                        </div>
                       </Link>
                     )}
 
-                    {/* Botones de BranchManager / TenantAdmin / SuperAdmin */}
-                    {(isBranchManager || isTenantAdmin || isSuperAdmin) && (
-                      <>
-                        <Link
-                          href={routes.getAdminHref("inventario")}
-                          className="bg-neutral-900 hover:bg-neutral-800 active:scale-95 text-white font-black text-xs uppercase tracking-wider font-display px-6 py-3 rounded-full shadow-sm transition-all inline-flex items-center justify-center gap-2 min-h-[44px]"
-                        >
-                          <span>Gestión de Inventario</span>
-                          <ArrowRight className="w-3.5 h-3.5" />
-                        </Link>
-                        <Link
-                          href={routes.getAdminHref("sucursales")}
-                          className="bg-neutral-800 hover:bg-neutral-700 active:scale-95 text-white font-black text-xs uppercase tracking-wider font-display px-6 py-3 rounded-full shadow-sm transition-all inline-flex items-center justify-center gap-2 min-h-[44px]"
-                        >
-                          <span>Sucursales & Horarios</span>
-                          <ArrowRight className="w-3.5 h-3.5" />
-                        </Link>
-                      </>
-                    )}
-
-                    {/* Botones de Cocina KDS / Cajero */}
-                    {(isKitchenStaff ||
-                      isCashier ||
-                      isBranchManager ||
-                      isTenantAdmin ||
-                      isSuperAdmin) && (
+                    {(isKitchenStaff || isCashier) && (
                       <Link
                         href={routes.getKitchenHref()}
-                        className="bg-neutral-800 hover:bg-neutral-700 active:scale-95 text-white font-black text-xs uppercase tracking-wider font-display px-6 py-3 rounded-full shadow-sm transition-all inline-flex items-center justify-center gap-2 min-h-[44px]"
+                        className="group bg-neutral-900 text-white rounded-2xl p-5 shadow-sm hover:bg-neutral-800 transition-all flex flex-col justify-between space-y-4"
                       >
-                        <span>Pantalla de Cocina (KDS)</span>
-                        <ArrowRight className="w-3.5 h-3.5" />
+                        <div className="space-y-3">
+                          <div className="w-10 h-10 rounded-xl bg-white/10 flex items-center justify-center text-white">
+                            <ChefHat className="w-5 h-5" />
+                          </div>
+                          <div>
+                            <h3 className="font-black text-white font-display text-lg uppercase tracking-tight">
+                              Pantalla Cocina KDS
+                            </h3>
+                            <p className="text-xs text-neutral-400 mt-1">
+                              Comandas en tiempo real, tiempos de cocción y audio de avisos.
+                            </p>
+                          </div>
+                        </div>
+                        <div className="flex items-center gap-1 text-xs font-bold text-white uppercase tracking-wider font-display pt-2 border-t border-white/10">
+                          <span>Abrir KDS</span>
+                          <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-1 transition-transform" />
+                        </div>
                       </Link>
                     )}
 
-                    {/* Botones de Repartidor */}
                     {isDriver && (
                       <Link
                         href={routes.getDriverHref()}
-                        className="bg-brand-primary hover:bg-brand-primary-hover active:scale-95 text-white font-black text-xs uppercase tracking-wider font-display px-6 py-3 rounded-full shadow-md shadow-brand-primary/20 transition-all inline-flex items-center justify-center gap-2 min-h-[44px]"
+                        className="group bg-neutral-900 text-white rounded-2xl p-5 shadow-sm hover:bg-neutral-800 transition-all flex flex-col justify-between space-y-4"
                       >
-                        <span>Consola de Repartidor</span>
-                        <ArrowRight className="w-3.5 h-3.5" />
+                        <div className="space-y-3">
+                          <div className="w-10 h-10 rounded-xl bg-white/10 flex items-center justify-center text-white">
+                            <Truck className="w-5 h-5" />
+                          </div>
+                          <div>
+                            <h3 className="font-black text-white font-display text-lg uppercase tracking-tight">
+                              Consola de Repartidor
+                            </h3>
+                            <p className="text-xs text-neutral-400 mt-1">
+                              Rutas activas, telemetría GPS y confirmación de entrega.
+                            </p>
+                          </div>
+                        </div>
+                        <div className="flex items-center gap-1 text-xs font-bold text-white uppercase tracking-wider font-display pt-2 border-t border-white/10">
+                          <span>Iniciar entregas</span>
+                          <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-1 transition-transform" />
+                        </div>
                       </Link>
                     )}
+                  </div>
 
-                    {/* Botones de Cliente */}
-                    {isCustomer && (
-                      <>
-                        <Link
-                          href={routes.getAccountHref()}
-                          className="bg-brand-primary hover:bg-brand-primary-hover active:scale-95 text-white font-black text-xs uppercase tracking-wider font-display px-6 py-3 rounded-full shadow-md shadow-brand-primary/20 transition-all inline-flex items-center justify-center gap-2 min-h-[44px]"
-                        >
-                          <UserCheck className="w-3.5 h-3.5" />
-                          <span>Ir a Mi Cuenta</span>
-                          <ArrowRight className="w-3.5 h-3.5" />
-                        </Link>
-                        <Link
-                          href={routes.getCatalogHref()}
-                          className="bg-neutral-900 hover:bg-neutral-800 active:scale-95 text-white font-black text-xs uppercase tracking-wider font-display px-6 py-3 rounded-full shadow-sm transition-all inline-flex items-center justify-center gap-2 min-h-[44px]"
-                        >
-                          <span>Ver Menú & Pedir</span>
-                          <ArrowRight className="w-3.5 h-3.5" />
-                        </Link>
-                        <Link
-                          href={routes.getRastreoHref()}
-                          className="bg-neutral-100 hover:bg-neutral-200 active:scale-95 text-neutral-800 font-bold text-xs uppercase tracking-wider px-5 py-3 rounded-full transition-colors inline-flex items-center justify-center gap-1.5 cursor-pointer min-h-[44px]"
-                        >
-                          <span>Rastrear mis Pedidos</span>
-                        </Link>
-                      </>
-                    )}
-
+                  {/* Barra Inferior de Navegación & Logout */}
+                  <div className="pt-6 border-t border-neutral-100 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs">
                     <Link
                       href={routes.getHomeHref()}
-                      className="bg-neutral-100 hover:bg-neutral-200 active:scale-95 text-neutral-800 font-bold text-xs uppercase tracking-wider px-5 py-3 rounded-full transition-colors inline-flex items-center justify-center gap-1.5 cursor-pointer min-h-[44px]"
+                      className="inline-flex items-center gap-1.5 text-neutral-600 hover:text-neutral-950 font-bold transition-colors"
                     >
-                      <span>Ir a la Tienda</span>
+                      <ArrowLeft className="w-3.5 h-3.5" />
+                      <span>Volver a la portada de {brandName}</span>
                     </Link>
 
                     <button
                       type="button"
                       onClick={handleLogout}
-                      className="bg-neutral-100 hover:bg-neutral-200 active:scale-95 text-neutral-800 font-bold text-xs uppercase tracking-wider px-5 py-3 rounded-full transition-colors inline-flex items-center justify-center gap-1.5 cursor-pointer min-h-[44px]"
+                      className="inline-flex items-center gap-1.5 text-neutral-500 hover:text-red-600 font-bold transition-colors cursor-pointer"
                     >
                       <LogOut className="w-3.5 h-3.5" />
-                      <span>Cerrar Sesión</span>
+                      <span>Cerrar sesión activa</span>
                     </button>
                   </div>
                 </div>

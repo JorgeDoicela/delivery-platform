@@ -12,6 +12,7 @@ public class User
     public string Phone { get; set; } = string.Empty;
     public string? IdentificationType { get; set; }
     public string? IdentificationNumber { get; set; }
+    public string? AvatarUrl { get; set; }
     public bool IsActive { get; set; } = true;
     public bool IsEmailVerified { get; set; }
     public DateTime? EmailVerifiedAt { get; set; }

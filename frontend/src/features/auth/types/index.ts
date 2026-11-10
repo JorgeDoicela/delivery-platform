@@ -32,6 +32,7 @@ export interface AuthUser {
   isActive: boolean;
   isEmailVerified?: boolean;
   emailVerifiedAt?: string | null;
+  avatarUrl?: string | null;
 }
 
 export interface LoginResponse {

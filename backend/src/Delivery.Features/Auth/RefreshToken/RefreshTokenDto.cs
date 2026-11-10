@@ -13,7 +13,8 @@ public record RefreshUserAuthInfoDto(
     int? BranchId,
     bool IsActive,
     List<string> Roles,
-    bool IsEmailVerified = false);
+    bool IsEmailVerified = false,
+    string? AvatarUrl = null);
 
 public record RefreshTokenResponse(
     string AccessToken,

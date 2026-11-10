@@ -249,18 +249,18 @@ export function AccountAddressesSection() {
               </label>
             </div>
 
-            <div className="flex items-center justify-end gap-3 pt-3">
+            <div className="flex flex-col-reverse sm:flex-row sm:items-center justify-end gap-2.5 sm:gap-3 pt-3">
               <button
                 type="button"
                 onClick={() => setIsEditing(false)}
-                className="px-6 py-3 rounded-full text-xs font-bold uppercase text-neutral-600 hover:bg-neutral-100 min-h-[44px]"
+                className="w-full sm:w-auto px-6 py-3 rounded-full text-xs font-bold uppercase text-neutral-600 hover:bg-neutral-100 min-h-[44px] cursor-pointer text-center"
               >
                 Cancelar
               </button>
               <button
                 type="submit"
                 disabled={isSaving}
-                className="bg-neutral-900 hover:bg-neutral-800 text-white font-black text-xs uppercase tracking-wider font-display px-8 py-3 rounded-full min-h-[44px] inline-flex items-center gap-2"
+                className="w-full sm:w-auto bg-neutral-900 hover:bg-neutral-800 text-white font-black text-xs uppercase tracking-wider font-display px-8 py-3 rounded-full min-h-[44px] inline-flex items-center justify-center gap-2 cursor-pointer"
               >
                 {isSaving ? (
                   <>

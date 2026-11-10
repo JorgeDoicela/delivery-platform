@@ -1,5 +1,6 @@
 import { create } from "zustand";
 import { accountApi } from "../api/accountApi";
+import { useAuthStore } from "@/features/auth";
 import type {
   AccountProfile,
   AccountAddress,
@@ -28,10 +29,12 @@ interface AccountState {
   isLoadingOrders: boolean;
   isLoadingAddresses: boolean;
   isSaving: boolean;
+  isUploadingAvatar: boolean;
 
   profileError: string | null;
   ordersError: string | null;
   addressesError: string | null;
+  avatarError: string | null;
   actionSuccessMessage: string | null;
 
   setActiveTab: (tab: AccountTab) => void;
@@ -44,6 +47,8 @@ interface AccountState {
   deleteAddress: (id: string) => Promise<boolean>;
   changePassword: (payload: ChangePasswordPayload) => Promise<boolean>;
   updateConsent: (payload: UpdateConsentPayload) => Promise<boolean>;
+  uploadAvatar: (file: File) => Promise<boolean>;
+  deleteAvatar: () => Promise<boolean>;
 }
 
 export const useAccountStore = create<AccountState>((set, get) => ({
@@ -57,19 +62,22 @@ export const useAccountStore = create<AccountState>((set, get) => ({
   isLoadingOrders: false,
   isLoadingAddresses: false,
   isSaving: false,
+  isUploadingAvatar: false,
 
   profileError: null,
   ordersError: null,
   addressesError: null,
+  avatarError: null,
   actionSuccessMessage: null,
 
-  setActiveTab: (tab) => set({ activeTab: tab, profileError: null, ordersError: null, addressesError: null, actionSuccessMessage: null }),
+  setActiveTab: (tab) => set({ activeTab: tab, profileError: null, ordersError: null, addressesError: null, avatarError: null, actionSuccessMessage: null }),
 
   clearMessages: () =>
     set({
       profileError: null,
       ordersError: null,
       addressesError: null,
+      avatarError: null,
       actionSuccessMessage: null,
     }),
 
@@ -196,6 +204,59 @@ export const useAccountStore = create<AccountState>((set, get) => ({
     } catch (err: unknown) {
       const msg = err instanceof Error ? err.message : "Error al actualizar preferencias de privacidad.";
       set({ profileError: msg, isSaving: false });
+      return false;
+    }
+  },
+
+  uploadAvatar: async (file: File) => {
+    set({ isUploadingAvatar: true, avatarError: null, actionSuccessMessage: null });
+    try {
+      const res = await accountApi.uploadAvatar(file);
+      set((state) => ({
+        profile: state.profile ? { ...state.profile, avatarUrl: res.avatarUrl } : null,
+        isUploadingAvatar: false,
+        actionSuccessMessage: "Foto de perfil actualizada y optimizada a WebP con éxito.",
+      }));
+
+      // Sincronizar en vivo con el usuario autenticado
+      const currentAuthUser = useAuthStore.getState().user;
+      if (currentAuthUser) {
+        useAuthStore.getState().setUser({
+          ...currentAuthUser,
+          avatarUrl: res.avatarUrl,
+        });
+      }
+
+      return true;
+    } catch (err: unknown) {
+      const msg = err instanceof Error ? err.message : "Error al subir y procesar la foto de perfil.";
+      set({ avatarError: msg, isUploadingAvatar: false });
+      return false;
+    }
+  },
+
+  deleteAvatar: async () => {
+    set({ isUploadingAvatar: true, avatarError: null, actionSuccessMessage: null });
+    try {
+      await accountApi.deleteAvatar();
+      set((state) => ({
+        profile: state.profile ? { ...state.profile, avatarUrl: null } : null,
+        isUploadingAvatar: false,
+        actionSuccessMessage: "Foto de perfil eliminada.",
+      }));
+
+      const currentAuthUser = useAuthStore.getState().user;
+      if (currentAuthUser) {
+        useAuthStore.getState().setUser({
+          ...currentAuthUser,
+          avatarUrl: null,
+        });
+      }
+
+      return true;
+    } catch (err: unknown) {
+      const msg = err instanceof Error ? err.message : "Error al eliminar la foto de perfil.";
+      set({ avatarError: msg, isUploadingAvatar: false });
       return false;
     }
   },
