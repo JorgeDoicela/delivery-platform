@@ -13,9 +13,7 @@ import {
   RefreshCw,
 } from "lucide-react";
 import {
-  verifyEmailSchema,
   resendVerificationSchema,
-  type VerifyEmailFormData,
   type ResendVerificationFormData,
 } from "../schemas/verifyEmailSchema";
 import { useAuthStore } from "../store/useAuthStore";
@@ -45,15 +43,12 @@ export function VerifyEmailView({
   const [autoVerifySuccess, setAutoVerifySuccess] = useState<string | null>(null);
   const [verifiedEmail, setVerifiedEmail] = useState<string>(initialEmail);
 
-  const [activeTab, setActiveTab] = useState<"code" | "resend">(
-    initialToken ? "code" : "resend"
-  );
   const [resendSuccessMessage, setResendSuccessMessage] = useState<string | null>(null);
   const [resendErrorMessage, setResendErrorMessage] = useState<string | null>(null);
   const [resendCooldown, setResendCooldown] = useState<number>(0);
   const [isPending, startTransition] = useTransition();
 
-  // Cooldown countdown
+  // Cuenta regresiva de enfriamiento para reenvío
   useEffect(() => {
     if (resendCooldown <= 0) return;
     const interval = setInterval(() => {
@@ -83,7 +78,7 @@ export function VerifyEmailView({
         const msg =
           err instanceof Error
             ? err.message
-            : "El enlace de verificación es inválido o ha expirado.";
+            : "El enlace de activación es inválido o ya ha expirado.";
         setAutoVerifyError(msg);
         setIsVerifyingAuto(false);
       });
@@ -92,37 +87,6 @@ export function VerifyEmailView({
       isMounted = false;
     };
   }, [initialToken, initialEmail, verifyEmailAction]);
-
-  // Formulario de ingreso manual de código
-  const {
-    register: registerManual,
-    handleSubmit: handleSubmitManual,
-    formState: { errors: manualErrors, isSubmitting: isSubmittingManual },
-  } = useForm<VerifyEmailFormData>({
-    resolver: zodResolver(verifyEmailSchema),
-    defaultValues: {
-      token: initialToken,
-      email: initialEmail,
-    },
-  });
-
-  const onManualSubmit = async (data: VerifyEmailFormData) => {
-    setAutoVerifyError(null);
-    try {
-      const res = await verifyEmailAction({
-        token: data.token,
-        email: data.email || undefined,
-      });
-      setAutoVerifySuccess(res.message);
-      if (res.email) setVerifiedEmail(res.email);
-    } catch (err: unknown) {
-      const msg =
-        err instanceof Error
-          ? err.message
-          : "El token de verificación es inválido o ha expirado.";
-      setAutoVerifyError(msg);
-    }
-  };
 
   // Formulario de reenvío de correo
   const {
@@ -158,17 +122,17 @@ export function VerifyEmailView({
     });
   };
 
-  // Estado 1: Verificación automática en curso
+  // Estado 1: Verificación automática en curso al abrir enlace del correo
   if (isVerifyingAuto) {
     return (
       <div className="flex flex-col items-center justify-center p-8 text-center space-y-4">
         <Loader2 className="w-8 h-8 animate-spin text-brand-primary" />
         <div className="space-y-1">
           <h3 className="text-lg font-black uppercase tracking-tight text-neutral-900 font-display">
-            Verificando cuenta
+            Confirmando cuenta
           </h3>
           <p className="text-xs text-neutral-500">
-            Validando token de seguridad criptográfico...
+            Validando tu correo electrónico...
           </p>
         </div>
       </div>
@@ -185,7 +149,7 @@ export function VerifyEmailView({
 
         <div className="space-y-2">
           <h3 className="text-2xl font-black uppercase tracking-tight text-neutral-950 font-display">
-            ¡Correo Verificado!
+            ¡Correo Confirmado!
           </h3>
           <p className="text-xs text-neutral-600 max-w-sm mx-auto leading-relaxed">
             {autoVerifySuccess}
@@ -202,7 +166,7 @@ export function VerifyEmailView({
             <button
               type="button"
               onClick={onSwitchToLogin}
-              className="w-full sm:w-auto bg-brand-primary hover:bg-brand-primary-hover active:scale-95 text-white font-black text-xs uppercase tracking-wider font-display px-6 py-3 rounded-full shadow-md transition-all inline-flex items-center justify-center gap-2 min-h-[44px]"
+              className="w-full sm:w-auto bg-brand-primary hover:bg-brand-primary-hover active:scale-95 text-white font-black text-xs uppercase tracking-wider font-display px-6 py-3 rounded-full shadow-md transition-all inline-flex items-center justify-center gap-2 min-h-[44px] cursor-pointer"
             >
               <span>Acceder al Portal</span>
               <ArrowRight className="w-3.5 h-3.5" />
@@ -228,168 +192,80 @@ export function VerifyEmailView({
     );
   }
 
-  // Estado 3: Ingreso manual de token o reenvío de correo
+  // Estado 3: Solicitud / reenvío de enlace de activación sin fricción técnica
   return (
-    <div className="space-y-6">
-      {/* Alerta de error si falló la verificación */}
+    <div className="space-y-5">
+      {/* Alerta de error si el enlace previo expiró o fue inválido */}
       {autoVerifyError && (
         <div className="flex items-start gap-3 p-3.5 bg-neutral-50 border border-neutral-300 rounded-2xl text-xs text-neutral-800">
           <AlertCircle className="w-4 h-4 text-brand-primary shrink-0 mt-0.5" />
           <div className="space-y-1">
-            <p className="font-bold">No se pudo verificar el correo</p>
+            <p className="font-bold">Enlace no válido o expirado</p>
             <p className="text-neutral-600">{autoVerifyError}</p>
           </div>
         </div>
       )}
 
-      {/* Selector de Pestaña: Ingresar Código vs Reenviar Correo */}
-      <div className="grid grid-cols-2 p-1 bg-neutral-100 rounded-2xl border border-neutral-200 text-xs font-bold font-display uppercase tracking-wider">
-        <button
-          type="button"
-          onClick={() => setActiveTab("code")}
-          className={`py-2 rounded-xl transition-all ${
-            activeTab === "code"
-              ? "bg-white text-neutral-950 shadow-xs"
-              : "text-neutral-500 hover:text-neutral-800"
-          }`}
-        >
-          Ingresar Token
-        </button>
-        <button
-          type="button"
-          onClick={() => setActiveTab("resend")}
-          className={`py-2 rounded-xl transition-all ${
-            activeTab === "resend"
-              ? "bg-white text-neutral-950 shadow-xs"
-              : "text-neutral-500 hover:text-neutral-800"
-          }`}
-        >
-          Reenviar Enlace
-        </button>
-      </div>
-
-      {activeTab === "code" ? (
-        /* Formulario 1: Ingreso de Token manual */
-        <form onSubmit={handleSubmitManual(onManualSubmit)} className="space-y-4">
-          <div className="space-y-1">
-            <label
-              htmlFor="verify-token-input"
-              className="block text-xs font-bold text-neutral-700 uppercase tracking-wider"
-            >
-              Token de Verificación
-            </label>
-            <input
-              id="verify-token-input"
-              type="text"
-              {...registerManual("token")}
-              placeholder="Pega aquí el código hexadecimal de 64 caracteres..."
-              className="w-full px-4 py-3 rounded-2xl border border-neutral-200 focus:outline-none focus:border-brand-primary focus:ring-1 focus:ring-brand-primary text-xs font-mono transition-all"
-            />
-            {manualErrors.token && (
-              <p className="text-xs text-brand-primary font-semibold mt-1">
-                {manualErrors.token.message}
-              </p>
-            )}
+      {/* Formulario de Reenvío de Enlace */}
+      <form onSubmit={handleSubmitResend(onResendSubmit)} className="space-y-4">
+        {resendSuccessMessage && (
+          <div className="flex items-start gap-3 p-3.5 bg-emerald-50 border border-emerald-200 rounded-2xl text-xs text-emerald-800">
+            <Mail className="w-4 h-4 text-emerald-600 shrink-0 mt-0.5" />
+            <p className="font-medium">{resendSuccessMessage}</p>
           </div>
+        )}
 
-          <div className="space-y-1">
-            <label
-              htmlFor="verify-email-input"
-              className="block text-xs font-bold text-neutral-700 uppercase tracking-wider"
-            >
-              Correo Electrónico (Opcional)
-            </label>
-            <input
-              id="verify-email-input"
-              type="email"
-              {...registerManual("email")}
-              placeholder="tu-correo@dominio.com"
-              className="w-full px-4 py-3 rounded-2xl border border-neutral-200 focus:outline-none focus:border-brand-primary focus:ring-1 focus:ring-brand-primary text-xs transition-all"
-            />
-            {manualErrors.email && (
-              <p className="text-xs text-brand-primary font-semibold mt-1">
-                {manualErrors.email.message}
-              </p>
-            )}
+        {resendErrorMessage && (
+          <div className="flex items-start gap-3 p-3.5 bg-red-50 border border-red-200 rounded-2xl text-xs text-red-700">
+            <AlertCircle className="w-4 h-4 text-red-600 shrink-0 mt-0.5" />
+            <p className="font-medium">{resendErrorMessage}</p>
           </div>
+        )}
 
-          <button
-            type="submit"
-            disabled={isSubmittingManual}
-            className="w-full bg-brand-primary hover:bg-brand-primary-hover active:scale-[0.98] disabled:opacity-50 text-white font-black text-xs uppercase tracking-wider font-display py-3.5 rounded-full shadow-md transition-all flex items-center justify-center gap-2 cursor-pointer min-h-[44px]"
+        <div className="space-y-1.5">
+          <label
+            htmlFor="resend-email-input"
+            className="block text-xs font-bold text-neutral-700 uppercase tracking-wider"
           >
-            {isSubmittingManual ? (
-              <>
-                <Loader2 className="w-4 h-4 animate-spin" />
-                <span>Verificando...</span>
-              </>
-            ) : (
-              <span>Validar y Confirmar Cuenta</span>
-            )}
-          </button>
-        </form>
-      ) : (
-        /* Formulario 2: Reenvío de Enlace */
-        <form onSubmit={handleSubmitResend(onResendSubmit)} className="space-y-4">
-          {resendSuccessMessage && (
-            <div className="flex items-start gap-3 p-3.5 bg-neutral-50 border border-neutral-300 rounded-2xl text-xs text-neutral-800">
-              <Mail className="w-4 h-4 text-emerald-600 shrink-0 mt-0.5" />
-              <p className="font-medium">{resendSuccessMessage}</p>
-            </div>
+            Correo Electrónico Registrado
+          </label>
+          <input
+            id="resend-email-input"
+            type="email"
+            {...registerResend("email")}
+            placeholder="tu-correo@dominio.com"
+            className="w-full px-4 py-3 rounded-2xl border border-neutral-200 focus:outline-none focus:border-brand-primary focus:ring-1 focus:ring-brand-primary text-xs transition-all"
+          />
+          {resendErrors.email && (
+            <p className="text-xs text-brand-primary font-semibold mt-1">
+              {resendErrors.email.message}
+            </p>
           )}
+        </div>
 
-          {resendErrorMessage && (
-            <div className="flex items-start gap-3 p-3.5 bg-neutral-50 border border-neutral-300 rounded-2xl text-xs text-neutral-800">
-              <AlertCircle className="w-4 h-4 text-brand-primary shrink-0 mt-0.5" />
-              <p className="font-medium">{resendErrorMessage}</p>
-            </div>
+        <button
+          type="submit"
+          disabled={isSubmittingResend || isPending || resendCooldown > 0}
+          className="w-full bg-neutral-900 hover:bg-neutral-800 active:scale-[0.98] disabled:opacity-50 text-white font-black text-xs uppercase tracking-wider font-display py-3.5 rounded-full shadow-sm transition-all flex items-center justify-center gap-2 cursor-pointer min-h-[44px]"
+        >
+          {isSubmittingResend || isPending ? (
+            <>
+              <Loader2 className="w-4 h-4 animate-spin" />
+              <span>Enviando enlace...</span>
+            </>
+          ) : resendCooldown > 0 ? (
+            <>
+              <RefreshCw className="w-4 h-4 animate-spin text-neutral-400" />
+              <span>Reintentar en {resendCooldown}s</span>
+            </>
+          ) : (
+            <>
+              <Mail className="w-4 h-4" />
+              <span>Enviar Nuevo Enlace de Activación</span>
+            </>
           )}
-
-          <div className="space-y-1">
-            <label
-              htmlFor="resend-email-input"
-              className="block text-xs font-bold text-neutral-700 uppercase tracking-wider"
-            >
-              Correo Electrónico Registrado
-            </label>
-            <input
-              id="resend-email-input"
-              type="email"
-              {...registerResend("email")}
-              placeholder="tu-correo@dominio.com"
-              className="w-full px-4 py-3 rounded-2xl border border-neutral-200 focus:outline-none focus:border-brand-primary focus:ring-1 focus:ring-brand-primary text-xs transition-all"
-            />
-            {resendErrors.email && (
-              <p className="text-xs text-brand-primary font-semibold mt-1">
-                {resendErrors.email.message}
-              </p>
-            )}
-          </div>
-
-          <button
-            type="submit"
-            disabled={isSubmittingResend || isPending || resendCooldown > 0}
-            className="w-full bg-neutral-900 hover:bg-neutral-800 active:scale-[0.98] disabled:opacity-50 text-white font-black text-xs uppercase tracking-wider font-display py-3.5 rounded-full shadow-sm transition-all flex items-center justify-center gap-2 cursor-pointer min-h-[44px]"
-          >
-            {isSubmittingResend || isPending ? (
-              <>
-                <Loader2 className="w-4 h-4 animate-spin" />
-                <span>Enviando enlace...</span>
-              </>
-            ) : resendCooldown > 0 ? (
-              <>
-                <RefreshCw className="w-4 h-4 animate-spin text-neutral-400" />
-                <span>Reintentar en {resendCooldown}s</span>
-              </>
-            ) : (
-              <>
-                <Mail className="w-4 h-4" />
-                <span>Enviar Nuevo Enlace de Activación</span>
-              </>
-            )}
-          </button>
-        </form>
-      )}
+        </button>
+      </form>
 
       {/* Enlace de regreso al login o a la cuenta */}
       <div className="text-center pt-2">
@@ -397,7 +273,7 @@ export function VerifyEmailView({
           <button
             type="button"
             onClick={onSwitchToLogin}
-            className="text-xs text-neutral-500 hover:text-neutral-900 font-bold uppercase tracking-wider transition-colors"
+            className="text-xs text-neutral-500 hover:text-neutral-900 font-bold uppercase tracking-wider transition-colors cursor-pointer"
           >
             {isAuthenticated ? "Volver a mi cuenta" : "Volver a Iniciar Sesión"}
           </button>
@@ -413,4 +289,3 @@ export function VerifyEmailView({
     </div>
   );
 }
-

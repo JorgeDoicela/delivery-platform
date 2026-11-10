@@ -56,7 +56,7 @@ function LoginContent({ initialSlug }: LoginPageProps) {
   const [authMode, setAuthMode] = useState<
     "login" | "register" | "forgot-password" | "reset-password" | "verify-email"
   >(initialMode);
-  const [activeEmail, setActiveEmail] = useState(emailParam);
+  const [activeEmail] = useState(emailParam);
   const [activeToken] = useState(tokenParam);
 
   const rawSlug = pathname.split("/").filter(Boolean)[0];
@@ -324,10 +324,6 @@ function LoginContent({ initialSlug }: LoginPageProps) {
                 <ForgotPasswordForm
                   embedded={true}
                   onSwitchToLogin={() => setAuthMode("login")}
-                  onSwitchToReset={(email) => {
-                    setActiveEmail(email);
-                    setAuthMode("reset-password");
-                  }}
                 />
               )}
 
@@ -337,6 +333,7 @@ function LoginContent({ initialSlug }: LoginPageProps) {
                   initialEmail={activeEmail}
                   initialToken={activeToken}
                   onSwitchToLogin={() => setAuthMode("login")}
+                  onSwitchToForgotPassword={() => setAuthMode("forgot-password")}
                 />
               )}
 

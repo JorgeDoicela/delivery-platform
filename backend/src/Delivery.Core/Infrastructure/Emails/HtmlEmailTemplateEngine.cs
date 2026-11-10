@@ -358,7 +358,7 @@ public sealed class HtmlEmailTemplateEngine : IEmailTemplateEngine
             Restablecer mi Contraseña &rarr;
           </a>
           <p style=""margin:12px 0 0;font-size:12px;color:#94A3B8;font-weight:600;"">
-            Este enlace y botón expirarán en {m.ExpirationMinutes} minutos por motivos de seguridad.
+            ⏱️ Este botón expirará en {m.ExpirationMinutes} minutos por motivos de seguridad.
           </p>
         </div>
 

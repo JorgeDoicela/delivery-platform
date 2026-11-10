@@ -16,7 +16,6 @@ interface ForgotPasswordFormProps {
   embedded?: boolean;
   initialEmail?: string;
   onSwitchToLogin?: () => void;
-  onSwitchToReset?: (email: string) => void;
 }
 
 export function ForgotPasswordForm({
@@ -24,7 +23,6 @@ export function ForgotPasswordForm({
   embedded = false,
   initialEmail = "",
   onSwitchToLogin,
-  onSwitchToReset,
 }: ForgotPasswordFormProps) {
   const forgotPasswordAction = useAuthStore((s) => s.forgotPassword);
   const { data: tenant } = useCurrentTenantQuery();
@@ -35,7 +33,6 @@ export function ForgotPasswordForm({
 
   const [formError, setFormError] = useState<string | null>(null);
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
-  const [submittedEmail, setSubmittedEmail] = useState<string>("");
 
   const {
     register,
@@ -60,7 +57,6 @@ export function ForgotPasswordForm({
     });
 
     if (result.success) {
-      setSubmittedEmail(data.email);
       setSuccessMessage(result.message);
     } else {
       setFormError(result.message);
@@ -131,17 +127,7 @@ export function ForgotPasswordForm({
             </p>
           </div>
 
-          <div className="pt-3 space-y-2">
-            {onSwitchToReset && (
-              <button
-                type="button"
-                onClick={() => onSwitchToReset(submittedEmail)}
-                className="w-full min-h-[46px] bg-neutral-900 hover:bg-neutral-800 active:scale-95 text-white font-black text-xs uppercase tracking-wider font-display rounded-full transition-all cursor-pointer"
-              >
-                Ya tengo el código de verificación
-              </button>
-            )}
-
+          <div className="pt-3">
             {onSwitchToLogin ? (
               <button
                 type="button"

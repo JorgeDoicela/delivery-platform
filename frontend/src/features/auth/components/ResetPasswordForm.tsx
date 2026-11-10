@@ -5,7 +5,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Loader2, AlertCircle, CheckCircle2, Eye, EyeOff, ArrowLeft } from "lucide-react";
+import { Loader2, AlertCircle, CheckCircle2, Eye, EyeOff, ArrowLeft, Mail } from "lucide-react";
 import { resetPasswordSchema, type ResetPasswordFormData } from "../schemas/resetPasswordSchema";
 import { useAuthStore } from "../store/useAuthStore";
 import { useCurrentTenantQuery, useTenantStore } from "@/features/tenant";
@@ -17,6 +17,7 @@ interface ResetPasswordFormProps {
   initialEmail?: string;
   initialToken?: string;
   onSwitchToLogin?: () => void;
+  onSwitchToForgotPassword?: () => void;
 }
 
 export function ResetPasswordForm({
@@ -25,6 +26,7 @@ export function ResetPasswordForm({
   initialEmail = "",
   initialToken = "",
   onSwitchToLogin,
+  onSwitchToForgotPassword,
 }: ResetPasswordFormProps) {
   const resetPasswordAction = useAuthStore((s) => s.resetPassword);
   const { data: tenant } = useCurrentTenantQuery();
@@ -74,8 +76,63 @@ export function ResetPasswordForm({
     ? "space-y-4 w-full max-w-md mx-auto"
     : "space-y-5 w-full max-w-md bg-white border border-neutral-200 rounded-3xl p-7 sm:p-9 shadow-xl shadow-neutral-900/5 mx-auto";
 
+  // Si no se proporcionó el token en la URL, se guía al usuario a solicitar un enlace seguro
+  if (!initialToken) {
+    return (
+      <div className={containerClasses}>
+        <div className="space-y-4 py-4 text-center">
+          <div className="w-12 h-12 bg-neutral-100 rounded-full flex items-center justify-center mx-auto text-neutral-900">
+            <Mail className="w-6 h-6 stroke-[2] text-neutral-700" />
+          </div>
+          <div className="space-y-1">
+            <h3 className="text-lg font-black text-neutral-900 uppercase font-display tracking-tight">
+              Enlace de Recuperación Requerido
+            </h3>
+            <p className="text-xs text-neutral-600 leading-relaxed max-w-sm mx-auto">
+              Para cambiar tu contraseña debes abrir el enlace seguro que enviamos a tu correo electrónico.
+            </p>
+          </div>
+
+          <div className="pt-3 space-y-2">
+            {onSwitchToForgotPassword && (
+              <button
+                type="button"
+                onClick={onSwitchToForgotPassword}
+                className="w-full min-h-[46px] bg-brand-primary hover:bg-brand-primary-hover active:scale-95 text-white font-black text-xs uppercase tracking-wider font-display rounded-full transition-all cursor-pointer shadow-sm"
+              >
+                Solicitar Enlace de Recuperación
+              </button>
+            )}
+
+            {onSwitchToLogin ? (
+              <button
+                type="button"
+                onClick={onSwitchToLogin}
+                className="w-full min-h-[44px] bg-neutral-100 hover:bg-neutral-200 text-neutral-800 font-bold text-xs uppercase tracking-wider rounded-full transition-colors inline-flex items-center justify-center gap-1.5 cursor-pointer"
+              >
+                <ArrowLeft className="w-3.5 h-3.5" />
+                <span>Volver a Iniciar Sesión</span>
+              </button>
+            ) : (
+              <Link
+                href={routes.getLoginHref({ redirect: redirectUrl })}
+                className="w-full min-h-[44px] bg-neutral-100 hover:bg-neutral-200 text-neutral-800 font-bold text-xs uppercase tracking-wider rounded-full transition-colors inline-flex items-center justify-center gap-1.5"
+              >
+                <ArrowLeft className="w-3.5 h-3.5" />
+                <span>Volver a Iniciar Sesión</span>
+              </Link>
+            )}
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <form onSubmit={handleSubmit(onSubmit)} noValidate className={containerClasses}>
+      {/* Token invisible para el usuario */}
+      <input type="hidden" {...register("token")} />
+
       {/* Cabecera en modo independiente */}
       {!embedded && (
         <>
@@ -100,7 +157,7 @@ export function ResetPasswordForm({
               {brandTagline} • Nueva Contraseña
             </span>
             <p className="text-xs text-neutral-500 mt-2 leading-relaxed">
-              Ingresa el token de verificación recibido y define tu nueva contraseña.
+              Define tu nueva contraseña para recuperar el acceso a tu cuenta.
             </p>
           </div>
           <div className="border-t border-neutral-100" />
@@ -167,42 +224,16 @@ export function ResetPasswordForm({
               id="reset-email"
               type="email"
               autoComplete="email"
-              disabled={isSubmitting}
+              disabled={isSubmitting || Boolean(initialEmail)}
               aria-invalid={Boolean(errors.email)}
               aria-describedby={errors.email ? "reset-email-error" : undefined}
               {...register("email")}
               placeholder="usuario@dominio.com"
-              className="w-full min-h-[46px] px-4 py-2 bg-neutral-50 border border-neutral-200 hover:border-neutral-300 focus:bg-white focus:border-brand-primary focus:ring-1 focus:ring-brand-primary focus:outline-none rounded-xl text-sm text-neutral-900 placeholder:text-neutral-400 transition-all disabled:opacity-50 shadow-2xs outline-none"
+              className="w-full min-h-[46px] px-4 py-2 bg-neutral-50 border border-neutral-200 hover:border-neutral-300 focus:bg-white focus:border-brand-primary focus:ring-1 focus:ring-brand-primary focus:outline-none rounded-xl text-sm text-neutral-900 placeholder:text-neutral-400 transition-all disabled:opacity-75 shadow-2xs outline-none"
             />
             {errors.email && (
               <p id="reset-email-error" className="text-xs text-red-600 font-medium">
                 {errors.email.message}
-              </p>
-            )}
-          </div>
-
-          {/* Token / Código de Verificación */}
-          <div className="space-y-1.5">
-            <label
-              htmlFor="reset-token"
-              className="block text-[11px] font-bold text-neutral-700 uppercase tracking-wider"
-            >
-              Token o Código de Recuperación
-            </label>
-            <input
-              id="reset-token"
-              type="text"
-              autoComplete="off"
-              disabled={isSubmitting}
-              aria-invalid={Boolean(errors.token)}
-              aria-describedby={errors.token ? "reset-token-error" : undefined}
-              {...register("token")}
-              placeholder="Pega el código o token recibido en tu correo"
-              className="w-full min-h-[46px] px-4 py-2 bg-neutral-50 border border-neutral-200 hover:border-neutral-300 focus:bg-white focus:border-brand-primary focus:ring-1 focus:ring-brand-primary focus:outline-none rounded-xl text-xs font-mono text-neutral-900 placeholder:text-neutral-400 transition-all disabled:opacity-50 shadow-2xs outline-none"
-            />
-            {errors.token && (
-              <p id="reset-token-error" className="text-xs text-red-600 font-medium">
-                {errors.token.message}
               </p>
             )}
           </div>
@@ -329,4 +360,3 @@ export function ResetPasswordForm({
     </form>
   );
 }
-
