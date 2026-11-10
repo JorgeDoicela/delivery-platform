@@ -357,21 +357,12 @@ public sealed class HtmlEmailTemplateEngine : IEmailTemplateEngine
           <a href=""{WebUtility.HtmlEncode(m.ResetUrl)}"" style=""display:inline-block;background-color:{primaryColor};color:#FFFFFF;text-decoration:none;padding:14px 32px;border-radius:9999px;font-weight:900;font-size:13px;text-transform:uppercase;letter-spacing:1px;box-shadow:0 4px 10px rgba(0,0,0,0.15);"">
             Restablecer mi Contraseña &rarr;
           </a>
-        </div>
-
-        <div style=""background-color:#F8FAFC;border:1px solid #E2E8F0;border-radius:16px;padding:16px 20px;margin-bottom:24px;"">
-          <div style=""font-size:11px;font-weight:700;color:#64748B;text-transform:uppercase;margin-bottom:6px;"">
-            O ingresa este token de verificación manualmente:
-          </div>
-          <div style=""background-color:#FFFFFF;border:1px dashed #CBD5E1;border-radius:8px;padding:10px 14px;font-family:monospace;font-size:12px;font-weight:700;color:#0F172A;word-break:break-all;letter-spacing:0.5px;"">
-            {WebUtility.HtmlEncode(m.ResetToken)}
-          </div>
-          <p style=""margin:8px 0 0;font-size:11px;color:#94A3B8;font-weight:600;"">
-            ⏱️ Este enlace y token expirarán en {m.ExpirationMinutes} minutos por motivos de seguridad.
+          <p style=""margin:12px 0 0;font-size:12px;color:#94A3B8;font-weight:600;"">
+            Este enlace y botón expirarán en {m.ExpirationMinutes} minutos por motivos de seguridad.
           </p>
         </div>
 
-        <div style=""background-color:#FFFBEB;border:1px solid #FEF3C7;border-radius:12px;padding:12px 16px;font-size:12px;color:#B45309;line-height:1.5;"">
+        <div style=""background-color:#FFFBEB;border:1px solid #FEF3C7;border-radius:12px;padding:12px 16px;font-size:12px;color:#B45309;line-height:1.5;margin-bottom:24px;"">
           <strong>Aviso de Seguridad:</strong> Si tú no solicitaste este cambio, puedes ignorar este correo de forma segura. Tu contraseña actual permanecerá intacta y nadie podrá acceder sin tu autorización.
         </div>";
 
@@ -380,7 +371,7 @@ public sealed class HtmlEmailTemplateEngine : IEmailTemplateEngine
 
     private static string RenderPasswordResetText(PasswordResetEmailModel m)
     {
-        return $"Hola {m.UserName},\n\nHemos recibido una solicitud para restablecer tu contraseña en {m.Brand.BrandName}.\n\nPara crear una nueva contraseña, haz clic en el siguiente enlace:\n{m.ResetUrl}\n\nO utiliza el siguiente token de verificación:\n{m.ResetToken}\n\nEste enlace expirará en {m.ExpirationMinutes} minutos.\nSi no realizaste esta solicitud, ignora este mensaje y tu cuenta permanecerá segura.";
+        return $"Hola {m.UserName},\n\nHemos recibido una solicitud para restablecer tu contraseña en {m.Brand.BrandName}.\n\nPara crear una nueva contraseña, haz clic en el siguiente enlace:\n{m.ResetUrl}\n\nEste enlace expirará en {m.ExpirationMinutes} minutos.\nSi no realizaste esta solicitud, ignora este mensaje y tu cuenta permanecerá segura.";
     }
 
     #endregion
@@ -406,17 +397,8 @@ public sealed class HtmlEmailTemplateEngine : IEmailTemplateEngine
           <a href=""{WebUtility.HtmlEncode(m.VerificationUrl)}"" style=""display:inline-block;background-color:{primaryColor};color:#FFFFFF;text-decoration:none;padding:14px 32px;border-radius:9999px;font-weight:900;font-size:13px;text-transform:uppercase;letter-spacing:1px;box-shadow:0 4px 10px rgba(0,0,0,0.15);"">
             Verificar mi Correo &rarr;
           </a>
-        </div>
-
-        <div style=""background-color:#F8FAFC;border:1px solid #E2E8F0;border-radius:16px;padding:16px 20px;margin-bottom:24px;"">
-          <div style=""font-size:11px;font-weight:700;color:#64748B;text-transform:uppercase;margin-bottom:6px;"">
-            O ingresa este código de verificación en el portal:
-          </div>
-          <div style=""background-color:#FFFFFF;border:1px dashed #CBD5E1;border-radius:8px;padding:10px 14px;font-family:monospace;font-size:12px;font-weight:700;color:#0F172A;word-break:break-all;letter-spacing:0.5px;"">
-            {WebUtility.HtmlEncode(m.VerificationToken)}
-          </div>
-          <p style=""margin:8px 0 0;font-size:11px;color:#94A3B8;font-weight:600;"">
-            Este enlace y código de verificación expirarán en {m.ExpirationMinutes / 60} horas por motivos de seguridad.
+          <p style=""margin:12px 0 0;font-size:12px;color:#94A3B8;font-weight:600;"">
+            Este botón expirará en {m.ExpirationMinutes / 60} horas por motivos de seguridad.
           </p>
         </div>
 
@@ -429,7 +411,7 @@ public sealed class HtmlEmailTemplateEngine : IEmailTemplateEngine
 
     private static string RenderEmailVerificationText(EmailVerificationEmailModel m)
     {
-        return $"Hola {m.UserName},\n\nGracias por registrarte en {m.Brand.BrandName}.\n\nPara verificar tu correo electrónico, haz clic en el siguiente enlace:\n{m.VerificationUrl}\n\nO utiliza el siguiente token de verificación:\n{m.VerificationToken}\n\nEste enlace expirará en {m.ExpirationMinutes / 60} horas.\nSi no creaste una cuenta, puedes ignorar este mensaje.";
+        return $"Hola {m.UserName},\n\nGracias por registrarte en {m.Brand.BrandName}.\n\nPara verificar tu correo electrónico, haz clic en el siguiente enlace:\n{m.VerificationUrl}\n\nEste enlace expirará en {m.ExpirationMinutes / 60} horas.\nSi no creaste una cuenta, puedes ignorar este mensaje.";
     }
 
     #endregion
