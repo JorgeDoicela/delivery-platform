@@ -61,6 +61,7 @@ export {
     isPlatformHost,
     getTenantSubdomain,
     getApiClientTenantDomain,
+    getApiClientAccessToken,
     getApiClientTenantSlug,
     setApiClientAccessToken,
     setApiClientTenantSlug,

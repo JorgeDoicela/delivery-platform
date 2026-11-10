@@ -60,6 +60,14 @@ public class VerticalSliceArchitectureRegistrationTests
         registeredServiceTypes.Should().Contain(typeof(Delivery.Features.Auth.ResetPassword.ResetPasswordHandler));
         registeredServiceTypes.Should().Contain(typeof(Delivery.Features.Auth.VerifyEmail.VerifyEmailHandler));
         registeredServiceTypes.Should().Contain(typeof(Delivery.Features.Auth.ResendVerification.ResendVerificationHandler));
+        registeredServiceTypes.Should().Contain(typeof(Delivery.Features.Account.GetAccountProfile.GetAccountProfileHandler));
+        registeredServiceTypes.Should().Contain(typeof(Delivery.Features.Account.UpdateAccountProfile.UpdateAccountProfileHandler));
+        registeredServiceTypes.Should().Contain(typeof(Delivery.Features.Account.ChangePassword.ChangePasswordHandler));
+        registeredServiceTypes.Should().Contain(typeof(Delivery.Features.Account.GetMyOrders.GetMyOrdersHandler));
+        registeredServiceTypes.Should().Contain(typeof(Delivery.Features.Account.GetMyAddresses.GetMyAddressesHandler));
+        registeredServiceTypes.Should().Contain(typeof(Delivery.Features.Account.UpsertAddress.UpsertAddressHandler));
+        registeredServiceTypes.Should().Contain(typeof(Delivery.Features.Account.DeleteAddress.DeleteAddressHandler));
+        registeredServiceTypes.Should().Contain(typeof(Delivery.Features.Account.UpdateConsentSettings.UpdateConsentSettingsHandler));
 
         // Verificar registro de interfaces IHandler<,>
         registeredServiceTypes.Should().Contain(typeof(Delivery.Features.Common.Handlers.IHandler<CreateOrderCommand, Result<CreateOrderResponse>>));
@@ -76,9 +84,9 @@ public class VerticalSliceArchitectureRegistrationTests
         // Act
         services.AddDeliveryFeatures();
 
-        // Assert: Deben registrarse exactamente 37 endpoints autónomos
+        // Assert: Deben registrarse exactamente 45 endpoints autónomos
         var endpointDescriptors = services.Where(s => s.ServiceType == typeof(IEndpoint)).ToList();
-        endpointDescriptors.Should().HaveCount(37);
+        endpointDescriptors.Should().HaveCount(45);
 
         var endpointImplementationTypes = endpointDescriptors.Select(d => d.ImplementationType).ToHashSet();
         endpointImplementationTypes.Should().Contain(typeof(ResolveBranchEndpoint));
@@ -118,6 +126,14 @@ public class VerticalSliceArchitectureRegistrationTests
         endpointImplementationTypes.Should().Contain(typeof(Delivery.Features.Auth.VerifyEmail.VerifyEmailEndpoint));
         endpointImplementationTypes.Should().Contain(typeof(Delivery.Features.Auth.ResendVerification.ResendVerificationEndpoint));
         endpointImplementationTypes.Should().Contain(typeof(Delivery.Features.Chatbot.WhatsAppWebhook.WhatsAppWebhookEndpoint));
+        endpointImplementationTypes.Should().Contain(typeof(Delivery.Features.Account.GetAccountProfile.GetAccountProfileEndpoint));
+        endpointImplementationTypes.Should().Contain(typeof(Delivery.Features.Account.UpdateAccountProfile.UpdateAccountProfileEndpoint));
+        endpointImplementationTypes.Should().Contain(typeof(Delivery.Features.Account.ChangePassword.ChangePasswordEndpoint));
+        endpointImplementationTypes.Should().Contain(typeof(Delivery.Features.Account.GetMyOrders.GetMyOrdersEndpoint));
+        endpointImplementationTypes.Should().Contain(typeof(Delivery.Features.Account.GetMyAddresses.GetMyAddressesEndpoint));
+        endpointImplementationTypes.Should().Contain(typeof(Delivery.Features.Account.UpsertAddress.UpsertAddressEndpoint));
+        endpointImplementationTypes.Should().Contain(typeof(Delivery.Features.Account.DeleteAddress.DeleteAddressEndpoint));
+        endpointImplementationTypes.Should().Contain(typeof(Delivery.Features.Account.UpdateConsentSettings.UpdateConsentSettingsEndpoint));
     }
 
     [Fact]

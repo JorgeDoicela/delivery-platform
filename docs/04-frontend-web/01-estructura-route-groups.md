@@ -78,7 +78,7 @@ La plataforma implementa un panel de accesos directos en [`src/app/(storefront)/
 ## 4. Descripcion de Canales y Experiencia de Usuario
 
 ### 4.1. Canal Storefront (`src/app/(storefront)/`)
-* **URL Publica:** `/`, `/[slug]`, `/checkout`, `/finalizar-pedido`, `/track/[orderId]`, `/login`, `/terminos`, `/privacidad`
+* **URL Publica:** `/`, `/[slug]`, `/cuenta`, `/[slug]/cuenta`, `/checkout`, `/finalizar-pedido`, `/track/[orderId]`, `/login`, `/terminos`, `/privacidad`
 * **Diseno Visual:** Paleta sobria asadero (fondos neutros oscuros `bg-neutral-950` y acentos ambar/rojo asadero dinamicamente inyectados segun la marca). Cero emojis y cero insignias infladas de garantia.
 * **Ergonomia Comercial:** Tarjetas de producto con botones de accion directa `+ PEDIR` e insignias de oferta sobrias.
 * **Header Interactivo:** Indicador de carrito reactivo en vivo mediante `CartButtonBadge.tsx`.

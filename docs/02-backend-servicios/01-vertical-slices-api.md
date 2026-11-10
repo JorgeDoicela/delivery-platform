@@ -539,6 +539,42 @@ El backend de la plataforma esta construido en .NET 8 utilizando C# 12 y Minimal
 
 ---
 
+### 2.10. Modulo de Cuenta y Portal del Cliente (Account)
+
+#### 2.10.1. Perfil del Usuario Autenticado (`GET /api/v1/account/profile`)
+* **Autorizacion:** Requiere JWT (`Bearer`)
+* **Descripcion:** Retorna la informacion de identidad del cliente, estado de verificacion de correo, documento de identidad (SRI), numero de telefono, consentimiento LOPDP de WhatsApp y metricas de pedidos (activas e historicas).
+
+#### 2.10.2. Actualizar Datos Personales y Fiscales (`PUT /api/v1/account/profile`)
+* **Autorizacion:** Requiere JWT (`Bearer`)
+* **Descripcion:** Permite al cliente actualizar su nombre, telefono de contacto y datos para facturacion electronica (`identificationType`: CEDULA, RUC, PASAPORTE, CONSUMIDOR_FINAL; `identificationNumber`).
+
+#### 2.10.3. Cambio Seguro de Contraseña (`POST /api/v1/account/change-password`)
+* **Autorizacion:** Requiere JWT (`Bearer`)
+* **Descripcion:** Valida la clave actual contra el hash BCrypt del usuario y aplica la nueva contraseña cumpliendo politicas de complejidad (minimo 8 caracteres, mayuscula y numero).
+
+#### 2.10.4. Historial Unificado de Pedidos (`GET /api/v1/account/orders`)
+* **Autorizacion:** Requiere JWT (`Bearer`)
+* **Descripcion:** Retorna todas las ordenes emitidas por el cliente autenticado en cualquier establecimiento afiliado a la plataforma, con desglose de items, estado operativo, montos y direccion de despacho.
+
+#### 2.10.5. Libreta de Direcciones (`GET /api/v1/account/addresses`)
+* **Autorizacion:** Requiere JWT (`Bearer`)
+* **Descripcion:** Obtiene el listado de ubicaciones guardadas por el comensal con coordenadas geograficas WGS 84, referencias y direccion predeterminada.
+
+#### 2.10.6. Guardar o Actualizar Direccion (`POST /api/v1/account/addresses`)
+* **Autorizacion:** Requiere JWT (`Bearer`)
+* **Descripcion:** Operacion de upsert para crear o editar una direccion de despacho garantizando unicidad del indicador predeterminado (`isDefault`).
+
+#### 2.10.7. Eliminar Direccion Guardada (`DELETE /api/v1/account/addresses/{id}`)
+* **Autorizacion:** Requiere JWT (`Bearer`)
+* **Descripcion:** Remueve la direccion indicada promoviendo automaticamente otra direccion si se elimino la predeterminada.
+
+#### 2.10.8. Gobernanza LOPDP y Consentimiento WhatsApp (`PUT /api/v1/account/privacy`)
+* **Autorizacion:** Requiere JWT (`Bearer`)
+* **Descripcion:** Activa o revoca el consentimiento auditable del usuario para notificaciones y asistencia por WhatsApp conforme a la Ley Organica de Proteccion de Datos Personales del Ecuador.
+
+---
+
 ## Navegacion de Documentacion
 * **Anterior:** [02. Maquina de Estados del Pedido](../01-arquitectura/02-maquina-estados.md)
 * **Siguiente:** [02. Especificacion de SignalR Hubs en Tiempo Real](./02-signalr-hubs.md)

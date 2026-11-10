@@ -1,4 +1,4 @@
-namespace Delivery.Features.Chatbot.WhatsAppWebhook;
+namespace Delivery.Features.Common.Privacy;
 
 /// <summary>
 /// Gestiona la verificación, registro auditable y revocatoria del consentimiento
@@ -21,4 +21,3 @@ public interface ICustomerConsentTracker
     /// </summary>
     Task RevokeConsentAsync(Guid tenantId, string customerPhone, CancellationToken ct = default);
 }
-

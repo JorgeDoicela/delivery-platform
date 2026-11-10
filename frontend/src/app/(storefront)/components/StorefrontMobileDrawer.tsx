@@ -182,7 +182,7 @@ export function StorefrontMobileDrawer({
               )}
 
               <Link
-                href={routes.getLoginHref()}
+                href={routes.getAccountHref()}
                 onClick={onClose}
                 className="flex items-center justify-between px-3 py-1.5 rounded-xl text-[11px] font-semibold text-text-muted hover:text-text-strong transition-colors"
               >

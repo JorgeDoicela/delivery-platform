@@ -10,6 +10,8 @@ public class User
     public string PasswordHash { get; set; } = string.Empty;
     public string FullName { get; set; } = string.Empty;
     public string Phone { get; set; } = string.Empty;
+    public string? IdentificationType { get; set; }
+    public string? IdentificationNumber { get; set; }
     public bool IsActive { get; set; } = true;
     public bool IsEmailVerified { get; set; }
     public DateTime? EmailVerifiedAt { get; set; }
@@ -20,5 +22,6 @@ public class User
     public ICollection<RefreshToken> RefreshTokens { get; set; } = new List<RefreshToken>();
     public ICollection<PasswordResetToken> PasswordResetTokens { get; set; } = new List<PasswordResetToken>();
     public ICollection<EmailVerificationToken> EmailVerificationTokens { get; set; } = new List<EmailVerificationToken>();
+    public ICollection<CustomerAddress> Addresses { get; set; } = new List<CustomerAddress>();
 }
 

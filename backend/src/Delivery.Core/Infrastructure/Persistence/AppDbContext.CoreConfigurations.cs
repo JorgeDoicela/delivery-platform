@@ -88,6 +88,8 @@ public partial class AppDbContext
             u.Property(x => x.PasswordHash).HasMaxLength(255).IsRequired();
             u.Property(x => x.FullName).HasMaxLength(150).IsRequired();
             u.Property(x => x.Phone).HasMaxLength(30);
+            u.Property(x => x.IdentificationType).HasMaxLength(20);
+            u.Property(x => x.IdentificationNumber).HasMaxLength(20);
             u.Property(x => x.IsEmailVerified).HasDefaultValue(false);
             u.Property(x => x.EmailVerifiedAt);
 
@@ -176,6 +178,23 @@ public partial class AppDbContext
                 .OnDelete(DeleteBehavior.Cascade);
 
             evt.HasQueryFilter(x => CurrentTenantId == null || x.User.TenantId == null || x.User.TenantId == CurrentTenantId);
+        });
+
+        modelBuilder.Entity<CustomerAddress>(ca =>
+        {
+            ca.ToTable("CustomerAddresses");
+            ca.HasKey(x => x.Id);
+            ca.Property(x => x.Title).HasMaxLength(60).IsRequired();
+            ca.Property(x => x.Street).HasMaxLength(250).IsRequired();
+            ca.Property(x => x.Reference).HasMaxLength(250);
+            ca.Property(x => x.City).HasMaxLength(100).IsRequired();
+
+            ca.HasOne(x => x.User)
+                .WithMany(x => x.Addresses)
+                .HasForeignKey(x => x.UserId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            ca.HasQueryFilter(x => CurrentTenantId == null || x.User.TenantId == null || x.User.TenantId == CurrentTenantId);
         });
 
         // -------------------------------------------------------------

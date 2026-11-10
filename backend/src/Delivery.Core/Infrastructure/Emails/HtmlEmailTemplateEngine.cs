@@ -78,6 +78,12 @@ public sealed class HtmlEmailTemplateEngine : IEmailTemplateEngine
             trimmed = "/" + trimmed;
         }
 
+        // Si la ruta apunta directamente a /tenants/... sin el prefijo /images, normalizar a /images/tenants/...
+        if (trimmed.StartsWith("/tenants/", StringComparison.OrdinalIgnoreCase))
+        {
+            trimmed = "/images" + trimmed;
+        }
+
         return $"{baseDomain}{trimmed}";
     }
 

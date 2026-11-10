@@ -57,7 +57,7 @@ public static class DependencyInjection
             });
 
         services.AddSingleton<Delivery.Features.Chatbot.WhatsAppWebhook.IConversationStore, Delivery.Features.Chatbot.WhatsAppWebhook.RedisConversationStore>();
-        services.AddScoped<Delivery.Features.Chatbot.WhatsAppWebhook.ICustomerConsentTracker, Delivery.Features.Chatbot.WhatsAppWebhook.CustomerConsentTracker>();
+        services.AddScoped<Delivery.Features.Common.Privacy.ICustomerConsentTracker, Delivery.Features.Chatbot.WhatsAppWebhook.CustomerConsentTracker>();
         services.AddScoped<Delivery.Features.Chatbot.WhatsAppWebhook.ITenantKnowledgeProvider, Delivery.Features.Chatbot.WhatsAppWebhook.TenantKnowledgeProvider>();
         services.AddScoped<Delivery.Features.Chatbot.WhatsAppWebhook.DeepSeekAiEngine>();
         services.AddScoped<Delivery.Features.Chatbot.WhatsAppWebhook.GeminiAiEngine>();

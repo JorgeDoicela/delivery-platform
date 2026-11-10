@@ -27,6 +27,7 @@ public partial class AppDbContext : DbContext
     public DbSet<RefreshToken> RefreshTokens => Set<RefreshToken>();
     public DbSet<PasswordResetToken> PasswordResetTokens => Set<PasswordResetToken>();
     public DbSet<EmailVerificationToken> EmailVerificationTokens => Set<EmailVerificationToken>();
+    public DbSet<CustomerAddress> CustomerAddresses => Set<CustomerAddress>();
 
     // Sucursales, Salón y Geocercas
     public DbSet<Branch> Branches => Set<Branch>();

@@ -1,0 +1,123 @@
+"use client";
+
+import { useEffect } from "react";
+import { useRouter } from "next/navigation";
+import {
+  User,
+  Package,
+  MapPin,
+  Shield,
+  Lock,
+  LogOut,
+  ChevronRight,
+} from "lucide-react";
+import { useAccountStore, type AccountTab } from "../store/useAccountStore";
+import { useAuthStore } from "@/features/auth/store/useAuthStore";
+import { AccountHeader } from "./AccountHeader";
+import { AccountProfileSection } from "./AccountProfileSection";
+import { AccountOrdersSection } from "./AccountOrdersSection";
+import { AccountAddressesSection } from "./AccountAddressesSection";
+import { AccountPrivacySection } from "./AccountPrivacySection";
+import { AccountSecuritySection } from "./AccountSecuritySection";
+
+interface AccountDashboardViewProps {
+  tenantSlug?: string;
+}
+
+const TABS: Array<{ id: AccountTab; label: string; icon: typeof User }> = [
+  { id: "perfil", label: "Datos Personales", icon: User },
+  { id: "pedidos", label: "Historial de Pedidos", icon: Package },
+  { id: "direcciones", label: "Direcciones Guardadas", icon: MapPin },
+  { id: "privacidad", label: "Privacidad (LOPDP)", icon: Shield },
+  { id: "seguridad", label: "Seguridad y Clave", icon: Lock },
+];
+
+export function AccountDashboardView({ tenantSlug }: AccountDashboardViewProps) {
+  const router = useRouter();
+  const profile = useAccountStore((s) => s.profile);
+  const activeTab = useAccountStore((s) => s.activeTab);
+  const isLoadingProfile = useAccountStore((s) => s.isLoadingProfile);
+  const setActiveTab = useAccountStore((s) => s.setActiveTab);
+  const fetchProfile = useAccountStore((s) => s.fetchProfile);
+
+  const isAuthenticated = useAuthStore((s) => s.isAuthenticated);
+  const logout = useAuthStore((s) => s.logout);
+
+  useEffect(() => {
+    if (isAuthenticated) {
+      fetchProfile();
+    }
+  }, [isAuthenticated, fetchProfile]);
+
+  const handleLogout = async () => {
+    await logout();
+    if (tenantSlug) {
+      router.push(`/${tenantSlug}/login`);
+    } else {
+      router.push("/login");
+    }
+  };
+
+  return (
+    <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-8 md:py-12 space-y-8">
+      {/* Header Principal del Usuario */}
+      <AccountHeader profile={profile} isLoading={isLoadingProfile} />
+
+      {/* Grid: Navegación de pestañas + Contenido */}
+      <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
+        {/* Menú Lateral */}
+        <aside className="lg:col-span-1 space-y-2">
+          <nav className="bg-white border border-neutral-200 rounded-3xl p-3 space-y-1 shadow-xs">
+            {TABS.map((tab) => {
+              const Icon = tab.icon;
+              const isActive = activeTab === tab.id;
+
+              return (
+                <button
+                  key={tab.id}
+                  type="button"
+                  onClick={() => setActiveTab(tab.id)}
+                  className={`w-full flex items-center justify-between px-4 py-3 rounded-2xl text-xs font-bold transition-all min-h-[44px] cursor-pointer ${
+                    isActive
+                      ? "bg-neutral-900 text-white shadow-xs font-display uppercase tracking-wider"
+                      : "text-neutral-600 hover:text-neutral-900 hover:bg-neutral-100"
+                  }`}
+                >
+                  <div className="flex items-center gap-3">
+                    <Icon className="w-4 h-4 shrink-0" />
+                    <span>{tab.label}</span>
+                  </div>
+                  <ChevronRight
+                    className={`w-3.5 h-3.5 transition-transform ${
+                      isActive ? "text-white" : "text-neutral-400"
+                    }`}
+                  />
+                </button>
+              );
+            })}
+
+            <div className="pt-2 border-t border-neutral-100 mt-2">
+              <button
+                type="button"
+                onClick={handleLogout}
+                className="w-full flex items-center gap-3 px-4 py-3 rounded-2xl text-xs font-bold text-neutral-500 hover:text-brand-primary hover:bg-neutral-50 transition-colors min-h-[44px] cursor-pointer"
+              >
+                <LogOut className="w-4 h-4 shrink-0" />
+                <span>Cerrar Sesión</span>
+              </button>
+            </div>
+          </nav>
+        </aside>
+
+        {/* Panel Central Dinámico */}
+        <main className="lg:col-span-3">
+          {activeTab === "perfil" && <AccountProfileSection />}
+          {activeTab === "pedidos" && <AccountOrdersSection />}
+          {activeTab === "direcciones" && <AccountAddressesSection />}
+          {activeTab === "privacidad" && <AccountPrivacySection />}
+          {activeTab === "seguridad" && <AccountSecuritySection />}
+        </main>
+      </div>
+    </div>
+  );
+}

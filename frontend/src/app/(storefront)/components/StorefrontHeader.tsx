@@ -200,9 +200,9 @@ export function StorefrontHeader() {
             )}
 
             <Link
-              href={routes.getLoginHref()}
+              href={isAuthenticated ? routes.getAccountHref() : routes.getLoginHref()}
               className="hidden sm:flex flex-col items-center justify-center text-text-strong hover:text-brand-primary transition-colors px-1 shrink-0 relative"
-              title={isAuthenticated ? `Sesión iniciada: ${user?.fullName}` : "Mi Perfil / Iniciar Sesión"}
+              title={isAuthenticated ? `Mi Cuenta (${user?.fullName})` : "Mi Perfil / Iniciar Sesión"}
             >
               <div className="relative">
                 <User className="w-5 h-5 text-text-strong stroke-[1.8]" />

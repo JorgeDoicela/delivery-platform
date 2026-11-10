@@ -32,6 +32,7 @@ export interface TenantRoutingResolution {
   getSuperAdminHref: () => string;
   getTermsHref: () => string;
   getPrivacyHref: () => string;
+  getAccountHref: () => string;
 }
 
 export interface ResolveRoutingOptions {
@@ -203,6 +204,10 @@ export function resolveTenantRouting(
     return basePath ? `${basePath}/privacidad` : "/privacidad";
   };
 
+  const getAccountHref = (): string => {
+    return basePath ? `${basePath}/cuenta` : "/cuenta";
+  };
+
   return {
     hostname: cleanHost,
     isCustomDomain,
@@ -224,6 +229,7 @@ export function resolveTenantRouting(
     getSuperAdminHref,
     getTermsHref,
     getPrivacyHref,
+    getAccountHref,
   };
 }
 

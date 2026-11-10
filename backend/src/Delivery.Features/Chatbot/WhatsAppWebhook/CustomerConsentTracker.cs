@@ -1,6 +1,7 @@
 using System.Text.Json;
 using Delivery.Core.Domain.Entities;
 using Delivery.Core.Infrastructure.Persistence;
+using Delivery.Features.Common.Privacy;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 

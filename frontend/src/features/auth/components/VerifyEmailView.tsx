@@ -209,15 +209,15 @@ export function VerifyEmailView({
       {/* Formulario de Reenvío de Enlace */}
       <form onSubmit={handleSubmitResend(onResendSubmit)} className="space-y-4">
         {resendSuccessMessage && (
-          <div className="flex items-start gap-3 p-3.5 bg-emerald-50 border border-emerald-200 rounded-2xl text-xs text-emerald-800">
-            <Mail className="w-4 h-4 text-emerald-600 shrink-0 mt-0.5" />
+          <div className="flex items-start gap-3 p-3.5 bg-neutral-900 border border-neutral-800 rounded-2xl text-xs text-white">
+            <Mail className="w-4 h-4 text-emerald-400 shrink-0 mt-0.5" />
             <p className="font-medium">{resendSuccessMessage}</p>
           </div>
         )}
 
         {resendErrorMessage && (
-          <div className="flex items-start gap-3 p-3.5 bg-red-50 border border-red-200 rounded-2xl text-xs text-red-700">
-            <AlertCircle className="w-4 h-4 text-red-600 shrink-0 mt-0.5" />
+          <div className="flex items-start gap-3 p-3.5 bg-neutral-50 border border-neutral-300 rounded-2xl text-xs text-neutral-900">
+            <AlertCircle className="w-4 h-4 text-brand-primary shrink-0 mt-0.5" />
             <p className="font-medium">{resendErrorMessage}</p>
           </div>
         )}

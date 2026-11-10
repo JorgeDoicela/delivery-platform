@@ -17,6 +17,7 @@ import {
 } from "@/features/tenant";
 import { useSmartScrollHeader } from "@/shared/hooks/useSmartScrollHeader";
 import { useTenantRoutes } from "@/shared/lib/tenant-routing";
+import { useAuthStore } from "@/features/auth/store/useAuthStore";
 
 export function MobileBottomNav() {
   const { isVisible } = useSmartScrollHeader({
@@ -33,12 +34,13 @@ export function MobileBottomNav() {
   const { data: tenant } = useCurrentTenantQuery(activeSlug);
   const { data: branches } = useBranchesQuery(activeSlug || tenant?.slug);
   const routes = useTenantRoutes(activeSlug || tenant?.slug);
+  const isAuthenticated = useAuthStore((s) => s.isAuthenticated);
 
   const homeHref = routes.getHomeHref();
   const catalogHref = routes.getCatalogHref();
   const sucursalesHref = routes.getSucursalesHref();
   const rastreoHref = routes.getRastreoHref();
-  const loginHref = routes.getLoginHref();
+  const profileHref = isAuthenticated ? routes.getAccountHref() : routes.getLoginHref();
 
   const isCheckout =
     pathname.includes("checkout") || pathname.includes("finalizar-pedido");
@@ -59,7 +61,8 @@ export function MobileBottomNav() {
   const isSucursalesActive = pathname.includes("sucursal");
   const isRastreoActive =
     pathname.includes("rastreo") || pathname.includes("track");
-  const isLoginActive = pathname.includes("login");
+  const isProfileActive =
+    pathname.includes("login") || pathname.includes("cuenta");
 
   return (
     <nav
@@ -121,15 +124,15 @@ export function MobileBottomNav() {
       </Link>
 
       <Link
-        href={loginHref}
+        href={profileHref}
         className={`h-full flex flex-col items-center justify-center py-1 px-2 rounded-lg text-[9px] font-bold font-display uppercase tracking-wider transition-colors min-w-[48px] ${
-          isLoginActive
+          isProfileActive
             ? "text-brand-primary"
             : "text-text-muted hover:text-text-strong"
         }`}
       >
         <User className="w-[18px] h-[18px] mb-0.5" />
-        <span>Perfil</span>
+        <span>{isAuthenticated ? "Cuenta" : "Perfil"}</span>
       </Link>
     </nav>
   );

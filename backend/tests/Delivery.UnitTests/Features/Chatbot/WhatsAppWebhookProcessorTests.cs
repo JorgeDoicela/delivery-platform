@@ -1,5 +1,6 @@
 using Delivery.Core.Domain.Entities;
 using Delivery.Features.Chatbot.WhatsAppWebhook;
+using Delivery.Features.Common.Privacy;
 using FluentAssertions;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
