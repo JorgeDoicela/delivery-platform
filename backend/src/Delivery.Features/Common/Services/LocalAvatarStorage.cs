@@ -1,4 +1,5 @@
 using Delivery.Core.Contracts.Storage;
+using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using SkiaSharp;
 
@@ -13,10 +14,12 @@ public sealed class LocalAvatarStorage : IAvatarStorage
 {
     private const int TargetAvatarDimension = 400;
     private const int WebpQuality = 85;
+    private readonly IHostEnvironment _environment;
     private readonly ILogger<LocalAvatarStorage> _logger;
 
-    public LocalAvatarStorage(ILogger<LocalAvatarStorage> logger)
+    public LocalAvatarStorage(IHostEnvironment environment, ILogger<LocalAvatarStorage> logger)
     {
+        _environment = environment;
         _logger = logger;
     }
 
@@ -74,7 +77,7 @@ public sealed class LocalAvatarStorage : IAvatarStorage
 
         // 5. Particionamiento Multi-Tenant de almacenamiento local
         var tenantFolder = tenantId.HasValue ? tenantId.Value.ToString("D") : "platform";
-        var uploadsDir = Path.Combine(Directory.GetCurrentDirectory(), "uploads", "avatars", tenantFolder);
+        var uploadsDir = Path.Combine(_environment.ContentRootPath, "uploads", "avatars", tenantFolder);
         Directory.CreateDirectory(uploadsDir);
 
         // Limpiar archivos anteriores del mismo usuario para evitar acumulación
@@ -124,7 +127,7 @@ public sealed class LocalAvatarStorage : IAvatarStorage
         try
         {
             var cleanRelative = avatarUrl.TrimStart('/').Replace('/', Path.DirectorySeparatorChar);
-            var fullPath = Path.Combine(Directory.GetCurrentDirectory(), cleanRelative);
+            var fullPath = Path.Combine(_environment.ContentRootPath, cleanRelative);
 
             if (File.Exists(fullPath))
             {

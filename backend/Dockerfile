@@ -35,6 +35,9 @@ RUN apt-get update && apt-get install -y --no-install-recommends curl && rm -rf 
 
 COPY --from=build /app/publish .
 
+# Crear directorio de archivos subidos con propiedad del usuario sin privilegios ($APP_UID)
+RUN mkdir -p /app/uploads/avatars && chown -R $APP_UID:$APP_UID /app/uploads
+
 # Usuario sin privilegios de root (estándar en .NET 8)
 USER $APP_UID
 

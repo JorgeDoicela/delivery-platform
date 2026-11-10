@@ -33,7 +33,20 @@ rollback_image() {
   local service_name="$1"
   local base_name="$2"
 
-  # 1. Buscar en el cache de Docker si existe cualquier imagen terminada en ${base_name}:previous
+  # 1. Priorizar exactamente la imagen configurada en docker-compose.yml (ej. ghcr.io/.../delivery-backend)
+  local configured_image
+  configured_image="$(docker compose -f "$COMPOSE_FILE" config --images 2>/dev/null | grep -E "(/|^)${base_name}(:|$)" | head -n 1 || true)"
+  if [ -n "$configured_image" ]; then
+    local conf_base="${configured_image%%:*}"
+    if docker image inspect "${conf_base}:previous" >/dev/null 2>&1; then
+      log "Restaurando ${conf_base}:previous -> ${conf_base}:latest..."
+      docker tag "${conf_base}:previous" "${conf_base}:latest"
+      docker compose -f "$COMPOSE_FILE" up -d --no-deps "$service_name"
+      return 0
+    fi
+  fi
+
+  # 2. Fallback a buscar en el cache local cualquier imagen terminada en ${base_name}:previous
   local target_image
   target_image="$(docker images --format '{{.Repository}}:{{.Tag}}' 2>/dev/null | grep -E "(/|^)${base_name}:previous$" | head -n 1 || true)"
 
@@ -43,19 +56,6 @@ rollback_image() {
     docker tag "${target_image}" "${repo_base}:latest"
     docker compose -f "$COMPOSE_FILE" up -d --no-deps "$service_name"
     return 0
-  fi
-
-  # 2. Fallback a resolver la imagen configurada en Compose
-  local configured_image
-  configured_image="$(docker compose -f "$COMPOSE_FILE" config --images 2>/dev/null | grep -E "${base_name}(:|$)" | head -n 1 || true)"
-  if [ -n "$configured_image" ]; then
-    local conf_base="${configured_image%%:*}"
-    if docker image inspect "${conf_base}:previous" >/dev/null 2>&1; then
-      log "Restaurando ${conf_base}:previous -> ${conf_base}:latest..."
-      docker tag "${conf_base}:previous" "${conf_base}:latest"
-      docker compose -f "$COMPOSE_FILE" up -d --no-deps "$service_name"
-      return 0
-    fi
   fi
 
   log "AVISO: No se encontro tag ${base_name}:previous en el cache local de Docker."

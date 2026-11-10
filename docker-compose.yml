@@ -70,6 +70,8 @@ services:
       - GEMINI_API_KEY=${GEMINI_API_KEY:-}
     ports:
       - "${API_BIND_IP:-127.0.0.1}:${API_PORT:-5005}:5005"
+    volumes:
+      - delivery_uploads_data:/app/uploads
     depends_on:
       postgres:
         condition: service_healthy
@@ -154,6 +156,8 @@ volumes:
     name: delivery_postgres_data
   delivery_redis_data:
     name: delivery_redis_data
+  delivery_uploads_data:
+    name: delivery_uploads_data
 
 networks:
   delivery-network:

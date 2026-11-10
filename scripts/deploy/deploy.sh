@@ -58,9 +58,16 @@ if [ -f "$LAST_COMMIT_FILE" ]; then
   cp "$LAST_COMMIT_FILE" "$PREVIOUS_COMMIT_FILE"
 fi
 
-# 3. Snapshot de imágenes previas para rollback rápido
+# 3. Snapshot de imágenes previas para rollback rápido (solo si el contenedor está saludable)
 log "Respaldando tags de imagenes actuales a :previous para rollback rapido..."
 for svc in backend frontend nginx; do
+  container_name="delivery-${svc}"
+  health_state="$(docker inspect --format='{{if .State.Health}}{{.State.Health.Status}}{{else}}{{.State.Status}}{{end}}' "$container_name" 2>/dev/null || echo 'none')"
+  if [ "$health_state" != "healthy" ] && [ "$health_state" != "running" ]; then
+    log "Aviso: ${container_name} en estado '${health_state}'. Se preserva :previous existente sin sobrescribir."
+    continue
+  fi
+
   img="$(docker compose -f "$COMPOSE_FILE" images -q "$svc" 2>/dev/null || true)"
   if [ -n "$img" ]; then
     tag_name="$(docker inspect --format='{{index .RepoTags 0}}' "$img" 2>/dev/null || true)"

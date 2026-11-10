@@ -66,6 +66,8 @@ flowchart TD
   - `Jwt__SecretKey=${JWT_SECRET:?Definir JWT_SECRET en .env}`
   - `INITIAL_ADMIN_PASSWORD=${INITIAL_ADMIN_PASSWORD:?Definir INITIAL_ADMIN_PASSWORD en .env}`
   - `GOOGLE_CLIENT_ID=${GOOGLE_CLIENT_ID:-}`
+  - `WHATSAPP_*`, `DEEPSEEK_API_KEY`, `GEMINI_API_KEY`
+* **Volumen Persistente:** `delivery_uploads_data:/app/uploads` (propiedad de `$APP_UID` en `backend/Dockerfile` para almacenamiento multi-tenant de avatares WebP).
 * **Dependencias:** `postgres` y `redis` en estado saludable (`service_healthy`).
 * **Healthcheck:**
   ```yaml

@@ -138,3 +138,12 @@
   - Fase 1 (Validación Productiva): Se utiliza el número de prueba de Meta (`1349339028273599`) apuntando al dominio oficial de producción (`https://api.mesafy.doicela.dev/api/v1/webhooks/whatsapp`) para verificar Nginx, terminación TLS, base de datos y SignalR sin afectar líneas personales activas.
   - Fase 2 (Número Comercial Físico): Al adquirir el chip/SIM dedicado para el restaurante, el alta se realiza en Meta Business Manager y se actualiza exclusivamente `WHATSAPP_PHONE_NUMBER_ID` en el `.env` del servidor, sin necesidad de recompilaciones ni cambios en el código fuente.
 
+## 10. Endurecimiento de Contenedores, Almacenamiento de Uploads y Pipeline CI/CD
+* **Permisos Non-Root y Persistencia de `/app/uploads` (`backend/Dockerfile` y `docker-compose.yml`):**
+  - El runtime .NET 8 opera bajo usuario sin privilegios (`USER $APP_UID`), por lo que `/app/uploads/avatars` debe precrearse con `chown -R $APP_UID:$APP_UID /app/uploads` en `Dockerfile` y montarse en el volumen persistente `delivery_uploads_data:/app/uploads`.
+  - `LocalAvatarStorage` utiliza `IHostEnvironment.ContentRootPath` para garantizar consistencia absoluta con `UseStaticFiles` en `Program.cs`.
+  - `docker/nginx/conf.d/default.conf` enruta `location /uploads/` hacia `http://backend:5005/uploads/`.
+* **Integridad de Snapshots `:previous` y Rollback (`deploy.sh` y `rollback.sh`):**
+  - `deploy.sh` únicamente respalda una imagen a `:previous` si su contenedor actual se encuentra en estado `healthy`/`running`, evitando sobrescribir el último snapshot válido con una imagen averiada.
+  - `rollback.sh` prioriza el nombre completo resuelto por `docker compose config --images` (`ghcr.io/...:previous`) antes de buscar en el caché local por comodín.
+
