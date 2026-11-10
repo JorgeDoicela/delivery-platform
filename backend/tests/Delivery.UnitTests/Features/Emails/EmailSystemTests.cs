@@ -269,4 +269,41 @@ public class EmailSystemTests
             It.Is<EnqueuedState>(s => s.Queue == "notifications")
         ), Times.Once);
     }
+
+    [Theory]
+    [InlineData("/images/tenants/la-granjita/identidad/logo.png", "https://mesafy.doicela.dev/images/tenants/la-granjita/identidad/logo.png")]
+    [InlineData("https://res.cloudinary.com/demo/logo.png", "https://res.cloudinary.com/demo/logo.png")]
+    [InlineData("http://custom-domain.com/logo.jpg", "http://custom-domain.com/logo.jpg")]
+    [InlineData("//cdn.mesafy.dev/logo.png", "https://cdn.mesafy.dev/logo.png")]
+    [InlineData("", "")]
+    [InlineData(null, "")]
+    public void HtmlEmailTemplateEngine_ResolveAbsoluteUrl_ShouldHandleRelativeAndAbsoluteUrls(string? input, string expected)
+    {
+        var result = HtmlEmailTemplateEngine.ResolveAbsoluteUrl(input);
+        result.Should().Be(expected);
+    }
+
+    [Fact]
+    public void HtmlEmailTemplateEngine_RenderWithRelativeLogo_ShouldProduceAbsoluteImgSrc()
+    {
+        var engine = new HtmlEmailTemplateEngine();
+        var model = new EmailVerificationEmailModel
+        {
+            Brand = new BrandEmailContext
+            {
+                BrandName = "La Granjita",
+                LogoUrl = "/images/tenants/la-granjita/identidad/logo.png"
+            },
+            UserName = "Jorge",
+            UserEmail = "jorge@test.com",
+            VerificationUrl = "https://mesafy.doicela.dev/la-granjita/login?tab=verify-email&token=123",
+            VerificationToken = "123",
+            ExpirationMinutes = 1440
+        };
+
+        var (html, _) = engine.Render(EmailTemplateType.EmailVerification, model);
+
+        html.Should().Contain("https://mesafy.doicela.dev/images/tenants/la-granjita/identidad/logo.png");
+        html.Should().NotContain("src=\"/images");
+    }
 }

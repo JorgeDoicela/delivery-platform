@@ -22,6 +22,7 @@ public sealed record BrandEmailContext
         BrandName = "Mesafy",
         BrandTagline = "Plataforma Integral de Pedidos y Delivery Gastronómico",
         PrimaryColor = "#0F172A",
+        LogoUrl = "/images/shared/placeholders/logo-default.png",
         StoreUrl = "https://mesafy.doicela.dev",
         SupportEmail = "soporte@mesafy.doicela.dev"
     };

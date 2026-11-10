@@ -45,11 +45,48 @@ public sealed class HtmlEmailTemplateEngine : IEmailTemplateEngine
 
     #region Layout Base y Estilos CSS Inline
 
+    public static string ResolveAbsoluteUrl(string? rawUrl)
+    {
+        if (string.IsNullOrWhiteSpace(rawUrl))
+        {
+            return string.Empty;
+        }
+
+        var trimmed = rawUrl.Trim();
+        if (trimmed.StartsWith("http://", StringComparison.OrdinalIgnoreCase) ||
+            trimmed.StartsWith("https://", StringComparison.OrdinalIgnoreCase))
+        {
+            return trimmed;
+        }
+
+        if (trimmed.StartsWith("//", StringComparison.Ordinal))
+        {
+            return $"https:{trimmed}";
+        }
+
+        var platformDomain = Environment.GetEnvironmentVariable("NEXT_PUBLIC_PLATFORM_DOMAIN")
+            ?? Environment.GetEnvironmentVariable("PLATFORM_DOMAIN")
+            ?? "mesafy.doicela.dev";
+
+        var baseDomain = platformDomain.StartsWith("http://", StringComparison.OrdinalIgnoreCase) ||
+                         platformDomain.StartsWith("https://", StringComparison.OrdinalIgnoreCase)
+            ? platformDomain.TrimEnd('/')
+            : $"https://{platformDomain.TrimEnd('/')}";
+
+        if (!trimmed.StartsWith('/'))
+        {
+            trimmed = "/" + trimmed;
+        }
+
+        return $"{baseDomain}{trimmed}";
+    }
+
     private static string BuildBaseHtml(BrandEmailContext brand, string title, string contentHtml)
     {
         var primaryColor = string.IsNullOrWhiteSpace(brand.PrimaryColor) ? "#E4002B" : brand.PrimaryColor;
-        var logoHtml = !string.IsNullOrWhiteSpace(brand.LogoUrl)
-            ? $"<img src=\"{WebUtility.HtmlEncode(brand.LogoUrl)}\" alt=\"{WebUtility.HtmlEncode(brand.BrandName)}\" width=\"48\" height=\"48\" style=\"width:48px;height:48px;object-fit:contain;margin-bottom:8px;display:inline-block;border-radius:12px;\" />"
+        var logoUrl = ResolveAbsoluteUrl(brand.LogoUrl);
+        var logoHtml = !string.IsNullOrWhiteSpace(logoUrl)
+            ? $"<img src=\"{WebUtility.HtmlEncode(logoUrl)}\" alt=\"{WebUtility.HtmlEncode(brand.BrandName)}\" width=\"56\" height=\"56\" border=\"0\" style=\"width:56px;height:56px;max-width:56px;max-height:56px;object-fit:contain;margin-bottom:10px;display:inline-block;border-radius:14px;background-color:#FFFFFF;padding:4px;box-shadow:0 2px 6px rgba(0,0,0,0.15);\" />"
             : string.Empty;
 
         return $@"<!DOCTYPE html>
