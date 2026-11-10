@@ -7,7 +7,11 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Delivery.Features.Orders.GetOrderById;
 
-public sealed record GetOrderByIdQuery(Guid OrderId);
+public sealed record GetOrderByIdQuery(
+    Guid OrderId,
+    Guid? RequesterUserId = null,
+    IReadOnlyList<string>? RequesterRoles = null
+);
 
 public sealed class GetOrderByIdValidator : AbstractValidator<GetOrderByIdQuery>
 {
@@ -37,8 +41,11 @@ public sealed record OrderDetailItemDto(
 
 public sealed record OrderDetailResponse(
     Guid OrderId,
+    int OrderNumber,
     int BranchId,
     string BranchName,
+    string TenantSlug,
+    string TenantName,
     double? BranchLatitude,
     double? BranchLongitude,
     string CustomerName,
@@ -68,7 +75,17 @@ public static class GetOrderByIdErrors
 {
     public static readonly Error OrderNotFound = new(
         "Orders.NotFound",
-        "La orden solicitada no existe."
+        "La orden solicitada no existe o no pertenece a este establecimiento."
+    );
+
+    public static readonly Error AuthenticationRequired = new(
+        "Orders.AuthenticationRequired",
+        "Se requiere iniciar sesión con la cuenta propietaria para consultar los detalles y rastreo del pedido."
+    );
+
+    public static readonly Error Forbidden = new(
+        "Orders.Forbidden",
+        "No tienes autorización para consultar los datos de este pedido."
     );
 }
 
@@ -93,7 +110,9 @@ public sealed class GetOrderByIdHandler : IHandler<GetOrderByIdQuery, Result<Ord
         }
 
         var order = await _context.Orders
+            .IgnoreQueryFilters()
             .AsNoTracking()
+            .Include(o => o.Tenant)
             .Include(o => o.Branch)
             .Include(o => o.Items)
                 .ThenInclude(i => i.Modifiers)
@@ -102,6 +121,63 @@ public sealed class GetOrderByIdHandler : IHandler<GetOrderByIdQuery, Result<Ord
         if (order is null)
         {
             return Result.Failure<OrderDetailResponse>(GetOrderByIdErrors.OrderNotFound);
+        }
+
+        // 1. Verificación de Aislamiento Multi-Tenant:
+        // Si la petición viene bajo el ámbito de un Tenant específico, la orden debe pertenecer a dicho Tenant.
+        if (_context.CurrentTenantId.HasValue && order.TenantId != _context.CurrentTenantId.Value)
+        {
+            return Result.Failure<OrderDetailResponse>(GetOrderByIdErrors.OrderNotFound);
+        }
+
+        // 2. Verificación de Regla de Negocio de Autorización:
+        // El personal operativo (Admin, BranchAdmin, Kitchen, Driver, Cashier, SuperAdmin) puede consultar órdenes del tenant.
+        // Los clientes solo pueden consultar órdenes que pertenezcan a su propia cuenta autenticada.
+        var roles = request.RequesterRoles ?? Array.Empty<string>();
+        bool isStaffOrAdmin = roles.Any(r => r is "SuperAdmin" or "Admin" or "TenantAdmin" or "BranchAdmin" or "Kitchen" or "Driver" or "Cashier");
+
+        if (!isStaffOrAdmin)
+        {
+            if (!request.RequesterUserId.HasValue)
+            {
+                return Result.Failure<OrderDetailResponse>(GetOrderByIdErrors.AuthenticationRequired);
+            }
+
+            var requesterUser = await _context.Users
+                .AsNoTracking()
+                .FirstOrDefaultAsync(u => u.Id == request.RequesterUserId.Value && u.IsActive, cancellationToken);
+
+            if (requesterUser is null)
+            {
+                return Result.Failure<OrderDetailResponse>(GetOrderByIdErrors.AuthenticationRequired);
+            }
+
+            bool isEmailMatch = !string.IsNullOrWhiteSpace(order.CustomerEmail)
+                && string.Equals(order.CustomerEmail, requesterUser.Email, StringComparison.OrdinalIgnoreCase);
+
+            bool isPhoneMatch = false;
+            if (!string.IsNullOrWhiteSpace(requesterUser.Phone) && !string.IsNullOrWhiteSpace(order.CustomerPhone))
+            {
+                var reqDigits = new string(requesterUser.Phone.Where(char.IsDigit).ToArray());
+                var orderDigits = new string(order.CustomerPhone.Where(char.IsDigit).ToArray());
+                if (reqDigits == orderDigits)
+                {
+                    isPhoneMatch = true;
+                }
+                else if (reqDigits.Length >= 8 && orderDigits.Length >= 8)
+                {
+                    isPhoneMatch = reqDigits[^8..] == orderDigits[^8..];
+                }
+            }
+
+            bool isOwner = (order.CreatedByUserId.HasValue && order.CreatedByUserId.Value == requesterUser.Id)
+                || isEmailMatch
+                || isPhoneMatch;
+
+            if (!isOwner)
+            {
+                return Result.Failure<OrderDetailResponse>(GetOrderByIdErrors.Forbidden);
+            }
         }
 
         var itemDtos = order.Items.Select(item =>
@@ -126,10 +202,13 @@ public sealed class GetOrderByIdHandler : IHandler<GetOrderByIdQuery, Result<Ord
 
         var response = new OrderDetailResponse(
             order.Id,
+            order.OrderNumber,
             order.BranchId,
-            order.Branch.Name,
-            order.Branch.LocationPoint?.Y, // Latitud de la sucursal
-            order.Branch.LocationPoint?.X, // Longitud de la sucursal
+            order.Branch?.Name ?? string.Empty,
+            order.Tenant?.Slug ?? string.Empty,
+            order.Tenant?.Name ?? string.Empty,
+            order.Branch?.LocationPoint?.Y, // Latitud de la sucursal
+            order.Branch?.LocationPoint?.X, // Longitud de la sucursal
             order.CustomerName,
             order.CustomerPhone,
             order.CustomerEmail,

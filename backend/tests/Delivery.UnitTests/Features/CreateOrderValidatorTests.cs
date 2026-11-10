@@ -9,6 +9,8 @@ public class CreateOrderValidatorTests
 {
     private readonly CreateOrderValidator _validator = new();
 
+    private static readonly Guid TestUserId = Guid.Parse("11111111-1111-1111-1111-111111111111");
+
     private static CreateOrderCommand CreateValidCommand() => new(
         BranchId: 1,
         CustomerName: "Juan Pérez",
@@ -27,8 +29,23 @@ public class CreateOrderValidatorTests
         Items:
         [
             new CreateOrderItemRequest(ProductId: 1, Quantity: 2, SelectedModifierOptionIds: [1, 2])
-        ]
+        ],
+        UserId: TestUserId
     );
+
+    [Fact]
+    public void Validate_WithEmptyUserId_ShouldFail()
+    {
+        // Arrange
+        var command = CreateValidCommand() with { UserId = Guid.Empty };
+
+        // Act
+        var result = _validator.Validate(command);
+
+        // Assert
+        result.IsValid.Should().BeFalse();
+        result.Errors.Should().Contain(e => e.PropertyName == nameof(CreateOrderCommand.UserId));
+    }
 
     [Fact]
     public void Validate_WithValidCommand_ShouldHaveNoValidationErrors()

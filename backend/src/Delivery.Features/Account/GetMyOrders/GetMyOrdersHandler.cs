@@ -78,12 +78,21 @@ public sealed class GetMyOrdersHandler : IHandler<GetMyOrdersQuery, Result<GetMy
         }
 
         var normalizedEmail = user.Email.Trim().ToLowerInvariant();
+        var userPhoneRaw = string.IsNullOrWhiteSpace(user.Phone) ? null : user.Phone.Trim();
+        var userDigits = !string.IsNullOrWhiteSpace(user.Phone)
+            ? new string(user.Phone.Where(char.IsDigit).ToArray())
+            : null;
+        var userPhoneSuffix = !string.IsNullOrEmpty(userDigits) && userDigits.Length >= 8
+            ? userDigits[^8..]
+            : null;
 
-        // Consulta de órdenes vinculadas al email del cliente autenticado
+        // Consulta de órdenes vinculadas a la cuenta del cliente autenticado (por Id, correo o número de teléfono)
         var query = _context.Orders
             .IgnoreQueryFilters()
             .AsNoTracking()
-            .Where(o => o.CustomerEmail != null && o.CustomerEmail.ToLower() == normalizedEmail);
+            .Where(o => o.CreatedByUserId == user.Id
+                || (o.CustomerEmail != null && o.CustomerEmail.ToLower() == normalizedEmail)
+                || (userPhoneRaw != null && (o.CustomerPhone == userPhoneRaw || (userPhoneSuffix != null && o.CustomerPhone.EndsWith(userPhoneSuffix)))));
 
         // Si hay tenant seleccionado en el contexto de la petición, se restringe a dicho tenant
         if (_context.CurrentTenantId.HasValue)

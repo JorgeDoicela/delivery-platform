@@ -2,7 +2,7 @@
 
 import { useRouter } from 'next/navigation';
 import { OrderStatus, PaymentMethod } from '@/shared/types/api';
-import { ArrowLeft, Clock, Truck, AlertCircle, RefreshCw } from 'lucide-react';
+import { ArrowLeft, Clock, Truck, AlertCircle, RefreshCw, Lock, LogIn, ShieldAlert } from 'lucide-react';
 import { StatusTimeline } from './StatusTimeline';
 import { OrderMap } from './OrderMap';
 import { useOrderTracking } from '../hooks/useOrderTracking';
@@ -73,6 +73,62 @@ export function OrderTrackingView({ orderId }: OrderTrackingViewProps) {
   }
 
   if (error || !order) {
+    if (error === 'AUTH_REQUIRED') {
+      return (
+        <div className="max-w-xl mx-auto my-12 p-8 bg-surface-card border border-surface-border rounded-3xl text-center shadow-lg space-y-4">
+          <div className="w-12 h-12 rounded-2xl bg-brand-primary/10 text-brand-primary mx-auto flex items-center justify-center">
+            <Lock className="h-6 w-6" />
+          </div>
+          <h2 className="text-xl sm:text-2xl font-black uppercase tracking-wide font-display text-text-strong">
+            Autenticación Requerida
+          </h2>
+          <p className="text-xs sm:text-sm text-text-muted leading-relaxed">
+            Este pedido pertenece a una cuenta de usuario registrada. Para consultar el seguimiento satelital y el estado en horno en tiempo real, inicia sesión con la cuenta correspondiente.
+          </p>
+          <div className="pt-2 flex justify-center gap-3">
+            <button
+              onClick={() => router.push(`${routes.getLoginHref()}?redirect=/rastreo/${orderId}`)}
+              className="inline-flex items-center gap-2 px-6 py-3 bg-brand-primary hover:bg-brand-primary-hover text-white text-xs uppercase tracking-wider rounded-full font-black transition-all shadow-md active:scale-95 cursor-pointer font-display"
+            >
+              <LogIn className="h-4 w-4" />
+              <span>Iniciar Sesión</span>
+            </button>
+            <button
+              onClick={() => router.push(routes.getRastreoHref())}
+              className="inline-flex items-center gap-2 px-5 py-2.5 bg-surface-card hover:bg-surface-card-hover border border-surface-border text-text-strong text-xs uppercase tracking-wider rounded-full font-bold transition-all active:scale-95 cursor-pointer font-display"
+            >
+              <span>Volver a Rastreo</span>
+            </button>
+          </div>
+        </div>
+      );
+    }
+
+    if (error === 'FORBIDDEN') {
+      return (
+        <div className="max-w-xl mx-auto my-12 p-8 bg-surface-card border border-status-danger/30 rounded-3xl text-center shadow-lg space-y-4">
+          <div className="w-12 h-12 rounded-2xl bg-status-danger/10 text-status-danger mx-auto flex items-center justify-center">
+            <ShieldAlert className="h-6 w-6" />
+          </div>
+          <h2 className="text-xl sm:text-2xl font-black uppercase tracking-wide font-display text-text-strong">
+            Acceso Denegado
+          </h2>
+          <p className="text-xs sm:text-sm text-text-muted leading-relaxed">
+            Esta comanda pertenece a otra cuenta de usuario. Por razones de seguridad y privacidad, solo el comensal propietario o el personal del restaurante pueden consultar el mapa de despacho.
+          </p>
+          <div className="pt-2 flex justify-center gap-3">
+            <button
+              onClick={() => router.push(routes.getRastreoHref())}
+              className="inline-flex items-center gap-2 px-6 py-3 bg-brand-primary hover:bg-brand-primary-hover text-white text-xs uppercase tracking-wider rounded-full font-black transition-all shadow-md active:scale-95 cursor-pointer font-display"
+            >
+              <ArrowLeft className="h-4 w-4" />
+              <span>Volver a Mis Pedidos</span>
+            </button>
+          </div>
+        </div>
+      );
+    }
+
     return (
       <div className="max-w-xl mx-auto my-12 p-8 bg-surface-card border border-surface-border rounded-3xl text-center shadow-lg">
         <AlertCircle className="h-10 w-10 text-status-danger mx-auto mb-3" />
@@ -88,7 +144,7 @@ export function OrderTrackingView({ orderId }: OrderTrackingViewProps) {
           </button>
           <button
             onClick={() => router.push(routes.getHomeHref())}
-            className="inline-flex items-center gap-2 px-5 py-2.5 bg-brand-primary hover:bg-brand-primary-hover text-white text-xs uppercase tracking-wider rounded-full font-black transition-all shadow-md active:scale-95 cursor-pointer"
+            className="inline-flex items-center gap-2 px-5 py-2.5 bg-brand-primary hover:bg-brand-primary-hover text-white text-xs uppercase tracking-wider rounded-full font-black transition-all shadow-md active:scale-95 cursor-pointer font-display"
           >
             <ArrowLeft className="h-3.5 w-3.5" />
             Volver a la carta
@@ -119,7 +175,7 @@ export function OrderTrackingView({ orderId }: OrderTrackingViewProps) {
                   {order.branchName}
                 </span>
                 <h1 className="text-2xl sm:text-3xl font-black uppercase tracking-tight text-text-strong font-display mt-1">
-                  Pedido #{order.orderId.slice(0, 8)}
+                  Pedido #{order.orderNumber && order.orderNumber > 0 ? order.orderNumber : order.orderId.slice(0, 8)}
                 </h1>
                 <p className="text-xs text-text-muted mt-1">
                   Cliente: <strong className="text-text-strong">{order.customerName}</strong> ({order.customerPhone})

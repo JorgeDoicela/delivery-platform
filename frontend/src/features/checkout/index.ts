@@ -1,4 +1,5 @@
 export { CheckoutForm } from "./components/CheckoutForm";
+export { CheckoutAuthGate } from "./components/CheckoutAuthGate";
 export { GeofenceChecker } from "./components/GeofenceChecker";
 export { AddressSelector } from "./components/AddressSelector";
 export { OrderSummary } from "./components/OrderSummary";

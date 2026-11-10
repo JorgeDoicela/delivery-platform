@@ -2,7 +2,7 @@
 
 import { useEffect, useState, useCallback } from 'react';
 import * as signalR from '@microsoft/signalr';
-import { apiClient } from '@/shared/lib/api-client';
+import { apiClient, ApiClientError } from '@/shared/lib/api-client';
 import { OrderDto, OrderStatus } from '@/shared/types/api';
 
 interface UseOrderTrackingProps {
@@ -49,7 +49,21 @@ export function useOrderTracking({ orderId }: UseOrderTrackingProps): UseOrderTr
           // Normal si aún no hay telemetría activa en Redis
         }
       }
-    } catch {
+    } catch (err: unknown) {
+      if (err instanceof ApiClientError) {
+        if (err.status === 401) {
+          setError('AUTH_REQUIRED');
+          return;
+        }
+        if (err.status === 403) {
+          setError('FORBIDDEN');
+          return;
+        }
+        if (err.status === 404) {
+          setError('NOT_FOUND');
+          return;
+        }
+      }
       setError('No se pudo cargar la orden especificada.');
     } finally {
       setLoading(false);
@@ -89,8 +103,25 @@ export function useOrderTracking({ orderId }: UseOrderTrackingProps): UseOrderTr
             void fetchCurrentDriverLocation();
           }
         }
-      } catch {
+      } catch (err: unknown) {
         if (isSubscribed) {
+          if (err instanceof ApiClientError) {
+            if (err.status === 401) {
+              setError('AUTH_REQUIRED');
+              setLoading(false);
+              return;
+            }
+            if (err.status === 403) {
+              setError('FORBIDDEN');
+              setLoading(false);
+              return;
+            }
+            if (err.status === 404) {
+              setError('NOT_FOUND');
+              setLoading(false);
+              return;
+            }
+          }
           setError('No se pudo cargar la orden especificada.');
           setLoading(false);
         }

@@ -12,3 +12,20 @@ export function formatCurrency(amount: number): string {
     minimumFractionDigits: 2,
   }).format(amount);
 }
+
+export function formatDate(
+  date: string | Date | number,
+  options?: Intl.DateTimeFormatOptions
+): string {
+  const d = typeof date === "string" || typeof date === "number" ? new Date(date) : date;
+  if (isNaN(d.getTime())) return "";
+
+  return d.toLocaleDateString("es-EC", {
+    year: "numeric",
+    month: "short",
+    day: "numeric",
+    hour: "2-digit",
+    minute: "2-digit",
+    ...options,
+  });
+}

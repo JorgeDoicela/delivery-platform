@@ -69,8 +69,17 @@ public class CreateOrderHandlerTests
         using var context = CreateInMemoryDbContext();
         var branch = CreateBranch();
         var product = CreateProduct();
+        var user = new User
+        {
+            Id = Guid.NewGuid(),
+            Email = "juan@test.com",
+            FullName = "Juan Pérez",
+            Phone = "0998765432",
+            IsActive = true
+        };
         context.Branches.Add(branch);
         context.Products.Add(product);
+        context.Users.Add(user);
         await context.SaveChangesAsync();
 
         var mockDatabase = new Mock<IDatabase>();
@@ -105,7 +114,8 @@ public class CreateOrderHandlerTests
             DeliveryType: DeliveryType.Delivery,
             CashAmountPaid: 20.00m,
             TransferReceiptUrl: null,
-            Items: [new CreateOrderItemRequest(product.Id, 2, null)]
+            Items: [new CreateOrderItemRequest(product.Id, 2, null)],
+            UserId: user.Id
         );
 
         // Act
@@ -116,11 +126,112 @@ public class CreateOrderHandlerTests
         result.Value.Total.Should().Be(11.50m); // 2 * 5.00 + 1.50 delivery fee
         result.Value.ChangeDue.Should().Be(8.50m);
 
+        var savedOrder = await context.Orders.FirstOrDefaultAsync(o => o.Id == result.Value.OrderId);
+        savedOrder.Should().NotBeNull();
+        savedOrder!.CreatedByUserId.Should().Be(user.Id);
+        savedOrder.CustomerEmail.Should().Be(user.Email);
+        savedOrder.CustomerId.Should().NotBeNull();
+
         mockKitchenNotifier.Verify(k => k.NotifyNewOrderAsync(
             branch.Id,
             It.Is<KitchenOrderTicketDto>(t => t.OrderId == result.Value.OrderId),
             It.IsAny<CancellationToken>()
         ), Times.Once);
+    }
+
+    [Fact]
+    public async Task Handle_WithoutUserId_ShouldFailValidation()
+    {
+        // Arrange
+        using var context = CreateInMemoryDbContext();
+        var branch = CreateBranch();
+        var product = CreateProduct();
+        context.Branches.Add(branch);
+        context.Products.Add(product);
+        await context.SaveChangesAsync();
+
+        var mockRedis = new Mock<IConnectionMultiplexer>();
+        var mockKitchenNotifier = new Mock<IKitchenNotifier>();
+
+        var handler = new CreateOrderHandler(
+            context,
+            new CreateOrderValidator(),
+            mockRedis.Object,
+            mockKitchenNotifier.Object
+        );
+
+        var command = new CreateOrderCommand(
+            BranchId: branch.Id,
+            CustomerName: "Juan Pérez",
+            CustomerPhone: "0998765432",
+            CustomerEmail: "juan@test.com",
+            IdentificationType: "CEDULA",
+            IdentificationNumber: "1712345678",
+            AddressStreet: "Av. 10 de Agosto",
+            AddressReference: "Cerca del banco",
+            DeliveryLatitude: -0.1800,
+            DeliveryLongitude: -78.4800,
+            PaymentMethod: PaymentMethod.CashOnDelivery,
+            DeliveryType: DeliveryType.Delivery,
+            CashAmountPaid: 20.00m,
+            TransferReceiptUrl: null,
+            Items: [new CreateOrderItemRequest(product.Id, 2, null)],
+            UserId: null
+        );
+
+        // Act
+        var result = await handler.Handle(command);
+
+        // Assert
+        result.IsFailure.Should().BeTrue();
+    }
+
+    [Fact]
+    public async Task Handle_WhenUserNotFound_ShouldReturnUserNotFound()
+    {
+        // Arrange
+        using var context = CreateInMemoryDbContext();
+        var branch = CreateBranch();
+        var product = CreateProduct();
+        context.Branches.Add(branch);
+        context.Products.Add(product);
+        await context.SaveChangesAsync();
+
+        var mockRedis = new Mock<IConnectionMultiplexer>();
+        var mockKitchenNotifier = new Mock<IKitchenNotifier>();
+
+        var handler = new CreateOrderHandler(
+            context,
+            new CreateOrderValidator(),
+            mockRedis.Object,
+            mockKitchenNotifier.Object
+        );
+
+        var command = new CreateOrderCommand(
+            BranchId: branch.Id,
+            CustomerName: "Juan Pérez",
+            CustomerPhone: "0998765432",
+            CustomerEmail: "juan@test.com",
+            IdentificationType: "CEDULA",
+            IdentificationNumber: "1712345678",
+            AddressStreet: "Av. 10 de Agosto",
+            AddressReference: "Cerca del banco",
+            DeliveryLatitude: -0.1800,
+            DeliveryLongitude: -78.4800,
+            PaymentMethod: PaymentMethod.CashOnDelivery,
+            DeliveryType: DeliveryType.Delivery,
+            CashAmountPaid: 20.00m,
+            TransferReceiptUrl: null,
+            Items: [new CreateOrderItemRequest(product.Id, 2, null)],
+            UserId: Guid.NewGuid()
+        );
+
+        // Act
+        var result = await handler.Handle(command);
+
+        // Assert
+        result.IsFailure.Should().BeTrue();
+        result.Error.Code.Should().Be(CreateOrderErrors.UserNotFound.Code);
     }
 
     [Fact]
@@ -130,8 +241,17 @@ public class CreateOrderHandlerTests
         using var context = CreateInMemoryDbContext();
         var branch = CreateBranch(1, maxOrdersPerSlot: 10);
         var product = CreateProduct();
+        var user = new User
+        {
+            Id = Guid.NewGuid(),
+            Email = "juan@test.com",
+            FullName = "Juan Pérez",
+            Phone = "0998765432",
+            IsActive = true
+        };
         context.Branches.Add(branch);
         context.Products.Add(product);
+        context.Users.Add(user);
         await context.SaveChangesAsync();
 
         var mockDatabase = new Mock<IDatabase>();
@@ -167,7 +287,8 @@ public class CreateOrderHandlerTests
             DeliveryType: DeliveryType.Delivery,
             CashAmountPaid: 20.00m,
             TransferReceiptUrl: null,
-            Items: [new CreateOrderItemRequest(product.Id, 1, null)]
+            Items: [new CreateOrderItemRequest(product.Id, 1, null)],
+            UserId: user.Id
         );
 
         // Act

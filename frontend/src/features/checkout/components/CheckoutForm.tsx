@@ -16,7 +16,8 @@ import { useAccountStore } from "@/features/account";
 import { apiClient } from "@/shared/lib/api-client";
 import { formatCurrency } from "@/shared/lib/utils";
 import { useTenantRoutes } from "@/shared/lib/tenant-routing";
-import { Loader2 } from "lucide-react";
+import { UserCheck, ShieldCheck, LogIn, Loader2 } from "lucide-react";
+import { CheckoutAuthGate } from "./CheckoutAuthGate";
 
 export function CheckoutForm() {
   const router = useRouter();
@@ -37,6 +38,7 @@ export function CheckoutForm() {
   const total = getTotal();
   const user = useAuthStore((s) => s.user);
   const isAuthenticated = useAuthStore((s) => s.isAuthenticated);
+  const logout = useAuthStore((s) => s.logout);
   const profile = useAccountStore((s) => s.profile);
   const fetchProfile = useAccountStore((s) => s.fetchProfile);
 
@@ -98,6 +100,12 @@ export function CheckoutForm() {
   };
 
   const onSubmit = async (data: CheckoutFormData) => {
+    if (!isAuthenticated) {
+      setSubmitError("Debes iniciar sesión o registrar tu cuenta para poder confirmar el pedido.");
+      document.getElementById("checkout-auth-section")?.scrollIntoView({ behavior: "smooth" });
+      return;
+    }
+
     if (items.length === 0) {
       setSubmitError("Tu pedido está vacío. Agrega productos antes de continuar.");
       return;
@@ -180,26 +188,61 @@ export function CheckoutForm() {
         <div className="lg:col-span-5 space-y-6 lg:sticky lg:top-24">
           <OrderSummary />
 
+          {/* Autenticación Requerida o Banner de Cuenta Verificada */}
+          <div id="checkout-auth-section">
+            {!isAuthenticated ? (
+              <CheckoutAuthGate />
+            ) : (
+              <div className="p-4 rounded-3xl bg-surface-card border border-surface-border shadow-sm flex items-center justify-between gap-3 text-xs">
+                <div className="flex items-center gap-3 min-w-0">
+                  <div className="w-10 h-10 rounded-2xl bg-brand-primary/10 text-brand-primary flex items-center justify-center shrink-0">
+                    <UserCheck className="w-5 h-5" />
+                  </div>
+                  <div className="min-w-0">
+                    <div className="flex items-center gap-1.5">
+                      <span className="font-bold text-text-strong truncate">
+                        {user?.fullName || profile?.fullName || user?.email}
+                      </span>
+                      <ShieldCheck className="w-3.5 h-3.5 text-status-success shrink-0" />
+                    </div>
+                    <span className="text-text-muted text-[11px] block truncate">
+                      {user?.email} • Cuenta Autenticada
+                    </span>
+                  </div>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => logout()}
+                  className="text-xs font-bold text-brand-primary hover:underline shrink-0 cursor-pointer"
+                >
+                  Cambiar
+                </button>
+              </div>
+            )}
+          </div>
+
           {submitError && (
             <div className="p-3.5 rounded-xl bg-status-danger-bg border border-status-danger-border text-xs text-status-danger font-medium leading-relaxed">
               {submitError}
             </div>
           )}
 
-          <button
-            type="submit"
-            disabled={isSubmitting || items.length === 0}
-            className="w-full hidden lg:flex items-center justify-center gap-2 bg-brand-primary hover:bg-brand-primary-hover disabled:bg-surface-border disabled:text-text-muted text-white font-black text-sm uppercase tracking-wider py-4 px-8 rounded-full shadow-xl transition-all hover:scale-[1.01] active:scale-95 disabled:active:scale-100 disabled:hover:scale-100 cursor-pointer"
-          >
-            {isSubmitting ? (
-              <>
-                <Loader2 className="w-5 h-5 animate-spin" />
-                <span>Procesando e Imprimiendo Comanda...</span>
-              </>
-            ) : (
-              <span>Confirmar y Enviar Pedido ({formatCurrency(total)})</span>
-            )}
-          </button>
+          {isAuthenticated && (
+            <button
+              type="submit"
+              disabled={isSubmitting || items.length === 0}
+              className="w-full hidden lg:flex items-center justify-center gap-2 bg-brand-primary hover:bg-brand-primary-hover disabled:bg-surface-border disabled:text-text-muted text-white font-black text-sm uppercase tracking-wider py-4 px-8 rounded-full shadow-xl transition-all hover:scale-[1.01] active:scale-95 disabled:active:scale-100 disabled:hover:scale-100 cursor-pointer"
+            >
+              {isSubmitting ? (
+                <>
+                  <Loader2 className="w-5 h-5 animate-spin" />
+                  <span>Procesando e Imprimiendo Comanda...</span>
+                </>
+              ) : (
+                <span>Confirmar y Enviar Pedido ({formatCurrency(total)})</span>
+              )}
+            </button>
+          )}
         </div>
       </div>
 
@@ -217,20 +260,33 @@ export function CheckoutForm() {
           </span>
         </div>
 
-        <button
-          type="submit"
-          disabled={isSubmitting || items.length === 0}
-          className="flex-1 max-w-[240px] flex items-center justify-center gap-2 bg-brand-primary hover:bg-brand-primary-hover disabled:bg-surface-border disabled:text-text-muted text-white font-black text-xs uppercase tracking-wider py-3.5 px-4 rounded-full shadow-lg transition-all active:scale-95 disabled:active:scale-100 cursor-pointer font-display min-h-[44px]"
-        >
-          {isSubmitting ? (
-            <>
-              <Loader2 className="w-4 h-4 animate-spin" />
-              <span>Enviando...</span>
-            </>
-          ) : (
-            <span>Confirmar Pedido</span>
-          )}
-        </button>
+        {isAuthenticated ? (
+          <button
+            type="submit"
+            disabled={isSubmitting || items.length === 0}
+            className="flex-1 max-w-[240px] flex items-center justify-center gap-2 bg-brand-primary hover:bg-brand-primary-hover disabled:bg-surface-border disabled:text-text-muted text-white font-black text-xs uppercase tracking-wider py-3.5 px-4 rounded-full shadow-lg transition-all active:scale-95 disabled:active:scale-100 cursor-pointer font-display min-h-[44px]"
+          >
+            {isSubmitting ? (
+              <>
+                <Loader2 className="w-4 h-4 animate-spin" />
+                <span>Enviando...</span>
+              </>
+            ) : (
+              <span>Confirmar Pedido</span>
+            )}
+          </button>
+        ) : (
+          <button
+            type="button"
+            onClick={() => {
+              document.getElementById("checkout-auth-section")?.scrollIntoView({ behavior: "smooth" });
+            }}
+            className="flex-1 max-w-[240px] flex items-center justify-center gap-2 bg-brand-primary hover:bg-brand-primary-hover text-white font-black text-xs uppercase tracking-wider py-3.5 px-4 rounded-full shadow-lg transition-all active:scale-95 cursor-pointer font-display min-h-[44px]"
+          >
+            <LogIn className="w-4 h-4" />
+            <span>Iniciar Sesión para Pedir</span>
+          </button>
+        )}
       </div>
     </form>
   );

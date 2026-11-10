@@ -36,7 +36,8 @@ public sealed record CreateOrderCommand(
     DeliveryType DeliveryType,
     decimal? CashAmountPaid,
     string? TransferReceiptUrl,
-    List<CreateOrderItemRequest> Items
+    List<CreateOrderItemRequest> Items,
+    Guid? UserId = null
 );
 
 public sealed record CreateOrderResponse(
@@ -53,6 +54,16 @@ public sealed record CreateOrderResponse(
 
 public static class CreateOrderErrors
 {
+    public static readonly Error AuthenticationRequired = new(
+        "Orders.AuthenticationRequired",
+        "Se requiere una cuenta autenticada para confirmar y realizar el pedido."
+    );
+
+    public static readonly Error UserNotFound = new(
+        "Orders.UserNotFound",
+        "El usuario autenticado no existe o se encuentra inactivo."
+    );
+
     public static readonly Error SlotCapacityExceeded = new(
         "Orders.SlotCapacityExceeded",
         "La cocina se encuentra temporalmente al 150% de su capacidad física de producción. Admisión pausada para proteger la calidad. Intenta en unos minutos."
@@ -82,6 +93,12 @@ public sealed class CreateOrderValidator : AbstractValidator<CreateOrderCommand>
 {
     public CreateOrderValidator()
     {
+        RuleFor(x => x.UserId)
+            .NotNull()
+            .NotEmpty()
+            .NotEqual(Guid.Empty)
+            .WithMessage("Se requiere una cuenta autenticada para realizar el pedido.");
+
         RuleFor(x => x.BranchId).GreaterThan(0);
         RuleFor(x => x.CustomerName).NotEmpty().MaximumLength(150);
         RuleFor(x => x.CustomerPhone).NotEmpty().MaximumLength(30);
@@ -136,6 +153,20 @@ public sealed class CreateOrderHandler : IHandler<CreateOrderCommand, Result<Cre
             return Result.Failure<CreateOrderResponse>(new Error(first.ErrorCode, first.ErrorMessage));
         }
 
+        if (!command.UserId.HasValue || command.UserId.Value == Guid.Empty)
+        {
+            return Result.Failure<CreateOrderResponse>(CreateOrderErrors.AuthenticationRequired);
+        }
+
+        var user = await _context.Users
+            .AsNoTracking()
+            .FirstOrDefaultAsync(u => u.Id == command.UserId.Value && u.IsActive, cancellationToken);
+
+        if (user is null)
+        {
+            return Result.Failure<CreateOrderResponse>(CreateOrderErrors.UserNotFound);
+        }
+
         var branch = await _context.Branches
             .AsNoTracking()
             .FirstOrDefaultAsync(b => b.Id == command.BranchId && b.IsActive, cancellationToken);
@@ -181,14 +212,58 @@ public sealed class CreateOrderHandler : IHandler<CreateOrderCommand, Result<Cre
 
         decimal configuredDeliveryFee = tenantSettings?.BaseDeliveryFee ?? 1.50m;
 
-        // Construir la orden y liquidar totales contables
+        // Directorio de Clientes SRI por Tenant para métricas de compras y autocompletado
+        Customer? customer = null;
+        var contactPhone = !string.IsNullOrWhiteSpace(command.CustomerPhone)
+            ? command.CustomerPhone.Trim()
+            : user.Phone;
+
+        if (!string.IsNullOrWhiteSpace(contactPhone) || !string.IsNullOrWhiteSpace(user.Email))
+        {
+            customer = await _context.Customers
+                .IgnoreQueryFilters()
+                .FirstOrDefaultAsync(c => c.TenantId == branch.TenantId && (c.Phone == contactPhone || c.Email == user.Email), cancellationToken);
+
+            if (customer == null)
+            {
+                var idNum = !string.IsNullOrWhiteSpace(command.IdentificationNumber) && command.IdentificationNumber != "9999999999999"
+                    ? command.IdentificationNumber.Trim()
+                    : $"CF-{user.Id:N}"[..18];
+
+                customer = new Customer
+                {
+                    Id = Guid.NewGuid(),
+                    TenantId = branch.TenantId,
+                    FullName = !string.IsNullOrWhiteSpace(command.CustomerName) ? command.CustomerName.Trim() : user.FullName,
+                    Phone = contactPhone,
+                    Email = user.Email,
+                    IdentificationType = !string.IsNullOrWhiteSpace(command.IdentificationType) ? command.IdentificationType.Trim() : "CONSUMIDOR_FINAL",
+                    IdentificationNumber = idNum,
+                    DefaultAddressStreet = command.AddressStreet.Trim(),
+                    DefaultAddressReference = command.AddressReference?.Trim() ?? string.Empty,
+                    CreatedAt = DateTime.UtcNow,
+                    TotalOrdersCount = 1,
+                    LastOrderAt = DateTime.UtcNow
+                };
+                await _context.Customers.AddAsync(customer, cancellationToken);
+            }
+            else
+            {
+                customer.TotalOrdersCount++;
+                customer.LastOrderAt = DateTime.UtcNow;
+            }
+        }
+
+        // Construir la orden y liquidar totales contables vinculada a la cuenta autenticada
         var order = new Order
         {
             TenantId = branch.TenantId,
             BranchId = branch.Id,
-            CustomerName = command.CustomerName.Trim(),
-            CustomerPhone = command.CustomerPhone.Trim(),
-            CustomerEmail = command.CustomerEmail?.Trim(),
+            CreatedByUserId = user.Id,
+            CustomerId = customer?.Id,
+            CustomerName = !string.IsNullOrWhiteSpace(command.CustomerName) ? command.CustomerName.Trim() : user.FullName,
+            CustomerPhone = contactPhone,
+            CustomerEmail = user.Email,
             IdentificationType = command.IdentificationType.Trim(),
             IdentificationNumber = command.IdentificationNumber.Trim(),
             AddressStreet = command.AddressStreet.Trim(),

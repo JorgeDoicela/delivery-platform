@@ -80,8 +80,14 @@ export const accountApi = {
     return handleAccountResponse<AccountProfile>(res);
   },
 
-  async getMyOrders(): Promise<GetMyOrdersResponse> {
-    const res = await fetch(`${getApiEndOrdersUrl()}`, {
+  async getMyOrders(params?: { page?: number; pageSize?: number; status?: string }): Promise<GetMyOrdersResponse> {
+    const query = new URLSearchParams();
+    if (params?.page) query.set("page", params.page.toString());
+    if (params?.pageSize) query.set("pageSize", params.pageSize.toString());
+    if (params?.status) query.set("status", params.status);
+    const qs = query.toString();
+    const url = `${getApiEndOrdersUrl()}${qs ? `?${qs}` : ""}`;
+    const res = await fetch(url, {
       method: "GET",
       headers: buildHeaders(),
       credentials: "include",

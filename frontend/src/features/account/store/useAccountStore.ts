@@ -41,7 +41,7 @@ interface AccountState {
   clearMessages: () => void;
   fetchProfile: () => Promise<void>;
   updateProfile: (payload: UpdateProfilePayload) => Promise<boolean>;
-  fetchOrders: () => Promise<void>;
+  fetchOrders: (params?: { page?: number; pageSize?: number; status?: string }) => Promise<void>;
   fetchAddresses: () => Promise<void>;
   saveAddress: (payload: UpsertAddressPayload) => Promise<boolean>;
   deleteAddress: (id: string) => Promise<boolean>;
@@ -109,10 +109,10 @@ export const useAccountStore = create<AccountState>((set, get) => ({
     }
   },
 
-  fetchOrders: async () => {
+  fetchOrders: async (params) => {
     set({ isLoadingOrders: true, ordersError: null });
     try {
-      const res = await accountApi.getMyOrders();
+      const res = await accountApi.getMyOrders(params);
       set({
         orders: res.orders,
         totalOrdersCount: res.totalCount,

@@ -2,18 +2,18 @@
 
 ## 1. Descripcion General del Proceso de Compra
 
-El flujo de checkout en la plataforma esta disenado para **eliminar la friccion de compra** permitiendo adquisicion rapida sin obligar a registrarse con contrasena. Opera en [`src/app/(storefront)/finalizar-pedido/page.tsx`](../../frontend/src/app/%28storefront%29/finalizar-pedido/page.tsx) (con alias `/checkout`) combinando captura de datos fiscales, resolucion de geocerca espacial en mapa interactivo y blindaje transaccional con idempotencia.
+El flujo de checkout en la plataforma opera en [`src/app/(storefront)/finalizar-pedido/page.tsx`](../../frontend/src/app/%28storefront%29/finalizar-pedido/page.tsx) (con alias `/checkout`). Combina captura de datos de despacho, resolucion de geocerca espacial en mapa interactivo y una **regla de negocio profesional de autenticacion obligatoria previa a la emision de la comanda** (`CheckoutAuthGate`). Dicha regla asegura que toda orden quede vinculada de forma inmutable a la cuenta del comensal, garantizando la trazabilidad contable y el seguimiento satelital en vivo sin exponer datos privados de terceros.
 
 ---
 
-## 2. Diagrama de Secuencia del Flujo de Checkout
+## 2. Diagrama de Secuencia del Flujo de Checkout con Autenticacion Obligatoria
 
 ```mermaid
 sequenceDiagram
     autonumber
     actor Cliente as Cliente (Navegador)
     participant UI as Formulario Checkout (React Hook Form + Zod)
-    participant Map as MapLibre GL JS (Geocerca)
+    participant Auth as CheckoutAuthGate (useAuthStore)
     participant API as Backend .NET 8 (Orders API)
     participant PostGIS as PostgreSQL + PostGIS (ST_Contains)
     participant Redis as Redis (Idempotencia & Throttling)
@@ -31,16 +31,24 @@ sequenceDiagram
         UI-->>Cliente: Sucursal asignada y tiempo estimado
     end
 
-    Cliente->>UI: Selecciona metodo de pago y completa datos fiscales
+    alt Cliente No Autenticado
+        UI->>Auth: Renderiza CheckoutAuthGate en checkout
+        Cliente->>Auth: Inicia sesion o crea cuenta rapida (conservando items del carrito)
+        Auth-->>UI: useAuthStore.isAuthenticated = true
+        UI-->>Cliente: Auto-rellena datos de perfil y habilita boton de confirmacion
+    end
+
+    Cliente->>UI: Selecciona metodo de pago y confirma pedido
     UI->>UI: Validacion en cliente con Zod (checkoutSchema)
-    UI->>API: POST /api/orders (Header: Idempotency-Key: UUIDv4)
+    UI->>API: POST /api/orders (Bearer JWT + Header Idempotency-Key)
     API->>Redis: Verificar / Adquirir bloqueo idempotency:KEY
+    API->>API: Validar UserId autenticado y vincular CreatedByUserId / CustomerId
     API->>API: Recalcular subtotal en backend contra precios de BD
     API->>Redis: Incrementar contador de slot de 20 min
     API->>API: Persistir Orden en PostgreSQL
     API-->>UI: 201 Created { orderId: UUID, status: Confirmed, total: ... }
     UI->>UI: Limpiar carrito en useCartStore
-    UI-->>Cliente: Redireccion a pantalla de rastreo /track/UUID
+    UI-->>Cliente: Redireccion a pantalla de rastreo inteligente /rastreo/[orderId]
 ```
 
 ---
@@ -113,6 +121,16 @@ Idempotency-Key: e81d4fae-7dec-11d0-a765-00a0c91e6bf6
 ```
 
 Si el usuario hace doble clic rapido o la conexion celular experimenta un microcorte, Redis intercepta la segunda peticion mediante la clave `idempotency:{key}` con TTL de 24 horas y retorna el resultado anterior sin duplicar cobros ni generar comandas dobles en cocina.
+
+---
+
+## 7. Modelo de Rastreo Profesional Vinculado a Cuenta y Telefono
+
+En [`OrderSearchView.tsx`](../../frontend/src/features/tracking/components/OrderSearchView.tsx) y [`OrderTrackingView.tsx`](../../frontend/src/features/tracking/components/OrderTrackingView.tsx), el sistema prescinde de formularios manuales de busqueda por codigo o identificador UUID. La regla de negocio unifica la identidad del comensal:
+
+* **Sincronizacion Automatica:** Todos los pedidos realizados en tienda web, app o canal conversacional de WhatsApp quedan vinculados a la persona mediante su `UserId`, correo o `CustomerPhone` (normalizado a sus ultimos 8-9 digitos significativos).
+* **Experiencia de Usuario Autenticado:** Al iniciar sesion (con Google, correo o credenciales con telefono), el usuario visualiza directamente sus pedidos activos en curso con boton de seguimiento satelital en vivo con un solo clic.
+* **Privacidad y Control de Acceso:** No se expone telemetria ni datos de despacho de forma anonima. La API (`GetOrderByIdEndpoint`) exige token JWT y verifica autorizacion estricta por `UserId`, email o numero de telefono del solicitante.
 
 ---
 

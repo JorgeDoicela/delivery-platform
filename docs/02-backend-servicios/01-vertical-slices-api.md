@@ -300,10 +300,11 @@ El backend de la plataforma esta construido en .NET 8 utilizando C# 12 y Minimal
 
 ---
 
-### 2.3. Creacion de Ordenes (Checkout con Idempotencia)
+### 2.3. Creacion de Ordenes (Checkout con Idempotencia y Autenticacion Obligatoria)
 * **Ruta:** `POST /api/orders`
+* **Autenticacion:** Requerida (`[Authorize]` / `.RequireAuthorization()`). El `UserId` se extrae criptograficamente del claim `NameIdentifier`/`sub` del JWT.
 * **Cabecera Requerida:** `Idempotency-Key: <UUIDv4>`
-* **Descripcion:** Recalcula y blinda los precios unitarios en backend contra la base de datos (descartando cualquier precio manipulado en cliente), calcula el cambio en efectivo y registra la transaccion de forma atomica.
+* **Descripcion:** Valida la sesion del usuario comensal, recalcula y blinda los precios unitarios en backend contra la base de datos (descartando cualquier precio manipulado en cliente), calcula el cambio en efectivo, registra la transaccion de forma atomica, vincula de forma inmutable la cuenta (`CreatedByUserId`, `CustomerEmail`) y actualiza o crea el cliente CRM (`Customer`) para el tenant de la sucursal.
 * **Payload de Entrada:**
   ```json
   {
@@ -343,9 +344,12 @@ El backend de la plataforma esta construido en .NET 8 utilizando C# 12 y Minimal
 
 ---
 
-### 2.4. Consulta de Orden por ID
+### 2.4. Consulta de Orden por ID y Rastreo Satelital Protegido
 * **Ruta:** `GET /api/orders/{orderId}`
-* **Descripcion:** Retorna el detalle exhaustivo del pedido, snapshots de precios inmutables al momento de la compra y desglose de liquidacion.
+* **Seguridad y Control de Acceso:**
+  - **Aislamiento Multi-Tenant:** Si la peticion incluye contexto de tenant (`X-Tenant-Slug`), la orden debe pertenecer estrictamente a dicho tenant; de lo contrario retorna `404 Not Found`.
+  - **Regla de Propiedad:** El personal operativo (`Admin`, `BranchAdmin`, `Kitchen`, `Driver`, `Cashier`, `SuperAdmin`) puede consultar cualquier orden del tenant. Los clientes comensales únicamente pueden consultar órdenes creadas por su propia cuenta (`CreatedByUserId` o `CustomerEmail`). Usuarios no autenticados reciben `401 Unauthorized` y otros clientes reciben `403 Forbidden`.
+* **Descripcion:** Retorna el detalle exhaustivo del pedido, numero secuencial de comanda (`orderNumber`), snapshots de precios inmutables al momento de la compra, desglose contable y coordenadas para tracking en tiempo real.
 
 ---
 

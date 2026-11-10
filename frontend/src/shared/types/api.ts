@@ -110,8 +110,11 @@ export interface OrderDetailItemDto {
 
 export interface OrderDetailResponse {
   orderId: string;
+  orderNumber?: number;
   branchId: number;
   branchName: string;
+  tenantSlug?: string;
+  tenantName?: string;
   branchLatitude?: number;
   branchLongitude?: number;
   customerName: string;

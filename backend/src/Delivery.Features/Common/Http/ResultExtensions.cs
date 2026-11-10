@@ -43,6 +43,7 @@ public static class ResultExtensions
     private static int DetermineStatusCode(string errorCode) => errorCode switch
     {
         var code when code.Contains("Unauthorized", StringComparison.OrdinalIgnoreCase) ||
+                       code.Contains("AuthenticationRequired", StringComparison.OrdinalIgnoreCase) ||
                        code.Contains("InvalidCredentials", StringComparison.OrdinalIgnoreCase) ||
                        code.Contains("InvalidGoogleToken", StringComparison.OrdinalIgnoreCase) ||
                        code.Contains("InvalidRefreshToken", StringComparison.OrdinalIgnoreCase) => StatusCodes.Status401Unauthorized,

@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { cn, formatCurrency } from "./utils";
+import { cn, formatCurrency, formatDate } from "./utils";
 
 describe("utils", () => {
   describe("cn", () => {
@@ -33,6 +33,18 @@ describe("utils", () => {
       const normalized = formatted.replace(/\u00a0/g, " ");
       expect(normalized).toContain("0,00");
       expect(normalized).toContain("$");
+    });
+  });
+
+  describe("formatDate", () => {
+    it("debe formatear una fecha válida en formato legible en español", () => {
+      const formatted = formatDate("2026-10-27T15:30:00Z");
+      expect(formatted).toBeTruthy();
+      expect(formatted).toContain("2026");
+    });
+
+    it("debe retornar cadena vacía ante una fecha inválida", () => {
+      expect(formatDate("fecha-invalida")).toBe("");
     });
   });
 });
