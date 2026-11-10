@@ -50,6 +50,7 @@ public partial class AppDbContext : DbContext
 
     // Clientes, Pedidos, Despacho y Facturación SRI
     public DbSet<Customer> Customers => Set<Customer>();
+    public DbSet<CustomerConsent> CustomerConsents => Set<CustomerConsent>();
     public DbSet<Order> Orders => Set<Order>();
     public DbSet<OrderItem> OrderItems => Set<OrderItem>();
     public DbSet<OrderItemModifier> OrderItemModifiers => Set<OrderItemModifier>();

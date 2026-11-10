@@ -43,6 +43,9 @@ public static class DependencyInjection
                 var envVerifyToken = Environment.GetEnvironmentVariable("WHATSAPP_VERIFY_TOKEN");
                 if (!string.IsNullOrWhiteSpace(envVerifyToken)) options.VerifyToken = envVerifyToken;
 
+                var envAppSecret = Environment.GetEnvironmentVariable("WHATSAPP_APP_SECRET");
+                if (!string.IsNullOrWhiteSpace(envAppSecret)) options.AppSecret = envAppSecret;
+
                 var envDeepSeekKey = Environment.GetEnvironmentVariable("DEEPSEEK_API_KEY");
                 if (!string.IsNullOrWhiteSpace(envDeepSeekKey)) options.DeepSeekApiKey = envDeepSeekKey;
 
@@ -54,6 +57,7 @@ public static class DependencyInjection
             });
 
         services.AddSingleton<Delivery.Features.Chatbot.WhatsAppWebhook.IConversationStore, Delivery.Features.Chatbot.WhatsAppWebhook.RedisConversationStore>();
+        services.AddScoped<Delivery.Features.Chatbot.WhatsAppWebhook.ICustomerConsentTracker, Delivery.Features.Chatbot.WhatsAppWebhook.CustomerConsentTracker>();
         services.AddScoped<Delivery.Features.Chatbot.WhatsAppWebhook.ITenantKnowledgeProvider, Delivery.Features.Chatbot.WhatsAppWebhook.TenantKnowledgeProvider>();
         services.AddScoped<Delivery.Features.Chatbot.WhatsAppWebhook.DeepSeekAiEngine>();
         services.AddScoped<Delivery.Features.Chatbot.WhatsAppWebhook.GeminiAiEngine>();

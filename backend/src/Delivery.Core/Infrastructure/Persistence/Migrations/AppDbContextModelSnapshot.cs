@@ -318,6 +318,51 @@ namespace Delivery.Core.Infrastructure.Persistence.Migrations
                     b.ToTable("Customers", (string)null);
                 });
 
+            modelBuilder.Entity("Delivery.Core.Domain.Entities.CustomerConsent", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTime>("AcceptedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("Channel")
+                        .IsRequired()
+                        .HasMaxLength(30)
+                        .HasColumnType("character varying(30)");
+
+                    b.Property<string>("ConsentVersion")
+                        .IsRequired()
+                        .HasMaxLength(20)
+                        .HasColumnType("character varying(20)");
+
+                    b.Property<string>("EvidencePayload")
+                        .HasColumnType("text");
+
+                    b.Property<bool>("IsRevoked")
+                        .HasColumnType("boolean");
+
+                    b.Property<string>("PhoneNumber")
+                        .IsRequired()
+                        .HasMaxLength(30)
+                        .HasColumnType("character varying(30)");
+
+                    b.Property<DateTime?>("RevokedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<Guid>("TenantId")
+                        .HasColumnType("uuid");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("TenantId", "PhoneNumber");
+
+                    b.HasIndex("TenantId", "PhoneNumber", "IsRevoked");
+
+                    b.ToTable("CustomerConsents", (string)null);
+                });
+
             modelBuilder.Entity("Delivery.Core.Domain.Entities.DiningTable", b =>
                 {
                     b.Property<int>("Id")
@@ -1311,6 +1356,10 @@ namespace Delivery.Core.Infrastructure.Persistence.Migrations
                         .HasMaxLength(150)
                         .HasColumnType("character varying(150)");
 
+                    b.Property<string>("CustomPrivacyPolicyUrl")
+                        .HasMaxLength(500)
+                        .HasColumnType("character varying(500)");
+
                     b.Property<bool>("EnableDelivery")
                         .HasColumnType("boolean");
 
@@ -1318,6 +1367,9 @@ namespace Delivery.Core.Infrastructure.Persistence.Migrations
                         .HasColumnType("boolean");
 
                     b.Property<bool>("EnableTakeout")
+                        .HasColumnType("boolean");
+
+                    b.Property<bool>("EnableWhatsAppBot")
                         .HasColumnType("boolean");
 
                     b.Property<string>("HeroSlidesJson")
@@ -1336,6 +1388,9 @@ namespace Delivery.Core.Infrastructure.Persistence.Migrations
                         .HasColumnType("text");
 
                     b.Property<bool>("QuickLinksEnabled")
+                        .HasColumnType("boolean");
+
+                    b.Property<bool>("RequireDataProtectionConsent")
                         .HasColumnType("boolean");
 
                     b.Property<string>("SriCertificatePasswordHash")
@@ -1551,6 +1606,17 @@ namespace Delivery.Core.Infrastructure.Persistence.Migrations
                 {
                     b.HasOne("Delivery.Core.Domain.Entities.Tenant", "Tenant")
                         .WithMany()
+                        .HasForeignKey("TenantId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Tenant");
+                });
+
+            modelBuilder.Entity("Delivery.Core.Domain.Entities.CustomerConsent", b =>
+                {
+                    b.HasOne("Delivery.Core.Domain.Entities.Tenant", "Tenant")
+                        .WithMany("Consents")
                         .HasForeignKey("TenantId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -2036,6 +2102,8 @@ namespace Delivery.Core.Infrastructure.Persistence.Migrations
                     b.Navigation("Branches");
 
                     b.Navigation("Categories");
+
+                    b.Navigation("Consents");
 
                     b.Navigation("Orders");
 

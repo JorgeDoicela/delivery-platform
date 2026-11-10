@@ -39,5 +39,21 @@ public class TenantSetting : IMustHaveTenant
     // Textos Legales y Políticas por Tenant
     public string? TermsAndConditionsMarkdown { get; set; }
     public string? PrivacyPolicyMarkdown { get; set; }
+
+    // Configuración Asistente WhatsApp e Inteligencia Artificial
+    /// <summary>
+    /// Habilita o deshabilita la atención automatizada del bot conversacional de WhatsApp para este establecimiento.
+    /// </summary>
+    public bool EnableWhatsAppBot { get; set; } = true;
+
+    /// <summary>
+    /// Exige consentimiento previo auditable conforme a la Ley Orgánica de Protección de Datos Personales (LOPDP).
+    /// </summary>
+    public bool RequireDataProtectionConsent { get; set; } = true;
+
+    /// <summary>
+    /// Enlace personalizado de la política de privacidad. Si es nulo, usa https://{PlatformDomain}/{slug}/privacidad.
+    /// </summary>
+    public string? CustomPrivacyPolicyUrl { get; set; }
 }
 

@@ -228,6 +228,18 @@ public static partial class DatabaseSeeder
                 needsSave = true;
             }
 
+            if (!settings.EnableWhatsAppBot)
+            {
+                settings.EnableWhatsAppBot = true;
+                needsSave = true;
+            }
+
+            if (!settings.RequireDataProtectionConsent)
+            {
+                settings.RequireDataProtectionConsent = true;
+                needsSave = true;
+            }
+
             if (string.IsNullOrWhiteSpace(settings.HeroSlidesJson) || settings.HeroSlidesJson == "[]")
             {
                 settings.HeroSlidesJson = JsonSerializer.Serialize(defaultHeroSlides, JsonOptions);

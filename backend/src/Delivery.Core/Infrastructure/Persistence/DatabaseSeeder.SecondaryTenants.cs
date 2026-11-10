@@ -142,6 +142,16 @@ public static partial class DatabaseSeeder
                     secondarySettings.PromotionalBannersJson = secondarySettings.PromotionalBannersJson.Replace("/images/banners/", $"/images/tenants/{slug}/banners/");
                     needsSave = true;
                 }
+                if (!secondarySettings.EnableWhatsAppBot)
+                {
+                    secondarySettings.EnableWhatsAppBot = true;
+                    needsSave = true;
+                }
+                if (!secondarySettings.RequireDataProtectionConsent)
+                {
+                    secondarySettings.RequireDataProtectionConsent = true;
+                    needsSave = true;
+                }
             }
             if (needsSave)
             {

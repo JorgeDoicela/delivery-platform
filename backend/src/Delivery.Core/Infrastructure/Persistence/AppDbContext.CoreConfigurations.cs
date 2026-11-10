@@ -47,6 +47,7 @@ public partial class AppDbContext
             ts.Property(x => x.BankAccountTaxId).HasMaxLength(30);
             ts.Property(x => x.HeroSlidesJson).HasColumnType("text");
             ts.Property(x => x.PromotionalBannersJson).HasColumnType("text");
+            ts.Property(x => x.CustomPrivacyPolicyUrl).HasMaxLength(500);
 
             ts.HasOne(x => x.Tenant)
                 .WithOne(x => x.Settings)
@@ -54,6 +55,26 @@ public partial class AppDbContext
                 .OnDelete(DeleteBehavior.Cascade);
 
             ts.HasQueryFilter(x => CurrentTenantId == null || x.TenantId == CurrentTenantId);
+        });
+
+        modelBuilder.Entity<CustomerConsent>(cc =>
+        {
+            cc.ToTable("CustomerConsents");
+            cc.HasKey(x => x.Id);
+            cc.Property(x => x.PhoneNumber).HasMaxLength(30).IsRequired();
+            cc.Property(x => x.Channel).HasMaxLength(30).IsRequired();
+            cc.Property(x => x.ConsentVersion).HasMaxLength(20).IsRequired();
+            cc.Property(x => x.EvidencePayload).HasColumnType("text");
+
+            cc.HasIndex(x => new { x.TenantId, x.PhoneNumber });
+            cc.HasIndex(x => new { x.TenantId, x.PhoneNumber, x.IsRevoked });
+
+            cc.HasOne(x => x.Tenant)
+                .WithMany(x => x.Consents)
+                .HasForeignKey(x => x.TenantId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            cc.HasQueryFilter(x => CurrentTenantId == null || x.TenantId == CurrentTenantId);
         });
 
         // -------------------------------------------------------------

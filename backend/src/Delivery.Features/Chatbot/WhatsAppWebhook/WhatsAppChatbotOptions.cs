@@ -28,6 +28,11 @@ public class WhatsAppChatbotOptions
     public string VerifyToken { get; set; } = "mesafy_secure_webhook_token_2026";
 
     /// <summary>
+    /// Secreto de la aplicación de Meta para validar firmas HMAC SHA-256 (cabecera X-Hub-Signature-256).
+    /// </summary>
+    public string? AppSecret { get; set; }
+
+    /// <summary>
     /// Clave de API para el servicio DeepSeek.
     /// </summary>
     public string DeepSeekApiKey { get; set; } = string.Empty;

@@ -26,18 +26,27 @@ public partial class TenantKnowledgeProvider : ITenantKnowledgeProvider
         _logger = logger;
     }
 
-    public async Task<TenantChatContext> ResolveContextAsync(string phoneNumberId, string? userMessage = null, CancellationToken ct = default)
+    public async Task<TenantChatContext> ResolveContextAsync(
+        string phoneNumberId,
+        string? userMessage = null,
+        string? customerPhone = null,
+        Guid? currentSessionTenantId = null,
+        CancellationToken ct = default)
     {
         var tenants = await _db.Tenants
             .AsNoTracking()
+            .IgnoreQueryFilters()
+            .Include(t => t.Settings)
             .Include(t => t.Branches.Where(b => b.IsActive))
             .Include(t => t.Categories)
             .Include(t => t.Products.Where(p => p.IsActive))
+                .ThenInclude(p => p.CategoryEntity)
             .Where(t => t.IsActive)
             .ToListAsync(ct);
 
         Tenant? activeTenant = null;
 
+        // 1. Detección por mención explícita del comensal en el mensaje
         if (!string.IsNullOrWhiteSpace(userMessage))
         {
             var lowerMsg = userMessage.ToLowerInvariant();
@@ -46,6 +55,41 @@ public partial class TenantKnowledgeProvider : ITenantKnowledgeProvider
                 lowerMsg.Contains(t.Name.ToLowerInvariant(), StringComparison.OrdinalIgnoreCase));
         }
 
+        // 2. Detección por número telefónico asignado al Tenant o a sus Sucursales
+        if (activeTenant == null && !string.IsNullOrWhiteSpace(phoneNumberId))
+        {
+            activeTenant = tenants.FirstOrDefault(t =>
+                (!string.IsNullOrWhiteSpace(t.ContactPhone) && t.ContactPhone.Contains(phoneNumberId, StringComparison.OrdinalIgnoreCase)) ||
+                t.Branches.Any(b => !string.IsNullOrWhiteSpace(b.Phone) && b.Phone.Contains(phoneNumberId, StringComparison.OrdinalIgnoreCase)));
+        }
+
+        // 3. Detección por pedido activo reciente del cliente en las últimas 24 horas
+        if (activeTenant == null && !string.IsNullOrWhiteSpace(customerPhone))
+        {
+            var cleanPhone = customerPhone.Replace("+", "").Trim();
+            var searchDigits = cleanPhone.Length >= 9 ? cleanPhone[^9..] : cleanPhone;
+
+            var recentTenantId = await _db.Orders
+                .AsNoTracking()
+                .IgnoreQueryFilters()
+                .Where(o => o.CustomerPhone.Contains(searchDigits) && o.CreatedAt >= DateTime.UtcNow.AddHours(-24))
+                .OrderByDescending(o => o.CreatedAt)
+                .Select(o => o.TenantId)
+                .FirstOrDefaultAsync(ct);
+
+            if (recentTenantId != default)
+            {
+                activeTenant = tenants.FirstOrDefault(t => t.Id == recentTenantId);
+            }
+        }
+
+        // 4. Continuidad de sesión conversacional activa en Redis
+        if (activeTenant == null && currentSessionTenantId.HasValue)
+        {
+            activeTenant = tenants.FirstOrDefault(t => t.Id == currentSessionTenantId.Value);
+        }
+
+        // 5. Fallback a establecimiento principal de plataforma
         activeTenant ??= tenants.FirstOrDefault(t => t.Slug == "la-granjita")
                          ?? tenants.FirstOrDefault();
 
@@ -72,24 +116,61 @@ public partial class TenantKnowledgeProvider : ITenantKnowledgeProvider
     {
         if (string.IsNullOrWhiteSpace(userMessage)) return null;
 
-        var match = OrderNumberRegex().Match(userMessage);
-        if (!match.Success) return null;
-
-        if (!int.TryParse(match.Groups[1].Value, NumberStyles.Integer, CultureInfo.InvariantCulture, out var orderNumber)) return null;
+        var numMatch = OrderNumberRegex().Match(userMessage);
 
         try
         {
-            var order = await _db.Orders
-                .AsNoTracking()
-                .Include(o => o.Branch)
-                .Include(o => o.Items)
-                .FirstOrDefaultAsync(o => o.TenantId == tenantId && o.OrderNumber == orderNumber, ct);
+            Order? order = null;
 
-            if (order == null)
+            if (numMatch.Success && int.TryParse(numMatch.Groups[1].Value, NumberStyles.Integer, CultureInfo.InvariantCulture, out var orderNumber))
             {
-                return string.Format(CultureInfo.InvariantCulture,
-                    "El pedido #{0} no fue encontrado en nuestro sistema. Verifica que el número de ticket sea correcto.", orderNumber);
+                // Búsqueda por número de ticket explícito
+                order = await _db.Orders
+                    .AsNoTracking()
+                    .IgnoreQueryFilters()
+                    .Include(o => o.Branch)
+                    .Include(o => o.Tenant)
+                    .Include(o => o.Items)
+                    .FirstOrDefaultAsync(o => o.TenantId == tenantId && o.OrderNumber == orderNumber, ct);
+
+                // Si no se encuentra en el tenant activo, buscar en toda la plataforma por número global
+                order ??= await _db.Orders
+                    .AsNoTracking()
+                    .IgnoreQueryFilters()
+                    .Include(o => o.Branch)
+                    .Include(o => o.Tenant)
+                    .Include(o => o.Items)
+                    .FirstOrDefaultAsync(o => o.OrderNumber == orderNumber, ct);
+
+                if (order == null)
+                {
+                    return string.Format(CultureInfo.InvariantCulture,
+                        "El pedido #{0} no fue encontrado en nuestro sistema. Por favor verifica que el número de ticket sea correcto.", orderNumber);
+                }
             }
+            else if (OrderStatusInquiryRegex().IsMatch(userMessage) && !string.IsNullOrWhiteSpace(customerPhone))
+            {
+                // Búsqueda automática por número de teléfono del cliente en las últimas 24 horas
+                var cleanPhone = customerPhone.Replace("+", "").Trim();
+                var searchDigits = cleanPhone.Length >= 9 ? cleanPhone[^9..] : cleanPhone;
+
+                order = await _db.Orders
+                    .AsNoTracking()
+                    .IgnoreQueryFilters()
+                    .Include(o => o.Branch)
+                    .Include(o => o.Tenant)
+                    .Include(o => o.Items)
+                    .Where(o => o.CustomerPhone.Contains(searchDigits) && o.CreatedAt >= DateTime.UtcNow.AddHours(-24))
+                    .OrderByDescending(o => o.CreatedAt)
+                    .FirstOrDefaultAsync(ct);
+
+                if (order == null)
+                {
+                    return "No encontramos pedidos recientes asociados a tu número de WhatsApp en las últimas 24 horas. Si cuentas con tu número de ticket o comanda (ej. #1001), por favor indícalo para rastrearlo.";
+                }
+            }
+
+            if (order == null) return null;
 
             var statusName = order.Status switch
             {
@@ -104,30 +185,39 @@ public partial class TenantKnowledgeProvider : ITenantKnowledgeProvider
                 _ => order.Status.ToString()
             };
 
+            var branchName = order.Branch?.Name ?? "Matriz Principal";
+            var branchAddress = string.IsNullOrWhiteSpace(order.Branch?.Address) ? "" : $" ({order.Branch.Address})";
+            var branchPhone = string.IsNullOrWhiteSpace(order.Branch?.Phone) ? "" : $" - Tel: {order.Branch.Phone}";
+
             var sb = new StringBuilder();
             sb.AppendFormat(CultureInfo.InvariantCulture, "INFORMACIÓN OFICIAL DEL PEDIDO #{0}:\n", order.OrderNumber);
             sb.AppendFormat(CultureInfo.InvariantCulture, "- Estado actual: {0}\n", statusName);
-            sb.AppendFormat(CultureInfo.InvariantCulture, "- Sucursal de origen: {0}\n", order.Branch?.Name ?? "Principal");
-            sb.AppendFormat(CultureInfo.InvariantCulture, "- Tipo: {0}\n", order.DeliveryType == DeliveryType.Delivery ? "Entrega a Domicilio" : "Retiro en Local");
+            sb.AppendFormat(CultureInfo.InvariantCulture, "- Sucursal encargada: {0}{1}{2}\n", branchName, branchAddress, branchPhone);
+            sb.AppendFormat(CultureInfo.InvariantCulture, "- Modalidad: {0}\n", order.DeliveryType == DeliveryType.Delivery ? "Entrega a Domicilio" : "Retiro en Local");
             sb.AppendFormat(CultureInfo.InvariantCulture, "- Total: ${0:F2} USD\n", order.Total);
             sb.AppendFormat(CultureInfo.InvariantCulture, "- Fecha/Hora: {0:dd/MM/yyyy HH:mm}\n", order.CreatedAt);
+
+            var tenantSlug = order.Tenant?.Slug ?? "la-granjita";
             sb.AppendFormat(CultureInfo.InvariantCulture, "- Enlace de rastreo satelital: https://{0}/{1}/rastreo/{2}\n",
-                _options.PlatformDomain, order.Tenant?.Slug ?? "la-granjita", order.Id);
+                _options.PlatformDomain, tenantSlug, order.Id);
 
             return sb.ToString();
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Error buscando pedido #{OrderNumber}", orderNumber);
+            _logger.LogError(ex, "Error consultando estado de pedido para mensaje: {Message}", userMessage);
             return null;
         }
     }
 
     private string BuildSystemPrompt(Tenant tenant, List<Branch> branches, List<Product> products)
     {
+        var nowEcuador = DateTime.UtcNow.AddHours(-5); // Zona Horaria Ecuador (UTC-5)
+
         var sb = new StringBuilder();
         sb.AppendFormat(CultureInfo.InvariantCulture, "Eres el asistente virtual oficial de WhatsApp de '{0}'.\n", tenant.Name);
         sb.AppendFormat(CultureInfo.InvariantCulture, "Eslogan: {0}\n", tenant.Tagline);
+        sb.AppendFormat(CultureInfo.InvariantCulture, "Fecha y hora actual: {0:dddd, dd/MM/yyyy HH:mm} (Hora Ecuador).\n\n", nowEcuador);
         sb.AppendLine("Tu misión es brindar atención cordial, rápida, ejecutiva y precisa a los comensales.");
         sb.AppendLine("REGLAS ESTRICTAS DE COMPORTAMIENTO:");
         sb.AppendLine("1. Responde siempre en español con tono amable, sobrio, formal y directo.");
@@ -136,7 +226,8 @@ public partial class TenantKnowledgeProvider : ITenantKnowledgeProvider
         sb.AppendLine("4. Los precios son exactos en dólares estadounidenses (USD).");
         sb.AppendFormat(CultureInfo.InvariantCulture, "5. Si el cliente desea realizar su pedido formalmente o pagar en línea con tarjeta/transferencia/efectivo, invítalo a ingresar a la tienda web: https://{0}/{1}/menu\n",
             _options.PlatformDomain, tenant.Slug);
-        sb.AppendLine("6. Mantén las respuestas concisas (máximo 2 a 3 párrafos o lista con viñetas) para que se lean cómodamente en la pantalla del celular sin saturar al usuario.\n");
+        sb.AppendLine("6. Mantén las respuestas concisas (máximo 2 a 3 párrafos o lista con viñetas) para que se lean cómodamente en la pantalla del celular sin saturar al usuario.");
+        sb.AppendLine("7. INSTRUCCIONES MULTI-SUCURSAL: Si el cliente pregunta por sucursales, ubicaciones, retiros en local o cobertura a domicilio, asesórale con las direcciones, teléfonos y horarios de cada sucursal listada abajo para que elija la más conveniente.\n");
 
         sb.AppendLine("SUCURSALES Y HORARIOS:");
         if (branches.Count == 0)
@@ -154,7 +245,11 @@ public partial class TenantKnowledgeProvider : ITenantKnowledgeProvider
         sb.AppendLine();
 
         sb.AppendLine("MENÚ OFICIAL Y PRECIOS DISPONIBLES:");
-        var grouped = products.GroupBy(p => string.IsNullOrWhiteSpace(p.Category) ? "General" : p.Category);
+        var grouped = products.GroupBy(p =>
+            !string.IsNullOrWhiteSpace(p.Category)
+                ? p.Category
+                : (p.CategoryEntity?.Name ?? "General"));
+
         foreach (var group in grouped)
         {
             sb.AppendFormat(CultureInfo.InvariantCulture, "[{0}]\n", group.Key.ToUpperInvariant());
@@ -169,7 +264,10 @@ public partial class TenantKnowledgeProvider : ITenantKnowledgeProvider
         return sb.ToString();
     }
 
-    [GeneratedRegex(@"(?:#|pedido\s*#?|orden\s*#?)\s*(\d{4,6})", RegexOptions.IgnoreCase)]
+    [GeneratedRegex(@"(?:#|pedido\s*#?|orden\s*#?|ticket\s*#?|comanda\s*#?)\s*(\d{1,8})", RegexOptions.IgnoreCase)]
     private static partial Regex OrderNumberRegex();
+
+    [GeneratedRegex(@"(?:estado|como va|cómo va|dónde está|donde esta|ya salió|ya salio|cuánto falta|cuanto falta|tiempo|repartidor|demora|pedido|orden|comanda)", RegexOptions.IgnoreCase)]
+    private static partial Regex OrderStatusInquiryRegex();
 }
 

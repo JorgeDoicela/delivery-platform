@@ -92,13 +92,24 @@ public class GeminiAiEngine : IChatbotAiEngine
         }
 
         using var doc = JsonDocument.Parse(responseContent);
-        var text = doc.RootElement
-            .GetProperty("candidates")[0]
-            .GetProperty("content")
-            .GetProperty("parts")[0]
-            .GetProperty("text")
-            .GetString();
 
+        if (!doc.RootElement.TryGetProperty("candidates", out var candidates) || candidates.GetArrayLength() == 0)
+        {
+            _logger.LogError("Gemini API retornó un cuerpo sin 'candidates': {Response}", responseContent);
+            return "Disculpa, no pude procesar tu solicitud en este momento.";
+        }
+
+        var firstCandidate = candidates[0];
+        if (!firstCandidate.TryGetProperty("content", out var contentElem) ||
+            !contentElem.TryGetProperty("parts", out var parts) ||
+            parts.GetArrayLength() == 0 ||
+            !parts[0].TryGetProperty("text", out var textElem))
+        {
+            _logger.LogError("Gemini API retornó un candidato sin partes de texto: {Response}", responseContent);
+            return "Disculpa, no pude procesar tu solicitud en este momento.";
+        }
+
+        var text = textElem.GetString();
         return text?.Trim() ?? "Disculpa, no pude procesar tu solicitud en este momento.";
     }
 }

@@ -80,12 +80,22 @@ public class DeepSeekAiEngine : IChatbotAiEngine
         }
 
         using var doc = JsonDocument.Parse(responseContent);
-        var content = doc.RootElement
-            .GetProperty("choices")[0]
-            .GetProperty("message")
-            .GetProperty("content")
-            .GetString();
 
+        if (!doc.RootElement.TryGetProperty("choices", out var choices) || choices.GetArrayLength() == 0)
+        {
+            _logger.LogError("DeepSeek API retornó un cuerpo sin 'choices': {Response}", responseContent);
+            return "En este momento no pude procesar tu consulta. Por favor intenta de nuevo.";
+        }
+
+        var firstChoice = choices[0];
+        if (!firstChoice.TryGetProperty("message", out var message) ||
+            !message.TryGetProperty("content", out var contentElement))
+        {
+            _logger.LogError("DeepSeek API retornó una estructura de mensaje inesperada: {Response}", responseContent);
+            return "En este momento no pude procesar tu consulta. Por favor intenta de nuevo.";
+        }
+
+        var content = contentElement.GetString();
         return content?.Trim() ?? "En este momento no pude procesar tu consulta. Por favor intenta de nuevo.";
     }
 }

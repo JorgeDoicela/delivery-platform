@@ -1,3 +1,6 @@
+using System.Security.Cryptography;
+using System.Text;
+using System.Text.Json;
 using Delivery.Features.Common.Endpoints;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
@@ -41,30 +44,82 @@ public class WhatsAppWebhookEndpoint : IEndpoint
         .Produces(StatusCodes.Status200OK, contentType: "text/plain")
         .Produces(StatusCodes.Status401Unauthorized);
 
-        group.MapPost("/", (
-            WhatsAppWebhookPayload payload,
+        group.MapPost("/", async (
+            HttpContext context,
             IServiceScopeFactory scopeFactory,
+            IOptions<WhatsAppChatbotOptions> options,
             ILogger<WhatsAppWebhookEndpoint> logger) =>
         {
-            _ = Task.Run(async () =>
+            using var reader = new StreamReader(context.Request.Body, Encoding.UTF8);
+            var rawBody = await reader.ReadToEndAsync();
+
+            var signatureHeader = context.Request.Headers["X-Hub-Signature-256"].FirstOrDefault();
+            if (!IsValidMetaSignature(rawBody, signatureHeader, options.Value.AppSecret))
+            {
+                logger.LogWarning("Firma de seguridad HMAC SHA-256 de WhatsApp inválida.");
+                return Results.Unauthorized();
+            }
+
+            WhatsAppWebhookPayload? payload = null;
+            if (!string.IsNullOrWhiteSpace(rawBody))
             {
                 try
                 {
-                    using var scope = scopeFactory.CreateScope();
-                    var processor = scope.ServiceProvider.GetRequiredService<IWhatsAppWebhookProcessor>();
-                    await processor.ProcessPayloadAsync(payload);
+                    payload = JsonSerializer.Deserialize<WhatsAppWebhookPayload>(rawBody);
                 }
                 catch (Exception ex)
                 {
-                    logger.LogError(ex, "Excepción no controlada procesando webhook de WhatsApp en segundo plano.");
+                    logger.LogError(ex, "Error al deserializar payload JSON de WhatsApp.");
+                    return Results.BadRequest();
                 }
-            });
+            }
+
+            if (payload != null)
+            {
+                _ = Task.Run(async () =>
+                {
+                    try
+                    {
+                        using var scope = scopeFactory.CreateScope();
+                        var processor = scope.ServiceProvider.GetRequiredService<IWhatsAppWebhookProcessor>();
+                        await processor.ProcessPayloadAsync(payload);
+                    }
+                    catch (Exception ex)
+                    {
+                        logger.LogError(ex, "Excepción no controlada procesando webhook de WhatsApp en segundo plano.");
+                    }
+                });
+            }
 
             return Results.Ok();
         })
         .WithName("ReceiveWhatsAppMessage")
-        .WithDescription("Recibe eventos y mensajes entrantes de WhatsApp desde Meta Cloud API.")
-        .Produces(StatusCodes.Status200OK);
+        .WithDescription("Recibe eventos y mensajes entrantes de WhatsApp desde Meta Cloud API con validación HMAC SHA-256.")
+        .Produces(StatusCodes.Status200OK)
+        .Produces(StatusCodes.Status401Unauthorized)
+        .Produces(StatusCodes.Status400BadRequest);
+    }
+
+    public static bool IsValidMetaSignature(string rawBody, string? signatureHeader, string? appSecret)
+    {
+        if (string.IsNullOrWhiteSpace(appSecret))
+        {
+            return true; // En desarrollo o si no está configurado, omitir para no romper entornos locales
+        }
+
+        if (string.IsNullOrWhiteSpace(signatureHeader) || !signatureHeader.StartsWith("sha256=", StringComparison.OrdinalIgnoreCase))
+        {
+            return false;
+        }
+
+        var expectedHash = signatureHeader["sha256=".Length..];
+        using var hmac = new HMACSHA256(Encoding.UTF8.GetBytes(appSecret));
+        var hashBytes = hmac.ComputeHash(Encoding.UTF8.GetBytes(rawBody));
+        var computedHash = Convert.ToHexString(hashBytes).ToLowerInvariant();
+
+        return CryptographicOperations.FixedTimeEquals(
+            Encoding.UTF8.GetBytes(computedHash),
+            Encoding.UTF8.GetBytes(expectedHash.ToLowerInvariant()));
     }
 }
 

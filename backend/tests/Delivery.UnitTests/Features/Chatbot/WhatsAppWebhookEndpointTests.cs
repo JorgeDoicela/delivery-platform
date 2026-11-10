@@ -77,6 +77,49 @@ public class WhatsAppWebhookEndpointTests
         result.Should().BeOfType<UnauthorizedHttpResult>();
     }
 
+    [Fact]
+    public void IsValidMetaSignature_WhenAppSecretEmpty_AllowsRequest()
+    {
+        // Act
+        var isValid = WhatsAppWebhookEndpoint.IsValidMetaSignature("{\"test\":1}", null, null);
+
+        // Assert
+        isValid.Should().BeTrue();
+    }
+
+    [Fact]
+    public void IsValidMetaSignature_WithValidHmacSignature_ReturnsTrue()
+    {
+        // Arrange
+        var appSecret = "meta_secret_key_abc123";
+        var rawBody = "{\"entry\":[{\"id\":\"123\"}]}";
+
+        using var hmac = new System.Security.Cryptography.HMACSHA256(System.Text.Encoding.UTF8.GetBytes(appSecret));
+        var hash = Convert.ToHexString(hmac.ComputeHash(System.Text.Encoding.UTF8.GetBytes(rawBody))).ToLowerInvariant();
+        var header = $"sha256={hash}";
+
+        // Act
+        var isValid = WhatsAppWebhookEndpoint.IsValidMetaSignature(rawBody, header, appSecret);
+
+        // Assert
+        isValid.Should().BeTrue();
+    }
+
+    [Fact]
+    public void IsValidMetaSignature_WithTamperedBodyOrKey_ReturnsFalse()
+    {
+        // Arrange
+        var appSecret = "meta_secret_key_abc123";
+        var rawBody = "{\"entry\":[{\"id\":\"123\"}]}";
+        var tamperedHeader = "sha256=11223344556677889900aabbccddeeff11223344556677889900aabbccddeeff";
+
+        // Act
+        var isValid = WhatsAppWebhookEndpoint.IsValidMetaSignature(rawBody, tamperedHeader, appSecret);
+
+        // Assert
+        isValid.Should().BeFalse();
+    }
+
     private static IResult ExecuteGetHandler(
         string? mode,
         string? verifyToken,

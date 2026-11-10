@@ -31,11 +31,13 @@ public class ResilientChatbotAiEngine : IChatbotAiEngine
     {
         try
         {
-            return await _deepSeek.GenerateReplyAsync(systemPrompt, history, userMessage, injectedOrderContext, ct);
+            using var cts = CancellationTokenSource.CreateLinkedTokenSource(ct);
+            cts.CancelAfter(TimeSpan.FromSeconds(15));
+            return await _deepSeek.GenerateReplyAsync(systemPrompt, history, userMessage, injectedOrderContext, cts.Token);
         }
         catch (Exception ex)
         {
-            _logger.LogWarning(ex, "DeepSeek falló o agotó tiempo de respuesta. Evaluando respaldo con Gemini...");
+            _logger.LogWarning(ex, "DeepSeek falló o agotó tiempo de respuesta (15s). Evaluando respaldo con Gemini...");
 
             var hasGemini = !string.IsNullOrWhiteSpace(_options.GeminiApiKey) &&
                             !_options.GeminiApiKey.StartsWith("tu_", StringComparison.OrdinalIgnoreCase);

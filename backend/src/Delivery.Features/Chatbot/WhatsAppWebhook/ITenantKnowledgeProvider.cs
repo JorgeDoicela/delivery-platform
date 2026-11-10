@@ -12,7 +12,13 @@ public class TenantChatContext
 
 public interface ITenantKnowledgeProvider
 {
-    Task<TenantChatContext> ResolveContextAsync(string phoneNumberId, string? userMessage = null, CancellationToken ct = default);
+    Task<TenantChatContext> ResolveContextAsync(
+        string phoneNumberId,
+        string? userMessage = null,
+        string? customerPhone = null,
+        Guid? currentSessionTenantId = null,
+        CancellationToken ct = default);
+
     Task<string?> TryResolveOrderStatusAsync(Guid tenantId, string customerPhone, string userMessage, CancellationToken ct = default);
 }
 
