@@ -172,7 +172,12 @@ export function CheckoutForm() {
             errors={errors}
           />
 
-          <BillingInfoSection register={register} setValue={setValue} errors={errors} />
+          <BillingInfoSection
+            register={register}
+            setValue={setValue}
+            control={control}
+            errors={errors}
+          />
 
           <PaymentMethodSection
             register={register}

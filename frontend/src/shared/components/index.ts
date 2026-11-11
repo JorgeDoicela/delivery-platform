@@ -12,4 +12,11 @@ export {
   type SelectDropdownOption,
 } from "./SelectDropdown";
 
+export {
+  Select,
+  type SelectProps,
+  type SelectOption,
+  type SelectHandle,
+} from "./Select";
+
 export { ThemeToggle } from "./ThemeToggle";

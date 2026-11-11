@@ -1,14 +1,22 @@
 "use client";
 
-import { useForm } from "react-hook-form";
+import { useForm, useWatch } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Loader2, Check, AlertCircle } from "lucide-react";
+import { Select, type SelectOption } from "@/shared/components";
 import {
   updateProfileSchema,
   type UpdateProfileFormData,
 } from "../schemas/accountSchemas";
 import { useAccountStore } from "../store/useAccountStore";
 import type { IdentificationType } from "../types";
+
+const IDENTIFICATION_OPTIONS: SelectOption[] = [
+  { value: "CEDULA", label: "Cédula de Identidad" },
+  { value: "RUC", label: "R.U.C.", badge: "SRI" },
+  { value: "PASAPORTE", label: "Pasaporte" },
+  { value: "CONSUMIDOR_FINAL", label: "Consumidor Final" },
+];
 
 export function AccountProfileSection() {
   const profile = useAccountStore((s) => s.profile);
@@ -20,6 +28,8 @@ export function AccountProfileSection() {
   const {
     register,
     handleSubmit,
+    control,
+    setValue,
     formState: { errors },
   } = useForm<UpdateProfileFormData>({
     resolver: zodResolver(updateProfileSchema),
@@ -35,6 +45,11 @@ export function AccountProfileSection() {
       identificationType: (profile?.identificationType as IdentificationType) || null,
       identificationNumber: profile?.identificationNumber || "",
     },
+  });
+
+  const identificationTypeValue = useWatch({
+    control,
+    name: "identificationType",
   });
 
   const onSubmit = async (data: UpdateProfileFormData) => {
@@ -110,20 +125,19 @@ export function AccountProfileSection() {
           </div>
 
           {/* Tipo de Documento */}
-          <div className="space-y-1.5">
-            <label className="block text-xs font-bold text-text-base uppercase tracking-wider">
-              Tipo de Identificación
-            </label>
-            <select
-              {...register("identificationType")}
-              className="w-full px-4 py-3 rounded-2xl border border-surface-border bg-surface-canvas text-text-strong focus:outline-none focus:border-brand-primary text-xs transition-colors"
-            >
-              <option value="">Seleccionar tipo...</option>
-              <option value="CEDULA">Cédula de Identidad</option>
-              <option value="RUC">R.U.C.</option>
-              <option value="PASAPORTE">Pasaporte</option>
-              <option value="CONSUMIDOR_FINAL">Consumidor Final</option>
-            </select>
+          <div>
+            <Select
+              label="Tipo de Identificación"
+              placeholder="Seleccionar tipo..."
+              options={IDENTIFICATION_OPTIONS}
+              value={identificationTypeValue || ""}
+              onChange={(val) =>
+                setValue("identificationType", (val || null) as IdentificationType, {
+                  shouldValidate: true,
+                })
+              }
+              error={errors.identificationType?.message}
+            />
           </div>
 
           {/* Número de documento */}

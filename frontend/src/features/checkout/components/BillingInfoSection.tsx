@@ -1,20 +1,35 @@
 "use client";
 
-import type { UseFormRegister, UseFormSetValue, FieldErrors } from "react-hook-form";
+import { useWatch, type UseFormRegister, type UseFormSetValue, type Control, type FieldErrors } from "react-hook-form";
 import type { CheckoutFormData } from "../schemas/checkoutSchema";
 import { FileText } from "lucide-react";
+import { Select, type SelectOption } from "@/shared/components";
 
 interface BillingInfoSectionProps {
   register: UseFormRegister<CheckoutFormData>;
   setValue: UseFormSetValue<CheckoutFormData>;
+  control?: Control<CheckoutFormData>;
   errors: FieldErrors<CheckoutFormData>;
 }
+
+const BILLING_OPTIONS: SelectOption[] = [
+  { value: "CONSUMIDOR_FINAL", label: "Consumidor Final" },
+  { value: "CEDULA", label: "Cédula de Identidad" },
+  { value: "RUC", label: "R.U.C.", badge: "SRI" },
+];
 
 export function BillingInfoSection({
   register,
   setValue,
+  control,
   errors,
 }: BillingInfoSectionProps) {
+  const currentIdentificationType = useWatch({
+    control,
+    name: "identificationType",
+    defaultValue: "CONSUMIDOR_FINAL",
+  });
+
   return (
     <div className="bg-surface-card rounded-2xl border border-surface-border p-5 space-y-4 shadow-sm">
       <div className="flex items-center gap-2 pb-3 border-b border-surface-border-subtle">
@@ -31,13 +46,12 @@ export function BillingInfoSection({
 
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
         <div>
-          <label className="block text-xs font-bold text-text-base mb-1">
-            Tipo de Comprobante
-          </label>
-          <select
-            {...register("identificationType")}
-            onChange={(e) => {
-              const value = e.target.value as CheckoutFormData["identificationType"];
+          <Select
+            label="Tipo de Comprobante"
+            options={BILLING_OPTIONS}
+            value={currentIdentificationType}
+            onChange={(val) => {
+              const value = val as CheckoutFormData["identificationType"];
               setValue("identificationType", value);
               if (value === "CONSUMIDOR_FINAL") {
                 setValue("identificationNumber", "9999999999999");
@@ -45,12 +59,8 @@ export function BillingInfoSection({
                 setValue("identificationNumber", "");
               }
             }}
-            className="w-full text-xs px-3.5 py-2.5 rounded-xl border border-surface-border bg-surface-card text-text-strong focus:outline-none focus:ring-1 focus:ring-brand-primary focus:border-brand-primary"
-          >
-            <option value="CONSUMIDOR_FINAL">Consumidor Final</option>
-            <option value="CEDULA">Cédula de Identidad</option>
-            <option value="RUC">R.U.C.</option>
-          </select>
+            error={errors.identificationType?.message}
+          />
         </div>
 
         <div>
