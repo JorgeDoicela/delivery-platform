@@ -4,7 +4,7 @@ using StackExchange.Redis;
 
 namespace Delivery.Features.Chatbot.WhatsAppWebhook;
 
-public class RedisConversationStore : IConversationStore
+public partial class RedisConversationStore : IConversationStore
 {
     private readonly IConnectionMultiplexer _redis;
     private readonly ILogger<RedisConversationStore> _logger;
@@ -49,7 +49,7 @@ public class RedisConversationStore : IConversationStore
         }
         catch (Exception ex)
         {
-            _logger.LogWarning(ex, "Error recuperando historial conversacional de Redis para {Phone}", customerPhone);
+            LogGetHistoryFailed(_logger, ex, customerPhone);
             return new List<ChatMessageDto>();
         }
     }
@@ -68,7 +68,7 @@ public class RedisConversationStore : IConversationStore
         }
         catch (Exception ex)
         {
-            _logger.LogWarning(ex, "Error guardando mensaje en Redis para {Phone}", customerPhone);
+            LogSaveMessageFailed(_logger, ex, customerPhone);
         }
     }
 
@@ -84,7 +84,7 @@ public class RedisConversationStore : IConversationStore
         }
         catch (Exception ex)
         {
-            _logger.LogWarning(ex, "Error verificando idempotencia para {MessageId}", messageId);
+            LogCheckIdempotencyFailed(_logger, ex, messageId);
             return false;
         }
     }
@@ -101,7 +101,7 @@ public class RedisConversationStore : IConversationStore
         }
         catch (Exception ex)
         {
-            _logger.LogWarning(ex, "Error marcando mensaje como procesado {MessageId}", messageId);
+            LogMarkProcessedFailed(_logger, ex, messageId);
         }
     }
 
@@ -124,7 +124,7 @@ public class RedisConversationStore : IConversationStore
         }
         catch (Exception ex)
         {
-            _logger.LogWarning(ex, "Error recuperando sesión activa de tenant en Redis para {Phone}", customerPhone);
+            LogGetActiveTenantFailed(_logger, ex, customerPhone);
             return null;
         }
     }
@@ -141,7 +141,7 @@ public class RedisConversationStore : IConversationStore
         }
         catch (Exception ex)
         {
-            _logger.LogWarning(ex, "Error guardando sesión activa de tenant en Redis para {Phone}", customerPhone);
+            LogSetActiveTenantFailed(_logger, ex, customerPhone);
         }
     }
 
@@ -164,7 +164,7 @@ public class RedisConversationStore : IConversationStore
         }
         catch (Exception ex)
         {
-            _logger.LogWarning(ex, "Error consultando caché de consentimiento en Redis para {Phone}", customerPhone);
+            LogGetCachedConsentFailed(_logger, ex, customerPhone);
             return null;
         }
     }
@@ -182,7 +182,7 @@ public class RedisConversationStore : IConversationStore
         }
         catch (Exception ex)
         {
-            _logger.LogWarning(ex, "Error guardando caché de consentimiento en Redis para {Phone}", customerPhone);
+            LogSetCachedConsentFailed(_logger, ex, customerPhone);
         }
     }
 
@@ -198,7 +198,7 @@ public class RedisConversationStore : IConversationStore
         }
         catch (Exception ex)
         {
-            _logger.LogWarning(ex, "Error revocando caché de consentimiento en Redis para {Phone}", customerPhone);
+            LogRevokeCachedConsentFailed(_logger, ex, customerPhone);
         }
     }
 
@@ -219,5 +219,32 @@ public class RedisConversationStore : IConversationStore
         var cleanPhone = customerPhone.Replace("+", "").Trim();
         return $"whatsapp:conv:{tenantId}:{cleanPhone}";
     }
+
+    [LoggerMessage(EventId = 1, Level = LogLevel.Warning, Message = "Error recuperando historial conversacional de Redis para {Phone}")]
+    private static partial void LogGetHistoryFailed(ILogger logger, Exception ex, string phone);
+
+    [LoggerMessage(EventId = 2, Level = LogLevel.Warning, Message = "Error guardando mensaje en Redis para {Phone}")]
+    private static partial void LogSaveMessageFailed(ILogger logger, Exception ex, string phone);
+
+    [LoggerMessage(EventId = 3, Level = LogLevel.Warning, Message = "Error verificando idempotencia para {MessageId}")]
+    private static partial void LogCheckIdempotencyFailed(ILogger logger, Exception ex, string messageId);
+
+    [LoggerMessage(EventId = 4, Level = LogLevel.Warning, Message = "Error marcando mensaje como procesado {MessageId}")]
+    private static partial void LogMarkProcessedFailed(ILogger logger, Exception ex, string messageId);
+
+    [LoggerMessage(EventId = 5, Level = LogLevel.Warning, Message = "Error recuperando sesión activa de tenant en Redis para {Phone}")]
+    private static partial void LogGetActiveTenantFailed(ILogger logger, Exception ex, string phone);
+
+    [LoggerMessage(EventId = 6, Level = LogLevel.Warning, Message = "Error guardando sesión activa de tenant en Redis para {Phone}")]
+    private static partial void LogSetActiveTenantFailed(ILogger logger, Exception ex, string phone);
+
+    [LoggerMessage(EventId = 7, Level = LogLevel.Warning, Message = "Error consultando caché de consentimiento en Redis para {Phone}")]
+    private static partial void LogGetCachedConsentFailed(ILogger logger, Exception ex, string phone);
+
+    [LoggerMessage(EventId = 8, Level = LogLevel.Warning, Message = "Error guardando caché de consentimiento en Redis para {Phone}")]
+    private static partial void LogSetCachedConsentFailed(ILogger logger, Exception ex, string phone);
+
+    [LoggerMessage(EventId = 9, Level = LogLevel.Warning, Message = "Error revocando caché de consentimiento en Redis para {Phone}")]
+    private static partial void LogRevokeCachedConsentFailed(ILogger logger, Exception ex, string phone);
 }
 

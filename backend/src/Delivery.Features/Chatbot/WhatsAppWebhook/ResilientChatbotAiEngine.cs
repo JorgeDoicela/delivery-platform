@@ -3,7 +3,7 @@ using Microsoft.Extensions.Options;
 
 namespace Delivery.Features.Chatbot.WhatsAppWebhook;
 
-public class ResilientChatbotAiEngine : IChatbotAiEngine
+public partial class ResilientChatbotAiEngine : IChatbotAiEngine
 {
     private readonly DeepSeekAiEngine _deepSeek;
     private readonly GeminiAiEngine _gemini;
@@ -37,7 +37,7 @@ public class ResilientChatbotAiEngine : IChatbotAiEngine
         }
         catch (Exception ex)
         {
-            _logger.LogWarning(ex, "DeepSeek falló o agotó tiempo de respuesta (15s). Evaluando respaldo con Gemini...");
+            LogDeepSeekFailed(_logger, ex);
 
             var hasGemini = !string.IsNullOrWhiteSpace(_options.GeminiApiKey) &&
                             !_options.GeminiApiKey.StartsWith("tu_", StringComparison.OrdinalIgnoreCase);
@@ -50,12 +50,18 @@ public class ResilientChatbotAiEngine : IChatbotAiEngine
                 }
                 catch (Exception geminiEx)
                 {
-                    _logger.LogError(geminiEx, "El servicio de respaldo Gemini también falló.");
+                    LogGeminiFallbackFailed(_logger, geminiEx);
                 }
             }
 
             return "Estimado/a cliente, en este momento nuestros servidores están procesando alta demanda. Si deseas realizar tu pedido inmediatamente, puedes ingresar a nuestra tienda oficial en línea o intentar nuevamente en un minuto.";
         }
     }
+
+    [LoggerMessage(EventId = 1, Level = LogLevel.Warning, Message = "DeepSeek falló o agotó tiempo de respuesta (15s). Evaluando respaldo con Gemini...")]
+    private static partial void LogDeepSeekFailed(ILogger logger, Exception ex);
+
+    [LoggerMessage(EventId = 2, Level = LogLevel.Error, Message = "El servicio de respaldo Gemini también falló.")]
+    private static partial void LogGeminiFallbackFailed(ILogger logger, Exception ex);
 }
 

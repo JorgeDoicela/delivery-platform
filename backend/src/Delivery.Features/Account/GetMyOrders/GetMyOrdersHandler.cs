@@ -91,7 +91,7 @@ public sealed class GetMyOrdersHandler : IHandler<GetMyOrdersQuery, Result<GetMy
             .IgnoreQueryFilters()
             .AsNoTracking()
             .Where(o => o.CreatedByUserId == user.Id
-                || (o.CustomerEmail != null && o.CustomerEmail.ToLower() == normalizedEmail)
+                || (o.CustomerEmail != null && string.Equals(o.CustomerEmail, normalizedEmail, StringComparison.OrdinalIgnoreCase))
                 || (userPhoneRaw != null && (o.CustomerPhone == userPhoneRaw || (userPhoneSuffix != null && o.CustomerPhone.EndsWith(userPhoneSuffix)))));
 
         // Si hay tenant seleccionado en el contexto de la petición, se restringe a dicho tenant

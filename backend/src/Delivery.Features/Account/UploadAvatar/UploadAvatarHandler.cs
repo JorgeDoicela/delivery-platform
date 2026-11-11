@@ -13,7 +13,7 @@ public sealed record UploadAvatarCommand(Guid UserId, IFormFile File);
 
 public sealed record UploadAvatarResponse(string AvatarUrl);
 
-public sealed class UploadAvatarHandler : IHandler<UploadAvatarCommand, Result<UploadAvatarResponse>>
+public sealed partial class UploadAvatarHandler : IHandler<UploadAvatarCommand, Result<UploadAvatarResponse>>
 {
     private static readonly HashSet<string> AllowedExtensions = new(StringComparer.OrdinalIgnoreCase)
     {
@@ -85,18 +85,24 @@ public sealed class UploadAvatarHandler : IHandler<UploadAvatarCommand, Result<U
         }
         catch (InvalidOperationException ex)
         {
-            _logger.LogWarning(ex, "Fallo de validación de imagen para el usuario {UserId}", request.UserId);
+            LogImageValidationFailed(_logger, ex, request.UserId);
             return Result.Failure<UploadAvatarResponse>(new Error(
                 "Avatar.ProcessingError",
                 ex.Message));
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Error inesperado procesando avatar para el usuario {UserId}", request.UserId);
+            LogAvatarProcessingError(_logger, ex, request.UserId);
             return Result.Failure<UploadAvatarResponse>(new Error(
                 "Avatar.UnexpectedError",
                 "Ocurrió un error inesperado al procesar y convertir tu foto de perfil."));
         }
     }
+
+    [LoggerMessage(EventId = 1, Level = LogLevel.Warning, Message = "Fallo de validación de imagen para el usuario {UserId}")]
+    private static partial void LogImageValidationFailed(ILogger logger, Exception ex, Guid userId);
+
+    [LoggerMessage(EventId = 2, Level = LogLevel.Error, Message = "Error inesperado procesando avatar para el usuario {UserId}")]
+    private static partial void LogAvatarProcessingError(ILogger logger, Exception ex, Guid userId);
 }
 

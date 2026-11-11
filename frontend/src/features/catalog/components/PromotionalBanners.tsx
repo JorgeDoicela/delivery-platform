@@ -60,11 +60,7 @@ export function PromotionalBanners({
                 <Link
                   href={banner.ctaHref || "#catalogo"}
                   suppressHydrationWarning
-                  className={`inline-flex items-center gap-1.5 sm:gap-2 text-[10px] sm:text-xs font-black uppercase tracking-wider px-3.5 py-1.5 sm:px-6 sm:py-3 rounded-full transition-all shadow-xs sm:shadow-md active:scale-95 hover:scale-105 ${
-                    idx % 2 === 1
-                      ? "bg-white hover:bg-neutral-100 text-brand-primary"
-                      : "bg-brand-primary hover:bg-brand-primary-hover text-white"
-                  }`}
+                  className="inline-flex items-center gap-1.5 sm:gap-2 text-[10px] sm:text-xs font-black uppercase tracking-wider px-3.5 py-1.5 sm:px-6 sm:py-3 rounded-full transition-all shadow-xs sm:shadow-md active:scale-95 hover:scale-105 bg-white hover:bg-neutral-100 text-brand-primary"
                 >
                   <span>{banner.ctaText || "Ver Más"}</span>
                   <ArrowRight className="w-3 h-3 sm:w-3.5 sm:h-3.5" />

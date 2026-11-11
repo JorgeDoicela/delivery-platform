@@ -1,7 +1,7 @@
 "use client";
 
 import React from "react";
-import { Bike, Store, ArrowRight } from "lucide-react";
+import { Motorbike, Building2, ArrowRight } from "lucide-react";
 import { useCartStore } from "@/features/cart";
 import { useCurrentTenantQuery } from "@/features/tenant";
 
@@ -45,7 +45,7 @@ export function OrderModeSelector() {
               }`}
             >
               <div className="flex items-center gap-3.5 sm:gap-4 min-w-0">
-                <Bike className="w-6 h-6 sm:w-10 sm:h-10 text-white shrink-0 group-hover:scale-105 transition-transform" />
+                <Motorbike className="w-6 h-6 sm:w-10 sm:h-10 text-white shrink-0 group-hover:scale-105 transition-transform" />
                 <div className="min-w-0">
                   <span className="text-[11px] sm:text-xs font-bold tracking-wider uppercase text-white/85 block leading-tight truncate">
                     {brandName}
@@ -70,7 +70,7 @@ export function OrderModeSelector() {
               }`}
             >
               <div className="flex items-center gap-3.5 sm:gap-4 min-w-0">
-                <Store className="w-6 h-6 sm:w-10 sm:h-10 text-white shrink-0 group-hover:scale-105 transition-transform" />
+                <Building2 className="w-6 h-6 sm:w-10 sm:h-10 text-white shrink-0 group-hover:scale-105 transition-transform" />
                 <div className="min-w-0">
                   <span className="text-[11px] sm:text-xs font-bold tracking-wider uppercase text-white/85 block leading-tight truncate">
                     {brandName}

@@ -1,3 +1,4 @@
+using System.Net;
 using System.Text;
 using System.Text.Json;
 using Microsoft.Extensions.Logging;
@@ -5,7 +6,7 @@ using Microsoft.Extensions.Options;
 
 namespace Delivery.Features.Chatbot.WhatsAppWebhook;
 
-public class GeminiAiEngine : IChatbotAiEngine
+public partial class GeminiAiEngine : IChatbotAiEngine
 {
     private readonly HttpClient _httpClient;
     private readonly WhatsAppChatbotOptions _options;
@@ -80,14 +81,14 @@ public class GeminiAiEngine : IChatbotAiEngine
             Content = new StringContent(json, Encoding.UTF8, "application/json")
         };
 
-        _logger.LogInformation("Enviando petición de respaldo a Google Gemini ({Model})", model);
+        LogSendingFallbackRequest(_logger, model);
 
         using var response = await _httpClient.SendAsync(request, ct);
         var responseContent = await response.Content.ReadAsStringAsync(ct);
 
         if (!response.IsSuccessStatusCode)
         {
-            _logger.LogError("Gemini API respondió con error {StatusCode}: {Response}", response.StatusCode, responseContent);
+            LogErrorResponse(_logger, response.StatusCode, responseContent);
             throw new HttpRequestException($"Gemini API error: {response.StatusCode} - {responseContent}");
         }
 
@@ -95,7 +96,7 @@ public class GeminiAiEngine : IChatbotAiEngine
 
         if (!doc.RootElement.TryGetProperty("candidates", out var candidates) || candidates.GetArrayLength() == 0)
         {
-            _logger.LogError("Gemini API retornó un cuerpo sin 'candidates': {Response}", responseContent);
+            LogMissingCandidates(_logger, responseContent);
             return "Disculpa, no pude procesar tu solicitud en este momento.";
         }
 
@@ -105,12 +106,24 @@ public class GeminiAiEngine : IChatbotAiEngine
             parts.GetArrayLength() == 0 ||
             !parts[0].TryGetProperty("text", out var textElem))
         {
-            _logger.LogError("Gemini API retornó un candidato sin partes de texto: {Response}", responseContent);
+            LogMissingTextParts(_logger, responseContent);
             return "Disculpa, no pude procesar tu solicitud en este momento.";
         }
 
         var text = textElem.GetString();
         return text?.Trim() ?? "Disculpa, no pude procesar tu solicitud en este momento.";
     }
+
+    [LoggerMessage(EventId = 1, Level = LogLevel.Information, Message = "Enviando petición de respaldo a Google Gemini ({Model})")]
+    private static partial void LogSendingFallbackRequest(ILogger logger, string model);
+
+    [LoggerMessage(EventId = 2, Level = LogLevel.Error, Message = "Gemini API respondió con error {StatusCode}: {Response}")]
+    private static partial void LogErrorResponse(ILogger logger, HttpStatusCode statusCode, string response);
+
+    [LoggerMessage(EventId = 3, Level = LogLevel.Error, Message = "Gemini API retornó un cuerpo sin 'candidates': {Response}")]
+    private static partial void LogMissingCandidates(ILogger logger, string response);
+
+    [LoggerMessage(EventId = 4, Level = LogLevel.Error, Message = "Gemini API retornó un candidato sin partes de texto: {Response}")]
+    private static partial void LogMissingTextParts(ILogger logger, string response);
 }
 

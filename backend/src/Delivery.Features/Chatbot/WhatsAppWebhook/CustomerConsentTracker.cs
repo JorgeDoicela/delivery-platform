@@ -7,7 +7,7 @@ using Microsoft.Extensions.Logging;
 
 namespace Delivery.Features.Chatbot.WhatsAppWebhook;
 
-public class CustomerConsentTracker : ICustomerConsentTracker
+public partial class CustomerConsentTracker : ICustomerConsentTracker
 {
     private readonly AppDbContext _db;
     private readonly IConversationStore _conversationStore;
@@ -87,7 +87,7 @@ public class CustomerConsentTracker : ICustomerConsentTracker
         // Actualizar caché en Redis inmediatamente
         await _conversationStore.SetCachedConsentAsync(tenantId, customerPhone, true, ct);
 
-        _logger.LogInformation("Consentimiento LOPDP registrado exitosamente para {Phone} en Tenant {TenantId}", cleanPhone, tenantId);
+        LogConsentRecorded(_logger, cleanPhone, tenantId);
     }
 
     public async Task RevokeConsentAsync(Guid tenantId, string customerPhone, CancellationToken ct = default)
@@ -119,7 +119,13 @@ public class CustomerConsentTracker : ICustomerConsentTracker
         // Marcar revocatoria en Redis para bloquear turnos posteriores inmediatamente
         await _conversationStore.RevokeCachedConsentAsync(tenantId, customerPhone, ct);
 
-        _logger.LogInformation("Consentimiento LOPDP revocado para {Phone} en Tenant {TenantId}", cleanPhone, tenantId);
+        LogConsentRevoked(_logger, cleanPhone, tenantId);
     }
+
+    [LoggerMessage(EventId = 1, Level = LogLevel.Information, Message = "Consentimiento LOPDP registrado exitosamente para {Phone} en Tenant {TenantId}")]
+    private static partial void LogConsentRecorded(ILogger logger, string phone, Guid tenantId);
+
+    [LoggerMessage(EventId = 2, Level = LogLevel.Information, Message = "Consentimiento LOPDP revocado para {Phone} en Tenant {TenantId}")]
+    private static partial void LogConsentRevoked(ILogger logger, string phone, Guid tenantId);
 }
 

@@ -26,16 +26,16 @@ export function AsaderoClassicLandingLayout({
         {/* 2. Selector de Modalidad (Delivery / Salón / Takeout) */}
         <OrderModeSelector />
 
-        {/* 3. Banners Promocionales del Establecimiento */}
-        <PromotionalBanners tenant={tenant} />
-
-        {/* 4. Platos Más Pedidos y Populares de la Landing */}
+        {/* 3. Platos Más Pedidos y Populares de la Landing */}
         <section
           id="catalogo"
           className="max-w-[1240px] mx-auto w-full"
         >
           <PopularProductsSection tenantSlug={tenant?.slug} limit={8} />
         </section>
+
+        {/* 4. Banners Promocionales del Establecimiento */}
+        <PromotionalBanners tenant={tenant} />
 
         {/* 5. Ubicación, Casa Matriz y Cobertura Geolocalizada */}
         <StorefrontBranchShowcase tenant={tenant} />

@@ -71,9 +71,6 @@ export function StorefrontBranchShowcase({ tenant }: StorefrontBranchShowcasePro
           <h3 className="text-xl sm:text-4xl font-black text-brand-primary uppercase tracking-wide font-display">
             Ubicación y Horarios de Atención
           </h3>
-          <p className="text-xs sm:text-sm text-text-strong mt-0.5 sm:mt-1 leading-relaxed max-w-xl">
-            Atención continua todos los días de {activeBranch.openingTime || "10:30"} a {activeBranch.closingTime || "21:30"} en nuestro local de {branchDisplayName}.
-          </p>
         </div>
 
         {branches.length > 1 && (

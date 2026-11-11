@@ -3,6 +3,7 @@ import { StorefrontHeader } from "./components/StorefrontHeader";
 import { StorefrontFooter } from "./components/StorefrontFooter";
 import { MobileBottomNav } from "./components/MobileBottomNav";
 import { CartDrawer } from "@/features/cart";
+import { FloatingWhatsAppButton } from "@/features/tenant";
 
 export default function StorefrontLayout({
   children,
@@ -23,6 +24,9 @@ export default function StorefrontLayout({
       </Suspense>
       <Suspense fallback={null}>
         <CartDrawer />
+      </Suspense>
+      <Suspense fallback={null}>
+        <FloatingWhatsAppButton />
       </Suspense>
     </div>
   );

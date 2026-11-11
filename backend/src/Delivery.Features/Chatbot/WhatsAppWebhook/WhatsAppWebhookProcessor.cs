@@ -76,7 +76,7 @@ public partial class WhatsAppWebhookProcessor : IWhatsAppWebhookProcessor
 
         if (await _conversationStore.IsMessageProcessedAsync(messageId, ct))
         {
-            _logger.LogInformation("Mensaje duplicado ignorado: {MessageId}", messageId);
+            LogDuplicateMessageIgnored(_logger, messageId);
             return;
         }
 
@@ -92,7 +92,7 @@ public partial class WhatsAppWebhookProcessor : IWhatsAppWebhookProcessor
         }
 
         var userText = incoming.Text.Body.Trim();
-        _logger.LogInformation("Mensaje recibido de {Phone} ({Name}): {Text}", senderPhone, contactName ?? "Anónimo", userText);
+        LogMessageReceived(_logger, senderPhone, contactName ?? "Anónimo", userText);
 
         try
         {
@@ -187,12 +187,21 @@ public partial class WhatsAppWebhookProcessor : IWhatsAppWebhookProcessor
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Error procesando mensaje de WhatsApp de {Phone}", senderPhone);
+            LogProcessMessageError(_logger, ex, senderPhone);
 
             var fallbackMsg = "Estimado/a cliente, ocurrió un inconveniente temporal procesando tu mensaje. Si deseas ordenar, visita nuestra tienda en línea o intenta nuevamente en unos instantes.";
             await _whatsAppClient.SendTextMessageAsync(senderPhone, fallbackMsg, phoneId, ct);
         }
     }
+
+    [LoggerMessage(EventId = 1, Level = LogLevel.Information, Message = "Mensaje duplicado ignorado: {MessageId}")]
+    private static partial void LogDuplicateMessageIgnored(ILogger logger, string messageId);
+
+    [LoggerMessage(EventId = 2, Level = LogLevel.Information, Message = "Mensaje recibido de {Phone} ({Name}): {Text}")]
+    private static partial void LogMessageReceived(ILogger logger, string phone, string name, string text);
+
+    [LoggerMessage(EventId = 3, Level = LogLevel.Error, Message = "Error procesando mensaje de WhatsApp de {Phone}")]
+    private static partial void LogProcessMessageError(ILogger logger, Exception ex, string phone);
 
     [GeneratedRegex(@"^(?:acepto(?:\s+t[eé]rminos)?|aceptar|s[ií]|1|de\s+acuerdo|autorizo)$", RegexOptions.IgnoreCase)]
     private static partial Regex ConsentAcceptanceRegex();

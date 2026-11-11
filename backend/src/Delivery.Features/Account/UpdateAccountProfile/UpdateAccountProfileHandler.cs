@@ -102,7 +102,7 @@ public sealed class UpdateAccountProfileHandler : IHandler<UpdateAccountProfileC
         // Sincronizar directorio de clientes de caja si existe cliente con este email en el tenant activo
         var normalizedEmail = user.Email.Trim().ToLowerInvariant();
         var existingCustomer = await _context.Customers
-            .FirstOrDefaultAsync(c => c.Email != null && c.Email.ToLower() == normalizedEmail, cancellationToken);
+            .FirstOrDefaultAsync(c => c.Email != null && string.Equals(c.Email, normalizedEmail, StringComparison.OrdinalIgnoreCase), cancellationToken);
 
         if (existingCustomer != null)
         {
@@ -117,12 +117,12 @@ public sealed class UpdateAccountProfileHandler : IHandler<UpdateAccountProfileC
         var totalOrders = await _context.Orders
             .IgnoreQueryFilters()
             .AsNoTracking()
-            .CountAsync(o => o.CustomerEmail != null && o.CustomerEmail.ToLower() == normalizedEmail, cancellationToken);
+            .CountAsync(o => o.CustomerEmail != null && string.Equals(o.CustomerEmail, normalizedEmail, StringComparison.OrdinalIgnoreCase), cancellationToken);
 
         var activeOrders = await _context.Orders
             .IgnoreQueryFilters()
             .AsNoTracking()
-            .CountAsync(o => o.CustomerEmail != null && o.CustomerEmail.ToLower() == normalizedEmail && ActiveOrderStatuses.Contains(o.Status), cancellationToken);
+            .CountAsync(o => o.CustomerEmail != null && string.Equals(o.CustomerEmail, normalizedEmail, StringComparison.OrdinalIgnoreCase) && ActiveOrderStatuses.Contains(o.Status), cancellationToken);
 
         var consentActive = false;
         if (!string.IsNullOrWhiteSpace(user.Phone))

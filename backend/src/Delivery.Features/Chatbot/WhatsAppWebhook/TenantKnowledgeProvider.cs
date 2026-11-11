@@ -205,7 +205,7 @@ public partial class TenantKnowledgeProvider : ITenantKnowledgeProvider
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Error consultando estado de pedido para mensaje: {Message}", userMessage);
+            LogOrderStatusLookupFailed(_logger, ex, userMessage);
             return null;
         }
     }
@@ -269,5 +269,8 @@ public partial class TenantKnowledgeProvider : ITenantKnowledgeProvider
 
     [GeneratedRegex(@"(?:estado|como va|cómo va|dónde está|donde esta|ya salió|ya salio|cuánto falta|cuanto falta|tiempo|repartidor|demora|pedido|orden|comanda)", RegexOptions.IgnoreCase)]
     private static partial Regex OrderStatusInquiryRegex();
+
+    [LoggerMessage(EventId = 1, Level = LogLevel.Error, Message = "Error consultando estado de pedido para mensaje: {Message}")]
+    private static partial void LogOrderStatusLookupFailed(ILogger logger, Exception ex, string message);
 }
 

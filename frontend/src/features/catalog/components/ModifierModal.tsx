@@ -141,16 +141,28 @@ export function ModifierModal({ product, onClose }: ModifierModalProps) {
         >
             <div className="relative w-full max-w-lg bg-surface-card rounded-t-3xl sm:rounded-3xl shadow-2xl flex flex-col h-[90vh] sm:h-auto sm:max-h-[85vh] overflow-hidden text-text-strong animate-in zoom-in-95 duration-200">
                 {/* Cabecera Hero Fotográfica Gastronómica */}
-                <div className="relative w-full h-44 sm:h-52 bg-neutral-900 overflow-hidden shrink-0">
+                <div className="relative w-full h-48 sm:h-60 bg-neutral-950 overflow-hidden shrink-0 flex items-center justify-center">
+                    {/* Fondo ambiental difuminado para rellenar márgenes de forma armoniosa */}
                     <Image
                         src={product.imageUrl || "/images/shared/placeholders/dish-default.webp"}
-                        alt={product.name}
+                        alt=""
+                        aria-hidden="true"
                         fill
-                        sizes="(max-width: 640px) 100vw, 512px"
-                        className="object-cover object-center"
-                        priority
+                        className="object-cover object-center blur-2xl opacity-40 scale-110"
                     />
-                    <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent" />
+                    <div className="absolute inset-0 bg-black/20" />
+
+                    {/* Imagen principal completa sin recortes */}
+                    <div className="relative w-full h-full p-3 sm:p-4 z-1">
+                        <Image
+                            src={product.imageUrl || "/images/shared/placeholders/dish-default.webp"}
+                            alt={product.name}
+                            fill
+                            sizes="(max-width: 640px) 100vw, 512px"
+                            className="object-contain object-center"
+                            priority
+                        />
+                    </div>
 
                     {/* Badge de Categoría Superior Izquierdo */}
                     <span className="absolute top-3.5 left-3.5 z-10 text-[10px] font-bold uppercase tracking-wider text-white bg-black/60 backdrop-blur-md px-3 py-1 rounded-full shadow-md font-sans">

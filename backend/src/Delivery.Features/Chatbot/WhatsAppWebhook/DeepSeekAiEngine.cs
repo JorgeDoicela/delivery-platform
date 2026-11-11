@@ -1,3 +1,4 @@
+using System.Net;
 using System.Net.Http.Headers;
 using System.Text;
 using System.Text.Json;
@@ -6,7 +7,7 @@ using Microsoft.Extensions.Options;
 
 namespace Delivery.Features.Chatbot.WhatsAppWebhook;
 
-public class DeepSeekAiEngine : IChatbotAiEngine
+public partial class DeepSeekAiEngine : IChatbotAiEngine
 {
     private readonly HttpClient _httpClient;
     private readonly WhatsAppChatbotOptions _options;
@@ -68,14 +69,14 @@ public class DeepSeekAiEngine : IChatbotAiEngine
         };
         request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", _options.DeepSeekApiKey);
 
-        _logger.LogInformation("Enviando petición a DeepSeek ({Model}) con {Count} mensajes previos.", requestBody.model, history.Count);
+        LogSendingRequest(_logger, requestBody.model, history.Count);
 
         using var response = await _httpClient.SendAsync(request, ct);
         var responseContent = await response.Content.ReadAsStringAsync(ct);
 
         if (!response.IsSuccessStatusCode)
         {
-            _logger.LogError("DeepSeek API respondió con error {StatusCode}: {Response}", response.StatusCode, responseContent);
+            LogApiError(_logger, response.StatusCode, responseContent);
             throw new HttpRequestException($"DeepSeek API error: {response.StatusCode} - {responseContent}");
         }
 
@@ -83,7 +84,7 @@ public class DeepSeekAiEngine : IChatbotAiEngine
 
         if (!doc.RootElement.TryGetProperty("choices", out var choices) || choices.GetArrayLength() == 0)
         {
-            _logger.LogError("DeepSeek API retornó un cuerpo sin 'choices': {Response}", responseContent);
+            LogMissingChoices(_logger, responseContent);
             return "En este momento no pude procesar tu consulta. Por favor intenta de nuevo.";
         }
 
@@ -91,12 +92,24 @@ public class DeepSeekAiEngine : IChatbotAiEngine
         if (!firstChoice.TryGetProperty("message", out var message) ||
             !message.TryGetProperty("content", out var contentElement))
         {
-            _logger.LogError("DeepSeek API retornó una estructura de mensaje inesperada: {Response}", responseContent);
+            LogUnexpectedStructure(_logger, responseContent);
             return "En este momento no pude procesar tu consulta. Por favor intenta de nuevo.";
         }
 
         var content = contentElement.GetString();
         return content?.Trim() ?? "En este momento no pude procesar tu consulta. Por favor intenta de nuevo.";
     }
+
+    [LoggerMessage(EventId = 1, Level = LogLevel.Information, Message = "Enviando petición a DeepSeek ({Model}) con {Count} mensajes previos.")]
+    private static partial void LogSendingRequest(ILogger logger, string model, int count);
+
+    [LoggerMessage(EventId = 2, Level = LogLevel.Error, Message = "DeepSeek API respondió con error {StatusCode}: {Response}")]
+    private static partial void LogApiError(ILogger logger, HttpStatusCode statusCode, string response);
+
+    [LoggerMessage(EventId = 3, Level = LogLevel.Error, Message = "DeepSeek API retornó un cuerpo sin 'choices': {Response}")]
+    private static partial void LogMissingChoices(ILogger logger, string response);
+
+    [LoggerMessage(EventId = 4, Level = LogLevel.Error, Message = "DeepSeek API retornó una estructura de mensaje inesperada: {Response}")]
+    private static partial void LogUnexpectedStructure(ILogger logger, string response);
 }
 

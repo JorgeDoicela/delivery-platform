@@ -12,7 +12,7 @@ using Microsoft.Extensions.Options;
 
 namespace Delivery.Features.Chatbot.WhatsAppWebhook;
 
-public class WhatsAppWebhookEndpoint : IEndpoint
+public partial class WhatsAppWebhookEndpoint : IEndpoint
 {
     public void MapEndpoint(IEndpointRouteBuilder app)
     {
@@ -26,17 +26,17 @@ public class WhatsAppWebhookEndpoint : IEndpoint
             IOptions<WhatsAppChatbotOptions> options,
             ILogger<WhatsAppWebhookEndpoint> logger) =>
         {
-            logger.LogInformation("Verificando webhook de WhatsApp. Mode: {Mode}", mode);
+            LogVerifyingWebhook(logger, mode);
 
             var expectedToken = options.Value.VerifyToken;
 
             if (mode == "subscribe" && !string.IsNullOrWhiteSpace(verifyToken) && verifyToken == expectedToken)
             {
-                logger.LogInformation("Webhook de WhatsApp verificado exitosamente por Meta.");
+                LogWebhookVerified(logger);
                 return Results.Content(challenge ?? string.Empty, "text/plain");
             }
 
-            logger.LogWarning("Fallo en verificación de webhook de WhatsApp. Token recibido: {Token}", verifyToken);
+            LogVerificationFailed(logger, verifyToken);
             return Results.Unauthorized();
         })
         .WithName("VerifyWhatsAppWebhook")
@@ -56,7 +56,7 @@ public class WhatsAppWebhookEndpoint : IEndpoint
             var signatureHeader = context.Request.Headers["X-Hub-Signature-256"].FirstOrDefault();
             if (!IsValidMetaSignature(rawBody, signatureHeader, options.Value.AppSecret))
             {
-                logger.LogWarning("Firma de seguridad HMAC SHA-256 de WhatsApp inválida.");
+                LogInvalidSignature(logger);
                 return Results.Unauthorized();
             }
 
@@ -69,7 +69,7 @@ public class WhatsAppWebhookEndpoint : IEndpoint
                 }
                 catch (Exception ex)
                 {
-                    logger.LogError(ex, "Error al deserializar payload JSON de WhatsApp.");
+                    LogPayloadDeserializationFailed(logger, ex);
                     return Results.BadRequest();
                 }
             }
@@ -86,7 +86,7 @@ public class WhatsAppWebhookEndpoint : IEndpoint
                     }
                     catch (Exception ex)
                     {
-                        logger.LogError(ex, "Excepción no controlada procesando webhook de WhatsApp en segundo plano.");
+                        LogBackgroundProcessingFailed(logger, ex);
                     }
                 });
             }
@@ -121,5 +121,23 @@ public class WhatsAppWebhookEndpoint : IEndpoint
             Encoding.UTF8.GetBytes(computedHash),
             Encoding.UTF8.GetBytes(expectedHash.ToLowerInvariant()));
     }
+
+    [LoggerMessage(EventId = 1, Level = LogLevel.Information, Message = "Verificando webhook de WhatsApp. Mode: {Mode}")]
+    private static partial void LogVerifyingWebhook(ILogger logger, string? mode);
+
+    [LoggerMessage(EventId = 2, Level = LogLevel.Information, Message = "Webhook de WhatsApp verificado exitosamente por Meta.")]
+    private static partial void LogWebhookVerified(ILogger logger);
+
+    [LoggerMessage(EventId = 3, Level = LogLevel.Warning, Message = "Fallo en verificación de webhook de WhatsApp. Token recibido: {Token}")]
+    private static partial void LogVerificationFailed(ILogger logger, string? token);
+
+    [LoggerMessage(EventId = 4, Level = LogLevel.Warning, Message = "Firma de seguridad HMAC SHA-256 de WhatsApp inválida.")]
+    private static partial void LogInvalidSignature(ILogger logger);
+
+    [LoggerMessage(EventId = 5, Level = LogLevel.Error, Message = "Error al deserializar payload JSON de WhatsApp.")]
+    private static partial void LogPayloadDeserializationFailed(ILogger logger, Exception ex);
+
+    [LoggerMessage(EventId = 6, Level = LogLevel.Error, Message = "Excepción no controlada procesando webhook de WhatsApp en segundo plano.")]
+    private static partial void LogBackgroundProcessingFailed(ILogger logger, Exception ex);
 }
 

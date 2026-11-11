@@ -33,15 +33,15 @@ export function ProductCard({ product }: ProductCardProps) {
         className="group relative flex flex-col justify-between bg-surface-card rounded-2xl sm:rounded-3xl border border-surface-border overflow-hidden shadow-xs hover:shadow-xl hover:border-brand-primary/40 transition-all duration-300 cursor-pointer text-left focus:outline-hidden focus:ring-2 focus:ring-brand-primary"
       >
         <div>
-          {/* Contenedor Fotográfico con Bordes Redondeados y Espaciado Óptimo */}
-          <div className="p-2.5 sm:p-3.5 pb-0">
-            <div className="relative w-full aspect-[16/10] rounded-xl sm:rounded-2xl overflow-hidden bg-neutral-100 shadow-2xs">
+          {/* Contenedor Fotográfico con separación superior para no topar el borde de la tarjeta */}
+          <div className="pt-2.5 sm:pt-3.5 px-2.5 sm:px-3.5">
+            <div className="relative w-full aspect-[4/3] bg-white">
               <Image
                 src={displayImage}
                 alt={product.name}
                 fill
                 sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw"
-                className="object-cover object-center group-hover:scale-105 transition-transform duration-500 ease-out"
+                className="object-contain object-center group-hover:scale-105 transition-transform duration-500 ease-out"
               />
             </div>
           </div>

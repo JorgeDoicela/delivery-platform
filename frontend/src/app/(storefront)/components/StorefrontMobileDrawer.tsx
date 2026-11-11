@@ -15,7 +15,6 @@ import { TenantBranchSelector, TenantSwitcher } from "@/features/tenant";
 import type { TenantStorefrontConfigDto } from "@/shared/types/api";
 import type { AuthenticatedUserLike } from "@/features/auth/lib/redirectByRole";
 import type { TenantRoutingResolution } from "@/shared/lib/tenant-routing";
-import { ThemeToggle } from "@/shared/components/ThemeToggle";
 
 interface StorefrontMobileDrawerProps {
   isOpen: boolean;
@@ -50,6 +49,9 @@ export function StorefrontMobileDrawer({
 }: StorefrontMobileDrawerProps) {
   if (!isOpen) return null;
 
+  const hasMultipleBranches =
+    isPlatformRoot || Boolean(tenant?.branches && tenant.branches.length > 1);
+
   return (
     <div
       role="dialog"
@@ -63,66 +65,78 @@ export function StorefrontMobileDrawer({
         aria-hidden="true"
       />
 
-      <div className="fixed inset-y-0 left-0 w-[85vw] max-w-sm bg-surface-card border-r border-surface-border shadow-2xl flex flex-col justify-between p-5 sm:p-6 z-10 animate-in slide-in-from-left duration-300 overflow-y-auto">
-        <div className="space-y-6">
-          {/* Cabecera del Drawer */}
-          <div className="flex items-center justify-between pb-4 border-b border-surface-border">
-            <div className="flex items-center gap-2.5 min-w-0">
-              <div className="relative w-8 h-8 shrink-0">
-                <Image
-                  src={brandLogo}
-                  alt={`Logo ${brandName}`}
-                  width={32}
-                  height={32}
-                  className="w-full h-full object-contain"
-                />
-              </div>
-              <div className="min-w-0">
-                <span className="font-display font-black text-xl uppercase tracking-tight text-brand-primary block leading-none truncate">
-                  {brandName}
-                </span>
-                <span className="text-[9px] tracking-widest text-text-muted font-bold uppercase block mt-0.5 truncate">
-                  {brandTagline}
-                </span>
-              </div>
+      <div className="fixed inset-y-0 left-0 w-[85vw] max-w-sm bg-surface-card border-r border-surface-border shadow-2xl flex flex-col justify-between z-10 animate-in slide-in-from-left duration-300">
+        {/* Cabecera del Drawer */}
+        <div className="h-[52px] sm:h-[76px] px-4 sm:px-6 flex items-center justify-between gap-3 shrink-0">
+          <div className="flex items-center gap-2 sm:gap-2.5 group min-w-0 shrink">
+            <div className="relative w-7 h-7 sm:w-10 sm:h-10 shrink-0">
+              <Image
+                src={brandLogo}
+                alt={`Logo ${brandName}`}
+                width={40}
+                height={40}
+                className="w-full h-full object-contain"
+              />
             </div>
-
-            <button
-              type="button"
-              onClick={onClose}
-              className="w-9 h-9 rounded-full flex items-center justify-center text-text-muted hover:text-text-strong hover:bg-surface-card-hover transition-colors cursor-pointer shrink-0"
-              aria-label="Cerrar menú"
-            >
-              <X className="w-5 h-5" />
-            </button>
+            <div className="min-w-0">
+              <span
+                data-display-brand
+                className="font-black text-lg sm:text-[26px] tracking-tight text-brand-primary block leading-none uppercase font-display truncate max-w-[150px] sm:max-w-none"
+                suppressHydrationWarning
+              >
+                {brandName}
+              </span>
+              <span
+                className="text-[9px] sm:text-[10px] tracking-widest text-text-muted font-bold uppercase mt-0.5 truncate hidden sm:block"
+                suppressHydrationWarning
+              >
+                {brandTagline}
+              </span>
+            </div>
           </div>
 
-          {/* Selector de Comercio o Sucursal en Móvil */}
-          <div className="sm:hidden">
-            <span className="text-[10px] font-bold uppercase tracking-wider text-text-muted block mb-1.5">
-              {isPlatformRoot ? "Directorio de Marcas:" : "Sucursal Activa:"}
-            </span>
-            {isPlatformRoot ? (
-              <TenantSwitcher variant="auto" />
-            ) : (
-              <TenantBranchSelector tenant={tenant} />
-            )}
-          </div>
+          <button
+            type="button"
+            onClick={onClose}
+            className="p-1.5 -mr-1 sm:-mr-2 rounded-full text-text-strong hover:bg-surface-card-hover cursor-pointer shrink-0 transition-colors"
+            aria-label="Cerrar menú"
+          >
+            <X className="w-5 h-5 sm:w-6 sm:h-6" />
+          </button>
+        </div>
+
+        {/* Contenido scrolleable del Drawer */}
+        <div className="flex-1 overflow-y-auto px-4 py-3 sm:px-6 sm:py-4 space-y-5">
+          {/* Selector de Comercio o Sucursal en Móvil (solo si hay más de 1 sucursal o en raíz de plataforma) */}
+          {hasMultipleBranches && (
+            <div className="sm:hidden">
+              <span className="text-[10px] font-bold uppercase tracking-wider text-text-muted block mb-1.5">
+                {isPlatformRoot ? "Directorio de Marcas:" : "Sucursal Activa:"}
+              </span>
+              {isPlatformRoot ? (
+                <TenantSwitcher variant="auto" />
+              ) : (
+                <TenantBranchSelector tenant={tenant} />
+              )}
+            </div>
+          )}
 
           {/* Enlaces de Información y Soporte (Sin duplicar la barra fija inferior) */}
           <nav className="space-y-1">
             <span className="text-[10px] font-bold uppercase tracking-wider text-text-muted block px-3 py-1">
-              Información & Locales
+              {hasMultipleBranches ? "Información & Locales" : "Información"}
             </span>
 
-            <Link
-              href={routes.getSucursalesHref()}
-              onClick={onClose}
-              className="flex items-center gap-3 px-3.5 py-3 rounded-2xl hover:bg-surface-canvas text-text-strong hover:text-brand-primary font-display font-black text-sm uppercase tracking-wide transition-colors"
-            >
-              <Building2 className="w-4 h-4 text-brand-primary shrink-0" />
-              <span>Sucursales & Cobertura</span>
-            </Link>
+            {hasMultipleBranches && (
+              <Link
+                href={routes.getSucursalesHref()}
+                onClick={onClose}
+                className="flex items-center gap-3 px-3.5 py-3 rounded-2xl hover:bg-surface-canvas text-text-strong hover:text-brand-primary font-display font-black text-sm uppercase tracking-wide transition-colors"
+              >
+                <Building2 className="w-4 h-4 text-brand-primary shrink-0" />
+                <span>Sucursales & Cobertura</span>
+              </Link>
+            )}
 
             <Link
               href={routes.getTermsHref()}
@@ -145,7 +159,7 @@ export function StorefrontMobileDrawer({
         </div>
 
         {/* Pie del Drawer */}
-        <div className="pt-5 border-t border-surface-border space-y-3">
+        <div className="p-4 sm:p-6 pt-3 sm:pt-4 border-t border-surface-border space-y-3 shrink-0">
           {isAuthenticated && user ? (
             <div className="p-3 bg-surface-canvas rounded-2xl border border-surface-border space-y-2.5">
               <div className="flex items-center justify-between">
@@ -203,11 +217,6 @@ export function StorefrontMobileDrawer({
               <span className="text-[10px] text-text-muted">&rarr;</span>
             </Link>
           )}
-
-          <div className="flex items-center justify-between px-2 pt-1">
-            <span className="text-[11px] text-text-muted font-medium">Tema Visual:</span>
-            <ThemeToggle />
-          </div>
         </div>
       </div>
     </div>
