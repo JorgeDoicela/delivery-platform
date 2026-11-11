@@ -93,7 +93,7 @@ export function LoginForm({
 
   const containerClasses = embedded
     ? "space-y-5 w-full max-w-md mx-auto"
-    : "space-y-6 w-full max-w-md bg-white border border-neutral-200 rounded-3xl p-7 sm:p-9 shadow-xl shadow-neutral-900/5 mx-auto";
+    : "space-y-6 w-full max-w-md bg-surface-card border border-surface-border text-text-strong rounded-3xl p-7 sm:p-9 shadow-xl shadow-black/10 mx-auto";
 
   return (
     <form onSubmit={handleSubmit(onSubmit)} noValidate className={containerClasses}>
@@ -113,18 +113,18 @@ export function LoginForm({
             </div>
             <h1
               data-display-brand
-              className="text-3xl font-black text-neutral-950 uppercase tracking-tight font-display leading-none"
+              className="text-3xl font-black text-text-strong uppercase tracking-tight font-display leading-none"
             >
               {brandName}
             </h1>
-            <span className="text-[11px] font-bold text-neutral-500 uppercase tracking-widest block mt-1 font-mono">
+            <span className="text-[11px] font-bold text-text-subtle uppercase tracking-widest block mt-1 font-mono">
               {brandTagline} • Acceso al Sistema
             </span>
-            <p className="text-xs text-neutral-500 mt-2 leading-relaxed">
+            <p className="text-xs text-text-muted mt-2 leading-relaxed">
               Ingresa tus credenciales para acceder a cocina KDS, pedidos y administración.
             </p>
           </div>
-          <div className="border-t border-neutral-100" />
+          <div className="border-t border-surface-border/60" />
         </>
       )}
 
@@ -133,7 +133,7 @@ export function LoginForm({
         <div
           role="alert"
           aria-live="polite"
-          className="bg-red-50 border border-red-200 text-red-700 text-xs p-3.5 rounded-2xl flex items-start gap-2.5 animate-fadeIn"
+          className="bg-red-50 dark:bg-red-950/40 border border-red-200 dark:border-red-800/60 text-red-700 dark:text-red-300 text-xs p-3.5 rounded-2xl flex items-start gap-2.5 animate-fadeIn"
         >
           <AlertCircle className="w-4 h-4 shrink-0 text-red-600 mt-0.5" />
           <div className="leading-relaxed font-medium">{formError}</div>
@@ -144,7 +144,7 @@ export function LoginForm({
       <div className="space-y-1.5">
         <label
           htmlFor="email"
-          className="block text-[11px] font-bold text-neutral-700 uppercase tracking-wider"
+          className="block text-[11px] font-bold text-text-base uppercase tracking-wider"
         >
           Correo Electrónico
         </label>
@@ -157,7 +157,7 @@ export function LoginForm({
           aria-describedby={errors.email ? "email-error" : undefined}
           {...register("email")}
           placeholder="usuario@dominio.com"
-          className="w-full min-h-[48px] px-4 py-2.5 bg-neutral-50 border border-neutral-200 hover:border-neutral-300 focus:bg-white focus:border-brand-primary focus:ring-1 focus:ring-brand-primary focus:outline-none rounded-xl text-sm text-neutral-900 placeholder:text-neutral-400 transition-all disabled:opacity-50 shadow-2xs outline-none"
+          className="w-full min-h-[48px] px-4 py-2.5 bg-surface-canvas border border-surface-border hover:border-surface-border/80 focus:bg-surface-card focus:border-brand-primary focus:ring-1 focus:ring-brand-primary focus:outline-none rounded-xl text-sm text-text-strong placeholder:text-text-subtle transition-all disabled:opacity-50 shadow-2xs outline-none"
         />
         {errors.email && (
           <p id="email-error" className="text-xs text-red-600 font-medium">
@@ -171,7 +171,7 @@ export function LoginForm({
         <div className="flex items-center justify-between">
           <label
             htmlFor="password"
-            className="block text-[11px] font-bold text-neutral-700 uppercase tracking-wider"
+            className="block text-[11px] font-bold text-text-base uppercase tracking-wider"
           >
             Contraseña
           </label>
@@ -202,13 +202,13 @@ export function LoginForm({
             aria-describedby={errors.password ? "password-error" : undefined}
             {...register("password")}
             placeholder="••••••••"
-            className="w-full min-h-[48px] pl-4 pr-11 py-2.5 bg-neutral-50 border border-neutral-200 hover:border-neutral-300 focus:bg-white focus:border-brand-primary focus:ring-1 focus:ring-brand-primary focus:outline-none rounded-xl text-sm text-neutral-900 placeholder:text-neutral-400 transition-all disabled:opacity-50 shadow-2xs outline-none"
+            className="w-full min-h-[48px] pl-4 pr-11 py-2.5 bg-surface-canvas border border-surface-border hover:border-surface-border/80 focus:bg-surface-card focus:border-brand-primary focus:ring-1 focus:ring-brand-primary focus:outline-none rounded-xl text-sm text-text-strong placeholder:text-text-subtle transition-all disabled:opacity-50 shadow-2xs outline-none"
           />
           <button
             type="button"
             onClick={() => setShowPassword((prev) => !prev)}
             aria-label={showPassword ? "Ocultar contraseña" : "Ver contraseña"}
-            className="absolute right-2.5 top-1/2 -translate-y-1/2 p-1.5 rounded-lg text-neutral-400 hover:text-neutral-700 hover:bg-neutral-100 transition-colors cursor-pointer"
+            className="absolute right-2.5 top-1/2 -translate-y-1/2 p-1.5 rounded-lg text-text-subtle hover:text-text-strong hover:bg-surface-card-hover transition-colors cursor-pointer"
           >
             {showPassword ? (
               <EyeOff className="w-4 h-4 stroke-[1.8]" />
@@ -243,8 +243,8 @@ export function LoginForm({
       <GoogleSignInButton redirectUrl={redirectUrl} />
 
       {/* Enlace alternativo para crear cuenta */}
-      <div className="pt-2 text-center border-t border-neutral-100">
-        <p className="text-xs text-neutral-500 font-sans">
+      <div className="pt-2 text-center border-t border-surface-border/60">
+        <p className="text-xs text-text-muted font-sans">
           ¿No tienes una cuenta aún?{" "}
           {onSwitchToRegister ? (
             <button

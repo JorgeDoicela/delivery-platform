@@ -47,25 +47,25 @@ export function AccountProfileSection() {
   };
 
   return (
-    <div className="bg-white border border-neutral-200 rounded-3xl p-6 md:p-8 space-y-6">
-      <div className="border-b border-neutral-100 pb-4">
-        <h2 className="text-lg font-black text-neutral-900 font-display uppercase tracking-tight">
+    <div className="bg-surface-card border border-surface-border rounded-3xl p-6 md:p-8 space-y-6">
+      <div className="border-b border-surface-border pb-4">
+        <h2 className="text-lg font-black text-text-strong font-display uppercase tracking-tight">
           Datos Personales y de Facturación
         </h2>
-        <p className="text-xs text-neutral-500 mt-0.5">
+        <p className="text-xs text-text-muted mt-0.5">
           Configura tus datos para agilizar el despacho y la emisión de comprobantes fiscales electrónicos (SRI).
         </p>
       </div>
 
       {actionSuccessMessage && (
-        <div className="flex items-start gap-3 p-4 bg-neutral-900 text-white rounded-2xl text-xs">
+        <div className="flex items-start gap-3 p-4 bg-emerald-950/40 border border-emerald-800 text-emerald-200 rounded-2xl text-xs">
           <Check className="w-4 h-4 text-emerald-400 shrink-0 mt-0.5" />
           <p className="font-medium">{actionSuccessMessage}</p>
         </div>
       )}
 
       {profileError && (
-        <div className="flex items-start gap-3 p-4 bg-neutral-50 border border-neutral-300 text-neutral-900 rounded-2xl text-xs">
+        <div className="flex items-start gap-3 p-4 bg-red-50 dark:bg-red-950/40 border border-red-200 dark:border-red-800/60 text-red-800 dark:text-red-300 rounded-2xl text-xs">
           <AlertCircle className="w-4 h-4 text-brand-primary shrink-0 mt-0.5" />
           <p className="font-medium">{profileError}</p>
         </div>
@@ -75,14 +75,14 @@ export function AccountProfileSection() {
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           {/* Nombre completo */}
           <div className="space-y-1.5">
-            <label className="block text-xs font-bold text-neutral-700 uppercase tracking-wider">
+            <label className="block text-xs font-bold text-text-base uppercase tracking-wider">
               Nombre Completo *
             </label>
             <input
               type="text"
               {...register("fullName")}
               placeholder="Ej: Carlos Mendoza"
-              className="w-full px-4 py-3 rounded-2xl border border-neutral-200 focus:outline-none focus:border-neutral-900 text-xs transition-colors"
+              className="w-full px-4 py-3 rounded-2xl border border-surface-border bg-surface-canvas text-text-strong placeholder:text-text-subtle focus:outline-none focus:border-brand-primary text-xs transition-colors"
             />
             {errors.fullName && (
               <p className="text-xs text-brand-primary font-semibold">
@@ -93,14 +93,14 @@ export function AccountProfileSection() {
 
           {/* Teléfono */}
           <div className="space-y-1.5">
-            <label className="block text-xs font-bold text-neutral-700 uppercase tracking-wider">
+            <label className="block text-xs font-bold text-text-base uppercase tracking-wider">
               Teléfono de Contacto *
             </label>
             <input
               type="tel"
               {...register("phone")}
               placeholder="Ej: +593987654321"
-              className="w-full px-4 py-3 rounded-2xl border border-neutral-200 focus:outline-none focus:border-neutral-900 text-xs transition-colors"
+              className="w-full px-4 py-3 rounded-2xl border border-surface-border bg-surface-canvas text-text-strong placeholder:text-text-subtle focus:outline-none focus:border-brand-primary text-xs transition-colors"
             />
             {errors.phone && (
               <p className="text-xs text-brand-primary font-semibold">
@@ -111,12 +111,12 @@ export function AccountProfileSection() {
 
           {/* Tipo de Documento */}
           <div className="space-y-1.5">
-            <label className="block text-xs font-bold text-neutral-700 uppercase tracking-wider">
+            <label className="block text-xs font-bold text-text-base uppercase tracking-wider">
               Tipo de Identificación
             </label>
             <select
               {...register("identificationType")}
-              className="w-full px-4 py-3 rounded-2xl border border-neutral-200 bg-white focus:outline-none focus:border-neutral-900 text-xs transition-colors"
+              className="w-full px-4 py-3 rounded-2xl border border-surface-border bg-surface-canvas text-text-strong focus:outline-none focus:border-brand-primary text-xs transition-colors"
             >
               <option value="">Seleccionar tipo...</option>
               <option value="CEDULA">Cédula de Identidad</option>
@@ -128,14 +128,14 @@ export function AccountProfileSection() {
 
           {/* Número de documento */}
           <div className="space-y-1.5">
-            <label className="block text-xs font-bold text-neutral-700 uppercase tracking-wider">
+            <label className="block text-xs font-bold text-text-base uppercase tracking-wider">
               Número de Identificación
             </label>
             <input
               type="text"
               {...register("identificationNumber")}
               placeholder="Ej: 1712345678"
-              className="w-full px-4 py-3 rounded-2xl border border-neutral-200 focus:outline-none focus:border-neutral-900 text-xs transition-colors"
+              className="w-full px-4 py-3 rounded-2xl border border-surface-border bg-surface-canvas text-text-strong placeholder:text-text-subtle focus:outline-none focus:border-brand-primary text-xs transition-colors"
             />
             {errors.identificationNumber && (
               <p className="text-xs text-brand-primary font-semibold">
@@ -147,16 +147,16 @@ export function AccountProfileSection() {
 
         {/* Correo (de solo lectura por motivos de auditoría y verificación) */}
         <div className="space-y-1.5">
-          <label className="block text-xs font-bold text-neutral-400 uppercase tracking-wider">
+          <label className="block text-xs font-bold text-text-subtle uppercase tracking-wider">
             Correo Electrónico (Registrado)
           </label>
           <input
             type="email"
             value={profile?.email || ""}
             disabled
-            className="w-full px-4 py-3 rounded-2xl border border-neutral-200 bg-neutral-100 text-neutral-500 text-xs cursor-not-allowed"
+            className="w-full px-4 py-3 rounded-2xl border border-surface-border bg-surface-canvas/60 text-text-subtle text-xs cursor-not-allowed"
           />
-          <p className="text-[11px] text-neutral-400">
+          <p className="text-[11px] text-text-subtle">
             Para modificar tu correo electrónico principal, contacta con el soporte del sistema.
           </p>
         </div>
@@ -165,7 +165,7 @@ export function AccountProfileSection() {
           <button
             type="submit"
             disabled={isSaving}
-            className="w-full sm:w-auto bg-neutral-900 hover:bg-neutral-800 active:scale-95 disabled:opacity-50 text-white font-black text-xs uppercase tracking-wider font-display px-8 py-3.5 rounded-full shadow-sm transition-all flex items-center justify-center gap-2 min-h-[44px] cursor-pointer"
+            className="w-full sm:w-auto bg-brand-primary hover:brightness-110 active:scale-95 disabled:opacity-50 text-white font-black text-xs uppercase tracking-wider font-display px-8 py-3.5 rounded-full shadow-sm transition-all flex items-center justify-center gap-2 min-h-[44px] cursor-pointer"
           >
             {isSaving ? (
               <>

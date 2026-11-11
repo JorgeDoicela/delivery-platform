@@ -108,10 +108,10 @@ function LoginContent({ initialSlug }: LoginPageProps) {
     };
 
     return (
-        <div className="w-full max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-12 space-y-6">
+        <div className="w-full max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-12 space-y-6 min-h-[100dvh] mb-16 sm:mb-24">
             {/* 1. Titular Principal en Barlow Condensed */}
             <div className="text-center sm:text-left space-y-1">
-                <h1 className="text-3xl sm:text-4xl font-black text-neutral-950 uppercase tracking-tight font-display">
+                <h1 className="text-3xl sm:text-4xl font-black text-text-strong uppercase tracking-tight font-display">
                     {isAuthenticated && user && authMode !== "verify-email"
                         ? `Tu Cuenta en ${brandName}`
                         : `Hola, bienvenido/a a ${brandName}`}
@@ -119,9 +119,9 @@ function LoginContent({ initialSlug }: LoginPageProps) {
             </div>
 
             {/* 2. Tarjeta Blanca Principal de Estado / Formulario */}
-            <div className="bg-white border border-neutral-200/90 rounded-3xl p-5 sm:p-10 lg:p-12 shadow-sm min-h-[380px] flex flex-col justify-center">
+            <div className="bg-surface-card border border-surface-border rounded-3xl p-5 sm:p-10 lg:p-12 shadow-sm min-h-[380px] flex flex-col justify-center text-text-strong">
                 {!isMounted ? (
-                    <div className="flex flex-col items-center justify-center p-8 text-neutral-400 gap-2">
+                    <div className="flex flex-col items-center justify-center p-8 text-text-muted gap-2">
                         <Loader2 className="w-6 h-6 animate-spin text-brand-primary" />
                         <span className="text-xs font-semibold uppercase tracking-wider">
                             Verificando sesión...
@@ -161,8 +161,8 @@ function LoginContent({ initialSlug }: LoginPageProps) {
                         return (
                             <div className="space-y-6">
                                 {/* Encabezado de Usuario Activo */}
-                                <div className="flex flex-col sm:flex-row items-center sm:items-start gap-4 pb-6 border-b border-neutral-100">
-                                    <div className="w-16 h-16 rounded-2xl bg-neutral-950 text-white flex items-center justify-center font-black text-2xl font-display shadow-sm shrink-0 overflow-hidden border border-neutral-200">
+                                <div className="flex flex-col sm:flex-row items-center sm:items-start gap-4 pb-6 border-b border-surface-border/60">
+                                    <div className="w-16 h-16 rounded-2xl bg-neutral-900 text-white flex items-center justify-center font-black text-2xl font-display shadow-sm shrink-0 overflow-hidden border border-surface-border">
                                         {user.avatarUrl ? (
                                             /* eslint-disable-next-line @next/next/no-img-element */
                                             <img
@@ -182,29 +182,29 @@ function LoginContent({ initialSlug }: LoginPageProps) {
                                     </div>
                                     <div className="text-center sm:text-left space-y-1">
                                         <div className="flex flex-wrap items-center justify-center sm:justify-start gap-2">
-                                            <h2 className="text-2xl font-black text-neutral-950 font-display tracking-tight">
+                                            <h2 className="text-2xl font-black text-text-strong font-display tracking-tight">
                                                 {user.fullName || "Cliente"}
                                             </h2>
                                             {user.isEmailVerified ? (
-                                                <span className="inline-flex items-center gap-1 text-[11px] font-bold text-emerald-700 bg-emerald-50 border border-emerald-200 px-2.5 py-0.5 rounded-full">
-                                                    <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600" />
+                                                <span className="inline-flex items-center gap-1 text-[11px] font-bold text-emerald-700 bg-emerald-50 dark:bg-emerald-950/40 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-800/60 px-2.5 py-0.5 rounded-full">
+                                                    <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400" />
                                                     <span>Verificado</span>
                                                 </span>
                                             ) : (
-                                                <span className="text-[11px] font-bold text-amber-700 bg-amber-50 border border-amber-200 px-2.5 py-0.5 rounded-full">
+                                                <span className="text-[11px] font-bold text-amber-700 bg-amber-50 dark:bg-amber-950/40 dark:text-amber-400 border border-amber-200 dark:border-amber-800/60 px-2.5 py-0.5 rounded-full">
                                                     Sin verificar
                                                 </span>
                                             )}
                                         </div>
-                                        <p className="text-xs text-neutral-500 font-mono">
+                                        <p className="text-xs text-text-muted font-mono">
                                             {user.email}
                                             {!isCustomer && staffRoleLabel && (
-                                                <span className="ml-2 font-sans font-bold text-neutral-700">
+                                                <span className="ml-2 font-sans font-bold text-text-base">
                                                     • Cargo: <span className="text-brand-primary">{staffRoleLabel}</span>
                                                 </span>
                                             )}
                                         </p>
-                                        <div className="flex items-center justify-center sm:justify-start gap-2 pt-1 text-xs text-neutral-500">
+                                        <div className="flex items-center justify-center sm:justify-start gap-2 pt-1 text-xs text-text-muted">
                                             <Loader2 className="w-3.5 h-3.5 animate-spin text-brand-primary" />
                                             <span>Redirigiendo a tu espacio personal... o selecciona una opción:</span>
                                         </div>
@@ -213,11 +213,11 @@ function LoginContent({ initialSlug }: LoginPageProps) {
 
                                 {/* Alerta de correo no verificado si aplica */}
                                 {!user.isEmailVerified && (
-                                    <div className="p-4 bg-amber-50 border border-amber-200 rounded-2xl text-xs text-amber-900 flex items-start gap-3">
-                                        <Mail className="w-4 h-4 text-amber-700 shrink-0 mt-0.5" />
+                                    <div className="p-4 bg-amber-50 dark:bg-amber-950/30 border border-amber-200 dark:border-amber-800/60 rounded-2xl text-xs text-amber-900 dark:text-amber-200 flex items-start gap-3">
+                                        <Mail className="w-4 h-4 text-amber-700 dark:text-amber-400 shrink-0 mt-0.5" />
                                         <div className="space-y-1">
                                             <p className="font-bold">Correo pendiente de verificación</p>
-                                            <p className="text-amber-800">
+                                            <p className="text-amber-800 dark:text-amber-300">
                                                 Te enviamos un enlace de activación a tu correo al momento del registro.
                                             </p>
                                             <button
@@ -237,22 +237,22 @@ function LoginContent({ initialSlug }: LoginPageProps) {
                                     {/* Tarjeta Mi Cuenta */}
                                     <Link
                                         href={routes.getAccountHref()}
-                                        className="group bg-neutral-50 hover:bg-white border border-neutral-200 hover:border-brand-primary/40 rounded-2xl p-5 shadow-xs hover:shadow-md transition-all flex flex-col justify-between space-y-4"
+                                        className="group bg-surface-canvas hover:bg-surface-card-hover border border-surface-border hover:border-brand-primary/40 rounded-2xl p-5 shadow-xs hover:shadow-md transition-all flex flex-col justify-between space-y-4"
                                     >
                                         <div className="space-y-3">
-                                            <div className="w-10 h-10 rounded-xl bg-white border border-neutral-200 flex items-center justify-center text-neutral-900 group-hover:bg-brand-primary group-hover:text-white group-hover:border-transparent transition-colors">
+                                            <div className="w-10 h-10 rounded-xl bg-surface-card border border-surface-border flex items-center justify-center text-text-strong group-hover:bg-brand-primary group-hover:text-white group-hover:border-transparent transition-colors">
                                                 <User className="w-5 h-5" />
                                             </div>
                                             <div>
-                                                <h3 className="font-black text-neutral-950 font-display text-lg uppercase tracking-tight group-hover:text-brand-primary transition-colors">
+                                                <h3 className="font-black text-text-strong font-display text-lg uppercase tracking-tight group-hover:text-brand-primary transition-colors">
                                                     Mi Cuenta & Perfil
                                                 </h3>
-                                                <p className="text-xs text-neutral-500 mt-1 line-clamp-2">
+                                                <p className="text-xs text-text-muted mt-1 line-clamp-2">
                                                     Gestiona tus pedidos, direcciones de entrega guardadas y seguridad.
                                                 </p>
                                             </div>
                                         </div>
-                                        <div className="flex items-center gap-1 text-xs font-bold text-brand-primary uppercase tracking-wider font-display pt-2 border-t border-neutral-100">
+                                        <div className="flex items-center gap-1 text-xs font-bold text-brand-primary uppercase tracking-wider font-display pt-2 border-t border-surface-border/60">
                                             <span>Ir al portal</span>
                                             <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-1 transition-transform" />
                                         </div>
@@ -261,22 +261,22 @@ function LoginContent({ initialSlug }: LoginPageProps) {
                                     {/* Tarjeta Menú & Pedidos */}
                                     <Link
                                         href={routes.getCatalogHref()}
-                                        className="group bg-neutral-50 hover:bg-white border border-neutral-200 hover:border-brand-primary/40 rounded-2xl p-5 shadow-xs hover:shadow-md transition-all flex flex-col justify-between space-y-4"
+                                        className="group bg-surface-canvas hover:bg-surface-card-hover border border-surface-border hover:border-brand-primary/40 rounded-2xl p-5 shadow-xs hover:shadow-md transition-all flex flex-col justify-between space-y-4"
                                     >
                                         <div className="space-y-3">
-                                            <div className="w-10 h-10 rounded-xl bg-white border border-neutral-200 flex items-center justify-center text-neutral-900 group-hover:bg-brand-primary group-hover:text-white group-hover:border-transparent transition-colors">
+                                            <div className="w-10 h-10 rounded-xl bg-surface-card border border-surface-border flex items-center justify-center text-text-strong group-hover:bg-brand-primary group-hover:text-white group-hover:border-transparent transition-colors">
                                                 <ShoppingBag className="w-5 h-5" />
                                             </div>
                                             <div>
-                                                <h3 className="font-black text-neutral-950 font-display text-lg uppercase tracking-tight group-hover:text-brand-primary transition-colors">
+                                                <h3 className="font-black text-text-strong font-display text-lg uppercase tracking-tight group-hover:text-brand-primary transition-colors">
                                                     Ver Menú & Pedir
                                                 </h3>
-                                                <p className="text-xs text-neutral-500 mt-1 line-clamp-2">
+                                                <p className="text-xs text-text-muted mt-1 line-clamp-2">
                                                     Explora platos, combos familiares y promociones activas de {brandName}.
                                                 </p>
                                             </div>
                                         </div>
-                                        <div className="flex items-center gap-1 text-xs font-bold text-brand-primary uppercase tracking-wider font-display pt-2 border-t border-neutral-100">
+                                        <div className="flex items-center gap-1 text-xs font-bold text-brand-primary uppercase tracking-wider font-display pt-2 border-t border-surface-border/60">
                                             <span>Explorar carta</span>
                                             <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-1 transition-transform" />
                                         </div>
@@ -285,22 +285,22 @@ function LoginContent({ initialSlug }: LoginPageProps) {
                                     {/* Tarjeta Rastreo */}
                                     <Link
                                         href={routes.getRastreoHref()}
-                                        className="group bg-neutral-50 hover:bg-white border border-neutral-200 hover:border-brand-primary/40 rounded-2xl p-5 shadow-xs hover:shadow-md transition-all flex flex-col justify-between space-y-4"
+                                        className="group bg-surface-canvas hover:bg-surface-card-hover border border-surface-border hover:border-brand-primary/40 rounded-2xl p-5 shadow-xs hover:shadow-md transition-all flex flex-col justify-between space-y-4"
                                     >
                                         <div className="space-y-3">
-                                            <div className="w-10 h-10 rounded-xl bg-white border border-neutral-200 flex items-center justify-center text-neutral-900 group-hover:bg-brand-primary group-hover:text-white group-hover:border-transparent transition-colors">
+                                            <div className="w-10 h-10 rounded-xl bg-surface-card border border-surface-border flex items-center justify-center text-text-strong group-hover:bg-brand-primary group-hover:text-white group-hover:border-transparent transition-colors">
                                                 <Compass className="w-5 h-5" />
                                             </div>
                                             <div>
-                                                <h3 className="font-black text-neutral-950 font-display text-lg uppercase tracking-tight group-hover:text-brand-primary transition-colors">
+                                                <h3 className="font-black text-text-strong font-display text-lg uppercase tracking-tight group-hover:text-brand-primary transition-colors">
                                                     Rastreo Satelital
                                                 </h3>
-                                                <p className="text-xs text-neutral-500 mt-1 line-clamp-2">
+                                                <p className="text-xs text-text-muted mt-1 line-clamp-2">
                                                     Seguimiento en tiempo real de tus pedidos en preparación y entrega.
                                                 </p>
                                             </div>
                                         </div>
-                                        <div className="flex items-center gap-1 text-xs font-bold text-brand-primary uppercase tracking-wider font-display pt-2 border-t border-neutral-100">
+                                        <div className="flex items-center gap-1 text-xs font-bold text-brand-primary uppercase tracking-wider font-display pt-2 border-t border-surface-border/60">
                                             <span>Consultar estado</span>
                                             <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-1 transition-transform" />
                                         </div>
@@ -409,10 +409,10 @@ function LoginContent({ initialSlug }: LoginPageProps) {
                                 </div>
 
                                 {/* Barra Inferior de Navegación & Logout */}
-                                <div className="pt-6 border-t border-neutral-100 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs">
+                                <div className="pt-6 border-t border-surface-border/60 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs">
                                     <Link
                                         href={routes.getHomeHref()}
-                                        className="inline-flex items-center gap-1.5 text-neutral-600 hover:text-neutral-950 font-bold transition-colors"
+                                        className="inline-flex items-center gap-1.5 text-text-muted hover:text-text-strong font-bold transition-colors"
                                     >
                                         <ArrowLeft className="w-3.5 h-3.5" />
                                         <span>Volver a la portada de {brandName}</span>
@@ -421,7 +421,7 @@ function LoginContent({ initialSlug }: LoginPageProps) {
                                     <button
                                         type="button"
                                         onClick={handleLogout}
-                                        className="inline-flex items-center gap-1.5 text-neutral-500 hover:text-red-600 font-bold transition-colors cursor-pointer"
+                                        className="inline-flex items-center gap-1.5 text-text-muted hover:text-red-500 font-bold transition-colors cursor-pointer"
                                     >
                                         <LogOut className="w-3.5 h-3.5" />
                                         <span>Cerrar sesión activa</span>
@@ -433,8 +433,8 @@ function LoginContent({ initialSlug }: LoginPageProps) {
                 ) : (
                     /* Formulario de Login / Registro / Recuperación */
                     <div className="w-full max-w-md mx-auto py-2">
-                        <div className="mb-6 pb-3 border-b border-neutral-100">
-                            <h2 className="text-2xl font-black uppercase tracking-tight text-neutral-950 font-display">
+                        <div className="mb-6 pb-3 border-b border-surface-border/60">
+                            <h2 className="text-2xl font-black uppercase tracking-tight text-text-strong font-display">
                                 {authMode === "login"
                                     ? "Iniciar Sesión"
                                     : authMode === "register"
@@ -445,7 +445,7 @@ function LoginContent({ initialSlug }: LoginPageProps) {
                                                 ? "Restablecer Contraseña"
                                                 : "Verificar Correo Electrónico"}
                             </h2>
-                            <p className="text-xs text-neutral-500 mt-1">
+                            <p className="text-xs text-text-muted mt-1">
                                 {authMode === "login"
                                     ? "Accede a tu cuenta para gestionar pedidos, cocina o administración."
                                     : authMode === "register"
@@ -511,7 +511,7 @@ export default function LoginPage({ initialSlug }: LoginPageProps = {}) {
     return (
         <Suspense
             fallback={
-                <div className="flex flex-col items-center justify-center min-h-[50vh] text-neutral-500 gap-2">
+                <div className="flex flex-col items-center justify-center min-h-[100dvh] text-neutral-500 gap-2 mb-16 sm:mb-24">
                     <Loader2 className="w-6 h-6 animate-spin text-brand-primary" />
                     <span className="text-xs font-semibold uppercase tracking-wider">
                         Cargando portal...

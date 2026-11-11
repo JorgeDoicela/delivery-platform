@@ -231,11 +231,11 @@ export function GoogleSignInButton({
             onClick={handleButtonClick}
             disabled={isLoading}
             aria-label="Continuar con Google"
-            className="w-full min-h-[48px] px-4 py-2.5 bg-white hover:bg-neutral-50 active:scale-95 border border-neutral-300 hover:border-neutral-400 rounded-full text-xs sm:text-sm font-bold uppercase tracking-wider font-display text-neutral-800 shadow-xs transition-all flex items-center justify-center gap-3 disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
+            className="w-full min-h-[48px] px-4 py-2.5 bg-surface-card hover:bg-surface-card-hover active:scale-95 border border-surface-border hover:border-surface-border/80 rounded-full text-xs sm:text-sm font-bold uppercase tracking-wider font-display text-text-strong shadow-xs transition-all flex items-center justify-center gap-3 disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
           >
             {isLoading ? (
               <>
-                <Loader2 className="w-4 h-4 animate-spin text-neutral-600" />
+                <Loader2 className="w-4 h-4 animate-spin text-text-muted" />
                 <span className="font-sans text-xs font-semibold normal-case">Conectando con Google...</span>
               </>
             ) : (

@@ -39,7 +39,7 @@ async function TenantAccountLoader({ params }: TenantAccountPageProps) {
 
   return (
     <AuthGuard>
-      <div className="min-h-screen bg-neutral-50/50">
+      <div className="min-h-screen bg-surface-canvas">
         <AccountDashboardView tenantSlug={slug} />
       </div>
     </AuthGuard>

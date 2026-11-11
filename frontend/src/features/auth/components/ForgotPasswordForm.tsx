@@ -65,7 +65,7 @@ export function ForgotPasswordForm({
 
   const containerClasses = embedded
     ? "space-y-5 w-full max-w-md mx-auto"
-    : "space-y-6 w-full max-w-md bg-white border border-neutral-200 rounded-3xl p-7 sm:p-9 shadow-xl shadow-neutral-900/5 mx-auto";
+    : "space-y-6 w-full max-w-md bg-surface-card border border-surface-border text-text-strong rounded-3xl p-7 sm:p-9 shadow-xl shadow-black/10 mx-auto";
 
   return (
     <form onSubmit={handleSubmit(onSubmit)} noValidate className={containerClasses}>
@@ -85,18 +85,18 @@ export function ForgotPasswordForm({
             </div>
             <h1
               data-display-brand
-              className="text-3xl font-black text-neutral-950 uppercase tracking-tight font-display leading-none"
+              className="text-3xl font-black text-text-strong uppercase tracking-tight font-display leading-none"
             >
               {brandName}
             </h1>
-            <span className="text-[11px] font-bold text-neutral-500 uppercase tracking-widest block mt-1 font-mono">
+            <span className="text-[11px] font-bold text-text-subtle uppercase tracking-widest block mt-1 font-mono">
               {brandTagline} • Recuperación
             </span>
-            <p className="text-xs text-neutral-500 mt-2 leading-relaxed">
+            <p className="text-xs text-text-muted mt-2 leading-relaxed">
               Ingresa tu correo para recibir un enlace seguro de restablecimiento.
             </p>
           </div>
-          <div className="border-t border-neutral-100" />
+          <div className="border-t border-surface-border/60" />
         </>
       )}
 
@@ -105,7 +105,7 @@ export function ForgotPasswordForm({
         <div
           role="alert"
           aria-live="polite"
-          className="bg-red-50 border border-red-200 text-red-700 text-xs p-3.5 rounded-2xl flex items-start gap-2.5 animate-fadeIn"
+          className="bg-red-50 dark:bg-red-950/40 border border-red-200 dark:border-red-800/60 text-red-700 dark:text-red-300 text-xs p-3.5 rounded-2xl flex items-start gap-2.5 animate-fadeIn"
         >
           <AlertCircle className="w-4 h-4 shrink-0 text-red-600 mt-0.5" />
           <div className="leading-relaxed font-medium">{formError}</div>
@@ -115,14 +115,14 @@ export function ForgotPasswordForm({
       {/* Pantalla de Éxito */}
       {successMessage ? (
         <div className="space-y-4 py-2 text-center animate-fadeIn">
-          <div className="w-12 h-12 bg-neutral-100 rounded-full flex items-center justify-center mx-auto text-neutral-900">
+          <div className="w-12 h-12 bg-surface-canvas border border-surface-border rounded-full flex items-center justify-center mx-auto text-text-strong">
             <CheckCircle2 className="w-6 h-6 stroke-[2.2] text-green-600" />
           </div>
           <div className="space-y-1">
-            <h3 className="text-lg font-black text-neutral-900 uppercase font-display tracking-tight">
+            <h3 className="text-lg font-black text-text-strong uppercase font-display tracking-tight">
               Revisa tu Correo
             </h3>
-            <p className="text-xs text-neutral-600 leading-relaxed max-w-sm mx-auto">
+            <p className="text-xs text-text-muted leading-relaxed max-w-sm mx-auto">
               {successMessage}
             </p>
           </div>
@@ -132,7 +132,7 @@ export function ForgotPasswordForm({
               <button
                 type="button"
                 onClick={onSwitchToLogin}
-                className="w-full min-h-[44px] bg-neutral-100 hover:bg-neutral-200 text-neutral-800 font-bold text-xs uppercase tracking-wider rounded-full transition-colors inline-flex items-center justify-center gap-1.5 cursor-pointer"
+                className="w-full min-h-[44px] bg-surface-canvas hover:bg-surface-card-hover border border-surface-border text-text-strong font-bold text-xs uppercase tracking-wider rounded-full transition-colors inline-flex items-center justify-center gap-1.5 cursor-pointer"
               >
                 <ArrowLeft className="w-3.5 h-3.5" />
                 <span>Volver a Iniciar Sesión</span>
@@ -140,7 +140,7 @@ export function ForgotPasswordForm({
             ) : (
               <Link
                 href={routes.getLoginHref({ redirect: redirectUrl })}
-                className="w-full min-h-[44px] bg-neutral-100 hover:bg-neutral-200 text-neutral-800 font-bold text-xs uppercase tracking-wider rounded-full transition-colors inline-flex items-center justify-center gap-1.5"
+                className="w-full min-h-[44px] bg-surface-canvas hover:bg-surface-card-hover border border-surface-border text-text-strong font-bold text-xs uppercase tracking-wider rounded-full transition-colors inline-flex items-center justify-center gap-1.5"
               >
                 <ArrowLeft className="w-3.5 h-3.5" />
                 <span>Volver a Iniciar Sesión</span>
@@ -154,7 +154,7 @@ export function ForgotPasswordForm({
           <div className="space-y-1.5">
             <label
               htmlFor="forgot-email"
-              className="block text-[11px] font-bold text-neutral-700 uppercase tracking-wider"
+              className="block text-[11px] font-bold text-text-base uppercase tracking-wider"
             >
               Correo Electrónico Registrado
             </label>
@@ -167,7 +167,7 @@ export function ForgotPasswordForm({
               aria-describedby={errors.email ? "forgot-email-error" : undefined}
               {...register("email")}
               placeholder="usuario@dominio.com"
-              className="w-full min-h-[48px] px-4 py-2.5 bg-neutral-50 border border-neutral-200 hover:border-neutral-300 focus:bg-white focus:border-brand-primary focus:ring-1 focus:ring-brand-primary focus:outline-none rounded-xl text-sm text-neutral-900 placeholder:text-neutral-400 transition-all disabled:opacity-50 shadow-2xs outline-none"
+              className="w-full min-h-[48px] px-4 py-2.5 bg-surface-canvas border border-surface-border hover:border-surface-border/80 focus:bg-surface-card focus:border-brand-primary focus:ring-1 focus:ring-brand-primary focus:outline-none rounded-xl text-sm text-text-strong placeholder:text-text-subtle transition-all disabled:opacity-50 shadow-2xs outline-none"
             />
             {errors.email && (
               <p id="forgot-email-error" className="text-xs text-red-600 font-medium">
@@ -193,12 +193,12 @@ export function ForgotPasswordForm({
           </button>
 
           {/* Enlace para volver */}
-          <div className="pt-2 text-center border-t border-neutral-100">
+          <div className="pt-2 text-center border-t border-surface-border/60">
             {onSwitchToLogin ? (
               <button
                 type="button"
                 onClick={onSwitchToLogin}
-                className="text-xs font-bold text-neutral-600 hover:text-neutral-900 hover:underline cursor-pointer inline-flex items-center gap-1"
+                className="text-xs font-bold text-text-muted hover:text-text-strong hover:underline cursor-pointer inline-flex items-center gap-1"
               >
                 <ArrowLeft className="w-3.5 h-3.5" />
                 <span>Recordé mi contraseña, iniciar sesión</span>
@@ -206,7 +206,7 @@ export function ForgotPasswordForm({
             ) : (
               <Link
                 href={routes.getLoginHref({ redirect: redirectUrl })}
-                className="text-xs font-bold text-neutral-600 hover:text-neutral-900 hover:underline inline-flex items-center gap-1"
+                className="text-xs font-bold text-text-muted hover:text-text-strong hover:underline inline-flex items-center gap-1"
               >
                 <ArrowLeft className="w-3.5 h-3.5" />
                 <span>Recordé mi contraseña, iniciar sesión</span>

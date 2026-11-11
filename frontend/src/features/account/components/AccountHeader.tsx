@@ -63,12 +63,12 @@ export function AccountHeader({ profile, isLoading }: AccountHeaderProps) {
 
   if (isLoading || !profile) {
     return (
-      <div className="bg-white border border-neutral-200 rounded-3xl p-6 md:p-8 animate-pulse">
+      <div className="bg-surface-card border border-surface-border rounded-3xl p-6 md:p-8 animate-pulse">
         <div className="flex items-center gap-4">
-          <div className="w-16 h-16 rounded-2xl bg-neutral-200" />
+          <div className="w-16 h-16 rounded-2xl bg-surface-canvas" />
           <div className="space-y-2 flex-1">
-            <div className="h-6 w-48 bg-neutral-200 rounded-lg" />
-            <div className="h-4 w-64 bg-neutral-100 rounded-lg" />
+            <div className="h-6 w-48 bg-surface-canvas rounded-lg" />
+            <div className="h-4 w-64 bg-surface-canvas/60 rounded-lg" />
           </div>
         </div>
       </div>
@@ -87,14 +87,14 @@ export function AccountHeader({ profile, isLoading }: AccountHeaderProps) {
   const resolvedAvatar = resolveAvatarUrl(profile.avatarUrl);
 
   return (
-    <div className="bg-white border border-neutral-200 rounded-3xl p-5 sm:p-6 md:p-8 shadow-xs space-y-4">
+    <div className="bg-surface-card border border-surface-border rounded-3xl p-5 sm:p-6 md:p-8 shadow-xs space-y-4">
       <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-5 sm:gap-6">
         <div className="flex items-center gap-4 min-w-0">
           {/* Contenedor de Avatar Interactivo con botón de cámara */}
           <div className="relative group shrink-0">
-            <div className="w-16 h-16 sm:w-20 sm:h-20 rounded-2xl bg-neutral-900 text-white font-black text-xl sm:text-2xl flex items-center justify-center font-display tracking-wider overflow-hidden shadow-sm border border-neutral-200">
+            <div className="w-16 h-16 sm:w-20 sm:h-20 rounded-2xl bg-surface-canvas text-text-strong font-black text-xl sm:text-2xl flex items-center justify-center font-display tracking-wider overflow-hidden shadow-sm border border-surface-border">
               {isUploadingAvatar ? (
-                <div className="w-full h-full flex flex-col items-center justify-center bg-neutral-900/90 text-white gap-1">
+                <div className="w-full h-full flex flex-col items-center justify-center bg-surface-canvas/90 text-text-strong gap-1">
                   <Loader2 className="w-6 h-6 animate-spin text-brand-primary" />
                 </div>
               ) : resolvedAvatar ? (
@@ -115,7 +115,7 @@ export function AccountHeader({ profile, isLoading }: AccountHeaderProps) {
               onClick={handleTriggerUpload}
               disabled={isUploadingAvatar}
               title="Cambiar foto de perfil (Convertir a WebP)"
-              className="absolute -bottom-1 -right-1 p-1.5 rounded-full bg-neutral-950 hover:bg-neutral-800 text-white shadow-md border-2 border-white transition-all active:scale-95 cursor-pointer disabled:opacity-50"
+              className="absolute -bottom-1 -right-1 p-1.5 rounded-full bg-brand-primary hover:brightness-110 text-white shadow-md border-2 border-surface-card transition-all active:scale-95 cursor-pointer disabled:opacity-50"
             >
               <Camera className="w-3.5 h-3.5" />
             </button>
@@ -126,7 +126,7 @@ export function AccountHeader({ profile, isLoading }: AccountHeaderProps) {
                 type="button"
                 onClick={handleDeleteAvatar}
                 title="Eliminar foto de perfil"
-                className="absolute -top-1 -right-1 p-1.5 rounded-full bg-white hover:bg-red-50 text-neutral-500 hover:text-red-600 shadow-sm border border-neutral-200 transition-all active:scale-95 cursor-pointer opacity-0 group-hover:opacity-100"
+                className="absolute -top-1 -right-1 p-1.5 rounded-full bg-surface-card hover:bg-red-50 dark:hover:bg-red-950/40 text-text-muted hover:text-red-500 shadow-sm border border-surface-border transition-all active:scale-95 cursor-pointer opacity-0 group-hover:opacity-100"
               >
                 <Trash2 className="w-3 h-3" />
               </button>
@@ -143,52 +143,52 @@ export function AccountHeader({ profile, isLoading }: AccountHeaderProps) {
 
           <div className="min-w-0">
             <div className="flex flex-wrap items-center gap-2">
-              <h1 className="text-xl sm:text-2xl font-black text-neutral-900 font-display uppercase tracking-tight break-words">
+              <h1 className="text-xl sm:text-2xl font-black text-text-strong font-display uppercase tracking-tight break-words">
                 {profile.fullName || "Cliente de la Plataforma"}
               </h1>
               {profile.isEmailVerified && (
                 <span
                   title="Cuenta de correo verificada"
-                  className="inline-flex items-center gap-1 text-[11px] font-bold uppercase tracking-wider text-neutral-800 bg-neutral-100 px-2 py-0.5 rounded-full shrink-0"
+                  className="inline-flex items-center gap-1 text-[11px] font-bold uppercase tracking-wider text-text-strong bg-surface-canvas border border-surface-border px-2 py-0.5 rounded-full shrink-0"
                 >
-                  <ShieldCheck className="w-3.5 h-3.5 text-neutral-900" />
+                  <ShieldCheck className="w-3.5 h-3.5 text-brand-primary" />
                   <span>Verificada</span>
                 </span>
               )}
             </div>
-            <div className="flex flex-wrap items-center gap-x-3 gap-y-1 mt-1 text-xs text-neutral-500 break-all sm:break-normal">
+            <div className="flex flex-wrap items-center gap-x-3 gap-y-1 mt-1 text-xs text-text-muted break-all sm:break-normal">
               <span className="flex items-center gap-1">
-                <Mail className="w-3.5 h-3.5 text-neutral-400 shrink-0" />
+                <Mail className="w-3.5 h-3.5 text-text-subtle shrink-0" />
                 <span>{profile.email}</span>
               </span>
               {profile.phone && (
                 <span className="flex items-center gap-1">
-                  <Phone className="w-3.5 h-3.5 text-neutral-400 shrink-0" />
+                  <Phone className="w-3.5 h-3.5 text-text-subtle shrink-0" />
                   <span>{profile.phone}</span>
                 </span>
               )}
             </div>
-            <p className="text-[11px] text-neutral-400 mt-1">
+            <p className="text-[11px] text-text-subtle mt-1">
               Haz clic en la cámara para subir tu foto (se optimizará a WebP automáticamente).
             </p>
           </div>
         </div>
 
         {/* Resumen de actividad */}
-        <div className="flex items-center gap-2.5 sm:gap-3 w-full sm:w-auto pt-4 sm:pt-0 border-t sm:border-t-0 border-neutral-100">
-          <div className="flex-1 sm:flex-initial text-center px-4 py-2.5 bg-neutral-50 rounded-2xl border border-neutral-100 min-w-0">
-            <span className="block text-xl font-black text-neutral-900 font-display">
+        <div className="flex items-center gap-2.5 sm:gap-3 w-full sm:w-auto pt-4 sm:pt-0 border-t sm:border-t-0 border-surface-border">
+          <div className="flex-1 sm:flex-initial text-center px-4 py-2.5 bg-surface-canvas rounded-2xl border border-surface-border min-w-0">
+            <span className="block text-xl font-black text-text-strong font-display">
               {profile.activeOrdersCount}
             </span>
-            <span className="text-[10px] uppercase font-bold text-neutral-400 tracking-wider truncate block">
+            <span className="text-[10px] uppercase font-bold text-text-subtle tracking-wider truncate block">
               En Curso
             </span>
           </div>
-          <div className="flex-1 sm:flex-initial text-center px-4 py-2.5 bg-neutral-50 rounded-2xl border border-neutral-100 min-w-0">
-            <span className="block text-xl font-black text-neutral-900 font-display">
+          <div className="flex-1 sm:flex-initial text-center px-4 py-2.5 bg-surface-canvas rounded-2xl border border-surface-border min-w-0">
+            <span className="block text-xl font-black text-text-strong font-display">
               {profile.totalOrdersCount}
             </span>
-            <span className="text-[10px] uppercase font-bold text-neutral-400 tracking-wider truncate block">
+            <span className="text-[10px] uppercase font-bold text-text-subtle tracking-wider truncate block">
               Historial
             </span>
           </div>
@@ -197,8 +197,8 @@ export function AccountHeader({ profile, isLoading }: AccountHeaderProps) {
 
       {/* Alertas de error de subida si ocurren */}
       {(previewError || avatarError) && (
-        <div className="p-3 bg-red-50 border border-red-200 text-red-800 rounded-2xl text-xs flex items-center gap-2">
-          <AlertCircle className="w-4 h-4 text-red-600 shrink-0" />
+        <div className="p-3 bg-red-50 dark:bg-red-950/40 border border-red-200 dark:border-red-800/60 text-red-800 dark:text-red-300 rounded-2xl text-xs flex items-center gap-2">
+          <AlertCircle className="w-4 h-4 text-brand-primary shrink-0" />
           <span>{previewError || avatarError}</span>
         </div>
       )}

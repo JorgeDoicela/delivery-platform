@@ -74,21 +74,21 @@ export function ResetPasswordForm({
 
   const containerClasses = embedded
     ? "space-y-4 w-full max-w-md mx-auto"
-    : "space-y-5 w-full max-w-md bg-white border border-neutral-200 rounded-3xl p-7 sm:p-9 shadow-xl shadow-neutral-900/5 mx-auto";
+    : "space-y-5 w-full max-w-md bg-surface-card border border-surface-border text-text-strong rounded-3xl p-7 sm:p-9 shadow-xl shadow-black/10 mx-auto";
 
   // Si no se proporcionó el token en la URL, se guía al usuario a solicitar un enlace seguro
   if (!initialToken) {
     return (
       <div className={containerClasses}>
         <div className="space-y-4 py-4 text-center">
-          <div className="w-12 h-12 bg-neutral-100 rounded-full flex items-center justify-center mx-auto text-neutral-900">
-            <Mail className="w-6 h-6 stroke-[2] text-neutral-700" />
+          <div className="w-12 h-12 bg-surface-canvas border border-surface-border rounded-full flex items-center justify-center mx-auto text-text-strong">
+            <Mail className="w-6 h-6 stroke-[2] text-text-muted" />
           </div>
           <div className="space-y-1">
-            <h3 className="text-lg font-black text-neutral-900 uppercase font-display tracking-tight">
+            <h3 className="text-lg font-black text-text-strong uppercase font-display tracking-tight">
               Enlace de Recuperación Requerido
             </h3>
-            <p className="text-xs text-neutral-600 leading-relaxed max-w-sm mx-auto">
+            <p className="text-xs text-text-muted leading-relaxed max-w-sm mx-auto">
               Para cambiar tu contraseña debes abrir el enlace seguro que enviamos a tu correo electrónico.
             </p>
           </div>
@@ -108,7 +108,7 @@ export function ResetPasswordForm({
               <button
                 type="button"
                 onClick={onSwitchToLogin}
-                className="w-full min-h-[44px] bg-neutral-100 hover:bg-neutral-200 text-neutral-800 font-bold text-xs uppercase tracking-wider rounded-full transition-colors inline-flex items-center justify-center gap-1.5 cursor-pointer"
+                className="w-full min-h-[44px] bg-surface-canvas hover:bg-surface-card-hover border border-surface-border text-text-strong font-bold text-xs uppercase tracking-wider rounded-full transition-colors inline-flex items-center justify-center gap-1.5 cursor-pointer"
               >
                 <ArrowLeft className="w-3.5 h-3.5" />
                 <span>Volver a Iniciar Sesión</span>
@@ -116,7 +116,7 @@ export function ResetPasswordForm({
             ) : (
               <Link
                 href={routes.getLoginHref({ redirect: redirectUrl })}
-                className="w-full min-h-[44px] bg-neutral-100 hover:bg-neutral-200 text-neutral-800 font-bold text-xs uppercase tracking-wider rounded-full transition-colors inline-flex items-center justify-center gap-1.5"
+                className="w-full min-h-[44px] bg-surface-canvas hover:bg-surface-card-hover border border-surface-border text-text-strong font-bold text-xs uppercase tracking-wider rounded-full transition-colors inline-flex items-center justify-center gap-1.5"
               >
                 <ArrowLeft className="w-3.5 h-3.5" />
                 <span>Volver a Iniciar Sesión</span>
@@ -149,18 +149,18 @@ export function ResetPasswordForm({
             </div>
             <h1
               data-display-brand
-              className="text-3xl font-black text-neutral-950 uppercase tracking-tight font-display leading-none"
+              className="text-3xl font-black text-text-strong uppercase tracking-tight font-display leading-none"
             >
               {brandName}
             </h1>
-            <span className="text-[11px] font-bold text-neutral-500 uppercase tracking-widest block mt-1 font-mono">
+            <span className="text-[11px] font-bold text-text-subtle uppercase tracking-widest block mt-1 font-mono">
               {brandTagline} • Nueva Contraseña
             </span>
-            <p className="text-xs text-neutral-500 mt-2 leading-relaxed">
+            <p className="text-xs text-text-muted mt-2 leading-relaxed">
               Define tu nueva contraseña para recuperar el acceso a tu cuenta.
             </p>
           </div>
-          <div className="border-t border-neutral-100" />
+          <div className="border-t border-surface-border/60" />
         </>
       )}
 
@@ -169,7 +169,7 @@ export function ResetPasswordForm({
         <div
           role="alert"
           aria-live="polite"
-          className="bg-red-50 border border-red-200 text-red-700 text-xs p-3.5 rounded-2xl flex items-start gap-2.5 animate-fadeIn"
+          className="bg-red-50 dark:bg-red-950/40 border border-red-200 dark:border-red-800/60 text-red-700 dark:text-red-300 text-xs p-3.5 rounded-2xl flex items-start gap-2.5 animate-fadeIn"
         >
           <AlertCircle className="w-4 h-4 shrink-0 text-red-600 mt-0.5" />
           <div className="leading-relaxed font-medium">{formError}</div>
@@ -179,14 +179,14 @@ export function ResetPasswordForm({
       {/* Estado Exitoso */}
       {success ? (
         <div className="space-y-4 py-2 text-center animate-fadeIn">
-          <div className="w-12 h-12 bg-neutral-100 rounded-full flex items-center justify-center mx-auto text-neutral-900">
+          <div className="w-12 h-12 bg-surface-canvas border border-surface-border rounded-full flex items-center justify-center mx-auto text-text-strong">
             <CheckCircle2 className="w-6 h-6 stroke-[2.2] text-green-600" />
           </div>
           <div className="space-y-1">
-            <h3 className="text-lg font-black text-neutral-900 uppercase font-display tracking-tight">
+            <h3 className="text-lg font-black text-text-strong uppercase font-display tracking-tight">
               Contraseña Actualizada
             </h3>
-            <p className="text-xs text-neutral-600 leading-relaxed max-w-sm mx-auto">
+            <p className="text-xs text-text-muted leading-relaxed max-w-sm mx-auto">
               Tu contraseña ha sido restablecida exitosamente. Todas las sesiones anteriores fueron cerradas por seguridad.
             </p>
           </div>
@@ -216,7 +216,7 @@ export function ResetPasswordForm({
           <div className="space-y-1.5">
             <label
               htmlFor="reset-email"
-              className="block text-[11px] font-bold text-neutral-700 uppercase tracking-wider"
+              className="block text-[11px] font-bold text-text-base uppercase tracking-wider"
             >
               Correo Electrónico
             </label>
@@ -229,7 +229,7 @@ export function ResetPasswordForm({
               aria-describedby={errors.email ? "reset-email-error" : undefined}
               {...register("email")}
               placeholder="usuario@dominio.com"
-              className="w-full min-h-[46px] px-4 py-2 bg-neutral-50 border border-neutral-200 hover:border-neutral-300 focus:bg-white focus:border-brand-primary focus:ring-1 focus:ring-brand-primary focus:outline-none rounded-xl text-sm text-neutral-900 placeholder:text-neutral-400 transition-all disabled:opacity-75 shadow-2xs outline-none"
+              className="w-full min-h-[46px] px-4 py-2 bg-surface-canvas border border-surface-border hover:border-surface-border/80 focus:bg-surface-card focus:border-brand-primary focus:ring-1 focus:ring-brand-primary focus:outline-none rounded-xl text-sm text-text-strong placeholder:text-text-subtle transition-all disabled:opacity-75 shadow-2xs outline-none"
             />
             {errors.email && (
               <p id="reset-email-error" className="text-xs text-red-600 font-medium">
@@ -242,7 +242,7 @@ export function ResetPasswordForm({
           <div className="space-y-1.5">
             <label
               htmlFor="reset-password"
-              className="block text-[11px] font-bold text-neutral-700 uppercase tracking-wider"
+              className="block text-[11px] font-bold text-text-base uppercase tracking-wider"
             >
               Nueva Contraseña
             </label>
@@ -256,13 +256,13 @@ export function ResetPasswordForm({
                 aria-describedby={errors.password ? "reset-password-error" : undefined}
                 {...register("password")}
                 placeholder="Mínimo 6 caracteres"
-                className="w-full min-h-[46px] pl-4 pr-11 py-2 bg-neutral-50 border border-neutral-200 hover:border-neutral-300 focus:bg-white focus:border-brand-primary focus:ring-1 focus:ring-brand-primary focus:outline-none rounded-xl text-sm text-neutral-900 placeholder:text-neutral-400 transition-all disabled:opacity-50 shadow-2xs outline-none"
+                className="w-full min-h-[46px] pl-4 pr-11 py-2 bg-surface-canvas border border-surface-border hover:border-surface-border/80 focus:bg-surface-card focus:border-brand-primary focus:ring-1 focus:ring-brand-primary focus:outline-none rounded-xl text-sm text-text-strong placeholder:text-text-subtle transition-all disabled:opacity-50 shadow-2xs outline-none"
               />
               <button
                 type="button"
                 onClick={() => setShowPassword((prev) => !prev)}
                 aria-label={showPassword ? "Ocultar contraseña" : "Ver contraseña"}
-                className="absolute right-2.5 top-1/2 -translate-y-1/2 p-1.5 rounded-lg text-neutral-400 hover:text-neutral-700 hover:bg-neutral-100 transition-colors cursor-pointer"
+                className="absolute right-2.5 top-1/2 -translate-y-1/2 p-1.5 rounded-lg text-text-subtle hover:text-text-strong hover:bg-surface-card-hover transition-colors cursor-pointer"
               >
                 {showPassword ? (
                   <EyeOff className="w-4 h-4 stroke-[1.8]" />
@@ -282,7 +282,7 @@ export function ResetPasswordForm({
           <div className="space-y-1.5">
             <label
               htmlFor="reset-confirmPassword"
-              className="block text-[11px] font-bold text-neutral-700 uppercase tracking-wider"
+              className="block text-[11px] font-bold text-text-base uppercase tracking-wider"
             >
               Confirmar Nueva Contraseña
             </label>
@@ -296,13 +296,13 @@ export function ResetPasswordForm({
                 aria-describedby={errors.confirmPassword ? "reset-confirmPassword-error" : undefined}
                 {...register("confirmPassword")}
                 placeholder="Repite la nueva contraseña"
-                className="w-full min-h-[46px] pl-4 pr-11 py-2 bg-neutral-50 border border-neutral-200 hover:border-neutral-300 focus:bg-white focus:border-brand-primary focus:ring-1 focus:ring-brand-primary focus:outline-none rounded-xl text-sm text-neutral-900 placeholder:text-neutral-400 transition-all disabled:opacity-50 shadow-2xs outline-none"
+                className="w-full min-h-[46px] pl-4 pr-11 py-2 bg-surface-canvas border border-surface-border hover:border-surface-border/80 focus:bg-surface-card focus:border-brand-primary focus:ring-1 focus:ring-brand-primary focus:outline-none rounded-xl text-sm text-text-strong placeholder:text-text-subtle transition-all disabled:opacity-50 shadow-2xs outline-none"
               />
               <button
                 type="button"
                 onClick={() => setShowConfirmPassword((prev) => !prev)}
                 aria-label={showConfirmPassword ? "Ocultar contraseña" : "Ver contraseña"}
-                className="absolute right-2.5 top-1/2 -translate-y-1/2 p-1.5 rounded-lg text-neutral-400 hover:text-neutral-700 hover:bg-neutral-100 transition-colors cursor-pointer"
+                className="absolute right-2.5 top-1/2 -translate-y-1/2 p-1.5 rounded-lg text-text-subtle hover:text-text-strong hover:bg-surface-card-hover transition-colors cursor-pointer"
               >
                 {showConfirmPassword ? (
                   <EyeOff className="w-4 h-4 stroke-[1.8]" />
@@ -335,12 +335,12 @@ export function ResetPasswordForm({
           </button>
 
           {/* Enlace de regreso */}
-          <div className="pt-2 text-center border-t border-neutral-100">
+          <div className="pt-2 text-center border-t border-surface-border/60">
             {onSwitchToLogin ? (
               <button
                 type="button"
                 onClick={onSwitchToLogin}
-                className="text-xs font-bold text-neutral-600 hover:text-neutral-900 hover:underline cursor-pointer inline-flex items-center gap-1"
+                className="text-xs font-bold text-text-muted hover:text-text-strong hover:underline cursor-pointer inline-flex items-center gap-1"
               >
                 <ArrowLeft className="w-3.5 h-3.5" />
                 <span>Cancelar y volver al inicio de sesión</span>
@@ -348,7 +348,7 @@ export function ResetPasswordForm({
             ) : (
               <Link
                 href={routes.getLoginHref({ redirect: redirectUrl })}
-                className="text-xs font-bold text-neutral-600 hover:text-neutral-900 hover:underline inline-flex items-center gap-1"
+                className="text-xs font-bold text-text-muted hover:text-text-strong hover:underline inline-flex items-center gap-1"
               >
                 <ArrowLeft className="w-3.5 h-3.5" />
                 <span>Cancelar y volver al inicio de sesión</span>

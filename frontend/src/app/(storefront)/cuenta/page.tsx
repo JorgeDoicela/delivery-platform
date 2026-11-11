@@ -6,7 +6,7 @@ import { AccountDashboardView } from "@/features/account";
 export default function PlatformAccountPage() {
   return (
     <AuthGuard>
-      <div className="min-h-screen bg-neutral-50/50">
+      <div className="min-h-screen bg-surface-canvas">
         <AccountDashboardView />
       </div>
     </AuthGuard>

@@ -43,7 +43,7 @@ export default function TenantLoginPage({ params }: TenantLoginPageProps) {
   return (
     <Suspense
       fallback={
-        <div className="flex flex-col items-center justify-center min-h-[50vh] text-neutral-500 gap-2">
+        <div className="flex flex-col items-center justify-center min-h-[100dvh] text-neutral-500 gap-2 mb-16 sm:mb-24">
           <Loader2 className="w-6 h-6 animate-spin text-brand-primary" />
           <span className="text-xs font-semibold uppercase tracking-wider">
             Cargando portal...

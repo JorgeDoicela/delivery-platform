@@ -128,10 +128,10 @@ export function VerifyEmailView({
       <div className="flex flex-col items-center justify-center p-8 text-center space-y-4">
         <Loader2 className="w-8 h-8 animate-spin text-brand-primary" />
         <div className="space-y-1">
-          <h3 className="text-lg font-black uppercase tracking-tight text-neutral-900 font-display">
+          <h3 className="text-lg font-black uppercase tracking-tight text-text-strong font-display">
             Confirmando cuenta
           </h3>
-          <p className="text-xs text-neutral-500">
+          <p className="text-xs text-text-muted">
             Validando tu correo electrónico...
           </p>
         </div>
@@ -143,19 +143,19 @@ export function VerifyEmailView({
   if (autoVerifySuccess) {
     return (
       <div className="space-y-6 text-center py-4">
-        <div className="w-14 h-14 rounded-full border border-neutral-300 flex items-center justify-center mx-auto text-neutral-900">
+        <div className="w-14 h-14 rounded-full border border-surface-border bg-surface-canvas flex items-center justify-center mx-auto text-text-strong">
           <CheckCircle className="w-7 h-7 text-emerald-600" />
         </div>
 
         <div className="space-y-2">
-          <h3 className="text-2xl font-black uppercase tracking-tight text-neutral-950 font-display">
+          <h3 className="text-2xl font-black uppercase tracking-tight text-text-strong font-display">
             ¡Correo Confirmado!
           </h3>
-          <p className="text-xs text-neutral-600 max-w-sm mx-auto leading-relaxed">
+          <p className="text-xs text-text-muted max-w-sm mx-auto leading-relaxed">
             {autoVerifySuccess}
           </p>
           {verifiedEmail && (
-            <p className="text-xs font-mono font-bold text-neutral-800">
+            <p className="text-xs font-mono font-bold text-text-strong">
               {verifiedEmail}
             </p>
           )}
@@ -183,7 +183,7 @@ export function VerifyEmailView({
 
           <Link
             href={routes.getCatalogHref()}
-            className="w-full sm:w-auto bg-neutral-100 hover:bg-neutral-200 active:scale-95 text-neutral-800 font-bold text-xs uppercase tracking-wider px-6 py-3 rounded-full transition-colors inline-flex items-center justify-center min-h-[44px]"
+            className="w-full sm:w-auto bg-surface-canvas hover:bg-surface-card-hover border border-surface-border active:scale-95 text-text-strong font-bold text-xs uppercase tracking-wider px-6 py-3 rounded-full transition-colors inline-flex items-center justify-center min-h-[44px]"
           >
             Ver Menú
           </Link>
@@ -197,11 +197,11 @@ export function VerifyEmailView({
     <div className="space-y-5">
       {/* Alerta de error si el enlace previo expiró o fue inválido */}
       {autoVerifyError && (
-        <div className="flex items-start gap-3 p-3.5 bg-neutral-50 border border-neutral-300 rounded-2xl text-xs text-neutral-800">
+        <div className="flex items-start gap-3 p-3.5 bg-surface-canvas border border-surface-border rounded-2xl text-xs text-text-strong">
           <AlertCircle className="w-4 h-4 text-brand-primary shrink-0 mt-0.5" />
           <div className="space-y-1">
             <p className="font-bold">Enlace no válido o expirado</p>
-            <p className="text-neutral-600">{autoVerifyError}</p>
+            <p className="text-text-muted">{autoVerifyError}</p>
           </div>
         </div>
       )}
@@ -216,7 +216,7 @@ export function VerifyEmailView({
         )}
 
         {resendErrorMessage && (
-          <div className="flex items-start gap-3 p-3.5 bg-neutral-50 border border-neutral-300 rounded-2xl text-xs text-neutral-900">
+          <div className="flex items-start gap-3 p-3.5 bg-surface-canvas border border-surface-border rounded-2xl text-xs text-text-strong">
             <AlertCircle className="w-4 h-4 text-brand-primary shrink-0 mt-0.5" />
             <p className="font-medium">{resendErrorMessage}</p>
           </div>
@@ -225,7 +225,7 @@ export function VerifyEmailView({
         <div className="space-y-1.5">
           <label
             htmlFor="resend-email-input"
-            className="block text-xs font-bold text-neutral-700 uppercase tracking-wider"
+            className="block text-xs font-bold text-text-base uppercase tracking-wider"
           >
             Correo Electrónico Registrado
           </label>
@@ -234,7 +234,7 @@ export function VerifyEmailView({
             type="email"
             {...registerResend("email")}
             placeholder="tu-correo@dominio.com"
-            className="w-full px-4 py-3 rounded-2xl border border-neutral-200 focus:outline-none focus:border-brand-primary focus:ring-1 focus:ring-brand-primary text-xs transition-all"
+            className="w-full px-4 py-3 rounded-2xl bg-surface-canvas border border-surface-border focus:bg-surface-card focus:outline-none focus:border-brand-primary focus:ring-1 focus:ring-brand-primary text-text-strong placeholder:text-text-subtle text-xs transition-all"
           />
           {resendErrors.email && (
             <p className="text-xs text-brand-primary font-semibold mt-1">
@@ -246,7 +246,7 @@ export function VerifyEmailView({
         <button
           type="submit"
           disabled={isSubmittingResend || isPending || resendCooldown > 0}
-          className="w-full bg-neutral-900 hover:bg-neutral-800 active:scale-[0.98] disabled:opacity-50 text-white font-black text-xs uppercase tracking-wider font-display py-3.5 rounded-full shadow-sm transition-all flex items-center justify-center gap-2 cursor-pointer min-h-[44px]"
+          className="w-full bg-brand-primary hover:bg-brand-primary-hover active:scale-[0.98] disabled:opacity-50 text-white font-black text-xs uppercase tracking-wider font-display py-3.5 rounded-full shadow-sm transition-all flex items-center justify-center gap-2 cursor-pointer min-h-[44px]"
         >
           {isSubmittingResend || isPending ? (
             <>
@@ -255,7 +255,7 @@ export function VerifyEmailView({
             </>
           ) : resendCooldown > 0 ? (
             <>
-              <RefreshCw className="w-4 h-4 animate-spin text-neutral-400" />
+              <RefreshCw className="w-4 h-4 animate-spin text-white/70" />
               <span>Reintentar en {resendCooldown}s</span>
             </>
           ) : (
@@ -273,14 +273,14 @@ export function VerifyEmailView({
           <button
             type="button"
             onClick={onSwitchToLogin}
-            className="text-xs text-neutral-500 hover:text-neutral-900 font-bold uppercase tracking-wider transition-colors cursor-pointer"
+            className="text-xs text-text-muted hover:text-text-strong font-bold uppercase tracking-wider transition-colors cursor-pointer"
           >
             {isAuthenticated ? "Volver a mi cuenta" : "Volver a Iniciar Sesión"}
           </button>
         ) : (
           <Link
             href={routes.getLoginHref()}
-            className="text-xs text-neutral-500 hover:text-neutral-900 font-bold uppercase tracking-wider transition-colors"
+            className="text-xs text-text-muted hover:text-text-strong font-bold uppercase tracking-wider transition-colors"
           >
             {isAuthenticated ? "Volver a mi cuenta" : "Volver a Iniciar Sesión"}
           </Link>

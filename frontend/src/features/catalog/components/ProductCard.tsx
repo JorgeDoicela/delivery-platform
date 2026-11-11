@@ -35,7 +35,7 @@ export function ProductCard({ product }: ProductCardProps) {
         <div>
           {/* Contenedor Fotográfico con separación superior para no topar el borde de la tarjeta */}
           <div className="pt-2.5 sm:pt-3.5 px-2.5 sm:px-3.5">
-            <div className="relative w-full aspect-[4/3] bg-white">
+            <div className="relative w-full aspect-[4/3] bg-surface-card">
               <Image
                 src={displayImage}
                 alt={product.name}

@@ -149,7 +149,7 @@ export function SteakhouseGourmetLandingLayout({
 
       {/* 3. Selector de Modalidad y Cobertura */}
       <div className="max-w-[1240px] mx-auto px-6 sm:px-10 lg:px-12 w-full space-y-8">
-        <div className="bg-white rounded-3xl p-6 text-neutral-900 shadow-2xl">
+        <div className="bg-surface-card border border-surface-border rounded-3xl p-6 text-text-strong shadow-2xl">
           <OrderModeSelector />
         </div>
 
@@ -169,7 +169,7 @@ export function SteakhouseGourmetLandingLayout({
             </div>
           </div>
 
-          <div className="bg-white rounded-3xl p-6 text-neutral-900 shadow-2xl">
+          <div className="bg-surface-card border border-surface-border rounded-3xl p-6 text-text-strong shadow-2xl">
             <CatalogSection tenantSlug={tenant?.slug} />
           </div>
         </section>

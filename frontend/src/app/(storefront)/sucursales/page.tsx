@@ -32,7 +32,7 @@ function SucursalesContent() {
           {[1, 2].map((i) => (
             <div
               key={i}
-              className="h-64 rounded-3xl bg-neutral-100 animate-pulse border border-neutral-200"
+              className="h-64 rounded-3xl bg-surface-canvas animate-pulse border border-surface-border"
             />
           ))}
         </div>

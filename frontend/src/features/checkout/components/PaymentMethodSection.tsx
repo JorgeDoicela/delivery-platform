@@ -51,7 +51,7 @@ export function PaymentMethodSection({
             onClick={() => setValue("paymentMethod", 1)}
             className={`p-4 rounded-2xl border text-left text-xs transition-all flex flex-col justify-between ${
               selectedPaymentMethod === 1
-                ? "border-2 border-brand-primary bg-white shadow-sm"
+                ? "border-2 border-brand-primary bg-brand-primary/10 shadow-sm"
                 : "border-surface-border hover:border-surface-border-subtle bg-surface-card"
             }`}
           >
@@ -78,7 +78,7 @@ export function PaymentMethodSection({
             onClick={() => setValue("paymentMethod", 2)}
             className={`p-4 rounded-2xl border text-left text-xs transition-all flex flex-col justify-between ${
               selectedPaymentMethod === 2
-                ? "border-2 border-brand-primary bg-white shadow-sm"
+                ? "border-2 border-brand-primary bg-brand-primary/10 shadow-sm"
                 : "border-surface-border hover:border-surface-border-subtle bg-surface-card"
             }`}
           >

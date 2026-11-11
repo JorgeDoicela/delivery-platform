@@ -42,25 +42,25 @@ export function AccountSecuritySection() {
   };
 
   return (
-    <div className="bg-white border border-neutral-200 rounded-3xl p-6 md:p-8 space-y-6">
-      <div className="border-b border-neutral-100 pb-4">
-        <h2 className="text-lg font-black text-neutral-900 font-display uppercase tracking-tight">
+    <div className="bg-surface-card border border-surface-border rounded-3xl p-6 md:p-8 space-y-6">
+      <div className="border-b border-surface-border pb-4">
+        <h2 className="text-lg font-black text-text-strong font-display uppercase tracking-tight">
           Seguridad y Acceso a la Cuenta
         </h2>
-        <p className="text-xs text-neutral-500 mt-0.5">
+        <p className="text-xs text-text-muted mt-0.5">
           Actualiza tu clave periódicamente para proteger tu información de pedidos y facturación.
         </p>
       </div>
 
       {actionSuccessMessage && (
-        <div className="flex items-start gap-3 p-4 bg-neutral-900 text-white rounded-2xl text-xs">
+        <div className="flex items-start gap-3 p-4 bg-emerald-950/40 border border-emerald-800 text-emerald-200 rounded-2xl text-xs">
           <Check className="w-4 h-4 text-emerald-400 shrink-0 mt-0.5" />
           <p className="font-medium">{actionSuccessMessage}</p>
         </div>
       )}
 
       {profileError && (
-        <div className="flex items-start gap-3 p-4 bg-neutral-50 border border-neutral-300 text-neutral-900 rounded-2xl text-xs">
+        <div className="flex items-start gap-3 p-4 bg-red-50 dark:bg-red-950/40 border border-red-200 dark:border-red-800/60 text-red-800 dark:text-red-300 rounded-2xl text-xs">
           <AlertCircle className="w-4 h-4 text-brand-primary shrink-0 mt-0.5" />
           <p className="font-medium">{profileError}</p>
         </div>
@@ -68,14 +68,14 @@ export function AccountSecuritySection() {
 
       <form onSubmit={handleSubmit(onSubmit)} className="space-y-4 max-w-lg">
         <div className="space-y-1.5">
-          <label className="block text-xs font-bold text-neutral-700 uppercase tracking-wider">
+          <label className="block text-xs font-bold text-text-base uppercase tracking-wider">
             Contraseña Actual *
           </label>
           <input
             type="password"
             {...register("currentPassword")}
             placeholder="••••••••"
-            className="w-full px-4 py-3 rounded-2xl border border-neutral-200 text-xs focus:outline-none focus:border-neutral-900"
+            className="w-full px-4 py-3 rounded-2xl border border-surface-border bg-surface-canvas text-text-strong placeholder:text-text-subtle text-xs focus:outline-none focus:border-brand-primary"
           />
           {errors.currentPassword && (
             <p className="text-xs text-brand-primary font-semibold">
@@ -85,14 +85,14 @@ export function AccountSecuritySection() {
         </div>
 
         <div className="space-y-1.5">
-          <label className="block text-xs font-bold text-neutral-700 uppercase tracking-wider">
+          <label className="block text-xs font-bold text-text-base uppercase tracking-wider">
             Nueva Contraseña *
           </label>
           <input
             type="password"
             {...register("newPassword")}
             placeholder="Mínimo 8 caracteres, mayúscula y número"
-            className="w-full px-4 py-3 rounded-2xl border border-neutral-200 text-xs focus:outline-none focus:border-neutral-900"
+            className="w-full px-4 py-3 rounded-2xl border border-surface-border bg-surface-canvas text-text-strong placeholder:text-text-subtle text-xs focus:outline-none focus:border-brand-primary"
           />
           {errors.newPassword && (
             <p className="text-xs text-brand-primary font-semibold">
@@ -102,14 +102,14 @@ export function AccountSecuritySection() {
         </div>
 
         <div className="space-y-1.5">
-          <label className="block text-xs font-bold text-neutral-700 uppercase tracking-wider">
+          <label className="block text-xs font-bold text-text-base uppercase tracking-wider">
             Confirmar Nueva Contraseña *
           </label>
           <input
             type="password"
             {...register("confirmPassword")}
             placeholder="Repite la nueva contraseña"
-            className="w-full px-4 py-3 rounded-2xl border border-neutral-200 text-xs focus:outline-none focus:border-neutral-900"
+            className="w-full px-4 py-3 rounded-2xl border border-surface-border bg-surface-canvas text-text-strong placeholder:text-text-subtle text-xs focus:outline-none focus:border-brand-primary"
           />
           {errors.confirmPassword && (
             <p className="text-xs text-brand-primary font-semibold">
@@ -122,7 +122,7 @@ export function AccountSecuritySection() {
           <button
             type="submit"
             disabled={isSaving}
-            className="w-full sm:w-auto bg-neutral-900 hover:bg-neutral-800 active:scale-95 text-white font-black text-xs uppercase tracking-wider font-display px-8 py-3.5 rounded-full shadow-sm min-h-[44px] inline-flex items-center justify-center gap-2 cursor-pointer"
+            className="w-full sm:w-auto bg-brand-primary hover:brightness-110 active:scale-95 text-white font-black text-xs uppercase tracking-wider font-display px-8 py-3.5 rounded-full shadow-sm min-h-[44px] inline-flex items-center justify-center gap-2 cursor-pointer"
           >
             {isSaving ? (
               <>

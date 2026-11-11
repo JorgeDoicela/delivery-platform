@@ -53,7 +53,7 @@ export function DeliveryInfoSection({
   return (
     <div className="bg-surface-card rounded-2xl border border-surface-border p-5 space-y-4 shadow-sm">
       <div className="flex items-center gap-2 pb-3 border-b border-surface-border-subtle">
-        <div className="w-8 h-8 rounded-lg bg-neutral-100 text-neutral-900 flex items-center justify-center">
+        <div className="w-8 h-8 rounded-lg bg-surface-canvas text-text-strong flex items-center justify-center">
           <User className="w-4 h-4" />
         </div>
         <div>

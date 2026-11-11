@@ -2,7 +2,7 @@
 
 import React, { Suspense } from "react";
 import Link from "next/link";
-import { ChevronRight, Shield, Lock, MapPin, Database, Loader2 } from "lucide-react";
+import { ChevronRight, Lock, MapPin, Database, Loader2 } from "lucide-react";
 import { useCurrentTenantQuery } from "@/features/tenant";
 import { useTenantRoutes } from "@/shared/lib/tenant-routing";
 
@@ -20,46 +20,46 @@ function PoliticaPrivacidadContent() {
     return (
         <div className="w-full max-w-[1000px] mx-auto px-4 sm:px-8 py-8 sm:py-12 space-y-8">
             {/* Miga de Pan */}
-            <nav aria-label="Miga de pan" className="flex items-center gap-2 text-xs font-semibold text-neutral-500">
+            <nav aria-label="Miga de pan" className="flex items-center gap-2 text-xs font-semibold text-text-muted">
                 <Link href={routes.getHomeHref()} className="hover:text-brand-primary transition-colors">
                     Inicio
                 </Link>
-                <ChevronRight className="w-3.5 h-3.5 text-neutral-400" />
-                <span className="text-neutral-900 font-bold">Privacidad</span>
+                <ChevronRight className="w-3.5 h-3.5 text-text-subtle" />
+                <span className="text-text-strong font-bold">Privacidad</span>
             </nav>
 
             {/* Cabecera */}
-            <div className="border-b border-neutral-200 pb-5">
-                <h1 className="text-3xl sm:text-4xl font-black text-neutral-950 uppercase tracking-tight font-display">
+            <div className="border-b border-surface-border pb-5">
+                <h1 className="text-3xl sm:text-4xl font-black text-text-strong uppercase tracking-tight font-display">
                     Política de Privacidad • {brandName}
                 </h1>
-                <p className="text-xs sm:text-sm text-neutral-500 mt-1">
+                <p className="text-xs sm:text-sm text-text-muted mt-1">
                     Tratamiento ético y cifrado de datos de entrega, facturación y telemetría de despacho.
                 </p>
             </div>
 
             {customContent ? (
-                <div className="prose prose-sm max-w-none text-neutral-700 bg-white border border-neutral-200 rounded-3xl p-6 sm:p-10 shadow-xs whitespace-pre-line leading-relaxed">
+                <div className="prose prose-sm max-w-none text-text-base bg-surface-card border border-surface-border rounded-3xl p-6 sm:p-10 shadow-xs whitespace-pre-line leading-relaxed">
                     {customContent}
                 </div>
             ) : (
-                <div className="bg-white border border-neutral-200 rounded-3xl p-6 sm:p-10 shadow-xs space-y-8 text-xs sm:text-sm text-neutral-700 leading-relaxed">
+                <div className="bg-surface-card border border-surface-border rounded-3xl p-6 sm:p-10 shadow-xs space-y-8 text-xs sm:text-sm text-text-base leading-relaxed">
                     <section className="space-y-2">
-                        <h2 className="text-base font-black uppercase text-neutral-950 font-display flex items-center gap-2">
+                        <h2 className="text-base font-black uppercase text-text-strong font-display flex items-center gap-2">
                             <Database className="w-4 h-4 text-emerald-600" />
                             <span>1. Responsable del Tratamiento de Datos</span>
                         </h2>
                         <p>
                             El responsable del almacenamiento y custodia de tus datos es{" "}
-                            <strong className="text-neutral-950">{businessName}</strong> (RUC{" "}
-                            <strong className="text-neutral-950 font-mono">{taxId}</strong>), operando la marca comercial{" "}
-                            <strong className="text-neutral-950">{brandName}</strong>. Ante cualquier requerimiento de acceso, rectificación o eliminación de tus registros, puedes dirigirte a{" "}
-                            <strong className="font-mono text-neutral-950">{contactEmail}</strong>.
+                            <strong className="text-text-strong">{businessName}</strong> (RUC{" "}
+                            <strong className="text-text-strong font-mono">{taxId}</strong>), operando la marca comercial{" "}
+                            <strong className="text-text-strong">{brandName}</strong>. Ante cualquier requerimiento de acceso, rectificación o eliminación de tus registros, puedes dirigirte a{" "}
+                            <strong className="font-mono text-text-strong">{contactEmail}</strong>.
                         </p>
                     </section>
 
                     <section className="space-y-2">
-                        <h2 className="text-base font-black uppercase text-neutral-950 font-display flex items-center gap-2">
+                        <h2 className="text-base font-black uppercase text-text-strong font-display flex items-center gap-2">
                             <MapPin className="w-4 h-4 text-emerald-600" />
                             <span>2. Uso de Coordenadas GPS y Datos de Entrega</span>
                         </h2>
@@ -74,7 +74,7 @@ function PoliticaPrivacidadContent() {
                     </section>
 
                     <section className="space-y-2">
-                        <h2 className="text-base font-black uppercase text-neutral-950 font-display flex items-center gap-2">
+                        <h2 className="text-base font-black uppercase text-text-strong font-display flex items-center gap-2">
                             <Lock className="w-4 h-4 text-emerald-600" />
                             <span>3. Cero Comercialización a Terceros</span>
                         </h2>
@@ -83,7 +83,7 @@ function PoliticaPrivacidadContent() {
                         </p>
                     </section>
 
-                    <div className="pt-4 border-t border-neutral-100 flex flex-wrap items-center justify-between text-xs text-neutral-400 gap-3">
+                    <div className="pt-4 border-t border-surface-border/60 flex flex-wrap items-center justify-between text-xs text-text-muted gap-3">
                         <span>Conforme a la Ley Orgánica de Protección de Datos Personales (LOPDP Ecuador)</span>
                         <div className="flex items-center gap-4">
                             <Link href={routes.getTermsHref()} className="hover:text-brand-primary underline">
