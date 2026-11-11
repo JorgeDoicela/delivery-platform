@@ -43,6 +43,8 @@ export interface TenantBranchSummaryDto {
   latitude: number;
   longitude: number;
   isActive: boolean;
+  deliveryRadiusKm?: number | null;
+  isCoverageStrict?: boolean;
 }
 
 export interface BranchDetailDto {
@@ -58,12 +60,16 @@ export interface BranchDetailDto {
   latitude: number;
   longitude: number;
   isActive: boolean;
+  deliveryRadiusKm?: number | null;
+  isCoverageStrict?: boolean;
 }
 
 export interface UpdateBranchHoursRequest {
   openingTime: string;
   closingTime: string;
   isActive?: boolean;
+  deliveryRadiusKm?: number | null;
+  isCoverageStrict?: boolean;
 }
 
 export interface UpdateBranchHoursResponse {
@@ -72,6 +78,8 @@ export interface UpdateBranchHoursResponse {
   openingTime: string;
   closingTime: string;
   isActive: boolean;
+  deliveryRadiusKm?: number | null;
+  isCoverageStrict?: boolean;
 }
 
 export interface PublicTenantSummaryDto {
@@ -126,6 +134,7 @@ export interface TenantStorefrontConfigDto {
   heroSlides: TenantHeroSlide[];
   promotionalBanners: TenantPromoBanner[];
   branches: TenantBranchSummaryDto[];
+  requireCoverageValidation?: boolean;
 }
 
 export interface UpdateTenantStorefrontCommand {
@@ -156,6 +165,7 @@ export interface UpdateTenantStorefrontCommand {
   bankDetails: TenantBankDetailsDto;
   heroSlides: TenantHeroSlide[];
   promotionalBanners: TenantPromoBanner[];
+  requireCoverageValidation?: boolean;
 }
 
 export interface PlatformTenantItemDto {

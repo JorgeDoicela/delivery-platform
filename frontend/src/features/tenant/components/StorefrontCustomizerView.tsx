@@ -66,6 +66,7 @@ function StorefrontCustomizerForm({
     acceptsBankTransfer: tenant.acceptsBankTransfer,
     acceptsCard: tenant.acceptsCard,
     quickLinksEnabled: tenant.quickLinksEnabled,
+    requireCoverageValidation: tenant.requireCoverageValidation ?? true,
     landingLayoutTemplate: tenant.landingLayoutTemplate ?? "asadero-clasico",
     customDomain: tenant.customDomain ?? null,
     bankDetails: { ...tenant.bankDetails },

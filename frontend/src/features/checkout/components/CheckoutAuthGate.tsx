@@ -75,7 +75,7 @@ export function CheckoutAuthGate() {
   };
 
   return (
-    <div className="bg-surface-card border-2 border-brand-primary/30 rounded-3xl p-6 sm:p-7 shadow-lg space-y-6">
+    <div className="bg-surface-card border-2 border-brand-primary/30 rounded-2xl sm:rounded-3xl p-4 sm:p-7 shadow-md sm:shadow-lg space-y-5 sm:space-y-6">
       {/* Encabezado con Regla de Negocio */}
       <div className="flex items-start gap-3.5">
         <div className="p-2.5 rounded-2xl bg-brand-primary/10 text-brand-primary shrink-0 mt-0.5">

@@ -1,72 +1,81 @@
 "use client";
 
-import type { UseFormRegister, UseFormSetValue } from "react-hook-form";
+import { useState } from "react";
+import type { UseFormSetValue } from "react-hook-form";
 import type { CheckoutFormData } from "../schemas/checkoutSchema";
-import { formatCurrency } from "@/shared/lib/utils";
-import { Banknote, Building2, CheckCircle2 } from "lucide-react";
+import { Copy, Check } from "lucide-react";
 import { useCurrentTenantQuery } from "@/features/tenant";
+import { useCartStore } from "@/features/cart";
 
 interface PaymentMethodSectionProps {
-  register: UseFormRegister<CheckoutFormData>;
   setValue: UseFormSetValue<CheckoutFormData>;
   selectedPaymentMethod: number;
-  cashAmountPaid: number;
-  changeDue: number;
-  total: number;
 }
 
 export function PaymentMethodSection({
-  register,
   setValue,
   selectedPaymentMethod,
-  cashAmountPaid,
-  changeDue,
-  total,
 }: PaymentMethodSectionProps) {
-  const { data: tenant } = useCurrentTenantQuery();
+  const tenantSlug = useCartStore((s) => s.tenantSlug);
+  const { data: tenant } = useCurrentTenantQuery(tenantSlug);
   const bankDetails = tenant?.bankDetails;
   const acceptsCash = tenant?.acceptsCash ?? true;
   const acceptsBankTransfer = tenant?.acceptsBankTransfer ?? true;
 
+  const [copiedAccount, setCopiedAccount] = useState(false);
+
+  const handleCopyAccount = (accountNumber: string) => {
+    if (typeof navigator !== "undefined" && navigator.clipboard) {
+      navigator.clipboard.writeText(accountNumber);
+      setCopiedAccount(true);
+      setTimeout(() => setCopiedAccount(false), 2000);
+    }
+  };
+
+  const handleSelectPaymentMethod = (method: 1 | 2) => {
+    setValue("paymentMethod", method);
+    if (method === 1) {
+      setValue("cashAmountPaid", undefined);
+    }
+  };
+
   return (
-    <div className="bg-surface-card rounded-2xl border border-surface-border p-5 space-y-4 shadow-sm">
-      <div className="flex items-center gap-2 pb-3 border-b border-surface-border-subtle">
-        <div className="w-8 h-8 rounded-lg bg-surface-canvas text-text-base flex items-center justify-center">
-          <Banknote className="w-4 h-4" />
-        </div>
-        <div>
-          <h3 className="text-sm font-bold uppercase tracking-wider text-text-strong font-display">
-            Método de Pago • {tenant?.name}
-          </h3>
-          <p className="text-[11px] text-text-muted">
-            Selecciona cómo deseas cancelar tu pedido
-          </p>
-        </div>
+    <div className="space-y-4">
+      <div>
+        <h3 className="text-xs sm:text-sm font-bold uppercase tracking-wider text-text-strong font-display">
+          Método de Pago
+        </h3>
+        <p className="text-[11px] text-text-muted">
+          Opciones habilitadas por {tenant?.name || "el restaurante"}
+        </p>
       </div>
 
-      <div className="grid grid-cols-2 gap-3">
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
         {acceptsCash && (
           <button
             type="button"
-            onClick={() => setValue("paymentMethod", 1)}
-            className={`p-4 rounded-2xl border text-left text-xs transition-all flex flex-col justify-between ${
+            onClick={() => handleSelectPaymentMethod(1)}
+            className={`p-3.5 rounded-xl border text-left text-xs transition-all flex items-start gap-3 cursor-pointer ${
               selectedPaymentMethod === 1
-                ? "border-2 border-brand-primary bg-brand-primary/10 shadow-sm"
-                : "border-surface-border hover:border-surface-border-subtle bg-surface-card"
+                ? "border-brand-primary bg-surface-card ring-1 ring-brand-primary shadow-xs"
+                : "border-surface-border hover:border-surface-border-subtle bg-surface-canvas/50"
             }`}
           >
-            <div className="flex items-center justify-between mb-2">
-              <Banknote className="w-5 h-5 text-brand-primary" />
-              {selectedPaymentMethod === 1 && (
-                <CheckCircle2 className="w-4 h-4 text-brand-primary" />
-              )}
+            <div
+              className={`w-4 h-4 rounded-full border mt-0.5 flex items-center justify-center shrink-0 ${
+                selectedPaymentMethod === 1
+                  ? "border-brand-primary bg-brand-primary"
+                  : "border-surface-border bg-white"
+              }`}
+            >
+              {selectedPaymentMethod === 1 && <div className="w-1.5 h-1.5 rounded-full bg-white" />}
             </div>
-            <div>
-              <p className="font-bold text-text-strong">
+            <div className="min-w-0">
+              <p className="font-bold text-text-strong font-display uppercase tracking-wide">
                 Efectivo contra Entrega
               </p>
-              <p className="text-[10px] text-text-muted mt-0.5">
-                Paga al repartidor al recibir
+              <p className="text-[11px] text-text-muted mt-0.5 leading-snug">
+                Paga en efectivo al recibir tu pedido o retirar en caja.
               </p>
             </div>
           </button>
@@ -75,91 +84,60 @@ export function PaymentMethodSection({
         {acceptsBankTransfer && (
           <button
             type="button"
-            onClick={() => setValue("paymentMethod", 2)}
-            className={`p-4 rounded-2xl border text-left text-xs transition-all flex flex-col justify-between ${
+            onClick={() => handleSelectPaymentMethod(2)}
+            className={`p-3.5 rounded-xl border text-left text-xs transition-all flex items-start gap-3 cursor-pointer ${
               selectedPaymentMethod === 2
-                ? "border-2 border-brand-primary bg-brand-primary/10 shadow-sm"
-                : "border-surface-border hover:border-surface-border-subtle bg-surface-card"
+                ? "border-brand-primary bg-surface-card ring-1 ring-brand-primary shadow-xs"
+                : "border-surface-border hover:border-surface-border-subtle bg-surface-canvas/50"
             }`}
           >
-            <div className="flex items-center justify-between mb-2">
-              <Building2 className="w-5 h-5 text-brand-primary" />
-              {selectedPaymentMethod === 2 && (
-                <CheckCircle2 className="w-4 h-4 text-brand-primary" />
-              )}
+            <div
+              className={`w-4 h-4 rounded-full border mt-0.5 flex items-center justify-center shrink-0 ${
+                selectedPaymentMethod === 2
+                  ? "border-brand-primary bg-brand-primary"
+                  : "border-surface-border bg-white"
+              }`}
+            >
+              {selectedPaymentMethod === 2 && <div className="w-1.5 h-1.5 rounded-full bg-white" />}
             </div>
-            <div>
-              <p className="font-bold text-text-strong">
+            <div className="min-w-0">
+              <p className="font-bold text-text-strong font-display uppercase tracking-wide">
                 Transferencia / Deuna
               </p>
-              <p className="text-[10px] text-text-muted mt-0.5">
-                Validación previa con cajero
+              <p className="text-[11px] text-text-muted mt-0.5 leading-snug">
+                Transfiere y valida el comprobante directamente con caja.
               </p>
             </div>
           </button>
         )}
       </div>
 
-      {selectedPaymentMethod === 1 && (
-        <div className="p-4 bg-surface-canvas border border-surface-border rounded-2xl space-y-3 animate-in fade-in text-xs">
-          <label className="block font-bold text-text-strong">
-            ¿Con cuánto billete pagarás para enviarte cambio exacto?
-          </label>
-          <div className="flex flex-wrap items-center gap-2">
-            {[20, 30, 50].map((amount) => (
-              <button
-                key={amount}
-                type="button"
-                onClick={() => setValue("cashAmountPaid", amount)}
-                className={`px-4 py-2 rounded-full border font-bold text-xs transition-colors ${
-                  cashAmountPaid === amount
-                    ? "bg-brand-primary text-white border-brand-primary shadow-sm"
-                    : "bg-surface-card text-text-base border-surface-border hover:bg-surface-canvas cursor-pointer"
-                }`}
-              >
-                $ {amount}.00
-              </button>
-            ))}
-          </div>
-
-          <div className="pt-2">
-            <input
-              type="number"
-              step="0.01"
-              {...register("cashAmountPaid", { valueAsNumber: true })}
-              placeholder={`Monto exacto (mínimo ${formatCurrency(total)})`}
-              className="w-full text-xs px-3.5 py-2.5 rounded-xl border border-surface-border bg-surface-card text-text-strong focus:outline-none focus:ring-1 focus:ring-brand-primary focus:border-brand-primary"
-            />
-          </div>
-
-          {cashAmountPaid > 0 && (
-            <div className="flex justify-between items-center text-xs font-bold pt-1">
-              <span className="text-text-base">
-                Cambio a entregar por el repartidor:
-              </span>
-              <span className="text-status-success bg-status-success/10 px-2 py-0.5 rounded border border-status-success/20">
-                {formatCurrency(changeDue)}
-              </span>
-            </div>
-          )}
-        </div>
-      )}
-
+      {/* Subsección Informativa: Transferencia Bancaria */}
       {selectedPaymentMethod === 2 && (
-        <div className="p-4 bg-status-info/10 border border-status-info/30 rounded-xl space-y-2 text-xs text-status-info animate-in fade-in">
-          <p className="font-bold">
-            Datos Bancarios para Transferencia ({tenant?.name}):
-          </p>
-          <p className="text-[11px] leading-relaxed">
-            {bankDetails?.bankName || "Banco Pichincha"} |{" "}
-            {bankDetails?.accountType || "Cta. Corriente"}:{" "}
-            {bankDetails?.accountNumber || "2100456789"} | Titular:{" "}
-            {bankDetails?.accountHolder || tenant?.businessName} | RUC:{" "}
-            {bankDetails?.taxId || tenant?.taxId}
-          </p>
-          <p className="text-[10px] text-status-info/90">
-            * El cajero verificará la acreditación bancaria antes de enviar la
-            orden a cocina.
+        <div className="p-3.5 bg-surface-canvas border border-surface-border/80 rounded-xl space-y-2 text-xs animate-in fade-in duration-200">
+          <div className="flex items-center justify-between">
+            <p className="font-bold uppercase tracking-wide font-display text-text-strong">
+              Datos Bancarios ({tenant?.name}):
+            </p>
+            {bankDetails?.accountNumber && (
+              <button
+                type="button"
+                onClick={() => handleCopyAccount(bankDetails.accountNumber)}
+                className="inline-flex items-center gap-1 text-[11px] font-bold text-brand-primary hover:underline cursor-pointer"
+              >
+                {copiedAccount ? <Check className="w-3.5 h-3.5" /> : <Copy className="w-3.5 h-3.5" />}
+                <span>{copiedAccount ? "Copiado" : "Copiar Cuenta"}</span>
+              </button>
+            )}
+          </div>
+          <div className="space-y-1 text-[11px] leading-relaxed text-text-strong">
+            <p><span className="font-semibold text-text-muted">Banco:</span> {bankDetails?.bankName || "Banco Pichincha"}</p>
+            <p><span className="font-semibold text-text-muted">Tipo & Número:</span> {bankDetails?.accountType || "Cta. Corriente"} • {bankDetails?.accountNumber || "2100456789"}</p>
+            <p><span className="font-semibold text-text-muted">Titular:</span> {bankDetails?.accountHolder || tenant?.businessName || tenant?.name}</p>
+            <p><span className="font-semibold text-text-muted">RUC:</span> {bankDetails?.taxId || tenant?.taxId || "1754455341001"}</p>
+          </div>
+          <p className="text-[10px] text-text-muted pt-1 border-t border-status-info-border/50">
+            * Una vez confirmado tu pedido, podrás compartir el comprobante de transferencia al repartidor o directamente por WhatsApp.
           </p>
         </div>
       )}

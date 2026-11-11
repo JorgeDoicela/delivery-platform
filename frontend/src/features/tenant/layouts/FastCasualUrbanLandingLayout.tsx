@@ -33,7 +33,7 @@ export function FastCasualUrbanLandingLayout({
     primarySlide?.imageUrl || "/images/tenants/la-granjita/banners/hero-combo-familiar.jpg";
 
   return (
-    <div className="w-full pb-16 space-y-12 bg-surface-canvas text-text-strong">
+    <div className="w-full pb-4 sm:pb-12 space-y-8 sm:space-y-14 bg-surface-canvas text-text-strong">
       {/* 1. Split Hero Urbano Moderno */}
       <section className="w-full bg-surface-card border-b border-surface-border">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 sm:py-14 lg:py-16 grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-center">

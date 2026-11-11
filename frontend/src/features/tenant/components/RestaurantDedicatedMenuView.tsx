@@ -21,7 +21,7 @@ export function RestaurantDedicatedMenuView({
   }, [initialSlug, currentSlug, setTenantSlug]);
 
   return (
-    <div className="w-full min-h-screen pb-16 bg-surface-canvas text-text-strong">
+    <div className="w-full min-h-screen pb-4 sm:pb-8 bg-surface-canvas text-text-strong">
       {/* Contenedor del Catálogo Completo */}
       <main className="max-w-[1240px] mx-auto px-3.5 sm:px-8 lg:px-12 pt-1 sm:pt-4">
         <CatalogSection tenantSlug={initialSlug} />

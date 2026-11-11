@@ -28,6 +28,10 @@ public sealed class UpdateBranchOperatingHoursValidator : AbstractValidator<Upda
             .Must(x => !string.Equals(x.OpeningTime?.Trim(), x.ClosingTime?.Trim(), StringComparison.Ordinal))
             .When(x => !string.IsNullOrWhiteSpace(x.OpeningTime) && !string.IsNullOrWhiteSpace(x.ClosingTime))
             .WithMessage("La hora de cierre no puede ser idéntica a la hora de apertura.");
+
+        RuleFor(x => x.DeliveryRadiusKm)
+            .InclusiveBetween(0.5, 200.0)
+            .When(x => x.DeliveryRadiusKm.HasValue)
+            .WithMessage("El radio de cobertura debe estar comprendido entre 0.5 km y 200 km.");
     }
 }
-

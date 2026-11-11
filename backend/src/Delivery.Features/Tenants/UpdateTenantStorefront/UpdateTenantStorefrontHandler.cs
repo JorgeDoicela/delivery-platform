@@ -28,7 +28,9 @@ public sealed record UpdatedTenantBranchSummaryDto(
     int MaxOrdersPerSlot,
     double Latitude,
     double Longitude,
-    bool IsActive
+    bool IsActive,
+    double? DeliveryRadiusKm = null,
+    bool IsCoverageStrict = true
 );
 
 public sealed record UpdatedTenantStorefrontDto(
@@ -62,7 +64,8 @@ public sealed record UpdatedTenantStorefrontDto(
     UpdateTenantBankDetailsDto BankDetails,
     List<TenantHeroSlide> HeroSlides,
     List<TenantPromoBanner> PromotionalBanners,
-    List<UpdatedTenantBranchSummaryDto> Branches
+    List<UpdatedTenantBranchSummaryDto> Branches,
+    bool RequireCoverageValidation = true
 );
 
 public sealed record UpdateTenantStorefrontCommand(
@@ -92,7 +95,8 @@ public sealed record UpdateTenantStorefrontCommand(
     string? PrivacyPolicyMarkdown,
     UpdateTenantBankDetailsDto BankDetails,
     List<TenantHeroSlide> HeroSlides,
-    List<TenantPromoBanner> PromotionalBanners
+    List<TenantPromoBanner> PromotionalBanners,
+    bool? RequireCoverageValidation = null
 );
 
 public sealed class UpdateTenantStorefrontHandler : IHandler<UpdateTenantStorefrontCommand, Result<UpdatedTenantStorefrontDto>>
@@ -201,6 +205,11 @@ public sealed class UpdateTenantStorefrontHandler : IHandler<UpdateTenantStorefr
         settings.AcceptsCard = command.AcceptsCard;
         settings.QuickLinksEnabled = command.QuickLinksEnabled;
         settings.CustomDomain = normalizedCustomDomain;
+        if (command.RequireCoverageValidation.HasValue)
+        {
+            settings.RequireCoverageValidation = command.RequireCoverageValidation.Value;
+        }
+
         if (!string.IsNullOrWhiteSpace(command.LandingLayoutTemplate))
         {
             settings.LandingLayoutTemplate = command.LandingLayoutTemplate.Trim();
@@ -233,7 +242,9 @@ public sealed class UpdateTenantStorefrontHandler : IHandler<UpdateTenantStorefr
                 b.MaxOrdersPerSlot,
                 b.LocationPoint.Y,
                 b.LocationPoint.X,
-                b.IsActive
+                b.IsActive,
+                b.DeliveryRadiusKm,
+                b.IsCoverageStrict
             ))
             .ToList();
 
@@ -274,7 +285,8 @@ public sealed class UpdateTenantStorefrontHandler : IHandler<UpdateTenantStorefr
             ),
             heroSlides.Where(s => s.IsActive).OrderBy(s => s.DisplayOrder).ToList(),
             promos.Where(p => p.IsActive).OrderBy(p => p.DisplayOrder).ToList(),
-            branches
+            branches,
+            settings.RequireCoverageValidation
         );
 
         return Result.Success(dto);

@@ -269,6 +269,21 @@ public static partial class DatabaseSeeder
         }
 
         // Sucursal única y Geocerca PostGIS (establecimiento SRI 001 - Guamaní)
+        // Delimitación integral del Distrito Metropolitano de Quito (DMQ) que cubre
+        // Norte (Calderón, Carcelén, Pomasqui, San Antonio), Centro y Valles (Cumbayá, Tumbaco, Los Chillos)
+        // y Sur (Guamaní, Quitumbe, Cutuglagua, Chillogallo).
+        var quitoDmqPolygon = GeometryFactory.CreatePolygon(new[]
+        {
+            new Coordinate(-78.5800, 0.0800),   // Noroccidente (Pomasqui / San Antonio)
+            new Coordinate(-78.3600, 0.0800),   // Nororiente (Calderón / Carapungo)
+            new Coordinate(-78.2600, -0.1600),  // Nororiente Valles (Tumbaco / Puembo / Pifo)
+            new Coordinate(-78.3400, -0.4200),  // Suroriente (Valle de Los Chillos / Amaguaña)
+            new Coordinate(-78.5600, -0.4200),  // Extremo Sur (Guamaní sur / Cutuglagua)
+            new Coordinate(-78.6200, -0.3400),  // Suroccidente (Chillogallo alto)
+            new Coordinate(-78.5800, -0.1500),  // Occidente Centro (Laderas Pichincha)
+            new Coordinate(-78.5800, 0.0800)    // Cierre
+        });
+
         var branches = await context.Branches
             .IgnoreQueryFilters()
             .Where(b => b.TenantId == tenant.Id)
@@ -278,14 +293,6 @@ public static partial class DatabaseSeeder
         if (branches.Count == 0)
         {
             var branch1Location = GeometryFactory.CreatePoint(new Coordinate(-78.557082, -0.332280));
-            var branch1Polygon = GeometryFactory.CreatePolygon(new[]
-            {
-                new Coordinate(-78.5900, -0.2900),
-                new Coordinate(-78.5200, -0.2900),
-                new Coordinate(-78.5200, -0.3700),
-                new Coordinate(-78.5900, -0.3700),
-                new Coordinate(-78.5900, -0.2900)
-            });
 
             branches = new List<Branch>
             {
@@ -296,7 +303,9 @@ public static partial class DatabaseSeeder
                     Address = "Clodoveo Carrión, Sector Guamaní (Quito Sur)",
                     Phone = "0987654321",
                     LocationPoint = branch1Location,
-                    CoveragePolygon = branch1Polygon,
+                    CoveragePolygon = quitoDmqPolygon,
+                    DeliveryRadiusKm = 35.0,
+                    IsCoverageStrict = true,
                     MaxOrdersPerSlot = 15,
                     SriEstablishmentCode = "001",
                     SriEmissionPoint = "001",
@@ -312,6 +321,15 @@ public static partial class DatabaseSeeder
         }
         else
         {
+            // Sincronización de la geocerca de Quito y radio de cobertura para sucursales de La Granjita
+            foreach (var b in branches)
+            {
+                b.CoveragePolygon = quitoDmqPolygon;
+                b.DeliveryRadiusKm = 35.0;
+                b.IsCoverageStrict = true;
+            }
+            await context.SaveChangesAsync();
+
             // Limpieza de sucursal obsoleta/demo 'Sucursal #2 (Sur)' en bases de datos existentes
             var obsoleteBranches = branches.Where(b => b.Name.Contains("Sucursal #2") || b.SriEstablishmentCode == "002").ToList();
             foreach (var obsolete in obsoleteBranches)

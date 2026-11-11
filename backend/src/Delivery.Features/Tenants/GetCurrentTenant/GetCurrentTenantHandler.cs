@@ -28,7 +28,9 @@ public sealed record TenantBranchSummaryDto(
     int MaxOrdersPerSlot,
     double Latitude,
     double Longitude,
-    bool IsActive
+    bool IsActive,
+    double? DeliveryRadiusKm = null,
+    bool IsCoverageStrict = true
 );
 
 public sealed record TenantStorefrontConfigDto(
@@ -62,7 +64,8 @@ public sealed record TenantStorefrontConfigDto(
     TenantBankDetailsDto BankDetails,
     List<TenantHeroSlide> HeroSlides,
     List<TenantPromoBanner> PromotionalBanners,
-    List<TenantBranchSummaryDto> Branches
+    List<TenantBranchSummaryDto> Branches,
+    bool RequireCoverageValidation = true
 );
 
 public sealed class GetCurrentTenantHandler : IHandler<GetCurrentTenantQuery, Result<TenantStorefrontConfigDto>>
@@ -98,7 +101,7 @@ public sealed class GetCurrentTenantHandler : IHandler<GetCurrentTenantQuery, Re
         if (tenant == null)
         {
             return Result.Failure<TenantStorefrontConfigDto>(
-                new Error("Tenant.NotFound", "No se encontró el negocio activo solicitado."));
+                new Error("Tenant.NotFound", "No se encontró un establecimiento activo para el contexto solicitado."));
         }
 
         var settings = tenant.Settings;
@@ -125,7 +128,9 @@ public sealed class GetCurrentTenantHandler : IHandler<GetCurrentTenantQuery, Re
                 b.MaxOrdersPerSlot,
                 b.LocationPoint.Y,
                 b.LocationPoint.X,
-                b.IsActive
+                b.IsActive,
+                b.DeliveryRadiusKm,
+                b.IsCoverageStrict
             ))
             .ToList();
 
@@ -168,7 +173,8 @@ public sealed class GetCurrentTenantHandler : IHandler<GetCurrentTenantQuery, Re
             ),
             heroSlides,
             promos,
-            branches
+            branches,
+            settings?.RequireCoverageValidation ?? true
         );
 
         return Result.Success(dto);

@@ -19,7 +19,9 @@ public sealed record BranchDetailDto(
     string SriEmissionPoint,
     double Latitude,
     double Longitude,
-    bool IsActive
+    bool IsActive,
+    double? DeliveryRadiusKm = null,
+    bool IsCoverageStrict = true
 );
 
 public sealed class GetBranchesHandler : IHandler<GetBranchesQuery, Result<List<BranchDetailDto>>>
@@ -49,11 +51,12 @@ public sealed class GetBranchesHandler : IHandler<GetBranchesQuery, Result<List<
                 b.SriEmissionPoint,
                 b.LocationPoint.Y,
                 b.LocationPoint.X,
-                b.IsActive
+                b.IsActive,
+                b.DeliveryRadiusKm,
+                b.IsCoverageStrict
             ))
             .ToListAsync(cancellationToken);
 
         return Result.Success(branches);
     }
 }
-

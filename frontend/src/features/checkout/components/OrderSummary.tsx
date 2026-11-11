@@ -11,7 +11,6 @@ export function OrderSummary() {
   const routes = useTenantRoutes();
   const items = useCartStore((s) => s.items);
   const deliveryType = useCartStore((s) => s.deliveryType);
-  const setDeliveryType = useCartStore((s) => s.setDeliveryType);
   const updateQuantity = useCartStore((s) => s.updateQuantity);
   const removeItem = useCartStore((s) => s.removeItem);
   const getSubtotal = useCartStore((s) => s.getSubtotal);
@@ -24,7 +23,7 @@ export function OrderSummary() {
 
   if (items.length === 0) {
     return (
-      <div className="bg-surface-card rounded-2xl border border-surface-border p-8 text-center space-y-4 shadow-sm">
+      <div className="bg-surface-card rounded-3xl border border-surface-border p-8 text-center space-y-4 shadow-sm">
         <div className="w-12 h-12 rounded-full bg-surface-canvas text-text-subtle flex items-center justify-center mx-auto">
           <ShoppingBag className="w-6 h-6" />
         </div>
@@ -36,7 +35,7 @@ export function OrderSummary() {
         </div>
         <Link
           href={routes.getCatalogHref()}
-          className="inline-flex items-center justify-center bg-brand-primary hover:bg-brand-primary-hover text-white text-xs font-black uppercase tracking-wider py-3.5 px-7 rounded-full shadow-md transition-all active:scale-95 cursor-pointer"
+          className="inline-flex items-center justify-center bg-brand-primary hover:bg-brand-primary-hover text-white text-xs font-black uppercase tracking-wider py-3.5 px-7 rounded-full shadow-md transition-all active:scale-95 cursor-pointer font-display"
         >
           Explorar el Menú
         </Link>
@@ -45,41 +44,29 @@ export function OrderSummary() {
   }
 
   return (
-    <div className="bg-surface-card rounded-2xl border border-surface-border p-5 space-y-5 shadow-sm">
+    <div className="bg-surface-card rounded-2xl sm:rounded-3xl border border-surface-border p-4 sm:p-6 space-y-5 shadow-sm">
       <div className="flex items-center justify-between pb-3 border-b border-surface-border-subtle">
-        <h3 className="text-sm font-bold uppercase tracking-wider text-text-strong font-display">Resumen del Pedido</h3>
-        <span className="text-xs text-text-muted font-bold uppercase tracking-wider bg-surface-canvas px-2.5 py-0.5 rounded-full border border-surface-border">
-          {items.reduce((acc, i) => acc + i.quantity, 0)} ítems
+        <div>
+          <h3 className="text-xs sm:text-sm font-bold uppercase tracking-wider text-text-strong font-display">
+            Resumen del Pedido
+          </h3>
+          <span className="text-[11px] text-text-muted">
+            {items.reduce((acc, i) => acc + i.quantity, 0)} {items.reduce((acc, i) => acc + i.quantity, 0) === 1 ? "artículo" : "artículos"}
+          </span>
+        </div>
+        <span className="inline-flex items-center gap-1.5 text-xs text-text-strong font-bold uppercase tracking-wider bg-surface-canvas px-3 py-1 rounded-full border border-surface-border font-display">
+          {deliveryType === "delivery" ? (
+            <>
+              <Truck className="w-3.5 h-3.5 text-brand-primary" />
+              <span>A Domicilio</span>
+            </>
+          ) : (
+            <>
+              <Store className="w-3.5 h-3.5 text-status-success" />
+              <span>Retiro en Local</span>
+            </>
+          )}
         </span>
-      </div>
-
-      {/* Selector de Modalidad (Delivery vs Takeout) */}
-      <div className="grid grid-cols-2 gap-2 p-1 bg-surface-canvas rounded-full border border-surface-border">
-        <button
-          type="button"
-          onClick={() => setDeliveryType("delivery")}
-          className={`flex items-center justify-center gap-1.5 py-2.5 text-xs font-bold uppercase tracking-wider rounded-full transition-all ${
-            deliveryType === "delivery"
-              ? "bg-brand-primary text-white shadow-sm"
-              : "text-text-muted hover:text-text-strong"
-          }`}
-        >
-          <Truck className="w-3.5 h-3.5" />
-          <span>A Domicilio</span>
-        </button>
-
-        <button
-          type="button"
-          onClick={() => setDeliveryType("takeout")}
-          className={`flex items-center justify-center gap-1.5 py-2.5 text-xs font-bold uppercase tracking-wider rounded-full transition-all ${
-            deliveryType === "takeout"
-              ? "bg-brand-primary text-white shadow-sm"
-              : "text-text-muted hover:text-text-strong"
-          }`}
-        >
-          <Store className="w-3.5 h-3.5" />
-          <span>Retiro en Local</span>
-        </button>
       </div>
 
       {/* Lista de Productos en el Carrito (ScrollArea Ergonómico) */}

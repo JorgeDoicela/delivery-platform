@@ -82,6 +82,28 @@ export function StorefrontOperationsSection({
             <span>Aceptar Transferencia Bancaria / Deuna</span>
           </label>
         </div>
+
+        <div className="pt-3 border-t border-surface-border space-y-2">
+          <span className="block text-[11px] font-bold uppercase tracking-wider text-text-muted">
+            Validación de Cobertura Geográfica
+          </span>
+          <label className="flex items-start gap-2.5 cursor-pointer text-text-strong">
+            <input
+              type="checkbox"
+              checked={formState.requireCoverageValidation ?? true}
+              onChange={(e) =>
+                onFieldChange("requireCoverageValidation", e.target.checked)
+              }
+              className="rounded border-surface-border mt-0.5"
+            />
+            <div className="space-y-0.5">
+              <span className="font-semibold block">Exigir cobertura geográfica estricta</span>
+              <p className="text-[11px] text-text-muted leading-tight">
+                Si se desactiva, los clientes pueden pedir desde cualquier ubicación y se les asignará la sucursal más cercana mediante cálculo geodésico Haversine.
+              </p>
+            </div>
+          </label>
+        </div>
       </div>
 
       <div className="bg-surface-card border border-surface-border rounded-3xl p-6 space-y-4 shadow-xs transition-colors duration-200">

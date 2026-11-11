@@ -59,8 +59,16 @@ export function CartDrawer() {
     return null;
   }
 
-  const branchTitle = branchName ? branchName.replace(/^Matriz\s*/i, "").trim() : "Principal";
+  const hasMultipleBranches = (tenant?.branches?.length ?? 0) > 1;
+  const ENABLE_CART_COUPONS = false; // Desactivado temporalmente según solicitud
+  const cleanBranchName = branchName
+    ? branchName.replace(/^Sucursal\s*/i, "").replace(/^Matriz\s*/i, "").trim()
+    : "Principal";
+  const branchTitle = branchName?.toLowerCase().startsWith("sucursal")
+    ? branchName
+    : `Sucursal ${cleanBranchName}`;
   const itemCount = items.reduce((acc, it) => acc + it.quantity, 0);
+  const hasSubheaderContent = hasMultipleBranches || !opStatus.isOpen || ENABLE_CART_COUPONS;
 
   return (
     <div
@@ -111,44 +119,43 @@ export function CartDrawer() {
             <CartEmptyState tenantSlug={tenantSlug} />
           ) : (
             <div className="flex-1 min-h-0 flex flex-col">
-              {/* Subcabecera de Sucursal y Cupón */}
-              <div className="p-5 sm:p-8 pb-3 space-y-3 shrink-0">
-                <div className="flex items-center justify-between bg-surface-canvas p-3 sm:p-3.5 rounded-2xl shadow-2xs">
-                  <div className="flex items-center gap-2.5 min-w-0">
-                    <Store className="w-4 h-4 text-brand-primary shrink-0" />
-                    <span className="font-display font-black text-sm uppercase tracking-wide text-text-strong truncate">
-                      Sucursal {branchTitle}
-                    </span>
-                  </div>
-                  <span
-                    className={`text-[10px] font-bold uppercase tracking-wider px-2.5 py-0.5 rounded-full shrink-0 ${
-                      opStatus.isOpen
-                        ? "bg-status-success-bg text-status-success"
-                        : "bg-status-warning-bg text-status-warning"
-                    }`}
-                  >
-                    {opStatus.isOpen ? "Cocina Abierta" : "Cerrado"}
-                  </span>
-                </div>
+              {/* Subcabecera de Sucursal, Cupón y Alerta de Horario */}
+              {hasSubheaderContent && (
+                <div className="p-5 sm:p-8 pb-3 space-y-3 shrink-0">
+                  {/* Selector/Aviso de Sucursal: Solo necesario cuando el comercio opera múltiples sucursales */}
+                  {hasMultipleBranches && (
+                    <div className="flex items-center justify-between bg-surface-canvas p-3 sm:p-3.5 rounded-2xl shadow-2xs">
+                      <div className="flex items-center gap-2.5 min-w-0">
+                        <Store className="w-4 h-4 text-brand-primary shrink-0" />
+                        <span className="font-display font-black text-sm uppercase tracking-wide text-text-strong truncate">
+                          {branchTitle}
+                        </span>
+                      </div>
+                      <span
+                        className={`text-[10px] font-bold uppercase tracking-wider px-2.5 py-0.5 rounded-full shrink-0 ${
+                          opStatus.isOpen
+                            ? "bg-status-success-bg text-status-success"
+                            : "bg-status-warning-bg text-status-warning"
+                        }`}
+                      >
+                        {opStatus.isOpen ? "Cocina Abierta" : "Cerrado"}
+                      </span>
+                    </div>
+                  )}
 
-                {/* Módulo de Cupón / Billetera */}
-                <CartDrawerCoupon />
+                  {/* Módulo de Cupón / Billetera (desactivado temporalmente) */}
+                  {ENABLE_CART_COUPONS && <CartDrawerCoupon />}
 
-                {/* Banner de Horario de Atención */}
-                <div
-                  className={`p-3 rounded-2xl text-xs leading-relaxed flex items-center gap-2.5 shadow-2xs ${
-                    !opStatus.isOpen
-                      ? "bg-brand-primary text-white"
-                      : "bg-surface-canvas text-text-muted"
-                  }`}
-                >
-                  <span className="text-[11px] leading-relaxed">
-                    {!opStatus.isOpen
-                      ? `Arma tu pedido y sé el primero en ordenar cuando abramos. Nuestro horario es ${openingTime} a ${closingTime}.`
-                      : `Cocina y despacho activos en tiempo real. Atención en horario continuo hasta las ${closingTime}.`}
-                  </span>
+                  {/* Aviso exclusivo cuando la cocina esté cerrada fuera de horario de atención */}
+                  {!opStatus.isOpen && (
+                    <div className="p-3 rounded-2xl text-xs leading-relaxed flex items-center gap-2.5 shadow-2xs bg-brand-primary text-white">
+                      <span className="text-[11px] leading-relaxed">
+                        Arma tu pedido y sé el primero en ordenar cuando abramos. Nuestro horario es {openingTime} a {closingTime}.
+                      </span>
+                    </div>
+                  )}
                 </div>
-              </div>
+              )}
 
               {/* Área Desplazable de Productos con ScrollArea */}
               <ScrollArea
@@ -156,7 +163,7 @@ export function CartDrawer() {
                 viewportClassName="space-y-3"
                 scrollShadows
               >
-                <div className="space-y-3 pt-1">
+                <div className={`space-y-3 ${hasSubheaderContent ? "pt-1" : "pt-4 sm:pt-6"}`}>
                   {items.map((item) => (
                     <CartDrawerItem key={item.cartItemId} item={item} />
                   ))}

@@ -45,6 +45,8 @@ export interface BranchCoverageDto {
   phone: string;
   maxOrdersPerSlot: number;
   isActive: boolean;
+  distanceKm?: number;
+  isDirectCoverage?: boolean;
 }
 
 export interface CreateOrderItemRequest {

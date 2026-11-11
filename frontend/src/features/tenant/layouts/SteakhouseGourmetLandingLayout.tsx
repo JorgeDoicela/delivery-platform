@@ -31,7 +31,7 @@ export function SteakhouseGourmetLandingLayout({
   const primarySlide = slides[0];
 
   return (
-    <div className="w-full pb-16 space-y-16 bg-neutral-950 text-white">
+    <div className="w-full pb-4 sm:pb-12 space-y-10 sm:space-y-16 bg-neutral-950 text-white">
       {/* 1. Hero Cinematográfico Gourmet Steakhouse */}
       <section className="relative w-full min-h-[580px] lg:min-h-[640px] flex items-center overflow-hidden border-b border-white/10">
         <div className="absolute inset-0 z-0">

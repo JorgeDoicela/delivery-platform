@@ -26,6 +26,18 @@ public class Branch : IMustHaveTenant
     public Polygon CoveragePolygon { get; set; } = null!;
 
     /// <summary>
+    /// Radio de cobertura máximo de entrega en kilómetros mediante la fórmula de Haversine.
+    /// Si es nulo o 0, la cobertura se evalúa principalmente por el polígono PostGIS.
+    /// </summary>
+    public double? DeliveryRadiusKm { get; set; }
+
+    /// <summary>
+    /// Indica si la sucursal exige validación estricta de cobertura (polígono o radio).
+    /// Si es falso, atiende como fallback cuando no hay sucursal en cobertura directa.
+    /// </summary>
+    public bool IsCoverageStrict { get; set; } = true;
+
+    /// <summary>
     /// Capacidad operativa máxima de pedidos admitidos por ventana de 20 minutos (throttling).
     /// </summary>
     public int MaxOrdersPerSlot { get; set; } = 15;

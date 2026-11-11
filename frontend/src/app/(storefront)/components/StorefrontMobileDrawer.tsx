@@ -5,6 +5,10 @@ import Link from "next/link";
 import Image from "next/image";
 import {
   User as UserIcon,
+  Package,
+  MapPin,
+  Shield,
+  Lock,
   X,
   Building2,
   FileText,
@@ -12,9 +16,18 @@ import {
   LogOut,
 } from "lucide-react";
 import { TenantBranchSelector, TenantSwitcher } from "@/features/tenant";
+import { useAccountStore, type AccountTab } from "@/features/account";
 import type { TenantStorefrontConfigDto } from "@/shared/types/api";
 import type { AuthenticatedUserLike } from "@/features/auth/lib/redirectByRole";
 import type { TenantRoutingResolution } from "@/shared/lib/tenant-routing";
+
+const ACCOUNT_NAV_ITEMS: Array<{ id: AccountTab; label: string; icon: typeof UserIcon }> = [
+  { id: "perfil", label: "Datos Personales", icon: UserIcon },
+  { id: "pedidos", label: "Historial de Pedidos", icon: Package },
+  { id: "direcciones", label: "Direcciones Guardadas", icon: MapPin },
+  { id: "privacidad", label: "Privacidad (LOPDP)", icon: Shield },
+  { id: "seguridad", label: "Seguridad y Clave", icon: Lock },
+];
 
 interface StorefrontMobileDrawerProps {
   isOpen: boolean;
@@ -42,7 +55,6 @@ export function StorefrontMobileDrawer({
   routes,
   tenant,
   isAuthenticated,
-  user,
   operationalHref,
   operationalLabel,
   onLogout,
@@ -121,6 +133,46 @@ export function StorefrontMobileDrawer({
             </div>
           )}
 
+          {/* Enlaces de Mi Cuenta (Solo visible cuando el usuario está autenticado) */}
+          {isAuthenticated && (
+            <nav className="space-y-1">
+              <span className="text-[10px] font-bold uppercase tracking-wider text-text-muted block px-3 py-1">
+                Mi Cuenta
+              </span>
+              {ACCOUNT_NAV_ITEMS.map((item) => {
+                const Icon = item.icon;
+                return (
+                  <Link
+                    key={item.id}
+                    href={`${routes.getAccountHref()}?tab=${item.id}`}
+                    onClick={() => {
+                      useAccountStore.getState().setActiveTab(item.id);
+                      onClose();
+                    }}
+                    className="flex items-center gap-3 px-3.5 py-3 rounded-2xl hover:bg-surface-canvas text-text-strong hover:text-brand-primary font-display font-black text-sm uppercase tracking-wide transition-colors"
+                  >
+                    <Icon className="w-4 h-4 text-brand-primary shrink-0" />
+                    <span>{item.label}</span>
+                  </Link>
+                );
+              })}
+            </nav>
+          )}
+
+          {/* Acceso a Panel Operativo para Staff / Admin */}
+          {operationalHref && (
+            <div className="pt-1">
+              <Link
+                href={operationalHref}
+                onClick={onClose}
+                className="flex items-center justify-between px-3.5 py-2.5 rounded-2xl bg-neutral-900 text-white text-xs font-bold uppercase tracking-wider font-display hover:bg-neutral-800 transition-colors"
+              >
+                <span>Ir a {operationalLabel}</span>
+                <span className="text-[10px] text-brand-primary">&rarr;</span>
+              </Link>
+            </div>
+          )}
+
           {/* Enlaces de Información y Soporte (Sin duplicar la barra fija inferior) */}
           <nav className="space-y-1">
             <span className="text-[10px] font-bold uppercase tracking-wider text-text-muted block px-3 py-1">
@@ -159,51 +211,19 @@ export function StorefrontMobileDrawer({
         </div>
 
         {/* Pie del Drawer */}
-        <div className="p-4 sm:p-6 pt-3 sm:pt-4 border-t border-surface-border space-y-3 shrink-0">
-          {isAuthenticated && user ? (
-            <div className="p-3 bg-surface-canvas rounded-2xl border border-surface-border space-y-2.5">
-              <div className="flex items-center justify-between">
-                <div className="min-w-0">
-                  <span className="font-bold text-xs text-text-strong block truncate">
-                    {user.fullName || "Usuario Conectado"}
-                  </span>
-                  <span className="text-[10px] text-brand-primary font-mono font-bold uppercase block truncate">
-                    Rol: {String(user.role)}
-                  </span>
-                </div>
-                <button
-                  type="button"
-                  onClick={async () => {
-                    await onLogout();
-                    onClose();
-                  }}
-                  className="p-1.5 rounded-full text-text-muted hover:text-red-500 hover:bg-surface-card-hover transition-colors cursor-pointer shrink-0"
-                  title="Cerrar sesión"
-                >
-                  <LogOut className="w-4 h-4" />
-                </button>
-              </div>
-
-              {operationalHref && (
-                <Link
-                  href={operationalHref}
-                  onClick={onClose}
-                  className="flex items-center justify-between px-3.5 py-2.5 rounded-xl bg-neutral-900 text-white text-xs font-bold uppercase tracking-wider font-display hover:bg-neutral-800 transition-colors"
-                >
-                  <span>Ir a {operationalLabel}</span>
-                  <span className="text-[10px] text-brand-primary">&rarr;</span>
-                </Link>
-              )}
-
-              <Link
-                href={routes.getAccountHref()}
-                onClick={onClose}
-                className="flex items-center justify-between px-3 py-1.5 rounded-xl text-[11px] font-semibold text-text-muted hover:text-text-strong transition-colors"
-              >
-                <span>Configurar mi Cuenta</span>
-                <span className="text-[10px]">&rarr;</span>
-              </Link>
-            </div>
+        <div className="p-4 sm:p-6 pt-3 sm:pt-4 border-t border-surface-border space-y-2 shrink-0">
+          {isAuthenticated ? (
+            <button
+              type="button"
+              onClick={async () => {
+                await onLogout();
+                onClose();
+              }}
+              className="w-full flex items-center justify-center gap-2 px-4 py-3 rounded-2xl bg-surface-canvas hover:bg-surface-card-hover border border-surface-border text-text-strong hover:text-brand-primary text-xs font-bold uppercase tracking-wider font-display transition-colors cursor-pointer"
+            >
+              <LogOut className="w-4 h-4 text-brand-primary shrink-0" />
+              <span>Cerrar Sesión</span>
+            </button>
           ) : (
             <Link
               href={routes.getLoginHref()}

@@ -176,6 +176,10 @@ public static partial class DatabaseSeeder
             }
             else
             {
+                groupEntity.MinSelectable = mgSpec.MinSelectable;
+                groupEntity.MaxSelectable = mgSpec.MaxSelectable;
+                groupEntity.IsRequired = mgSpec.IsRequired;
+
                 var existingOptionNames = new HashSet<string>(
                     groupEntity.Options.Select(o => o.Name),
                     StringComparer.OrdinalIgnoreCase
@@ -418,9 +422,9 @@ public static partial class DatabaseSeeder
             {
                 TenantId = tenantId,
                 Name = "Elección de Guarnición",
-                MinSelectable = 1,
+                MinSelectable = 0,
                 MaxSelectable = 1,
-                IsRequired = true,
+                IsRequired = false,
                 Options = new List<ModifierOption>
                 {
                     new() { Name = "Papas Fritas Grandes", AdditionalPrice = 0.00m, IsAvailable = true },
@@ -434,14 +438,13 @@ public static partial class DatabaseSeeder
             {
                 TenantId = tenantId,
                 Name = "Tipo de Ají",
-                MinSelectable = 1,
+                MinSelectable = 0,
                 MaxSelectable = 2,
-                IsRequired = true,
+                IsRequired = false,
                 Options = new List<ModifierOption>
                 {
                     new() { Name = "Ají Casero de la Casa (Picante medio)", AdditionalPrice = 0.00m, IsAvailable = true },
-                    new() { Name = "Ají Tomate de Árbol (Picante suave)", AdditionalPrice = 0.00m, IsAvailable = true },
-                    new() { Name = "Sin Ají", AdditionalPrice = 0.00m, IsAvailable = true }
+                    new() { Name = "Ají Tomate de Árbol (Picante suave)", AdditionalPrice = 0.00m, IsAvailable = true }
                 }
             };
 

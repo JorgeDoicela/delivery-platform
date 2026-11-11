@@ -57,6 +57,16 @@ public sealed class UpdateBranchOperatingHoursHandler : IHandler<UpdateBranchOpe
             branch.IsActive = command.IsActive.Value;
         }
 
+        if (command.DeliveryRadiusKm.HasValue)
+        {
+            branch.DeliveryRadiusKm = command.DeliveryRadiusKm.Value > 0 ? command.DeliveryRadiusKm.Value : null;
+        }
+
+        if (command.IsCoverageStrict.HasValue)
+        {
+            branch.IsCoverageStrict = command.IsCoverageStrict.Value;
+        }
+
         await _context.SaveChangesAsync(cancellationToken);
 
         return Result.Success(new UpdateBranchOperatingHoursResponse(
@@ -64,8 +74,9 @@ public sealed class UpdateBranchOperatingHoursHandler : IHandler<UpdateBranchOpe
             branch.Name,
             branch.OpeningTime,
             branch.ClosingTime,
-            branch.IsActive
+            branch.IsActive,
+            branch.DeliveryRadiusKm,
+            branch.IsCoverageStrict
         ));
     }
 }
-

@@ -4,7 +4,9 @@ public sealed record UpdateBranchOperatingHoursCommand(
     int BranchId,
     string OpeningTime,
     string ClosingTime,
-    bool? IsActive = null
+    bool? IsActive = null,
+    double? DeliveryRadiusKm = null,
+    bool? IsCoverageStrict = null
 );
 
 public sealed record UpdateBranchOperatingHoursResponse(
@@ -12,6 +14,7 @@ public sealed record UpdateBranchOperatingHoursResponse(
     string Name,
     string OpeningTime,
     string ClosingTime,
-    bool IsActive
+    bool IsActive,
+    double? DeliveryRadiusKm = null,
+    bool IsCoverageStrict = true
 );
-

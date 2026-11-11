@@ -37,7 +37,7 @@ export function StorefrontFooter() {
   return (
     <footer
       id="footer-info"
-      className="bg-surface-card text-text-muted text-xs border-t border-surface-border mt-4 sm:mt-10 transition-colors duration-200 pb-16 sm:pb-6 xl:pb-0"
+      className="bg-surface-card text-text-muted text-xs border-t border-surface-border mt-4 sm:mt-10 transition-colors duration-200"
     >
       <div
         className={`w-full px-4 sm:px-8 md:px-12 lg:px-16 ${

@@ -20,6 +20,12 @@ public class TenantSetting : IMustHaveTenant
     public bool EnableTakeout { get; set; } = true;
     public bool EnableDineIn { get; set; }
 
+    /// <summary>
+    /// Habilita o deshabilita la validación estricta de cobertura geográfica (geocerca/radio).
+    /// Si es falso, los clientes pueden pedir desde cualquier ubicación y se asigna la sucursal más cercana por Haversine.
+    /// </summary>
+    public bool RequireCoverageValidation { get; set; } = true;
+
     public bool AcceptsCash { get; set; } = true;
     public bool AcceptsBankTransfer { get; set; } = true;
     public bool AcceptsCard { get; set; }

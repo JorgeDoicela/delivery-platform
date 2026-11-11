@@ -21,6 +21,12 @@ function BranchScheduleForm({ branch, onClose }: BranchScheduleFormProps) {
   const [openingTime, setOpeningTime] = useState(branch.openingTime || "10:30");
   const [closingTime, setClosingTime] = useState(branch.closingTime || "21:30");
   const [isActive, setIsActive] = useState(branch.isActive ?? true);
+  const [deliveryRadiusKm, setDeliveryRadiusKm] = useState<number | null>(
+    branch.deliveryRadiusKm ?? 35
+  );
+  const [isCoverageStrict, setIsCoverageStrict] = useState(
+    branch.isCoverageStrict ?? true
+  );
   const [validationError, setValidationError] = useState<string | null>(null);
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
 
@@ -56,10 +62,12 @@ function BranchScheduleForm({ branch, onClose }: BranchScheduleFormProps) {
           openingTime,
           closingTime,
           isActive,
+          deliveryRadiusKm,
+          isCoverageStrict,
         },
       });
 
-      setSuccessMessage("Horarios de atención actualizados correctamente en base de datos.");
+      setSuccessMessage("Configuración operativa y zona de cobertura actualizadas correctamente.");
       setTimeout(() => {
         onClose();
       }, 1000);
@@ -202,6 +210,53 @@ function BranchScheduleForm({ branch, onClose }: BranchScheduleFormProps) {
             <Power className="w-3.5 h-3.5" />
             <span>{isActive ? "Activa" : "Pausada"}</span>
           </button>
+        </div>
+
+        {/* Configuración de Cobertura y Radio Haversine */}
+        <div className="pt-2 border-t border-surface-border space-y-3">
+          <span className="text-xs font-bold text-text-strong block font-display uppercase tracking-wider">
+            Zona de Cobertura y Reparto (Haversine)
+          </span>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            <div>
+              <label className="block text-[11px] font-bold text-text-muted mb-1 uppercase tracking-wider">
+                Radio de Cobertura (km)
+              </label>
+              <input
+                type="number"
+                step="0.5"
+                min="0.5"
+                max="200"
+                value={deliveryRadiusKm ?? ""}
+                placeholder="Ej. 35.0 (km)"
+                onChange={(e) =>
+                  setDeliveryRadiusKm(e.target.value ? Number(e.target.value) : null)
+                }
+                className="w-full px-3.5 py-2.5 bg-surface-canvas border border-surface-border rounded-xl text-sm font-mono font-bold text-text-strong focus:outline-none focus:ring-2 focus:ring-brand-primary"
+              />
+              <span className="text-[10px] text-text-subtle mt-1 block">
+                Cálculo geodésico exacto desde la sede.
+              </span>
+            </div>
+
+            <div className="flex flex-col justify-center">
+              <label className="flex items-start gap-2.5 cursor-pointer text-text-strong mt-2">
+                <input
+                  type="checkbox"
+                  checked={isCoverageStrict}
+                  onChange={(e) => setIsCoverageStrict(e.target.checked)}
+                  className="rounded border-surface-border mt-0.5"
+                />
+                <div className="space-y-0.5">
+                  <span className="text-xs font-bold block">Cobertura Estricta</span>
+                  <span className="text-[10px] text-text-muted block leading-tight">
+                    Limita entregas al radio o polígono de esta sede.
+                  </span>
+                </div>
+              </label>
+            </div>
+          </div>
         </div>
 
         {/* Botones de acción */}

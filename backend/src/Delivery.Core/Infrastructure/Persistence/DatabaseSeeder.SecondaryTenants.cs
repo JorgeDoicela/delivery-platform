@@ -153,6 +153,20 @@ public static partial class DatabaseSeeder
                     needsSave = true;
                 }
             }
+
+            var secondaryBranches = await context.Branches
+                .IgnoreQueryFilters()
+                .Where(b => b.TenantId == existing.Id)
+                .ToListAsync();
+            foreach (var b in secondaryBranches)
+            {
+                if (!b.DeliveryRadiusKm.HasValue)
+                {
+                    b.DeliveryRadiusKm = 25.0;
+                    b.IsCoverageStrict = true;
+                    needsSave = true;
+                }
+            }
             if (needsSave)
             {
                 await context.SaveChangesAsync();
@@ -226,6 +240,8 @@ public static partial class DatabaseSeeder
             Phone = "0998887766",
             LocationPoint = branchLocation,
             CoveragePolygon = branchPolygon,
+            DeliveryRadiusKm = 25.0,
+            IsCoverageStrict = true,
             MaxOrdersPerSlot = 18,
             SriEstablishmentCode = "001",
             SriEmissionPoint = "001",
@@ -355,9 +371,9 @@ public static partial class DatabaseSeeder
         {
             TenantId = tenant.Id,
             Name = "Guarnición & Punto de Casa",
-            MinSelectable = 1,
+            MinSelectable = 0,
             MaxSelectable = 2,
-            IsRequired = true,
+            IsRequired = false,
             Options = new List<ModifierOption>
             {
                 new() { Name = "Papas Rústicas al Romero", AdditionalPrice = 0.00m, IsAvailable = true },

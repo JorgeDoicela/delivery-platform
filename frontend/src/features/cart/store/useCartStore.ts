@@ -151,10 +151,11 @@ export const useCartStore = create<CartState>()(
         };
 
         if (state.tenantSlug === normalizedSlug) {
-          const validBranchId =
-            state.branchId ?? defaultBranch?.id ?? 1;
-          const validBranchName =
-            state.branchName ?? defaultBranch?.name ?? "Matriz Principal";
+          const isSameAsDefault = !state.branchId || state.branchId === defaultBranch?.id;
+          const validBranchId = state.branchId ?? defaultBranch?.id ?? 1;
+          const validBranchName = isSameAsDefault && defaultBranch?.name
+            ? defaultBranch.name
+            : (state.branchName ?? defaultBranch?.name ?? "Principal");
 
           set({
             baseDeliveryFee: nextFee,
@@ -175,21 +176,24 @@ export const useCartStore = create<CartState>()(
 
         const existingForNext = updatedMap[normalizedSlug];
         if (existingForNext) {
+          const isSameAsDefault = !existingForNext.branchId || existingForNext.branchId === defaultBranch?.id;
+          const nextBranchId = existingForNext.branchId ?? defaultBranch?.id ?? 1;
+          const nextBranchName = isSameAsDefault && defaultBranch?.name
+            ? defaultBranch.name
+            : (existingForNext.branchName ?? defaultBranch?.name ?? "Principal");
+
           set({
             tenantSlug: normalizedSlug,
             items: existingForNext.items,
-            branchId: existingForNext.branchId ?? defaultBranch?.id ?? 1,
-            branchName:
-              existingForNext.branchName ??
-              defaultBranch?.name ??
-              "Matriz Principal",
+            branchId: nextBranchId,
+            branchName: nextBranchName,
             deliveryType: existingForNext.deliveryType,
             baseDeliveryFee: nextFee,
             cartsByTenant: updatedMap,
           });
         } else {
           const initialBranchId = defaultBranch?.id ?? 1;
-          const initialBranchName = defaultBranch?.name ?? "Matriz Principal";
+          const initialBranchName = defaultBranch?.name ?? "Principal";
           const freshSnapshot: TenantCartSnapshot = {
             items: [],
             branchId: initialBranchId,

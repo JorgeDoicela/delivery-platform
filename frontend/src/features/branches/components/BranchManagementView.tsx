@@ -207,7 +207,12 @@ export function BranchManagementView() {
                             </div>
 
                             <div className="pt-3 border-t border-surface-border text-[11px] text-text-muted flex justify-between items-center">
-                                <span>Geocerca PostGIS NetTopologySuite</span>
+                                <span>
+                                    {branch.deliveryRadiusKm
+                                        ? `Cobertura Haversine: ${branch.deliveryRadiusKm} km`
+                                        : "Geocerca PostGIS NetTopologySuite"}
+                                    {branch.isCoverageStrict === false ? " • Cobertura Flexible" : ""}
+                                </span>
                                 <span className="text-brand-accent font-semibold">Ventana: 20 min</span>
                             </div>
                         </div>

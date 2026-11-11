@@ -86,13 +86,15 @@ public sealed class GetMyOrdersHandler : IHandler<GetMyOrdersQuery, Result<GetMy
             ? userDigits[^8..]
             : null;
 
+#pragma warning disable CA1862, CA1304, CA1311 // EF Core requiere ToLower() para traducir la comparación a SQL en el servidor
         // Consulta de órdenes vinculadas a la cuenta del cliente autenticado (por Id, correo o número de teléfono)
         var query = _context.Orders
             .IgnoreQueryFilters()
             .AsNoTracking()
             .Where(o => o.CreatedByUserId == user.Id
-                || (o.CustomerEmail != null && string.Equals(o.CustomerEmail, normalizedEmail, StringComparison.OrdinalIgnoreCase))
+                || (o.CustomerEmail != null && o.CustomerEmail.ToLower() == normalizedEmail)
                 || (userPhoneRaw != null && (o.CustomerPhone == userPhoneRaw || (userPhoneSuffix != null && o.CustomerPhone.EndsWith(userPhoneSuffix)))));
+#pragma warning restore CA1862, CA1304, CA1311
 
         // Si hay tenant seleccionado en el contexto de la petición, se restringe a dicho tenant
         if (_context.CurrentTenantId.HasValue)

@@ -19,7 +19,7 @@ export function PlatformLandingView() {
   const tenants = data?.tenants ?? [];
 
   return (
-    <div className="w-full pb-16 space-y-12 sm:space-y-14 bg-surface-canvas transition-colors duration-200">
+    <div className="w-full pb-4 sm:pb-12 space-y-10 sm:space-y-14 bg-surface-canvas transition-colors duration-200">
       {/* 1. Hero Panorámico a Ancho Completo */}
       <section className="relative overflow-hidden w-full min-h-[440px] sm:min-h-[520px] md:min-h-[580px] bg-neutral-950 text-white shadow-xl flex items-center py-10 sm:py-18 px-4 sm:px-12 md:px-16 lg:px-20">
         <div className="absolute inset-0 z-0">

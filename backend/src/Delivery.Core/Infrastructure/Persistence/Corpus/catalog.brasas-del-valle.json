@@ -25,9 +25,9 @@
   "modifierGroups": [
     {
       "name": "Término de Cocción",
-      "minSelectable": 1,
-      "maxSelectable": 1,
-      "isRequired": true,
+      "minSelectable": 0,
+      "maxSelectable": 99,
+      "isRequired": false,
       "options": [
         {
           "name": "Término Medio (Jugoso y rosado)",
@@ -48,9 +48,9 @@
     },
     {
       "name": "Salsa & Chimichurri",
-      "minSelectable": 1,
-      "maxSelectable": 2,
-      "isRequired": true,
+      "minSelectable": 0,
+      "maxSelectable": 99,
+      "isRequired": false,
       "options": [
         {
           "name": "Chimichurri Clásico de la Casa",

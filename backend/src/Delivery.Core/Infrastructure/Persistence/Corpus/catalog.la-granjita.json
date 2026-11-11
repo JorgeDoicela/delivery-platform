@@ -35,9 +35,9 @@
   "modifierGroups": [
     {
       "name": "Elección de Guarnición",
-      "minSelectable": 1,
-      "maxSelectable": 1,
-      "isRequired": true,
+      "minSelectable": 0,
+      "maxSelectable": 99,
+      "isRequired": false,
       "options": [
         {
           "name": "Papas Fritas Artesanales",
@@ -68,9 +68,9 @@
     },
     {
       "name": "Tipo de Ají",
-      "minSelectable": 1,
-      "maxSelectable": 2,
-      "isRequired": true,
+      "minSelectable": 0,
+      "maxSelectable": 99,
+      "isRequired": false,
       "options": [
         {
           "name": "Ají Casero de la Casa (Picante medio)",
@@ -81,18 +81,13 @@
           "name": "Ají Tomate de Árbol (Picante suave)",
           "additionalPrice": 0,
           "isAvailable": true
-        },
-        {
-          "name": "Sin Ají",
-          "additionalPrice": 0,
-          "isAvailable": true
         }
       ]
     },
     {
       "name": "Bebidas Opcionales",
       "minSelectable": 0,
-      "maxSelectable": 3,
+      "maxSelectable": 99,
       "isRequired": false,
       "options": [
         {

@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import {
   User,
   Package,
@@ -41,6 +41,9 @@ const TAB_OPTIONS: SelectOption<AccountTab>[] = TABS.map((tab) => ({
 
 export function AccountDashboardView({ tenantSlug }: AccountDashboardViewProps) {
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const tabParam = searchParams?.get("tab") as AccountTab | null;
+
   const profile = useAccountStore((s) => s.profile);
   const activeTab = useAccountStore((s) => s.activeTab);
   const isLoadingProfile = useAccountStore((s) => s.isLoadingProfile);
@@ -49,6 +52,19 @@ export function AccountDashboardView({ tenantSlug }: AccountDashboardViewProps) 
 
   const isAuthenticated = useAuthStore((s) => s.isAuthenticated);
   const logout = useAuthStore((s) => s.logout);
+
+  useEffect(() => {
+    if (
+      tabParam &&
+      (tabParam === "perfil" ||
+        tabParam === "pedidos" ||
+        tabParam === "direcciones" ||
+        tabParam === "privacidad" ||
+        tabParam === "seguridad")
+    ) {
+      setActiveTab(tabParam);
+    }
+  }, [tabParam, setActiveTab]);
 
   useEffect(() => {
     if (isAuthenticated) {
