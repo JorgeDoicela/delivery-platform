@@ -53,64 +53,56 @@ describe("accountApi", () => {
       fullName: "Test User",
     };
 
-    const checkAuthSpy = vi.spyOn(useAuthStore.getState(), "checkAuth").mockImplementation(async () => {
+    vi.spyOn(useAuthStore.getState(), "checkAuth").mockImplementation(async () => {
       // Simular que checkAuth actualizó el token
       vi.spyOn(apiClientModule, "getApiClientAccessToken").mockReturnValue("refreshed.token");
       return true;
     });
 
-    try {
-      // Primer intento devuelve 401, segundo intento devuelve 200 con el perfil
-      global.fetch = vi
-        .fn()
-        .mockResolvedValueOnce({
-          ok: false,
-          status: 401,
-          json: async () => ({ detail: "Token expired" }),
-        })
-        .mockResolvedValueOnce({
-          ok: true,
-          status: 200,
-          json: async () => mockProfile,
-        });
+    // Primer intento devuelve 401, segundo intento devuelve 200 con el perfil
+    global.fetch = vi
+      .fn()
+      .mockResolvedValueOnce({
+        ok: false,
+        status: 401,
+        json: async () => ({ detail: "Token expired" }),
+      })
+      .mockResolvedValueOnce({
+        ok: true,
+        status: 200,
+        json: async () => mockProfile,
+      });
 
-      const result = await accountApi.getProfile();
+    const result = await accountApi.getProfile();
 
-      expect(result).toEqual(mockProfile);
-      expect(checkAuthSpy).toHaveBeenCalledTimes(1);
-      expect(global.fetch).toHaveBeenCalledTimes(2);
+    expect(result).toEqual(mockProfile);
+    expect(useAuthStore.getState().checkAuth).toHaveBeenCalledTimes(1);
+    expect(global.fetch).toHaveBeenCalledTimes(2);
 
-      // Segundo llamado con el token refrescado
-      expect(global.fetch).toHaveBeenLastCalledWith(
-        "http://localhost:5005/api/v1/account/profile",
-        expect.objectContaining({
-          method: "GET",
-          headers: expect.objectContaining({
-            Authorization: "Bearer refreshed.token",
-          }),
-        })
-      );
-    } finally {
-      checkAuthSpy.mockRestore();
-    }
+    // Segundo llamado con el token refrescado
+    expect(global.fetch).toHaveBeenLastCalledWith(
+      "http://localhost:5005/api/v1/account/profile",
+      expect.objectContaining({
+        method: "GET",
+        headers: expect.objectContaining({
+          Authorization: "Bearer refreshed.token",
+        }),
+      })
+    );
   });
 
   it("ante 401 Unauthorized sin éxito de refresh, ejecuta logout y lanza excepción", async () => {
-    const checkAuthSpy = vi.spyOn(useAuthStore.getState(), "checkAuth").mockResolvedValue(false);
+    vi.spyOn(useAuthStore.getState(), "checkAuth").mockResolvedValue(false);
     const logoutSpy = vi.spyOn(useAuthStore.getState(), "logout").mockResolvedValue();
 
-    try {
-      global.fetch = vi.fn().mockResolvedValueOnce({
-        ok: false,
-        status: 401,
-        json: async () => ({ detail: "Unauthorized invalid refresh" }),
-      });
+    global.fetch = vi.fn().mockResolvedValueOnce({
+      ok: false,
+      status: 401,
+      json: async () => ({ detail: "Unauthorized invalid refresh" }),
+    });
 
-      await expect(accountApi.getProfile()).rejects.toThrow("Unauthorized invalid refresh");
-      expect(logoutSpy).toHaveBeenCalledTimes(1);
-    } finally {
-      checkAuthSpy.mockRestore();
-      logoutSpy.mockRestore();
-    }
+    await expect(accountApi.getProfile()).rejects.toThrow("Unauthorized invalid refresh");
+    expect(logoutSpy).toHaveBeenCalledTimes(1);
   });
 });
+

@@ -56,3 +56,4 @@ describe("jwt utilities", () => {
     expect(isJwtExpired(jwt, 30)).toBe(true);
   });
 });
+
