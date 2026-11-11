@@ -116,5 +116,6 @@ export interface AuthState {
   status: AuthStatus;
   error: string | null;
   isAuthenticated: boolean;
+  isHydrated: boolean;
 }
 

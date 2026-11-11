@@ -215,7 +215,7 @@ export const useAccountStore = create<AccountState>((set, get) => ({
       set((state) => ({
         profile: state.profile ? { ...state.profile, avatarUrl: res.avatarUrl } : null,
         isUploadingAvatar: false,
-        actionSuccessMessage: "Foto de perfil actualizada y optimizada a WebP con éxito.",
+        actionSuccessMessage: "Foto de perfil actualizada con éxito.",
       }));
 
       // Sincronizar en vivo con el usuario autenticado

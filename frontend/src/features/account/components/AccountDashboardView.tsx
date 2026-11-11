@@ -10,6 +10,7 @@ import {
   Lock,
   LogOut,
   ChevronRight,
+  ChevronDown,
 } from "lucide-react";
 import { useAccountStore, type AccountTab } from "../store/useAccountStore";
 import { useAuthStore } from "@/features/auth/store/useAuthStore";
@@ -58,6 +59,9 @@ export function AccountDashboardView({ tenantSlug }: AccountDashboardViewProps) 
     }
   };
 
+  const currentTab = TABS.find((t) => t.id === activeTab) || TABS[0];
+  const ActiveIcon = currentTab.icon;
+
   return (
     <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-8 md:py-12 space-y-8">
       {/* Header Principal del Usuario */}
@@ -65,35 +69,76 @@ export function AccountDashboardView({ tenantSlug }: AccountDashboardViewProps) 
 
       {/* Grid: Navegación de pestañas + Contenido */}
       <div className="grid grid-cols-1 lg:grid-cols-4 gap-6 lg:gap-8">
-        {/* Navegación Responsive: Horizontal táctil en móvil/tablet, Sidebar vertical en desktop */}
+        {/* Navegación Responsive: Selector táctil en móvil, flex-wrap en tablet, Sidebar vertical en desktop */}
         <aside className="lg:col-span-1 space-y-3">
-          {/* Versión Móvil/Tablet: Píldoras deslizantes con scroll horizontal suave */}
-          <div className="lg:hidden -mx-4 px-4 sm:mx-0 sm:px-0">
-            <nav className="flex items-center gap-2 overflow-x-auto pb-2 scrollbar-none [scrollbar-width:none] [-ms-overflow-style:none]">
-              {TABS.map((tab) => {
-                const Icon = tab.icon;
-                const isActive = activeTab === tab.id;
-
-                return (
-                  <button
-                    key={tab.id}
-                    type="button"
-                    onClick={() => setActiveTab(tab.id)}
-                    className={`inline-flex items-center gap-2 px-4 py-2.5 rounded-full text-xs font-bold whitespace-nowrap transition-all shrink-0 min-h-[44px] cursor-pointer ${
-                      isActive
-                        ? "bg-brand-primary text-white shadow-xs font-display uppercase tracking-wider"
-                        : "bg-surface-card border border-surface-border text-text-strong hover:bg-surface-canvas active:scale-95"
-                    }`}
-                  >
-                    <Icon className="w-3.5 h-3.5 shrink-0" />
-                    <span>{tab.label}</span>
-                  </button>
-                );
-              })}
-            </nav>
+          {/* Versión Móvil (< 640px): Selector desplegable 100% responsive sin scroll horizontal */}
+          <div className="sm:hidden">
+            <div className="relative">
+              <label htmlFor="account-tab-select" className="sr-only">
+                Sección de tu cuenta
+              </label>
+              <div className="flex items-center justify-between w-full bg-surface-card border border-surface-border rounded-2xl p-3 shadow-xs">
+                <div className="flex items-center gap-2.5 min-w-0">
+                  <div className="w-8 h-8 rounded-xl bg-brand-primary/10 text-brand-primary flex items-center justify-center shrink-0">
+                    <ActiveIcon className="w-4 h-4" />
+                  </div>
+                  <div className="min-w-0">
+                    <span className="text-[10px] font-bold uppercase tracking-wider text-text-muted block">
+                      Sección Activa
+                    </span>
+                    <span className="text-xs font-black uppercase tracking-tight font-display text-text-strong block truncate">
+                      {currentTab.label}
+                    </span>
+                  </div>
+                </div>
+                <div className="flex items-center gap-1.5 shrink-0 pl-2">
+                  <span className="text-[10px] font-bold text-brand-primary font-display uppercase tracking-wider">
+                    Cambiar
+                  </span>
+                  <ChevronDown className="w-4 h-4 text-text-muted" />
+                </div>
+              </div>
+              <select
+                id="account-tab-select"
+                value={activeTab}
+                onChange={(e) => setActiveTab(e.target.value as AccountTab)}
+                aria-label="Seleccionar sección de la cuenta"
+                className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
+              >
+                {TABS.map((tab) => (
+                  <option key={tab.id} value={tab.id} className="bg-surface-card text-text-strong">
+                    {tab.label}
+                  </option>
+                ))}
+              </select>
+            </div>
           </div>
 
-          {/* Versión Desktop: Menú lateral estructurado */}
+          {/* Versión Tablet (640px a 1024px): Píldoras con wrap automático sin scroll horizontal */}
+          <nav className="hidden sm:flex lg:hidden flex-wrap gap-2">
+            {TABS.map((tab) => {
+              const Icon = tab.icon;
+              const isActive = activeTab === tab.id;
+
+              return (
+                <button
+                  key={tab.id}
+                  type="button"
+                  onClick={() => setActiveTab(tab.id)}
+                  className={`inline-flex items-center gap-2 px-4 py-2.5 rounded-full text-xs font-bold transition-all min-h-[44px] cursor-pointer ${
+                    isActive
+                      ? "bg-brand-primary text-white shadow-xs font-display uppercase tracking-wider"
+                      : "bg-surface-card border border-surface-border text-text-strong hover:bg-surface-canvas active:scale-95"
+                  }`}
+                >
+                  <Icon className="w-3.5 h-3.5 shrink-0" />
+                  <span>{tab.label}</span>
+                </button>
+              );
+            })}
+          </nav>
+
+          {/* Versión Desktop (>= 1024px): Menú lateral estructurado */}
           <nav className="hidden lg:block bg-surface-card border border-surface-border rounded-3xl p-3 space-y-1 shadow-xs sticky top-24">
             {TABS.map((tab) => {
               const Icon = tab.icon;

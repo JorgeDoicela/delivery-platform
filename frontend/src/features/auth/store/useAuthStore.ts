@@ -59,6 +59,7 @@ interface AuthActions {
   checkAuth: () => Promise<boolean>;
   setAccessToken: (token: string | null) => void;
   setUser: (user: AuthUser | null) => void;
+  setHydrated: (isHydrated: boolean) => void;
   resetStatus: () => void;
 }
 
@@ -72,6 +73,11 @@ export const useAuthStore = create<AuthStore>()(
       status: "idle" as AuthStatus,
       error: null,
       isAuthenticated: false,
+      isHydrated: false,
+
+      setHydrated: (isHydrated) => {
+        set({ isHydrated });
+      },
 
       setAccessToken: (accessToken) => {
         setApiClientAccessToken(accessToken);
@@ -294,6 +300,15 @@ export const useAuthStore = create<AuthStore>()(
       },
 
       checkAuth: async () => {
+        // 0. Si el store no se ha hidratado aún en el cliente, esperar rehidratación
+        if (typeof window !== "undefined" && !get().isHydrated) {
+          try {
+            await useAuthStore.persist.rehydrate();
+          } catch {
+            // Continuar con el estado actual
+          }
+        }
+
         // 1. Si ya tiene accessToken en memoria y usuario activo, la sesión es válida
         const currentToken = get().accessToken;
         if (currentToken && get().user) {
@@ -365,11 +380,24 @@ export const useAuthStore = create<AuthStore>()(
         accessToken: state.accessToken,
       }),
       onRehydrateStorage: () => (state) => {
-        if (state?.accessToken) {
-          setApiClientAccessToken(state.accessToken);
+        if (state) {
+          state.isHydrated = true;
+          if (state.accessToken) {
+            setApiClientAccessToken(state.accessToken);
+          }
         }
       },
     }
   )
 );
+
+if (typeof window !== "undefined") {
+  useAuthStore.persist?.onFinishHydration?.(() => {
+    useAuthStore.setState({ isHydrated: true });
+    const currentToken = useAuthStore.getState().accessToken;
+    if (currentToken) {
+      setApiClientAccessToken(currentToken);
+    }
+  });
+}
 

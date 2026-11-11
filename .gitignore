@@ -79,6 +79,7 @@ next-env.d.ts
 # ==========================================
 .docker/
 docker-data/
+**/uploads/
 *.log
 **/logs/
 dump.rdb

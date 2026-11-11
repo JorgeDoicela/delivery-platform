@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import Link from "next/link";
 import { useRouter, usePathname } from "next/navigation";
 import { useAuthStore } from "../store/useAuthStore";
@@ -82,21 +82,38 @@ export function AuthGuard({ children, allowedRoles }: AuthGuardProps) {
   const isAuthenticated = useAuthStore((s) => s.isAuthenticated);
   const user = useAuthStore((s) => s.user);
   const checkAuth = useAuthStore((s) => s.checkAuth);
+  const [isVerifying, setIsVerifying] = useState(true);
 
   useEffect(() => {
-    checkAuth();
+    let isCurrent = true;
+
+    async function verify() {
+      try {
+        await checkAuth();
+      } finally {
+        if (isCurrent) {
+          setIsVerifying(false);
+        }
+      }
+    }
+
+    verify();
+
+    return () => {
+      isCurrent = false;
+    };
   }, [checkAuth]);
 
   useEffect(() => {
-    if (!isMounted) return;
+    if (!isMounted || isVerifying) return;
 
-    if (!isAuthenticated && useAuthStore.getState().status !== "loading") {
+    if (!isAuthenticated) {
       const routes = resolveTenantRouting({ pathname });
       router.push(routes.getLoginHref({ redirect: pathname }));
     }
-  }, [isMounted, isAuthenticated, pathname, router]);
+  }, [isMounted, isVerifying, isAuthenticated, pathname, router]);
 
-  if (!isMounted || (useAuthStore.getState().status === "loading" && !user)) {
+  if (!isMounted || isVerifying) {
     return (
       <div className="flex flex-col items-center justify-center min-h-[60vh] gap-3">
         <Loader2 className="w-8 h-8 animate-spin text-brand-primary" />

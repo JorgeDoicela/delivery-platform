@@ -167,12 +167,14 @@ export function StorefrontHeader() {
               >
                 {isPlatformRoot ? "Restaurantes" : "Menú & Combos"}
               </Link>
-              <Link
-                href={routes.getRastreoHref()}
-                className="hover:text-brand-primary transition-colors"
-              >
-                Rastrear Pedido
-              </Link>
+              {isAuthenticated && (
+                <Link
+                  href={routes.getRastreoHref()}
+                  className="hover:text-brand-primary transition-colors"
+                >
+                  Rastrear Pedido
+                </Link>
+              )}
             </nav>
           </div>
 
@@ -210,7 +212,10 @@ export function StorefrontHeader() {
                   <span className="absolute -top-0.5 -right-0.5 w-2 h-2 rounded-full bg-emerald-500 border border-white dark:border-neutral-900" />
                 )}
               </div>
-              <span className="text-[10px] font-semibold text-text-muted leading-none mt-1">
+              <span
+                suppressHydrationWarning
+                className="text-[10px] font-semibold text-text-muted leading-none mt-1"
+              >
                 {isAuthenticated ? "Mi Cuenta" : "Perfil"}
               </span>
             </Link>

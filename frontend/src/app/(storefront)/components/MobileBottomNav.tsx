@@ -111,17 +111,19 @@ export function MobileBottomNav() {
         </Link>
       )}
 
-      <Link
-        href={rastreoHref}
-        className={`h-full flex flex-col items-center justify-center py-1 px-2 rounded-lg text-[9px] font-bold font-display uppercase tracking-wider transition-colors min-w-[48px] ${
-          isRastreoActive
-            ? "text-brand-primary"
-            : "text-text-muted hover:text-text-strong"
-        }`}
-      >
-        <Clock className="w-[18px] h-[18px] mb-0.5" />
-        <span>Rastreo</span>
-      </Link>
+      {isAuthenticated && (
+        <Link
+          href={rastreoHref}
+          className={`h-full flex flex-col items-center justify-center py-1 px-2 rounded-lg text-[9px] font-bold font-display uppercase tracking-wider transition-colors min-w-[48px] ${
+            isRastreoActive
+              ? "text-brand-primary"
+              : "text-text-muted hover:text-text-strong"
+          }`}
+        >
+          <Clock className="w-[18px] h-[18px] mb-0.5" />
+          <span>Rastreo</span>
+        </Link>
+      )}
 
       <Link
         href={profileHref}
@@ -132,7 +134,7 @@ export function MobileBottomNav() {
         }`}
       >
         <User className="w-[18px] h-[18px] mb-0.5" />
-        <span>{isAuthenticated ? "Cuenta" : "Perfil"}</span>
+        <span suppressHydrationWarning>{isAuthenticated ? "Cuenta" : "Perfil"}</span>
       </Link>
     </nav>
   );
