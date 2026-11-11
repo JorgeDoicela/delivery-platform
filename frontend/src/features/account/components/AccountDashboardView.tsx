@@ -71,9 +71,9 @@ export function AccountDashboardView({ tenantSlug }: AccountDashboardViewProps) 
       <div className="grid grid-cols-1 lg:grid-cols-4 gap-6 lg:gap-8">
         {/* Navegación Responsive: Selector táctil en móvil, flex-wrap en tablet, Sidebar vertical en desktop */}
         <aside className="lg:col-span-1 space-y-3">
-          {/* Versión Móvil (< 640px): Selector desplegable 100% responsive sin scroll horizontal */}
-          <div className="sm:hidden">
-            <div className="relative">
+          {/* Versión Móvil (< 640px): Selector desplegable 100% responsive y botón Salir */}
+          <div className="sm:hidden flex items-center gap-2">
+            <div className="relative flex-1">
               <label htmlFor="account-tab-select" className="sr-only">
                 Sección de tu cuenta
               </label>
@@ -112,30 +112,52 @@ export function AccountDashboardView({ tenantSlug }: AccountDashboardViewProps) 
                 ))}
               </select>
             </div>
+
+            <button
+              type="button"
+              onClick={handleLogout}
+              title="Cerrar sesión"
+              aria-label="Cerrar sesión"
+              className="h-[56px] px-3.5 flex items-center justify-center gap-1.5 bg-surface-card border border-surface-border rounded-2xl text-text-muted hover:text-brand-primary active:scale-95 transition-all shrink-0 shadow-xs cursor-pointer"
+            >
+              <LogOut className="w-4 h-4 text-brand-primary" />
+              <span className="text-[10px] font-black uppercase tracking-wider font-display">Salir</span>
+            </button>
           </div>
 
-          {/* Versión Tablet (640px a 1024px): Píldoras con wrap automático sin scroll horizontal */}
-          <nav className="hidden sm:flex lg:hidden flex-wrap gap-2">
-            {TABS.map((tab) => {
-              const Icon = tab.icon;
-              const isActive = activeTab === tab.id;
+          {/* Versión Tablet (640px a 1024px): Píldoras con wrap automático y botón Cerrar Sesión */}
+          <nav className="hidden sm:flex lg:hidden flex-wrap items-center justify-between gap-2">
+            <div className="flex flex-wrap gap-2 flex-1">
+              {TABS.map((tab) => {
+                const Icon = tab.icon;
+                const isActive = activeTab === tab.id;
 
-              return (
-                <button
-                  key={tab.id}
-                  type="button"
-                  onClick={() => setActiveTab(tab.id)}
-                  className={`inline-flex items-center gap-2 px-4 py-2.5 rounded-full text-xs font-bold transition-all min-h-[44px] cursor-pointer ${
-                    isActive
-                      ? "bg-brand-primary text-white shadow-xs font-display uppercase tracking-wider"
-                      : "bg-surface-card border border-surface-border text-text-strong hover:bg-surface-canvas active:scale-95"
-                  }`}
-                >
-                  <Icon className="w-3.5 h-3.5 shrink-0" />
-                  <span>{tab.label}</span>
-                </button>
-              );
-            })}
+                return (
+                  <button
+                    key={tab.id}
+                    type="button"
+                    onClick={() => setActiveTab(tab.id)}
+                    className={`inline-flex items-center gap-2 px-4 py-2.5 rounded-full text-xs font-bold transition-all min-h-[44px] cursor-pointer ${
+                      isActive
+                        ? "bg-brand-primary text-white shadow-xs font-display uppercase tracking-wider"
+                        : "bg-surface-card border border-surface-border text-text-strong hover:bg-surface-canvas active:scale-95"
+                    }`}
+                  >
+                    <Icon className="w-3.5 h-3.5 shrink-0" />
+                    <span>{tab.label}</span>
+                  </button>
+                );
+              })}
+            </div>
+
+            <button
+              type="button"
+              onClick={handleLogout}
+              className="inline-flex items-center gap-2 px-4 py-2.5 rounded-full text-xs font-bold bg-surface-card border border-surface-border text-text-muted hover:text-brand-primary hover:bg-surface-canvas active:scale-95 transition-all min-h-[44px] cursor-pointer shrink-0"
+            >
+              <LogOut className="w-3.5 h-3.5 text-brand-primary shrink-0" />
+              <span>Cerrar Sesión</span>
+            </button>
           </nav>
 
           {/* Versión Desktop (>= 1024px): Menú lateral estructurado */}
@@ -182,12 +204,24 @@ export function AccountDashboardView({ tenantSlug }: AccountDashboardViewProps) 
         </aside>
 
         {/* Panel Central Dinámico */}
-        <main className="lg:col-span-3">
+        <main className="lg:col-span-3 space-y-6">
           {activeTab === "perfil" && <AccountProfileSection />}
           {activeTab === "pedidos" && <AccountOrdersSection />}
           {activeTab === "direcciones" && <AccountAddressesSection />}
           {activeTab === "privacidad" && <AccountPrivacySection />}
           {activeTab === "seguridad" && <AccountSecuritySection />}
+
+          {/* Botón de Cierre de Sesión visible al final en Móvil y Tablet */}
+          <div className="pt-6 border-t border-surface-border lg:hidden flex justify-center">
+            <button
+              type="button"
+              onClick={handleLogout}
+              className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-6 py-3.5 rounded-2xl bg-surface-card border border-surface-border text-xs font-bold uppercase tracking-wider font-display text-text-muted hover:text-brand-primary hover:bg-surface-canvas active:scale-95 transition-all min-h-[48px] shadow-xs cursor-pointer"
+            >
+              <LogOut className="w-4 h-4 text-brand-primary" />
+              <span>Cerrar Sesión</span>
+            </button>
+          </div>
         </main>
       </div>
     </div>
