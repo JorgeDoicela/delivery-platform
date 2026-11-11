@@ -1,6 +1,7 @@
 import { create } from "zustand";
 import { persist, createJSONStorage } from "zustand/middleware";
 import { authApi } from "../api/authApi";
+import { isJwtExpired } from "@/shared/lib/jwt";
 import {
   setApiClientAccessToken,
   setApiClientTenantSlug,
@@ -309,9 +310,9 @@ export const useAuthStore = create<AuthStore>()(
           }
         }
 
-        // 1. Si ya tiene accessToken en memoria y usuario activo, la sesión es válida
+        // 1. Si ya tiene accessToken en memoria y usuario activo, y NO está expirado, la sesión es válida
         const currentToken = get().accessToken;
-        if (currentToken && get().user) {
+        if (currentToken && get().user && !isJwtExpired(currentToken)) {
           setApiClientAccessToken(currentToken);
           return true;
         }

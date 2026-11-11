@@ -3,6 +3,7 @@
 import React, { useState, useRef } from "react";
 import { X, Loader2, Image as ImageIcon, Upload } from "lucide-react";
 import { apiClient } from "@/shared/lib/api-client";
+import { Select, type SelectOption } from "@/shared/components/Select";
 import { useTenantStore } from "@/features/tenant/store/useTenantStore";
 import type { MenuProductDto, UpsertProductCommand } from "@/shared/types/api";
 
@@ -38,6 +39,17 @@ const PRESET_PRODUCT_IMAGES = [
   {
     label: "Especialidad Brasa (/images/tenants/la-granjita/banners/hero-pollo-brasa.jpg)",
     value: "/images/tenants/la-granjita/banners/hero-pollo-brasa.jpg",
+  },
+];
+
+const GALLERY_SELECT_OPTIONS: SelectOption[] = [
+  ...PRESET_PRODUCT_IMAGES.map((img) => ({
+    label: img.label,
+    value: img.value,
+  })),
+  {
+    label: "URL Personalizada Externa / Propia",
+    value: "custom",
   },
 ];
 
@@ -284,25 +296,17 @@ export function ProductFormModal({
             </div>
 
             <div>
-              <label className="block text-[11px] font-bold uppercase tracking-wider text-text-muted mb-1">
-                Seleccionar de Galería Local o Usar URL Propia
-              </label>
-              <select
+              <Select
+                label="Seleccionar de Galería Local o Usar URL Propia"
+                options={GALLERY_SELECT_OPTIONS}
                 value={isPresetImage ? form.imageUrl : "custom"}
-                onChange={(e) => {
-                  if (e.target.value !== "custom") {
-                    setForm({ ...form, imageUrl: e.target.value });
+                onChange={(val) => {
+                  if (val !== "custom") {
+                    setForm({ ...form, imageUrl: val });
                   }
                 }}
-                className={inputClass}
-              >
-                {PRESET_PRODUCT_IMAGES.map((item) => (
-                  <option key={item.value} value={item.value}>
-                    {item.label}
-                  </option>
-                ))}
-                <option value="custom">URL Personalizada Externa / Propia</option>
-              </select>
+                size="sm"
+              />
             </div>
 
             <div>

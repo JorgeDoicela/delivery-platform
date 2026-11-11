@@ -1,7 +1,23 @@
 import React, { useRef, useState } from "react";
 import { Upload, Loader2 } from "lucide-react";
+import { Select, type SelectOption } from "@/shared/components/Select";
 import { useTenantStore } from "@/features/tenant/store/useTenantStore";
 import type { UpdateTenantStorefrontCommand } from "@/shared/types/api";
+
+const LANDING_LAYOUT_OPTIONS: SelectOption[] = [
+  {
+    value: "asadero-clasico",
+    label: "Asadero Clásico (Slider Panorámico + Combos Asador)",
+  },
+  {
+    value: "steakhouse-gourmet",
+    label: "Steakhouse Gourmet (Cortes Angus + Cámara de Maduración)",
+  },
+  {
+    value: "fast-casual-urbano",
+    label: "Fast-Casual Urbano (Hero Dividido + Vitrina Moderna)",
+  },
+];
 
 interface StorefrontBrandingSectionProps {
   formState: UpdateTenantStorefrontCommand;
@@ -294,26 +310,15 @@ export function StorefrontBrandingSection({
 
           <div className="pt-3 border-t border-surface-border space-y-3">
             <div>
-              <label className="block text-[11px] font-bold uppercase tracking-wider text-text-muted mb-1.5">
-                Plantilla de Estructura de Landing
-              </label>
-              <select
+              <Select
+                label="Plantilla de Estructura de Landing"
+                options={LANDING_LAYOUT_OPTIONS}
                 value={formState.landingLayoutTemplate ?? "asadero-clasico"}
-                onChange={(e) =>
-                  onFieldChange("landingLayoutTemplate", e.target.value)
+                onChange={(val) =>
+                  onFieldChange("landingLayoutTemplate", val)
                 }
-                className="w-full px-3 py-2 rounded-xl bg-surface-canvas border border-surface-border text-text-strong font-bold text-xs focus:outline-none focus:border-brand-primary cursor-pointer"
-              >
-                <option value="asadero-clasico">
-                  Asadero Clásico (Slider Panorámico + Combos Asador)
-                </option>
-                <option value="steakhouse-gourmet">
-                  Steakhouse Gourmet (Cortes Angus + Cámara de Maduración)
-                </option>
-                <option value="fast-casual-urbano">
-                  Fast-Casual Urbano (Hero Dividido + Vitrina Moderna)
-                </option>
-              </select>
+                size="sm"
+              />
             </div>
 
             <label className="flex items-center gap-2.5 cursor-pointer text-text-base">

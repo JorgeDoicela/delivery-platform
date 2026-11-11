@@ -53,6 +53,8 @@ async function handleAuthResponse<T>(response: Response): Promise<T> {
   return response.json();
 }
 
+let inFlightRefreshPromise: Promise<RefreshTokenResponse> | null = null;
+
 export const authApi = {
   async login(credentials: LoginFormData): Promise<LoginResponse> {
     const tenantSlug = getApiClientTenantSlug();
@@ -97,17 +99,29 @@ export const authApi = {
   },
 
   async refresh(): Promise<RefreshTokenResponse> {
-    const tenantSlug = getApiClientTenantSlug();
-    const res = await fetch(`${getApiBaseUrl()}/api/v1/auth/refresh`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        ...(tenantSlug ? { "X-Tenant-Slug": tenantSlug } : {}),
-      },
-      credentials: "include",
-      body: JSON.stringify({}),
-    });
-    return handleAuthResponse<RefreshTokenResponse>(res);
+    if (inFlightRefreshPromise) {
+      return inFlightRefreshPromise;
+    }
+
+    inFlightRefreshPromise = (async () => {
+      try {
+        const tenantSlug = getApiClientTenantSlug();
+        const res = await fetch(`${getApiBaseUrl()}/api/v1/auth/refresh`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            ...(tenantSlug ? { "X-Tenant-Slug": tenantSlug } : {}),
+          },
+          credentials: "include",
+          body: JSON.stringify({}),
+        });
+        return await handleAuthResponse<RefreshTokenResponse>(res);
+      } finally {
+        inFlightRefreshPromise = null;
+      }
+    })();
+
+    return inFlightRefreshPromise;
   },
 
   async getCurrentUser(accessToken?: string | null): Promise<AuthUser> {

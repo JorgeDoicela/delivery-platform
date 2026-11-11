@@ -2,6 +2,7 @@
 
 import React, { useState } from "react";
 import { X, Loader2 } from "lucide-react";
+import { Select, type SelectOption } from "@/shared/components/Select";
 import type { CreateTenantCommand } from "@/shared/types/api";
 import { useCreateTenantMutation } from "../hooks/useTenantQueries";
 import { RESERVED_TENANT_SLUGS } from "../constants";
@@ -35,6 +36,12 @@ const INITIAL_FORM: CreateTenantCommand = {
   heroBannerImageUrl: "/images/shared/placeholders/dish-default.webp",
   customDomain: "",
 };
+
+const LANDING_TEMPLATE_OPTIONS: SelectOption[] = [
+  { value: "asadero-clasico", label: "Asadero Clásico (Retail Claro)" },
+  { value: "steakhouse-gourmet", label: "Steakhouse Gourmet (Parrilla Nocturna)" },
+  { value: "fast-casual-urbano", label: "Fast-Casual Urbano (Split Hero Moderno)" },
+];
 
 export function CreateTenantModal({
   isOpen,
@@ -298,18 +305,13 @@ export function CreateTenantModal({
               </div>
 
               <div>
-                <label className="block text-[11px] font-bold uppercase tracking-wider text-text-muted mb-1">
-                  Plantilla Visual de Landing
-                </label>
-                <select
+                <Select
+                  label="Plantilla Visual de Landing"
+                  options={LANDING_TEMPLATE_OPTIONS}
                   value={form.landingLayoutTemplate || "asadero-clasico"}
-                  onChange={(e) => setForm({ ...form, landingLayoutTemplate: e.target.value })}
-                  className="w-full px-3.5 py-2.5 rounded-xl bg-surface-canvas border border-surface-border text-xs font-bold text-text-strong focus:outline-none focus:border-brand-primary focus:bg-surface-card"
-                >
-                  <option value="asadero-clasico">Asadero Clásico (Retail Claro)</option>
-                  <option value="steakhouse-gourmet">Steakhouse Gourmet (Parrilla Nocturna)</option>
-                  <option value="fast-casual-urbano">Fast-Casual Urbano (Split Hero Moderno)</option>
-                </select>
+                  onChange={(val) => setForm({ ...form, landingLayoutTemplate: val })}
+                  size="md"
+                />
               </div>
 
               <div>

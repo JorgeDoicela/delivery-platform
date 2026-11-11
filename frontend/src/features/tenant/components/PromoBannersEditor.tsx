@@ -3,6 +3,30 @@
 import React from "react";
 import type { TenantPromoBanner } from "@/shared/types/api";
 import { Plus, Trash2 } from "lucide-react";
+import { Select, type SelectOption } from "@/shared/components/Select";
+
+const PROMO_GALLERY_OPTIONS: SelectOption[] = [
+  {
+    value: "/images/tenants/la-granjita/banners/promo-receta-tradicional.jpg",
+    label: "Receta Tradicional",
+  },
+  {
+    value: "/images/tenants/la-granjita/banners/promo-hecho-a-la-brasa.jpg",
+    label: "Fuego y Brasa",
+  },
+  {
+    value: "/images/tenants/la-granjita/banners/hero-pollo-brasa.jpg",
+    label: "Especialidad al Carbón",
+  },
+  {
+    value: "/images/tenants/la-granjita/banners/hero-combo-familiar.jpg",
+    label: "Combo Familiar",
+  },
+  {
+    value: "custom",
+    label: "URL Personalizada",
+  },
+];
 
 interface PromoBannersEditorProps {
   banners: TenantPromoBanner[];
@@ -154,41 +178,21 @@ export function PromoBannersEditor({
                   </div>
 
                   <div>
-                    <label className="block text-[11px] font-bold uppercase tracking-wider text-text-muted mb-1">
-                      Galería Rápida
-                    </label>
-                    <select
+                    <Select
+                      label="Galería Rápida"
+                      options={PROMO_GALLERY_OPTIONS}
                       value={
-                        [
-                          "/images/tenants/la-granjita/banners/promo-receta-tradicional.jpg",
-                          "/images/tenants/la-granjita/banners/promo-hecho-a-la-brasa.jpg",
-                          "/images/tenants/la-granjita/banners/hero-pollo-brasa.jpg",
-                          "/images/tenants/la-granjita/banners/hero-combo-familiar.jpg",
-                        ].includes(banner.imageUrl)
+                        PROMO_GALLERY_OPTIONS.some((opt) => opt.value === banner.imageUrl)
                           ? banner.imageUrl
                           : "custom"
                       }
-                      onChange={(e) => {
-                        if (e.target.value !== "custom") {
-                          handleUpdateBanner(idx, { imageUrl: e.target.value });
+                      onChange={(val) => {
+                        if (val !== "custom") {
+                          handleUpdateBanner(idx, { imageUrl: val });
                         }
                       }}
-                      className={inputClass}
-                    >
-                      <option value="/images/tenants/la-granjita/banners/promo-receta-tradicional.jpg">
-                        Receta Tradicional
-                      </option>
-                      <option value="/images/tenants/la-granjita/banners/promo-hecho-a-la-brasa.jpg">
-                        Fuego y Brasa
-                      </option>
-                      <option value="/images/tenants/la-granjita/banners/hero-pollo-brasa.jpg">
-                        Especialidad al Carbón
-                      </option>
-                      <option value="/images/tenants/la-granjita/banners/hero-combo-familiar.jpg">
-                        Combo Familiar
-                      </option>
-                      <option value="custom">URL Personalizada</option>
-                    </select>
+                      size="sm"
+                    />
                   </div>
                 </div>
 

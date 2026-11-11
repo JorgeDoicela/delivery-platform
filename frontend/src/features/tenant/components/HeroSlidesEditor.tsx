@@ -3,6 +3,38 @@
 import React from "react";
 import type { TenantHeroSlide } from "@/shared/types/api";
 import { Plus, Trash2 } from "lucide-react";
+import { Select, type SelectOption } from "@/shared/components/Select";
+
+const HERO_GALLERY_OPTIONS: SelectOption[] = [
+  {
+    value: "/images/tenants/la-granjita/banners/hero-pollo-brasa.jpg",
+    label: "Brasa & Asador (/images/tenants/la-granjita/banners/hero-pollo-brasa.jpg)",
+  },
+  {
+    value: "/images/tenants/la-granjita/banners/hero-combo-familiar.jpg",
+    label: "Banquete Familiar (/images/tenants/la-granjita/banners/hero-combo-familiar.jpg)",
+  },
+  {
+    value: "/images/tenants/la-granjita/banners/hero-combo-personal.jpg",
+    label: "Especial Personal (/images/tenants/la-granjita/banners/hero-combo-personal.jpg)",
+  },
+  {
+    value: "/images/tenants/brasas-del-valle/banners/promo-hecho-a-la-brasa.jpg",
+    label: "Horno & Fuego (/images/tenants/brasas-del-valle/banners/promo-hecho-a-la-brasa.jpg)",
+  },
+  {
+    value: "/images/tenants/brasas-del-valle/banners/promo-receta-tradicional.jpg",
+    label: "Mesa Familiar (/images/tenants/brasas-del-valle/banners/promo-receta-tradicional.jpg)",
+  },
+  {
+    value: "/images/platform/hero-platform.jpg",
+    label: "Portada Plataforma (/images/platform/hero-platform.jpg)",
+  },
+  {
+    value: "custom",
+    label: "URL Personalizada Externa / Propia",
+  },
+];
 
 interface HeroSlidesEditorProps {
   slides: TenantHeroSlide[];
@@ -178,49 +210,21 @@ export function HeroSlidesEditor({ slides, onChange }: HeroSlidesEditorProps) {
                 </div>
 
                 <div>
-                  <label className="block text-[11px] font-bold uppercase tracking-wider text-text-muted mb-1">
-                    Galería Rápida de Portada
-                  </label>
-                  <select
+                  <Select
+                    label="Galería Rápida de Portada"
+                    options={HERO_GALLERY_OPTIONS}
                     value={
-                      [
-                        "/images/tenants/la-granjita/banners/hero-pollo-brasa.jpg",
-                        "/images/tenants/la-granjita/banners/hero-combo-familiar.jpg",
-                        "/images/tenants/la-granjita/banners/hero-combo-personal.jpg",
-                        "/images/tenants/brasas-del-valle/banners/promo-hecho-a-la-brasa.jpg",
-                        "/images/tenants/brasas-del-valle/banners/promo-receta-tradicional.jpg",
-                        "/images/platform/hero-platform.jpg",
-                      ].includes(slide.imageUrl)
+                      HERO_GALLERY_OPTIONS.some((opt) => opt.value === slide.imageUrl)
                         ? slide.imageUrl
                         : "custom"
                     }
-                    onChange={(e) => {
-                      if (e.target.value !== "custom") {
-                        handleUpdateSlide(idx, { imageUrl: e.target.value });
+                    onChange={(val) => {
+                      if (val !== "custom") {
+                        handleUpdateSlide(idx, { imageUrl: val });
                       }
                     }}
-                    className={inputClass}
-                  >
-                    <option value="/images/tenants/la-granjita/banners/hero-pollo-brasa.jpg">
-                      Brasa & Asador (/images/tenants/la-granjita/banners/hero-pollo-brasa.jpg)
-                    </option>
-                    <option value="/images/tenants/la-granjita/banners/hero-combo-familiar.jpg">
-                      Banquete Familiar (/images/tenants/la-granjita/banners/hero-combo-familiar.jpg)
-                    </option>
-                    <option value="/images/tenants/la-granjita/banners/hero-combo-personal.jpg">
-                      Especial Personal (/images/tenants/la-granjita/banners/hero-combo-personal.jpg)
-                    </option>
-                    <option value="/images/tenants/brasas-del-valle/banners/promo-hecho-a-la-brasa.jpg">
-                      Horno & Fuego (/images/tenants/brasas-del-valle/banners/promo-hecho-a-la-brasa.jpg)
-                    </option>
-                    <option value="/images/tenants/brasas-del-valle/banners/promo-receta-tradicional.jpg">
-                      Mesa Familiar (/images/tenants/brasas-del-valle/banners/promo-receta-tradicional.jpg)
-                    </option>
-                    <option value="/images/platform/hero-platform.jpg">
-                      Portada Plataforma (/images/platform/hero-platform.jpg)
-                    </option>
-                    <option value="custom">URL Personalizada Externa / Propia</option>
-                  </select>
+                    size="sm"
+                  />
                 </div>
 
                 <div className="sm:col-span-3">

@@ -4,6 +4,8 @@ import {
   getApiClientAccessToken,
   getApiClientTenantSlug,
 } from "@/shared/lib/api-client";
+import { isJwtExpired } from "@/shared/lib/jwt";
+import { useAuthStore } from "@/features/auth/store/useAuthStore";
 import type {
   AccountProfile,
   AccountAddress,
@@ -14,10 +16,12 @@ import type {
   UpdateConsentPayload,
 } from "../types";
 
-function buildHeaders(extra?: HeadersInit): HeadersInit {
-  const headers: Record<string, string> = {
-    "Content-Type": "application/json",
-  };
+function buildHeaders(extra?: HeadersInit, isFormData = false): HeadersInit {
+  const headers: Record<string, string> = {};
+
+  if (!isFormData) {
+    headers["Content-Type"] = "application/json";
+  }
 
   const slug = getApiClientTenantSlug();
   if (slug) {
@@ -30,6 +34,47 @@ function buildHeaders(extra?: HeadersInit): HeadersInit {
   }
 
   return { ...headers, ...extra };
+}
+
+async function fetchAccountWithAuth(
+  endpoint: string,
+  init?: RequestInit,
+  isFormData = false
+): Promise<Response> {
+  const url = `${getApiBaseUrl()}${endpoint}`;
+
+  // 1. Si el token actual está expirado, refrescar proactivamente antes de enviar la petición
+  const token = getApiClientAccessToken();
+  if (token && isJwtExpired(token)) {
+    try {
+      await useAuthStore.getState().checkAuth();
+    } catch {
+      // Continuar y permitir que la petición proceda o capture el 401
+    }
+  }
+
+  // 2. Ejecutar petición inicial
+  let res = await fetch(url, {
+    ...init,
+    headers: buildHeaders(init?.headers, isFormData),
+    credentials: "include",
+  });
+
+  // 3. Si el servidor retorna 401 Unauthorized, reintentar silenciosamente tras refrescar la sesión
+  if (res.status === 401) {
+    const refreshed = await useAuthStore.getState().checkAuth();
+    if (refreshed) {
+      res = await fetch(url, {
+        ...init,
+        headers: buildHeaders(init?.headers, isFormData),
+        credentials: "include",
+      });
+    } else {
+      await useAuthStore.getState().logout();
+    }
+  }
+
+  return res;
 }
 
 async function handleAccountResponse<T>(res: Response): Promise<T> {
@@ -62,19 +107,15 @@ async function handleAccountResponse<T>(res: Response): Promise<T> {
 
 export const accountApi = {
   async getProfile(): Promise<AccountProfile> {
-    const res = await fetch(`${getApiBaseUrl()}/api/v1/account/profile`, {
+    const res = await fetchAccountWithAuth("/api/v1/account/profile", {
       method: "GET",
-      headers: buildHeaders(),
-      credentials: "include",
     });
     return handleAccountResponse<AccountProfile>(res);
   },
 
   async updateProfile(payload: UpdateProfilePayload): Promise<AccountProfile> {
-    const res = await fetch(`${getApiBaseUrl()}/api/v1/account/profile`, {
+    const res = await fetchAccountWithAuth("/api/v1/account/profile", {
       method: "PUT",
-      headers: buildHeaders(),
-      credentials: "include",
       body: JSON.stringify(payload),
     });
     return handleAccountResponse<AccountProfile>(res);
@@ -86,59 +127,47 @@ export const accountApi = {
     if (params?.pageSize) query.set("pageSize", params.pageSize.toString());
     if (params?.status) query.set("status", params.status);
     const qs = query.toString();
-    const url = `${getApiEndOrdersUrl()}${qs ? `?${qs}` : ""}`;
-    const res = await fetch(url, {
+    const endpoint = `/api/v1/account/orders${qs ? `?${qs}` : ""}`;
+    const res = await fetchAccountWithAuth(endpoint, {
       method: "GET",
-      headers: buildHeaders(),
-      credentials: "include",
     });
     return handleAccountResponse<GetMyOrdersResponse>(res);
   },
 
   async getAddresses(): Promise<AccountAddress[]> {
-    const res = await fetch(`${getApiBaseUrl()}/api/v1/account/addresses`, {
+    const res = await fetchAccountWithAuth("/api/v1/account/addresses", {
       method: "GET",
-      headers: buildHeaders(),
-      credentials: "include",
     });
     return handleAccountResponse<AccountAddress[]>(res);
   },
 
   async upsertAddress(payload: UpsertAddressPayload): Promise<AccountAddress> {
-    const res = await fetch(`${getApiBaseUrl()}/api/v1/account/addresses`, {
+    const res = await fetchAccountWithAuth("/api/v1/account/addresses", {
       method: "POST",
-      headers: buildHeaders(),
-      credentials: "include",
       body: JSON.stringify(payload),
     });
     return handleAccountResponse<AccountAddress>(res);
   },
 
   async deleteAddress(id: string): Promise<boolean> {
-    const res = await fetch(`${getApiBaseUrl()}/api/v1/account/addresses/${encodeURIComponent(id)}`, {
+    const res = await fetchAccountWithAuth(`/api/v1/account/addresses/${encodeURIComponent(id)}`, {
       method: "DELETE",
-      headers: buildHeaders(),
-      credentials: "include",
     });
     await handleAccountResponse<unknown>(res);
     return true;
   },
 
   async changePassword(payload: ChangePasswordPayload): Promise<boolean> {
-    const res = await fetch(`${getApiBaseUrl()}/api/v1/account/change-password`, {
+    const res = await fetchAccountWithAuth("/api/v1/account/change-password", {
       method: "POST",
-      headers: buildHeaders(),
-      credentials: "include",
       body: JSON.stringify(payload),
     });
     return handleAccountResponse<boolean>(res);
   },
 
   async updateConsent(payload: UpdateConsentPayload): Promise<boolean> {
-    const res = await fetch(`${getApiBaseUrl()}/api/v1/account/privacy`, {
+    const res = await fetchAccountWithAuth("/api/v1/account/privacy", {
       method: "PUT",
-      headers: buildHeaders(),
-      credentials: "include",
       body: JSON.stringify(payload),
     });
     return handleAccountResponse<boolean>(res);
@@ -148,37 +177,23 @@ export const accountApi = {
     const formData = new FormData();
     formData.append("file", file);
 
-    const headers: Record<string, string> = {};
-    const token = getApiClientAccessToken();
-    if (token) {
-      headers["Authorization"] = `Bearer ${token}`;
-    }
-    const slug = getApiClientTenantSlug();
-    if (slug) {
-      headers["X-Tenant-Slug"] = slug;
-    }
-
-    const res = await fetch(`${getApiBaseUrl()}/api/v1/account/avatar`, {
-      method: "POST",
-      headers,
-      credentials: "include",
-      body: formData,
-    });
+    const res = await fetchAccountWithAuth(
+      "/api/v1/account/avatar",
+      {
+        method: "POST",
+        body: formData,
+      },
+      true
+    );
     return handleAccountResponse<{ avatarUrl: string }>(res);
   },
 
   async deleteAvatar(): Promise<boolean> {
-    const res = await fetch(`${getApiBaseUrl()}/api/v1/account/avatar`, {
+    const res = await fetchAccountWithAuth("/api/v1/account/avatar", {
       method: "DELETE",
-      headers: buildHeaders(),
-      credentials: "include",
     });
     await handleAccountResponse<unknown>(res);
     return true;
   },
 };
-
-function getApiEndOrdersUrl(): string {
-  return `${getApiBaseUrl()}/api/v1/account/orders`;
-}
 

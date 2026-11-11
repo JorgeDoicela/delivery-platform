@@ -6,6 +6,7 @@ import { KitchenTicketCard } from "./KitchenTicketCard";
 import { OrderStatus } from "@/shared/types/api";
 import { Volume2, Building2 } from "lucide-react";
 import { kitchenAlertSound } from "../lib/sound";
+import { Select, type SelectOption } from "@/shared/components/Select";
 import { useBranchesQuery, useCurrentTenantQuery } from "@/features/tenant";
 import { useAuthStore, UserRole } from "@/features/auth";
 
@@ -22,6 +23,15 @@ export function KitchenView() {
   const branches = useMemo(
     () => branchesData ?? tenant?.branches ?? [],
     [branchesData, tenant?.branches]
+  );
+
+  const branchOptions = useMemo<SelectOption<number>[]>(
+    () =>
+      branches.map((b) => ({
+        value: b.id,
+        label: b.name,
+      })),
+    [branches]
   );
 
   const user = useAuthStore((s) => s.user);
@@ -81,24 +91,16 @@ export function KitchenView() {
               </span>
             </div>
           ) : (
-            <div className="flex items-center gap-1.5 bg-surface-card border border-surface-border rounded-full px-3.5 py-1.5 shadow-xs">
-              <Building2 className="h-4 w-4 text-brand-primary" />
-              <select
-                value={branchId}
-                onChange={(e) => setSelectedBranchId(Number(e.target.value))}
-                className="bg-transparent text-xs text-text-strong font-bold uppercase tracking-wider focus:outline-none cursor-pointer"
-              >
-                {branches.map((branch) => (
-                  <option
-                    key={branch.id}
-                    value={branch.id}
-                    className="bg-surface-card text-text-strong"
-                  >
-                    {branch.name}
-                  </option>
-                ))}
-              </select>
-            </div>
+            <Select<number>
+              options={branchOptions}
+              value={branchId}
+              onChange={(val) => setSelectedBranchId(Number(val))}
+              size="sm"
+              leftIcon={Building2}
+              variant="surface"
+              className="w-auto min-w-[170px]"
+              triggerClassName="!rounded-full !py-1.5 !px-3.5 shadow-xs font-bold uppercase tracking-wider text-xs"
+            />
           )}
 
           <button

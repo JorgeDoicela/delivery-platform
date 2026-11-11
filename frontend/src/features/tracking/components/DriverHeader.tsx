@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import { Bike, Car, CheckCircle2, PauseCircle, DollarSign, Package, Building2 } from 'lucide-react';
 import { DriverProfileResponse, DriverShiftSummaryDto } from '@/shared/types/api';
+import { Select, type SelectOption } from '@/shared/components/Select';
 import { useBranchesQuery, useCurrentTenantQuery } from '@/features/tenant';
 import { useDriverStore } from '../store/useDriverStore';
 import type { DriverConnectionStatus } from '../hooks/useDriverHub';
@@ -40,6 +41,14 @@ export function DriverHeader({
   const selectedBranchId = useDriverStore((s) => s.selectedBranchId);
   const setSelectedBranchId = useDriverStore((s) => s.setSelectedBranchId);
 
+  const branchOptions: SelectOption<string>[] = [
+    { value: "", label: "Todas las sucursales" },
+    ...branches.map((b) => ({
+      value: String(b.id),
+      label: b.name,
+    })),
+  ];
+
   return (
     <div className="bg-surface-card border border-surface-border rounded-3xl p-4 sm:p-5 shadow-xs transition-colors duration-200 space-y-3.5">
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
@@ -62,23 +71,19 @@ export function DriverHeader({
 
             {branches.length > 1 ? (
               <div className="flex items-center gap-1.5 mt-1">
-                <Building2 className="w-3.5 h-3.5 text-brand-primary shrink-0" />
-                <select
-                  value={selectedBranchId ?? ""}
-                  onChange={(e) => {
-                    const val = e.target.value ? Number(e.target.value) : null;
-                    setSelectedBranchId(val);
+                <Select<string>
+                  options={branchOptions}
+                  value={selectedBranchId ? String(selectedBranchId) : ""}
+                  onChange={(val) => {
+                    const parsed = val ? Number(val) : null;
+                    setSelectedBranchId(parsed);
                   }}
+                  size="sm"
+                  leftIcon={Building2}
+                  className="w-auto min-w-[150px] max-w-[220px]"
+                  triggerClassName="!min-h-[30px] !py-0.5 !px-2.5 !rounded-full !text-[11px] font-bold uppercase tracking-wider"
                   aria-label="Filtrar pedidos por sucursal"
-                  className="bg-surface-canvas border border-surface-border text-text-strong rounded-full px-2.5 py-0.5 text-[11px] font-bold uppercase tracking-wider focus:outline-none cursor-pointer max-w-[160px] sm:max-w-[200px] truncate"
-                >
-                  <option value="">Todas las sucursales</option>
-                  {branches.map((b) => (
-                    <option key={b.id} value={b.id}>
-                      {b.name}
-                    </option>
-                  ))}
-                </select>
+                />
                 <span className="text-text-muted text-[10px]">•</span>
                 <span className="text-[11px] text-text-muted font-mono">{profile?.vehicleType || 'MOTO'}</span>
               </div>
