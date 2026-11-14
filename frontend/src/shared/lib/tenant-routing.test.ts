@@ -20,8 +20,10 @@ describe("resolveTenantRouting", () => {
       expect(routes.getLoginHref()).toBe("/la-granjita/login");
       expect(routes.getRegisterHref()).toBe("/la-granjita/login?tab=register");
       expect(routes.getCheckoutHref()).toBe("/la-granjita/checkout");
-      expect(routes.getRastreoHref()).toBe("/la-granjita/rastreo");
-      expect(routes.getRastreoHref("orden-123")).toBe("/la-granjita/rastreo/orden-123");
+      expect(routes.getPedidosHref()).toBe("/la-granjita/pedidos");
+      expect(routes.getPedidosHref("orden-123")).toBe("/la-granjita/pedidos/orden-123");
+      expect(routes.getRastreoHref()).toBe("/la-granjita/pedidos");
+      expect(routes.getRastreoHref("orden-123")).toBe("/la-granjita/pedidos/orden-123");
       expect(routes.getSucursalesHref()).toBe("/la-granjita/sucursales");
       expect(routes.getSucursalesHref(2)).toBe("/la-granjita/sucursal/2");
       expect(routes.getKitchenHref()).toBe("/la-granjita/cocina");
@@ -91,8 +93,10 @@ describe("resolveTenantRouting", () => {
       expect(routes.getLoginHref()).toBe("/login");
       expect(routes.getRegisterHref()).toBe("/login?tab=register");
       expect(routes.getCheckoutHref()).toBe("/checkout");
-      expect(routes.getRastreoHref()).toBe("/rastreo");
-      expect(routes.getRastreoHref("abc")).toBe("/rastreo/abc");
+      expect(routes.getPedidosHref()).toBe("/pedidos");
+      expect(routes.getPedidosHref("abc")).toBe("/pedidos/abc");
+      expect(routes.getRastreoHref()).toBe("/pedidos");
+      expect(routes.getRastreoHref("abc")).toBe("/pedidos/abc");
       expect(routes.getSucursalesHref()).toBe("/sucursales");
       expect(routes.getSucursalesHref(1)).toBe("/sucursal/1");
       expect(routes.getKitchenHref()).toBe("/cocina");

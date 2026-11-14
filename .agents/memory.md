@@ -27,11 +27,12 @@
 * **Motor Centralizado de Enrutamiento (`resolveTenantRouting` / `useTenantRoutes`):**
   - Ubicado en `frontend/src/shared/lib/tenant-routing.ts`. Provee una única fuente de verdad para generar URLs en todos los contextos: vitrina, login, registro, checkout, rastreo de pedidos, sucursales, terminales KDS, repartidores y paneles administrativos.
   - Prioridad determinística de resolución de slug: `explicitSlug` > `pathSlug` (segmento de ruta `/[slug]`) > `subdomain` (si el host pertenece a dominios base de la plataforma) > `storeSlug` (store Zustand) > fallback `DEFAULT_TENANT_SLUG`.
-* **Soporte Nativo de 4 Contextos de Red:**
-  1. *Host de Plataforma con Prefijo (`localhost:3005/[slug]`, `mesafy.com/[slug]`):* Vitrina y rutas operativas bajo `/[slug]` (`/[slug]/login`, `/[slug]/checkout`, `/[slug]/cocina`, `/[slug]/repartidor`, `/[slug]/admin/*`). La raíz `/` es el portal global multimarca `PlatformLandingView`.
-  2. *Dominio Propio / Custom Domain (`pedidos.lagranjita.com`, `mirestaurante.ec`):* Rutas limpias sin prefijos redundantes (`/login`, `/rastreo`, `/checkout`, `/cocina`). El cliente HTTP añade la cabecera `X-Tenant-Domain`.
+* **Soporte Nativo de Contextos de Red y Rutas de Pedidos:**
+  1. *Host de Plataforma con Prefijo (`localhost:3005/[slug]`, `mesafy.com/[slug]`):* Vitrina y rutas operativas bajo `/[slug]` (`/[slug]/login`, `/[slug]/pedidos`, `/[slug]/checkout`, `/[slug]/cocina`, `/[slug]/repartidor`, `/[slug]/admin/*`). La raíz `/` es el portal global multimarca `PlatformLandingView`.
+  2. *Dominio Propio / Custom Domain (`pedidos.lagranjita.com`, `mirestaurante.ec`):* Rutas limpias sin prefijos redundantes (`/login`, `/pedidos`, `/checkout`, `/cocina`). El cliente HTTP añade la cabecera `X-Tenant-Domain`.
   3. *Subdominio de Plataforma (`la-granjita.mesafy.com`):* Rutas limpias idénticas al dominio propio.
-  4. *Rutas y Parámetros de Sucursales:* Soporte nativo para rutas directas `/[slug]/sucursal/[branchId]`, `/[slug]/sucursales/[branchId]`, `/sucursal/[branchId]`, `/sucursales/[branchId]` y query parameters `?branch=...` / `?sucursal=...` sincronizados con `useCartStore` vía `BranchSync`.
+  4. *Rutas Canónicas de Pedidos (`/pedidos` y `/[slug]/pedidos`):* Migración canónica de la sección del comensal de `/rastreo` hacia `/pedidos` (con detalle en `/pedidos/[orderId]`). Se preservan `/rastreo` y `track` como alias y redirecciones transparentes para compatibilidad total con enlaces de WhatsApp y correos electrónicos previos.
+  5. *Rutas y Parámetros de Sucursales:* Soporte nativo para rutas directas `/[slug]/sucursal/[branchId]`, `/[slug]/sucursales/[branchId]`, `/sucursal/[branchId]`, `/sucursales/[branchId]` y query parameters `?branch=...` / `?sucursal=...` sincronizados con `useCartStore` vía `BranchSync`.
 * **Compatibilidad Next.js 16 Partial Prerendering (PPR):**
   - Componentes que consumen hooks dinámicos del cliente (`usePathname()`, `useSearchParams()`) están encapsulados en límites `<Suspense>`.
   - Rutas dinámicas basadas en `params` Promise de Next.js 16 separan la resolución asíncrona dentro de componentes cargadores envueltos en `<Suspense>`, garantizando prerenderizado estático de 55 páginas sin errores.
@@ -39,7 +40,7 @@
   - `StorefrontHeader.tsx` (326 líneas), `StorefrontFooter.tsx` (215 líneas), `MobileBottomNav.tsx` (135 líneas) y `layout.tsx` (28 líneas).
 
 ## 4. Responsividad Móvil Universal y Barras Inferiores Fijas (Mobile Bottom Navs)
-* **Storefront (`(storefront)`):** Barra fija inferior `MobileBottomNav.tsx` con accesos rápidos a Inicio, Menú, Locales, Rastreo, Bolsa y Perfil; se oculta automáticamente en `/checkout` y `/finalizar-pedido` para dar paso a la barra fija de confirmación. `StorefrontFooter` cuenta con `pb-20 xl:pb-0` para prevenir solapamiento.
+* **Storefront (`(storefront)`):** Barra fija inferior `MobileBottomNav.tsx` con accesos rápidos a Inicio, Menú, Locales, Pedidos, Bolsa y Perfil; se oculta automáticamente en `/checkout` y `/finalizar-pedido` para dar paso a la barra fija de confirmación. `StorefrontFooter` cuenta con `pb-20 xl:pb-0` para prevenir solapamiento.
 * **Checkout Móvil de Alta Conversión (`CheckoutForm.tsx`):** Dock fijo inferior en pantallas móviles (`fixed bottom-0` con `env(safe-area-inset-bottom)`) que mantiene visible el resumen de artículos, importe total y botón píldora "Confirmar Pedido", eliminando la necesidad de desplazarse hasta el final del formulario.
 * **Dashboard de Operaciones Modularizado (`(dashboard)`):**
   - `layout.tsx` refactorizado de 471 líneas a 134 líneas dividiéndose en `DashboardHeader.tsx`, `DashboardMobileDrawer.tsx` y `DashboardBottomNav.tsx`.
@@ -54,11 +55,14 @@
   - Sucursales y Redis (`BranchManagementView.tsx`): Botón manual "Refrescar" eliminado. Sustituido por `refetchInterval: 15000` con `refetchOnWindowFocus: true` en React Query y badge "Monitoreo en Vivo" con marca temporal.
   - Catálogo e Inventario (`useMenuQuery.ts`): Sincronización reactiva con `refetchOnWindowFocus: true` y `refetchInterval: 30000` en modo administración (`includeInactive = true`).
   - Gobernanza SaaS (`PlatformTenantsGovernanceView.tsx`): Botón manual "Actualizar" eliminado en favor de `refetchInterval: 30000`, `refetchOnWindowFocus: true` y badge "En Línea".
+  - Vista de Pedidos Limpia (`OrderSearchView.tsx`, `useLiveOrdersSync.ts`, `TrackingHub.cs`, `ITrackingNotifier.cs`): Botón manual "Actualizar Pedidos", badges artificiales, recuadros decorativos pesados, textos redundantes de conexión y párrafos explicativos eliminados. La vista de cliente es 100% limpia y reactiva de forma invisible (estándar Uber Eats / DoorDash), desplegando únicamente el título sobrio "Mis Pedidos" y las comandas en preparación. Arquitectura Event-Driven Push completa: `TrackingHub` gestiona el canal de usuario `user_orders_{userId}` (`JoinUserTracking`), el backend notifica al cliente ante creación (`CreateOrderHandler`), transiciones de estado (`UpdateOrderStatusHandler`), asignación de motorizado (`ClaimDriverOrderHandler`) y pagos (`ApproveTransferOrderHandler`). El frontend actualiza de inmediato mediante push por WebSocket con revalidación por foco (`visibilitychange`/`focus`) al desbloquear el teléfono. Cero polling agresivo.
+  - Botón de Perfil en Storefront (`StorefrontHeader.tsx`): Eliminación del punto verde estético superpuesto (`bg-emerald-500`) sobre el icono de usuario al estar autenticado, preservando el enlace limpio a "Mi Cuenta".
   - Redirección Determinista (`resolvePostLoginRedirect` en `redirectByRole.ts`): Impide que clientes (`Customer`) sean redirigidos a rutas operativas (`/cocina`, `/admin`, `/superadmin`, `/repartidor`). Despacha a cada rol a su consola primaria (`SuperAdmin` -> `/superadmin`, `TenantAdmin` -> `/admin/personalizacion`, `BranchManager` -> `/admin/inventario`, `KitchenStaff`/`Cashier` -> `/cocina`, `Driver` -> `/repartidor`, `Customer` -> `/`).
   - Aislamiento Multi-Tenant en Frontend (`AuthGuard.tsx`): Verifica que el usuario pertenezca al `activeTenantSlug` de la URL salvo excepciones de rol transversal (`SuperAdmin`). Bloquea con pantalla sobria de "Comercio no autorizado" con CTA de redirección hacia su propio establecimiento.
   - Anclaje de Sucursal en KDS (`KitchenView.tsx`): El personal de cocina o caja asignado a una sucursal (`user.branchId`) visualiza un indicador fijo sin permiso para conmutar sucursales ajenas; la conmutación entre locales queda reservada a `BranchManager`, `TenantAdmin` y `SuperAdmin`.
   - Navegación Dinámica por Rol (`DashboardHeader`, `DashboardBottomNav`, `DashboardMobileDrawer`, `StorefrontHeader`, `StorefrontMobileDrawer` y `login/page.tsx`): "Marca & Landing" restringido exclusivamente a `TenantAdmin` y `SuperAdmin`. Los botones en el perfil reflejan con exactitud las atribuciones de los 7 roles del dominio gastronómico.
   - Límite de 400 Líneas Preservado: `StorefrontHeader.tsx` (263 líneas) modularizado extrayendo `StorefrontMobileDrawer.tsx` (234 líneas).
+  - Sincronización Segura de Hidratación (`useIsMounted`): En `StorefrontHeader.tsx`, `MobileBottomNav.tsx` y `OrderSearchView.tsx`, el acceso a la sesión autenticada (`useAuthStore`) se condiciona con `isMounted`. Esto garantiza que durante el SSR y el primer frame de hidratación en React 19 el árbol HTML coincida de forma exacta con el cliente, eliminando errores de Hydration Mismatch (`react.dev/link/hydration-mismatch`) al renderizar elementos dependientes de `localStorage`.
 
 ## 5. Eliminación Estricta de Duplicidad de Controles y Botones de Navegación
 * **Principio de Única Fuente de Control por Dispositivo:** Queda estrictamente prohibido presentar pestañas, botones o enlaces duplicados simultáneamente entre cabeceras, barras flotantes inferiores y cuerpos de vista.
@@ -146,4 +150,52 @@
 * **Integridad de Snapshots `:previous` y Rollback (`deploy.sh` y `rollback.sh`):**
   - `deploy.sh` únicamente respalda una imagen a `:previous` si su contenedor actual se encuentra en estado `healthy`/`running`, evitando sobrescribir el último snapshot válido con una imagen averiada.
   - `rollback.sh` prioriza el nombre completo resuelto por `docker compose config --images` (`ghcr.io/...:previous`) antes de buscar en el caché local por comodín.
+
+## 11. Estándares de Análisis Estático de Código (.NET 8 CA Analyzers)
+* **Eliminación de Advertencias de Compilación a Nivel Solution:**
+  - `CA1848` y `CA1873` (Logging de alto rendimiento): Implementación de generadores de código fuente `[LoggerMessage(EventId = ..., Level = ..., Message = "...")]` en clases parciales (`MailKitSmtpEmailService`, `LocalAvatarStorage`), protegiendo evaluaciones de argumentos costosos con guardias `_logger.IsEnabled(...)`.
+  - `CA1305` (Globalización de cadenas): Paso explícito de `CultureInfo.InvariantCulture` en interpolaciones de `StringBuilder.Append` y `StringBuilder.AppendLine` dentro de `HtmlEmailTemplateEngine`.
+  - `CA1711` (Sufijos de identificadores): Supresión justificada `[SuppressMessage("Naming", "CA1711:Identifiers should not have incorrect suffix")]` en `IBackgroundEmailQueue` y `HangfireBackgroundEmailQueue` como abstracción de cola de tareas en segundo plano.
+  - `CA1862`, `CA1304`, `CA1311` (LINQ a SQL en EF Core): Supresión controlada `#pragma warning disable CA1862, CA1304, CA1311` alrededor de consultas LINQ que traducen `.ToLower() == ...` a SQL en PostgreSQL (`GetAccountProfileHandler`), preservando la convención establecida en `GetMyOrdersHandler` y `UpdateAccountProfileHandler`.
+
+## 12. Reconocimiento de Ubicación Satelital y Tiempo Real por WhatsApp (Multi-Tenant & PostGIS)
+* **Ingesta Dual de Coordenadas (`WhatsAppLocationParser`):**
+  - Ubicación Nativa de WhatsApp: Mensajes con `type == "location"` extrayendo `latitude`, `longitude`, `name`, `address` y `url`.
+  - Ubicación por Texto / Enlace: Reconocimiento regex estricto de URLs de Google Maps (`maps.google.com/?q=...`, `maps.app.goo.gl/...`), Apple Maps, Geo URIs (`geo:lat,lng`) y coordenadas numéricas directas con detección de palabras clave de tiempo real (`"tiempo real"`, `"en vivo"`, `"live"`).
+* **Procesamiento Determinista de Pedido (`WhatsAppOrderLocationProcessor`):**
+  - Resolución de Tenant: Contexto conversacional vía `ITenantKnowledgeProvider` y `IConversationStore` (`sessionTenantId`).
+  - Vinculación al Pedido: Prioriza número explícito en texto (ej. `#1001`), comanda activa en el tenant resuelto (`CustomerPhone` coincidente con los últimos 8 dígitos y estados `Created` a `OnTheWay`), comanda activa global o comanda más reciente en las últimas 24 horas.
+  - Validación Espacial PostGIS: Validación contra `Branch.CoveragePolygon` (`CoveragePolygon.Contains(Point)`) y radio de despacho `Branch.DeliveryRadiusKm` vía `HaversineCalculator`. Si está fuera de cobertura, responde cordialmente indicando la distancia exacta a la sucursal más cercana sin actualizar coordenadas de entrega.
+  - Telemetría en Tiempo Real (Live Location): Si se marca como ubicación en vivo, persiste telemetría efímera en Redis 7 (`order:{orderId}:live_location`) con TTL de 2 horas para trazabilidad del repartidor sin saturar escrituras en base de datos.
+  - Si el cliente no posee pedido activo, almacena las coordenadas en `Customer.DefaultLocationPoint` (`Point` SRID 4326) y `Customer.DefaultAddressStreet` para agilizar futuros pedidos por la vitrina pública.
+* **Propagación en Tiempo Real y Cero Parches en UI (SignalR Push):**
+  - Evento de Notificación: `CustomerLocationUpdated(orderId, latitude, longitude, isLive)` emitido tanto a `TrackingHub` (grupo `order_tracking_{orderId}`) como a `KitchenHub` (grupo `kitchen_branch_{branchId}`).
+  - Consumo en Frontend:
+    - `useOrderTracking.ts`: Escucha `CustomerLocationUpdated` y actualiza reactivamente `deliveryLatitude` y `deliveryLongitude` en el mapa del cliente.
+    - `useDriverHub.ts` y `useKitchenOrders.ts`: Escuchan `CustomerLocationUpdated` para refrescar de inmediato comandas asignadas sin necesidad de recargar la página manualmente ni botones de actualización.
+
+## 13. Arquitectura PWA Multi-Tenant y Multi-Sucursal Dinámica (Web App Manifest)
+* **Causa Raíz Erradicada:**
+  - El manifiesto estático anterior (`public/manifest.json`) contenía valores fijos globales (`"start_url": "/"`, `"name": "Mesafy"`). Al instalar la PWA desde una tienda afiliada (`/la-granjita`) o sucursal (`/la-granjita/sucursal/1`), el navegador instalaba la plataforma global en lugar del restaurante específico.
+* **Eliminación del Archivo Estático y Route Handler Dinámico (`app/manifest.json/route.ts` & `app/manifest.webmanifest/route.ts`):**
+  - Eliminación de `public/manifest.json` para que Next.js App Router intercepte las peticiones a `/manifest.json` y `/manifest.webmanifest`.
+  - El Route Handler extrae dinámicamente el `slug` y la sucursal (`branch`) mediante triple jerarquía de resolución:
+    1. Query parameters: `?slug=la-granjita&branch=1`.
+    2. Cabecera `Referer`: Detección automática de la ruta del navegador (`/[slug]/*`, `/sucursal/[branchId]`) si el motor PWA solicita el manifest de forma secundaria.
+    3. Cabecera `Host`: Detección de subdominios (`la-granjita.mesafy.com`) o dominios propios (`pedidos.lagranjita.com`).
+* **Aislamiento W3C por Identidad (`id`), Ámbito (`scope`) y URL de Inicio (`start_url`):**
+  - Vitrina de Tenant en Plataforma: `id: "/${slug}"`, `start_url: "/${slug}"`, `scope: "/${slug}/"`.
+  - Sucursal Específica: `id: "/${slug}?branch=${branchId}"`, `start_url: "/${slug}?branch=${branchId}"`, `scope: "/${slug}/"`, `name: "${tenant.name} • Sucursal ${branch.name}"`, `short_name: "${tenant.name} (${branch.name})"`.
+  - Dominio Propio / Subdominio: `id: "/"`, `start_url: "/"`, `scope: "/"`.
+  - Directorio Raíz de Plataforma (`/`): `id: "/"`, `start_url: "/"`, `scope: "/"`, `name: "Mesafy | Plataforma Gastronómica"`.
+  - Gracias al identificador W3C `id` único, un cliente puede instalar la aplicación de "La Granjita" y la de "Brasas del Valle" como dos aplicaciones independientes en la pantalla de inicio de su teléfono sin que una sobrescriba a la otra.
+* **Personalización Dinámica de Marca en la PWA:**
+  - Inyección en vivo de logotipo (`logoUrl` con fallback por tenant), color de tema (`brandPrimaryColor`), fondo, descripción y accesos directos táctiles (`shortcuts`) a "Ver Menú" y "Mis Pedidos".
+* **Sincronización en Tiempo de Ejecución en Frontend:**
+  - `(storefront)/[slug]/layout.tsx`: `generateMetadata` declara `manifest: "/manifest.json?slug=" + slug` para todas las páginas del restaurante.
+  - `(storefront)/[slug]/sucursal/[branchId]/page.tsx`: Inyecta `manifest: "/manifest.json?slug=" + slug + "&branch=" + branchId`.
+  - `DynamicPwaManifest.tsx`: Componente cliente que monitorea la selección activa de sucursal en `useTenantStore` y actualiza la etiqueta `<link rel="manifest">` en el `<head>` del documento en tiempo real si el usuario cambia de sucursal sin recargar.
+
+
+
 

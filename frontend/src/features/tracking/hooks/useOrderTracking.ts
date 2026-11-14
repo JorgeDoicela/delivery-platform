@@ -187,6 +187,43 @@ export function useOrderTracking({ orderId }: UseOrderTrackingProps): UseOrderTr
       }
     });
 
+    // Escucha de actualización de coordenadas del cliente enviadas por WhatsApp u otro canal
+    connection.on(
+      'CustomerLocationUpdated',
+      (
+        first: string | { orderId?: string; latitude: number; longitude: number; isLive?: boolean },
+        second?: number,
+        third?: number
+      ) => {
+        if (!isSubscribed) return;
+        let lat: number | undefined;
+        let lng: number | undefined;
+        let targetId: string | undefined;
+
+        if (typeof first === 'object' && first !== null) {
+          targetId = first.orderId;
+          lat = first.latitude;
+          lng = first.longitude;
+        } else if (typeof first === 'string' && typeof second === 'number' && typeof third === 'number') {
+          targetId = first;
+          lat = second;
+          lng = third;
+        }
+
+        if (lat !== undefined && lng !== undefined && (!targetId || targetId === orderId)) {
+          setOrder((prev) =>
+            prev
+              ? {
+                  ...prev,
+                  deliveryLatitude: lat,
+                  deliveryLongitude: lng,
+                }
+              : null
+          );
+        }
+      }
+    );
+
     // Polling de respaldo cada 20 segundos
     const interval = setInterval(loadInitialOrder, 20000);
 

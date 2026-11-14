@@ -48,6 +48,12 @@ public sealed class SignalRKitchenNotifier : IKitchenNotifier
         }
     }
 
+    public Task NotifyCustomerLocationUpdatedAsync(Guid orderId, int branchId, double latitude, double longitude, bool isLive, CancellationToken ct = default)
+    {
+        return _hubContext.Clients.Group($"kitchen_branch_{branchId}")
+            .CustomerLocationUpdated(orderId.ToString(), latitude, longitude, isLive);
+    }
+
     private async Task<List<string>> ResolveTenantGroupNamesAsync(CancellationToken ct)
     {
         var groups = new List<string>();

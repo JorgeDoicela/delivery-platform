@@ -198,7 +198,7 @@ public partial class TenantKnowledgeProvider : ITenantKnowledgeProvider
             sb.AppendFormat(CultureInfo.InvariantCulture, "- Fecha/Hora: {0:dd/MM/yyyy HH:mm}\n", order.CreatedAt);
 
             var tenantSlug = order.Tenant?.Slug ?? "la-granjita";
-            sb.AppendFormat(CultureInfo.InvariantCulture, "- Enlace de rastreo satelital: https://{0}/{1}/rastreo/{2}\n",
+            sb.AppendFormat(CultureInfo.InvariantCulture, "- Enlace de seguimiento en vivo: https://{0}/{1}/pedidos/{2}\n",
                 _options.PlatformDomain, tenantSlug, order.Id);
 
             return sb.ToString();

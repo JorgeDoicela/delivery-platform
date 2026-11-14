@@ -128,6 +128,10 @@ public sealed class UpdateOrderStatusHandler : IHandler<UpdateOrderStatusCommand
 
         // Notificaciones en tiempo real (Canal de Tracking de cliente y Pantallas KDS de cocina)
         await _trackingNotifier.NotifyOrderStatusChangedAsync(order.Id, order.Status, cancellationToken);
+        if (order.CreatedByUserId.HasValue)
+        {
+            await _trackingNotifier.NotifyUserOrdersChangedAsync(order.CreatedByUserId.Value, order.Id, cancellationToken);
+        }
         await _kitchenNotifier.NotifyOrderStatusChangedAsync(order.Id, order.Status, cancellationToken);
 
         // Notificación de cambio de estado de comanda por correo electrónico mediante Hangfire
@@ -169,7 +173,7 @@ public sealed class UpdateOrderStatusHandler : IHandler<UpdateOrderStatusCommand
                 CurrentStatus = command.NewStatus.ToString(),
                 StatusTitle = statusTitle,
                 StatusDescription = statusDesc,
-                TrackingUrl = $"https://mesafy.doicela.dev/{tenant?.Slug ?? "la-granjita"}/rastreo/{order.Id}",
+                TrackingUrl = $"https://mesafy.doicela.dev/{tenant?.Slug ?? "la-granjita"}/pedidos/{order.Id}",
                 Total = order.Total,
                 UpdatedAt = order.UpdatedAt.GetValueOrDefault(DateTime.UtcNow)
             };

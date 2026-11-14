@@ -1,1 +1,1 @@
-export { default, metadata } from "../rastreo/page";
+export { default, metadata } from "../pedidos/page";

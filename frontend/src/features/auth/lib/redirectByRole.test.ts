@@ -28,6 +28,8 @@ describe("redirectByRole", () => {
       expect(isOperationalPath("/la-granjita")).toBe(false);
       expect(isOperationalPath("/la-granjita/catalogo")).toBe(false);
       expect(isOperationalPath("/la-granjita/checkout")).toBe(false);
+      expect(isOperationalPath("/la-granjita/pedidos")).toBe(false);
+      expect(isOperationalPath("/la-granjita/pedidos/123")).toBe(false);
       expect(isOperationalPath("/la-granjita/rastreo/123")).toBe(false);
     });
   });

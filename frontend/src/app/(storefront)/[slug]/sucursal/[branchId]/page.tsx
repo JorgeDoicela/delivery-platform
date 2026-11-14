@@ -26,6 +26,7 @@ export async function generateMetadata({ params }: BranchPageProps) {
   return {
     title: `${formatted} • Sucursal ${branchId} | Pedidos y Delivery`,
     description: `Menú en línea, especialidades recién preparadas y despacho a domicilio en ${formatted}.`,
+    manifest: `/manifest.json?slug=${encodeURIComponent(slug)}&branch=${encodeURIComponent(branchId)}`,
   };
 }
 

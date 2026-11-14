@@ -127,6 +127,7 @@ public sealed class CreateOrderHandler : IHandler<CreateOrderCommand, Result<Cre
     private readonly IValidator<CreateOrderCommand> _validator;
     private readonly IConnectionMultiplexer _redis;
     private readonly IKitchenNotifier _kitchenNotifier;
+    private readonly ITrackingNotifier? _trackingNotifier;
     private readonly IBackgroundEmailQueue? _emailQueue;
 
     public CreateOrderHandler(
@@ -134,12 +135,14 @@ public sealed class CreateOrderHandler : IHandler<CreateOrderCommand, Result<Cre
         IValidator<CreateOrderCommand> validator,
         IConnectionMultiplexer redis,
         IKitchenNotifier kitchenNotifier,
+        ITrackingNotifier? trackingNotifier = null,
         IBackgroundEmailQueue? emailQueue = null)
     {
         _context = context;
         _validator = validator;
         _redis = redis;
         _kitchenNotifier = kitchenNotifier;
+        _trackingNotifier = trackingNotifier;
         _emailQueue = emailQueue;
     }
 
@@ -436,7 +439,7 @@ public sealed class CreateOrderHandler : IHandler<CreateOrderCommand, Result<Cre
                 AddressReference = order.AddressReference,
                 PaymentMethod = order.PaymentMethod.ToString(),
                 EstimatedDeliveryTime = estimatedTime,
-                TrackingUrl = $"https://mesafy.doicela.dev/{tenant?.Slug ?? "la-granjita"}/rastreo/{order.Id}",
+                TrackingUrl = $"https://mesafy.doicela.dev/{tenant?.Slug ?? "la-granjita"}/pedidos/{order.Id}",
                 Items = order.Items.Select(i => new OrderItemEmailDto(
                     i.ProductNameSnapshot,
                     i.Quantity,
@@ -458,6 +461,11 @@ public sealed class CreateOrderHandler : IHandler<CreateOrderCommand, Result<Cre
                 emailModel,
                 order.TenantId
             );
+        }
+
+        if (_trackingNotifier != null && order.CreatedByUserId.HasValue)
+        {
+            await _trackingNotifier.NotifyUserOrdersChangedAsync(order.CreatedByUserId.Value, order.Id, cancellationToken);
         }
 
         return Result.Success(new CreateOrderResponse(

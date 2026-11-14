@@ -133,6 +133,10 @@ export function useKitchenOrders(branchId: number) {
       }
     );
 
+    connection.on('CustomerLocationUpdated', () => {
+      void fetchOrders();
+    });
+
     // Polling de respaldo cada 20s
     const pollInterval = setInterval(() => {
       if (typeof document !== 'undefined' && document.visibilityState === 'visible') {

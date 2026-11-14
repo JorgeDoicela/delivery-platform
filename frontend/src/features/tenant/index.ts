@@ -11,3 +11,4 @@ export * from "./components/PlatformTenantsGovernanceView";
 export * from "./components/RestaurantStorefrontView";
 export * from "./components/RestaurantDedicatedMenuView";
 export * from "./components/FloatingWhatsAppButton";
+export * from "./components/DynamicPwaManifest";

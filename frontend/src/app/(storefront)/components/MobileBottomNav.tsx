@@ -18,6 +18,7 @@ import {
 import { useSmartScrollHeader } from "@/shared/hooks/useSmartScrollHeader";
 import { useTenantRoutes } from "@/shared/lib/tenant-routing";
 import { useAuthStore } from "@/features/auth/store/useAuthStore";
+import { useIsMounted } from "@/shared/hooks/useIsMounted";
 
 export function MobileBottomNav() {
   const { isVisible } = useSmartScrollHeader({
@@ -34,12 +35,14 @@ export function MobileBottomNav() {
   const { data: tenant } = useCurrentTenantQuery(activeSlug);
   const { data: branches } = useBranchesQuery(activeSlug || tenant?.slug);
   const routes = useTenantRoutes(activeSlug || tenant?.slug);
-  const isAuthenticated = useAuthStore((s) => s.isAuthenticated);
+  const isMounted = useIsMounted();
+  const rawIsAuthenticated = useAuthStore((s) => s.isAuthenticated);
+  const isAuthenticated = isMounted && rawIsAuthenticated;
 
   const homeHref = routes.getHomeHref();
   const catalogHref = routes.getCatalogHref();
   const sucursalesHref = routes.getSucursalesHref();
-  const rastreoHref = routes.getRastreoHref();
+  const pedidosHref = routes.getPedidosHref();
   const profileHref = isAuthenticated ? routes.getAccountHref() : routes.getLoginHref();
 
   const isCheckout =
@@ -59,8 +62,8 @@ export function MobileBottomNav() {
   const isCatalogActive =
     pathname.includes("menu") || pathname.includes("catalogo");
   const isSucursalesActive = pathname.includes("sucursal");
-  const isRastreoActive =
-    pathname.includes("rastreo") || pathname.includes("track");
+  const isPedidosActive =
+    pathname.includes("pedidos") || pathname.includes("rastreo") || pathname.includes("track");
   const isProfileActive =
     pathname.includes("login") || pathname.includes("cuenta");
 
@@ -113,15 +116,15 @@ export function MobileBottomNav() {
 
       {isAuthenticated && (
         <Link
-          href={rastreoHref}
+          href={pedidosHref}
           className={`h-full flex flex-col items-center justify-center py-1 px-2 rounded-lg text-[9px] font-bold font-display uppercase tracking-wider transition-colors min-w-[48px] ${
-            isRastreoActive
+            isPedidosActive
               ? "text-brand-primary"
               : "text-text-muted hover:text-text-strong"
           }`}
         >
           <Clock className="w-[18px] h-[18px] mb-0.5" />
-          <span>Rastreo</span>
+          <span>Pedidos</span>
         </Link>
       )}
 

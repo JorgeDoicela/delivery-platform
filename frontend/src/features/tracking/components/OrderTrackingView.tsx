@@ -87,17 +87,17 @@ export function OrderTrackingView({ orderId }: OrderTrackingViewProps) {
           </p>
           <div className="pt-2 flex justify-center gap-3">
             <button
-              onClick={() => router.push(`${routes.getLoginHref()}?redirect=/rastreo/${orderId}`)}
+              onClick={() => router.push(`${routes.getLoginHref()}?redirect=/pedidos/${orderId}`)}
               className="inline-flex items-center gap-2 px-6 py-3 bg-brand-primary hover:bg-brand-primary-hover text-white text-xs uppercase tracking-wider rounded-full font-black transition-all shadow-md active:scale-95 cursor-pointer font-display"
             >
               <LogIn className="h-4 w-4" />
               <span>Iniciar Sesión</span>
             </button>
             <button
-              onClick={() => router.push(routes.getRastreoHref())}
+              onClick={() => router.push(routes.getPedidosHref())}
               className="inline-flex items-center gap-2 px-5 py-2.5 bg-surface-card hover:bg-surface-card-hover border border-surface-border text-text-strong text-xs uppercase tracking-wider rounded-full font-bold transition-all active:scale-95 cursor-pointer font-display"
             >
-              <span>Volver a Rastreo</span>
+              <span>Volver a Mis Pedidos</span>
             </button>
           </div>
         </div>
@@ -118,7 +118,7 @@ export function OrderTrackingView({ orderId }: OrderTrackingViewProps) {
           </p>
           <div className="pt-2 flex justify-center gap-3">
             <button
-              onClick={() => router.push(routes.getRastreoHref())}
+              onClick={() => router.push(routes.getPedidosHref())}
               className="inline-flex items-center gap-2 px-6 py-3 bg-brand-primary hover:bg-brand-primary-hover text-white text-xs uppercase tracking-wider rounded-full font-black transition-all shadow-md active:scale-95 cursor-pointer font-display"
             >
               <ArrowLeft className="h-4 w-4" />

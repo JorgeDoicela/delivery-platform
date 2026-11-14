@@ -167,7 +167,7 @@ public sealed class HtmlEmailTemplateEngine : IEmailTemplateEngine
                 ? $"<div style=\"font-size:11px;color:#64748B;margin-top:2px;\">{WebUtility.HtmlEncode(item.ModifiersSummary)}</div>"
                 : string.Empty;
 
-            itemsRows.Append($@"
+            itemsRows.Append(CultureInfo.InvariantCulture, $@"
             <tr style=""border-bottom:1px solid #F1F5F9;"">
               <td style=""padding:12px 0;vertical-align:top;"">
                 <div style=""font-weight:700;color:#0F172A;font-size:13px;"">{item.Quantity}x {WebUtility.HtmlEncode(item.ProductName)}</div>
@@ -249,22 +249,22 @@ public sealed class HtmlEmailTemplateEngine : IEmailTemplateEngine
     private static string RenderOrderConfirmationText(OrderConfirmationEmailModel m)
     {
         var sb = new StringBuilder();
-        sb.AppendLine($"¡Hola {m.CustomerName}!");
-        sb.AppendLine($"Tu pedido #{m.OrderNumber} en {m.Brand.BrandName} ha sido confirmado con éxito.");
-        sb.AppendLine($"Sucursal: {m.BranchName}");
-        sb.AppendLine($"Dirección: {m.AddressStreet} {(string.IsNullOrEmpty(m.AddressReference) ? "" : $"({m.AddressReference})")}");
+        sb.AppendLine(CultureInfo.InvariantCulture, $"¡Hola {m.CustomerName}!");
+        sb.AppendLine(CultureInfo.InvariantCulture, $"Tu pedido #{m.OrderNumber} en {m.Brand.BrandName} ha sido confirmado con éxito.");
+        sb.AppendLine(CultureInfo.InvariantCulture, $"Sucursal: {m.BranchName}");
+        sb.AppendLine(CultureInfo.InvariantCulture, $"Dirección: {m.AddressStreet} {(string.IsNullOrEmpty(m.AddressReference) ? "" : $"({m.AddressReference})")}");
         sb.AppendLine();
         sb.AppendLine("DETALLE DEL PEDIDO:");
         foreach (var item in m.Items)
         {
-            sb.AppendLine($"- {item.Quantity}x {item.ProductName}: ${FormatCurrency(item.TotalPrice)}");
+            sb.AppendLine(CultureInfo.InvariantCulture, $"- {item.Quantity}x {item.ProductName}: ${FormatCurrency(item.TotalPrice)}");
         }
-        sb.AppendLine($"Subtotal: ${FormatCurrency(m.Subtotal)}");
-        sb.AppendLine($"Envío: ${FormatCurrency(m.DeliveryFee)}");
-        sb.AppendLine($"TOTAL: ${FormatCurrency(m.Total)}");
-        sb.AppendLine($"Método de pago: {m.PaymentMethod}");
+        sb.AppendLine(CultureInfo.InvariantCulture, $"Subtotal: ${FormatCurrency(m.Subtotal)}");
+        sb.AppendLine(CultureInfo.InvariantCulture, $"Envío: ${FormatCurrency(m.DeliveryFee)}");
+        sb.AppendLine(CultureInfo.InvariantCulture, $"TOTAL: ${FormatCurrency(m.Total)}");
+        sb.AppendLine(CultureInfo.InvariantCulture, $"Método de pago: {m.PaymentMethod}");
         sb.AppendLine();
-        sb.AppendLine($"Rastreo en vivo: {m.TrackingUrl}");
+        sb.AppendLine(CultureInfo.InvariantCulture, $"Rastreo en vivo: {m.TrackingUrl}");
         return sb.ToString();
     }
 

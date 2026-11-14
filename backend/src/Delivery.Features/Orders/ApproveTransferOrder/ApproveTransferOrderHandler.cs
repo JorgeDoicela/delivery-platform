@@ -45,15 +45,18 @@ public sealed class ApproveTransferOrderHandler : IHandler<ApproveTransferComman
     private readonly AppDbContext _context;
     private readonly IValidator<ApproveTransferCommand> _validator;
     private readonly IKitchenNotifier _kitchenNotifier;
+    private readonly ITrackingNotifier? _trackingNotifier;
 
     public ApproveTransferOrderHandler(
         AppDbContext context,
         IValidator<ApproveTransferCommand> validator,
-        IKitchenNotifier kitchenNotifier)
+        IKitchenNotifier kitchenNotifier,
+        ITrackingNotifier? trackingNotifier = null)
     {
         _context = context;
         _validator = validator;
         _kitchenNotifier = kitchenNotifier;
+        _trackingNotifier = trackingNotifier;
     }
 
     public async Task<Result<ApproveTransferResponse>> Handle(ApproveTransferCommand command, CancellationToken cancellationToken = default)
@@ -86,6 +89,14 @@ public sealed class ApproveTransferOrderHandler : IHandler<ApproveTransferComman
 
             // Notificar a las pantallas KDS de cocina que la orden fue confirmada
             await _kitchenNotifier.NotifyOrderStatusChangedAsync(order.Id, OrderStatus.Confirmed, cancellationToken);
+            if (_trackingNotifier != null)
+            {
+                await _trackingNotifier.NotifyOrderStatusChangedAsync(order.Id, OrderStatus.Confirmed, cancellationToken);
+                if (order.CreatedByUserId.HasValue)
+                {
+                    await _trackingNotifier.NotifyUserOrdersChangedAsync(order.CreatedByUserId.Value, order.Id, cancellationToken);
+                }
+            }
 
             return Result.Success(new ApproveTransferResponse(
                 order.Id,
@@ -101,6 +112,14 @@ public sealed class ApproveTransferOrderHandler : IHandler<ApproveTransferComman
 
             // Notificar cancelación a cocina si aplica
             await _kitchenNotifier.NotifyOrderStatusChangedAsync(order.Id, OrderStatus.Cancelled, cancellationToken);
+            if (_trackingNotifier != null)
+            {
+                await _trackingNotifier.NotifyOrderStatusChangedAsync(order.Id, OrderStatus.Cancelled, cancellationToken);
+                if (order.CreatedByUserId.HasValue)
+                {
+                    await _trackingNotifier.NotifyUserOrdersChangedAsync(order.CreatedByUserId.Value, order.Id, cancellationToken);
+                }
+            }
 
             return Result.Success(new ApproveTransferResponse(
                 order.Id,

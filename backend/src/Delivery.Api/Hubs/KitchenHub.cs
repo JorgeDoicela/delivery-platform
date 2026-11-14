@@ -9,6 +9,7 @@ public interface IKitchenClient
     Task ReceiveNewOrder(KitchenOrderTicketDto ticket);
     Task StockUpdated(int productId, bool isAvailable);
     Task OrderStatusChanged(string orderId, string status);
+    Task CustomerLocationUpdated(string orderId, double latitude, double longitude, bool isLive);
 }
 
 [Authorize(Policy = "OperationalStaffOnly")]

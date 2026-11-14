@@ -25,5 +25,17 @@ public sealed class SignalRTrackingNotifier : ITrackingNotifier
         return _hubContext.Clients.Group($"order_tracking_{orderId}")
             .OrderStatusChanged(status.ToString());
     }
+
+    public Task NotifyUserOrdersChangedAsync(Guid userId, Guid? orderId = null, CancellationToken ct = default)
+    {
+        return _hubContext.Clients.Group($"user_orders_{userId}")
+            .OrdersListUpdated(orderId?.ToString());
+    }
+
+    public Task NotifyCustomerLocationUpdatedAsync(Guid orderId, double latitude, double longitude, bool isLive, CancellationToken ct = default)
+    {
+        return _hubContext.Clients.Group($"order_tracking_{orderId}")
+            .CustomerLocationUpdated(orderId.ToString(), latitude, longitude, isLive);
+    }
 }
 

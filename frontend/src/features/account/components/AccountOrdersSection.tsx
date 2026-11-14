@@ -197,7 +197,7 @@ export function AccountOrdersSection() {
             {/* Acciones del pedido */}
             <div className="flex flex-col sm:flex-row flex-wrap items-stretch sm:items-center gap-2.5 pt-2">
               <Link
-                href={`/${order.tenantSlug}/rastreo/${order.orderId}`}
+                href={`/${order.tenantSlug}/pedidos/${order.orderId}`}
                 className="inline-flex items-center justify-center gap-2 bg-brand-primary hover:brightness-110 active:scale-95 text-white font-black text-xs uppercase tracking-wider font-display px-6 py-2.5 rounded-full transition-all min-h-[44px]"
               >
                 <span>{order.isActive ? "Rastrear Pedido en Vivo" : "Ver Resumen"}</span>

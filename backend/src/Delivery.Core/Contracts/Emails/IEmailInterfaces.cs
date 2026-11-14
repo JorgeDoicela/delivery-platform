@@ -39,6 +39,7 @@ public interface IEmailService
 /// <summary>
 /// Contrato para encolar correos en segundo plano (Hangfire) sin bloquear hilos de petición HTTP.
 /// </summary>
+[System.Diagnostics.CodeAnalysis.SuppressMessage("Naming", "CA1711:Identifiers should not have incorrect suffix", Justification = "Abstracción de cola de trabajos en segundo plano (Hangfire), no una colección.")]
 public interface IBackgroundEmailQueue
 {
     /// <summary>

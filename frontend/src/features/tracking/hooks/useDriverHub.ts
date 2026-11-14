@@ -87,6 +87,10 @@ export function useDriverHub({ branchId, enabled = true }: UseDriverHubOptions =
       void fetchDashboard();
     });
 
+    connection.on('CustomerLocationUpdated', () => {
+      void fetchDashboard();
+    });
+
     connection
       .start()
       .then(async () => {

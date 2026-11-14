@@ -24,6 +24,7 @@ export interface TenantRoutingResolution {
   }) => string;
   getRegisterHref: (options?: { redirect?: string }) => string;
   getCheckoutHref: () => string;
+  getPedidosHref: (orderId?: string) => string;
   getRastreoHref: (orderId?: string) => string;
   getSucursalesHref: (branchId?: number | string | null) => string;
   getKitchenHref: () => string;
@@ -160,12 +161,16 @@ export function resolveTenantRouting(
     return basePath ? `${basePath}/checkout` : "/checkout";
   };
 
-  const getRastreoHref = (orderId?: string): string => {
+  const getPedidosHref = (orderId?: string): string => {
     if (orderId) {
       const cleanId = encodeURIComponent(orderId.trim());
-      return basePath ? `${basePath}/rastreo/${cleanId}` : `/rastreo/${cleanId}`;
+      return basePath ? `${basePath}/pedidos/${cleanId}` : `/pedidos/${cleanId}`;
     }
-    return basePath ? `${basePath}/rastreo` : "/rastreo";
+    return basePath ? `${basePath}/pedidos` : "/pedidos";
+  };
+
+  const getRastreoHref = (orderId?: string): string => {
+    return getPedidosHref(orderId);
   };
 
   const getSucursalesHref = (branchId?: number | string | null): string => {
@@ -221,6 +226,7 @@ export function resolveTenantRouting(
     getLoginHref,
     getRegisterHref,
     getCheckoutHref,
+    getPedidosHref,
     getRastreoHref,
     getSucursalesHref,
     getKitchenHref,

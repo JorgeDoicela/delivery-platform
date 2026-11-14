@@ -9,6 +9,7 @@ export {
   createDestinationDomMarker,
 } from "./components/DriverMarker";
 export { useOrderTracking } from "./hooks/useOrderTracking";
+export { useLiveOrdersSync } from "./hooks/useLiveOrdersSync";
 export { useDriverTracking } from "./hooks/useDriverTracking";
 export { useDriverHub } from "./hooks/useDriverHub";
 export { useDriverStore } from "./store/useDriverStore";

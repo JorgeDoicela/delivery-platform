@@ -7,7 +7,7 @@ public sealed class CreateTenantValidator : AbstractValidator<CreateTenantComman
     public static readonly HashSet<string> ReservedSlugs = new(StringComparer.OrdinalIgnoreCase)
     {
         "admin", "superadmin", "api", "login", "checkout", "catalogo", "finalizar-pedido",
-        "cocina", "kitchen", "repartidor", "active-delivery", "rastreo", "track",
+        "cocina", "kitchen", "repartidor", "active-delivery", "pedidos", "mis-pedidos", "rastreo", "track",
         "sucursales", "terminos", "privacidad", "terms", "privacy", "static", "assets",
         "health", "hub", "hubs", "ws", "auth", "register", "cart", "favicon", "robots", "r"
     };

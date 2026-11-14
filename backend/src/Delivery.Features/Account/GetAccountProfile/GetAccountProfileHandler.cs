@@ -45,6 +45,7 @@ public sealed class GetAccountProfileHandler : IHandler<GetAccountProfileQuery, 
         var normalizedEmail = user.Email.Trim().ToLowerInvariant();
 
         // Contabilizar pedidos históricos y activos por email del usuario (ignorando filtros de tenant para estadísticas globales del cliente)
+#pragma warning disable CA1862, CA1304, CA1311 // EF Core requiere ToLower() para traducir la comparación a SQL en el servidor
         var totalOrders = await _context.Orders
             .IgnoreQueryFilters()
             .AsNoTracking()
@@ -54,6 +55,7 @@ public sealed class GetAccountProfileHandler : IHandler<GetAccountProfileQuery, 
             .IgnoreQueryFilters()
             .AsNoTracking()
             .CountAsync(o => o.CustomerEmail != null && o.CustomerEmail.ToLower() == normalizedEmail && ActiveOrderStatuses.Contains(o.Status), cancellationToken);
+#pragma warning restore CA1862, CA1304, CA1311
 
         // Consultar estado de consentimiento WhatsApp LOPDP
         var consentActive = false;

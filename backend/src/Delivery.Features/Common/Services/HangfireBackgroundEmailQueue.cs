@@ -8,6 +8,7 @@ namespace Delivery.Features.Common.Services;
 /// Despachador de correos electrónicos en segundo plano respaldado por la cola 'notifications' de Hangfire.
 /// Garantiza que los hilos de petición HTTP no queden bloqueados esperando el protocolo SMTP y proporciona reintentos automáticos ante caídas transitorias.
 /// </summary>
+[System.Diagnostics.CodeAnalysis.SuppressMessage("Naming", "CA1711:Identifiers should not have incorrect suffix", Justification = "Implementación de cola de trabajos en segundo plano con Hangfire.")]
 public sealed class HangfireBackgroundEmailQueue : IBackgroundEmailQueue
 {
     private readonly IBackgroundJobClient _backgroundJobClient;

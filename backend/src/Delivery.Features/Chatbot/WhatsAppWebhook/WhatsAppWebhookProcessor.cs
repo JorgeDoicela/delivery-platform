@@ -12,6 +12,7 @@ public partial class WhatsAppWebhookProcessor : IWhatsAppWebhookProcessor
     private readonly ICustomerConsentTracker _consentTracker;
     private readonly IChatbotAiEngine _aiEngine;
     private readonly IWhatsAppClient _whatsAppClient;
+    private readonly IWhatsAppOrderLocationProcessor? _locationProcessor;
     private readonly WhatsAppChatbotOptions _options;
     private readonly ILogger<WhatsAppWebhookProcessor> _logger;
 
@@ -22,7 +23,8 @@ public partial class WhatsAppWebhookProcessor : IWhatsAppWebhookProcessor
         IChatbotAiEngine aiEngine,
         IWhatsAppClient whatsAppClient,
         IOptions<WhatsAppChatbotOptions> options,
-        ILogger<WhatsAppWebhookProcessor> logger)
+        ILogger<WhatsAppWebhookProcessor> logger,
+        IWhatsAppOrderLocationProcessor? locationProcessor = null)
     {
         _knowledgeProvider = knowledgeProvider;
         _conversationStore = conversationStore;
@@ -31,6 +33,7 @@ public partial class WhatsAppWebhookProcessor : IWhatsAppWebhookProcessor
         _whatsAppClient = whatsAppClient;
         _options = options.Value;
         _logger = logger;
+        _locationProcessor = locationProcessor;
     }
 
     public async Task ProcessPayloadAsync(WhatsAppWebhookPayload payload, CancellationToken ct = default)
@@ -83,10 +86,24 @@ public partial class WhatsAppWebhookProcessor : IWhatsAppWebhookProcessor
         await _conversationStore.MarkMessageProcessedAsync(messageId, ct);
         await _whatsAppClient.MarkMessageAsReadAsync(messageId, phoneId, ct);
 
+        // 1. Detección y procesamiento de ubicación actual o en tiempo real (nativa o por enlace en texto)
+        if (_locationProcessor != null)
+        {
+            var extractedLocation = WhatsAppLocationParser.ExtractLocation(incoming);
+            if (extractedLocation != null)
+            {
+                var handled = await _locationProcessor.HandleLocationAsync(incoming, extractedLocation, phoneId, contactName, ct);
+                if (handled)
+                {
+                    return;
+                }
+            }
+        }
+
         if (incoming.Type != "text" || incoming.Text == null || string.IsNullOrWhiteSpace(incoming.Text.Body))
         {
             var politeMsg = "Hola" + (!string.IsNullOrWhiteSpace(contactName) ? $" {contactName}" : "") +
-                            ". En este momento solo puedo procesar mensajes de texto. ¿En qué puedo ayudarte hoy?";
+                            ". En este momento solo puedo procesar mensajes de texto o ubicaciones satelitales para entrega. ¿En qué puedo ayudarte hoy?";
             await _whatsAppClient.SendTextMessageAsync(senderPhone, politeMsg, phoneId, ct);
             return;
         }

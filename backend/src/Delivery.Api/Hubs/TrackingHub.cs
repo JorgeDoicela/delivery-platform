@@ -7,10 +7,34 @@ public interface ITrackingClient
 {
     Task ReceiveDriverLocation(double latitude, double longitude, double? heading);
     Task OrderStatusChanged(string status);
+    Task OrdersListUpdated(string? orderId = null);
+    Task CustomerLocationUpdated(string orderId, double latitude, double longitude, bool isLive);
 }
 
 public class TrackingHub : Hub<ITrackingClient>
 {
+    /// <summary>
+    /// Une al cliente al canal exclusivo de sus pedidos para recibir actualizaciones en tiempo real.
+    /// </summary>
+    public async Task JoinUserTracking(string userId)
+    {
+        if (!string.IsNullOrWhiteSpace(userId))
+        {
+            await Groups.AddToGroupAsync(Context.ConnectionId, $"user_orders_{userId.Trim()}");
+        }
+    }
+
+    /// <summary>
+    /// Abandona el canal de pedidos del usuario.
+    /// </summary>
+    public async Task LeaveUserTracking(string userId)
+    {
+        if (!string.IsNullOrWhiteSpace(userId))
+        {
+            await Groups.RemoveFromGroupAsync(Context.ConnectionId, $"user_orders_{userId.Trim()}");
+        }
+    }
+
     /// <summary>
     /// Une al cliente al canal exclusivo de rastreo de su orden activa.
     /// </summary>

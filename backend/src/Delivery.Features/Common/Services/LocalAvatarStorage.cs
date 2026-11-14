@@ -10,12 +10,27 @@ namespace Delivery.Features.Common.Services;
 /// Procesa y optimiza imágenes fotográficas convirtiéndolas a WebP (85% calidad, 400x400 px)
 /// organizadas por directorio multitenant: uploads/avatars/{tenantId}/{userId}_{timestamp}.webp
 /// </summary>
-public sealed class LocalAvatarStorage : IAvatarStorage
+public sealed partial class LocalAvatarStorage : IAvatarStorage
 {
     private const int TargetAvatarDimension = 400;
     private const int WebpQuality = 85;
     private readonly IHostEnvironment _environment;
     private readonly ILogger<LocalAvatarStorage> _logger;
+
+    [LoggerMessage(EventId = 1, Level = LogLevel.Warning, Message = "No se pudo eliminar el avatar antiguo {OldFile}")]
+    private static partial void LogDeleteOldAvatarFailed(ILogger logger, Exception ex, string oldFile);
+
+    [LoggerMessage(EventId = 2, Level = LogLevel.Warning, Message = "Error intentando limpiar avatares previos del usuario {UserId}")]
+    private static partial void LogCleanPreviousAvatarsFailed(ILogger logger, Exception ex, Guid userId);
+
+    [LoggerMessage(EventId = 3, Level = LogLevel.Information, Message = "Avatar guardado exitosamente en {Path} para usuario {UserId}")]
+    private static partial void LogAvatarSaved(ILogger logger, string path, Guid userId);
+
+    [LoggerMessage(EventId = 4, Level = LogLevel.Information, Message = "Avatar eliminado físicamente de {Path}")]
+    private static partial void LogAvatarDeleted(ILogger logger, string path);
+
+    [LoggerMessage(EventId = 5, Level = LogLevel.Warning, Message = "Error al eliminar archivo físico de avatar {Url}")]
+    private static partial void LogDeleteAvatarPhysicalFailed(ILogger logger, Exception ex, string url);
 
     public LocalAvatarStorage(IHostEnvironment environment, ILogger<LocalAvatarStorage> logger)
     {
@@ -92,13 +107,13 @@ public sealed class LocalAvatarStorage : IAvatarStorage
                 }
                 catch (Exception ex)
                 {
-                    _logger.LogWarning(ex, "No se pudo eliminar el avatar antiguo {OldFile}", oldFile);
+                    LogDeleteOldAvatarFailed(_logger, ex, oldFile);
                 }
             }
         }
         catch (Exception ex)
         {
-            _logger.LogWarning(ex, "Error intentando limpiar avatares previos del usuario {UserId}", userId);
+            LogCleanPreviousAvatarsFailed(_logger, ex, userId);
         }
 
         // 6. Escribir archivo WebP en disco
@@ -111,7 +126,10 @@ public sealed class LocalAvatarStorage : IAvatarStorage
             webpData.SaveTo(fileStream);
         }
 
-        _logger.LogInformation("Avatar guardado exitosamente en {Path} para usuario {UserId}", fullPath, userId);
+        if (_logger.IsEnabled(LogLevel.Information))
+        {
+            LogAvatarSaved(_logger, fullPath, userId);
+        }
 
         // Retornar ruta relativa web utilizable
         return $"/uploads/avatars/{tenantFolder}/{uniqueFileName}";
@@ -132,12 +150,15 @@ public sealed class LocalAvatarStorage : IAvatarStorage
             if (File.Exists(fullPath))
             {
                 File.Delete(fullPath);
-                _logger.LogInformation("Avatar eliminado físicamente de {Path}", fullPath);
+                if (_logger.IsEnabled(LogLevel.Information))
+                {
+                    LogAvatarDeleted(_logger, fullPath);
+                }
             }
         }
         catch (Exception ex)
         {
-            _logger.LogWarning(ex, "Error al eliminar archivo físico de avatar {Url}", avatarUrl);
+            LogDeleteAvatarPhysicalFailed(_logger, ex, avatarUrl);
         }
 
         return Task.CompletedTask;

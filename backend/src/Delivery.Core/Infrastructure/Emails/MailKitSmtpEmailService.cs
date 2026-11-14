@@ -12,11 +12,32 @@ namespace Delivery.Core.Infrastructure.Emails;
 /// Implementación robusta de IEmailService basada en MailKit y MimeKit (estándar oficial de .NET).
 /// Soporta negociación TLS moderna, autenticación con credenciales y modo de simulación para desarrollo.
 /// </summary>
-public sealed class MailKitSmtpEmailService : IEmailService
+public sealed partial class MailKitSmtpEmailService : IEmailService
 {
     private readonly SmtpOptions _options;
     private readonly IEmailTemplateEngine _templateEngine;
     private readonly ILogger<MailKitSmtpEmailService> _logger;
+
+    [LoggerMessage(EventId = 1, Level = LogLevel.Warning, Message = "[SMTP Dev Simulation] Host SMTP no configurado o en modo mock. Correo simulado exitosamente para [{Recipients}] con asunto '{Subject}'.")]
+    private static partial void LogDevSimulation(ILogger logger, string recipients, string subject);
+
+    [LoggerMessage(EventId = 2, Level = LogLevel.Information, Message = "Correo electrónico despachado exitosamente mediante SMTP ({Host}:{Port}) hacia [{Recipients}]. Asunto: '{Subject}'.")]
+    private static partial void LogEmailDispatchedSuccess(ILogger logger, string host, int port, string recipients, string subject);
+
+    [LoggerMessage(EventId = 3, Level = LogLevel.Error, Message = "Fallo de autenticación con el servidor SMTP {Host}:{Port}.")]
+    private static partial void LogAuthenticationFailed(ILogger logger, Exception ex, string host, int port);
+
+    [LoggerMessage(EventId = 4, Level = LogLevel.Error, Message = "Error en comando del protocolo SMTP ({StatusCode}) al despachar hacia [{Host}].")]
+    private static partial void LogSmtpCommandFailed(ILogger logger, Exception ex, SmtpStatusCode statusCode, string host);
+
+    [LoggerMessage(EventId = 5, Level = LogLevel.Error, Message = "Fallo de conectividad de red con el host SMTP {Host}:{Port}.")]
+    private static partial void LogConnectivityFailed(ILogger logger, Exception ex, string host, int port);
+
+    [LoggerMessage(EventId = 6, Level = LogLevel.Error, Message = "Error no controlado durante el envío de correo hacia {Host}:{Port}.")]
+    private static partial void LogUnhandledEmailSendError(ILogger logger, Exception ex, string host, int port);
+
+    [LoggerMessage(EventId = 7, Level = LogLevel.Error, Message = "Error al componer o renderizar la plantilla de correo {TemplateType}.")]
+    private static partial void LogTemplateRenderError(ILogger logger, Exception ex, EmailTemplateType templateType);
 
     public MailKitSmtpEmailService(
         IOptions<SmtpOptions> options,
@@ -44,12 +65,11 @@ public sealed class MailKitSmtpEmailService : IEmailService
         // 1. Modo de Simulación de Desarrollo si el host no está configurado
         if (!_options.IsConfigured)
         {
-            var recipientList = string.Join(", ", message.To.Select(r => r.ToString()));
-            _logger.LogWarning(
-                "[SMTP Dev Simulation] Host SMTP no configurado o en modo mock. Correo simulado exitosamente para [{Recipients}] con asunto '{Subject}'.",
-                recipientList,
-                message.Subject
-            );
+            if (_logger.IsEnabled(LogLevel.Warning))
+            {
+                var recipientList = string.Join(", ", message.To.Select(r => r.ToString()));
+                LogDevSimulation(_logger, recipientList, message.Subject);
+            }
             return Result.Success();
         }
 
@@ -124,34 +144,32 @@ public sealed class MailKitSmtpEmailService : IEmailService
             await client.SendAsync(mimeMessage, cancellationToken);
             await client.DisconnectAsync(true, cancellationToken);
 
-            _logger.LogInformation(
-                "Correo electrónico despachado exitosamente mediante SMTP ({Host}:{Port}) hacia [{Recipients}]. Asunto: '{Subject}'.",
-                _options.Host,
-                _options.Port,
-                string.Join(", ", message.To.Select(t => t.Email)),
-                message.Subject
-            );
+            if (_logger.IsEnabled(LogLevel.Information))
+            {
+                var recipientEmails = string.Join(", ", message.To.Select(t => t.Email));
+                LogEmailDispatchedSuccess(_logger, _options.Host, _options.Port, recipientEmails, message.Subject);
+            }
 
             return Result.Success();
         }
         catch (AuthenticationException ex)
         {
-            _logger.LogError(ex, "Fallo de autenticación con el servidor SMTP {Host}:{Port}.", _options.Host, _options.Port);
+            LogAuthenticationFailed(_logger, ex, _options.Host, _options.Port);
             return Result.Failure(EmailErrors.AuthenticationFailed(ex.Message));
         }
         catch (SmtpCommandException ex)
         {
-            _logger.LogError(ex, "Error en comando del protocolo SMTP ({StatusCode}) al despachar hacia [{Host}].", ex.StatusCode, _options.Host);
+            LogSmtpCommandFailed(_logger, ex, ex.StatusCode, _options.Host);
             return Result.Failure(EmailErrors.SendFailed($"[{ex.StatusCode}] {ex.Message}"));
         }
         catch (Exception ex) when (ex is System.Net.Sockets.SocketException or System.IO.IOException or TimeoutException)
         {
-            _logger.LogError(ex, "Fallo de conectividad de red con el host SMTP {Host}:{Port}.", _options.Host, _options.Port);
+            LogConnectivityFailed(_logger, ex, _options.Host, _options.Port);
             return Result.Failure(EmailErrors.SmtpConnectionFailed(ex.Message));
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Error no controlado durante el envío de correo hacia {Host}:{Port}.", _options.Host, _options.Port);
+            LogUnhandledEmailSendError(_logger, ex, _options.Host, _options.Port);
             return Result.Failure(EmailErrors.SendFailed(ex.Message));
         }
     }
@@ -179,7 +197,7 @@ public sealed class MailKitSmtpEmailService : IEmailService
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Error al componer o renderizar la plantilla de correo {TemplateType}.", templateType);
+            LogTemplateRenderError(_logger, ex, templateType);
             return Result.Failure(EmailErrors.TemplateNotFound(ex.Message));
         }
     }

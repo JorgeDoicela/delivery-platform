@@ -18,6 +18,7 @@ import {
 } from "@/features/tenant";
 import { useAuthStore, UserRole, isUserInRole } from "@/features/auth";
 import { ThemeToggle } from "@/shared/components/ThemeToggle";
+import { useIsMounted } from "@/shared/hooks/useIsMounted";
 import { StorefrontMobileDrawer } from "./StorefrontMobileDrawer";
 import { useSmartScrollHeader } from "@/shared/hooks/useSmartScrollHeader";
 import { useTenantRoutes } from "@/shared/lib/tenant-routing";
@@ -51,9 +52,13 @@ export function StorefrontHeader() {
     ? "/images/platform/logo.png"
     : tenant?.logoUrl || "/images/shared/placeholders/logo-default.png";
 
-  const user = useAuthStore((s) => s.user);
-  const isAuthenticated = useAuthStore((s) => s.isAuthenticated);
+  const isMounted = useIsMounted();
+  const rawUser = useAuthStore((s) => s.user);
+  const rawIsAuthenticated = useAuthStore((s) => s.isAuthenticated);
   const logout = useAuthStore((s) => s.logout);
+
+  const isAuthenticated = isMounted && rawIsAuthenticated;
+  const user = isMounted ? rawUser : null;
 
   const isSuperAdmin = isUserInRole(user, UserRole.SuperAdmin);
   const isTenantAdmin = isUserInRole(user, UserRole.TenantAdmin);
@@ -85,6 +90,13 @@ export function StorefrontHeader() {
           : isDriver
             ? "Repartidor"
             : null;
+
+  const isHomeActive =
+    pathname === brandHomeHref || (routes.basePath ? pathname === routes.basePath : pathname === "/");
+  const isCatalogActive =
+    pathname.includes("menu") || pathname.includes("catalogo");
+  const isPedidosActive =
+    pathname.includes("pedidos") || pathname.includes("rastreo") || pathname.includes("track");
 
   // Cerrar menú móvil al navegar
   const [prevPathname, setPrevPathname] = useState(pathname);
@@ -162,17 +174,29 @@ export function StorefrontHeader() {
 
             <nav className="hidden xl:flex items-center gap-6 text-[13px] sm:text-sm font-semibold text-text-strong">
               <Link
+                href={brandHomeHref}
+                className={`transition-colors hover:text-brand-primary ${
+                  isHomeActive ? "text-brand-primary font-bold" : ""
+                }`}
+              >
+                Inicio
+              </Link>
+              <Link
                 href={catalogHref}
-                className="hover:text-brand-primary transition-colors"
+                className={`transition-colors hover:text-brand-primary ${
+                  isCatalogActive ? "text-brand-primary font-bold" : ""
+                }`}
               >
                 {isPlatformRoot ? "Restaurantes" : "Menú & Combos"}
               </Link>
               {isAuthenticated && (
                 <Link
-                  href={routes.getRastreoHref()}
-                  className="hover:text-brand-primary transition-colors"
+                  href={routes.getPedidosHref()}
+                  className={`transition-colors hover:text-brand-primary ${
+                    isPedidosActive ? "text-brand-primary font-bold" : ""
+                  }`}
                 >
-                  Rastrear Pedido
+                  Mis Pedidos
                 </Link>
               )}
             </nav>
@@ -206,12 +230,7 @@ export function StorefrontHeader() {
               className="hidden sm:flex flex-col items-center justify-center text-text-strong hover:text-brand-primary transition-colors px-1 shrink-0 relative"
               title={isAuthenticated ? `Mi Cuenta (${user?.fullName})` : "Mi Perfil / Iniciar Sesión"}
             >
-              <div className="relative">
-                <User className="w-5 h-5 text-text-strong stroke-[1.8]" />
-                {isAuthenticated && (
-                  <span className="absolute -top-0.5 -right-0.5 w-2 h-2 rounded-full bg-emerald-500 border border-white dark:border-neutral-900" />
-                )}
-              </div>
+              <User className="w-5 h-5 text-text-strong stroke-[1.8]" />
               <span
                 suppressHydrationWarning
                 className="text-[10px] font-semibold text-text-muted leading-none mt-1"

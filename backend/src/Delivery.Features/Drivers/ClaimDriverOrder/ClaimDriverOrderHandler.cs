@@ -176,6 +176,10 @@ public sealed class ClaimDriverOrderHandler : IHandler<ClaimDriverOrderCommand, 
 
         // 5. Notificar en tiempo real a clientes y pantallas de cocina
         await _trackingNotifier.NotifyOrderStatusChangedAsync(order.Id, order.Status, cancellationToken);
+        if (order.CreatedByUserId.HasValue)
+        {
+            await _trackingNotifier.NotifyUserOrdersChangedAsync(order.CreatedByUserId.Value, order.Id, cancellationToken);
+        }
         await _kitchenNotifier.NotifyOrderStatusChangedAsync(order.Id, order.Status, cancellationToken);
 
         var response = new ClaimDriverOrderResponse(
