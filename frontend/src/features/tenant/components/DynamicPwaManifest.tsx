@@ -1,26 +1,28 @@
 "use client";
 
 import { useEffect } from "react";
-import { useTenantStore } from "../store/useTenantStore";
+import { useParams } from "next/navigation";
+import { useCartStore } from "@/features/cart";
 
 interface DynamicPwaManifestProps {
-  slug: string;
+  slug?: string;
 }
 
 /**
  * Sincroniza dinamicamente la etiqueta <link rel="manifest"> en document.head
  * con el tenant y la sucursal seleccionada en tiempo de ejecucion.
  */
-export function DynamicPwaManifest({ slug }: DynamicPwaManifestProps) {
-  const selectedBranchId = useTenantStore((s) => s.selectedBranchId);
+export function DynamicPwaManifest({ slug: explicitSlug }: DynamicPwaManifestProps = {}) {
+  const params = useParams();
+  const routeSlug = typeof params?.slug === "string" ? params.slug : "";
+  const slug = explicitSlug || routeSlug;
+  const selectedBranchId = useCartStore((s) => s.branchId);
 
   useEffect(() => {
-    if (typeof document === "undefined") return;
+    if (typeof document === "undefined" || !slug) return;
 
     const query = new URLSearchParams();
-    if (slug) {
-      query.set("slug", slug);
-    }
+    query.set("slug", slug);
     if (selectedBranchId !== null && selectedBranchId !== undefined) {
       query.set("branch", String(selectedBranchId));
     }

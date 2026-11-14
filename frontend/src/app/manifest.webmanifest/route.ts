@@ -1,1 +1,1 @@
-export { GET, dynamic } from "../manifest.json/route";
+export { GET } from "../manifest.json/route";

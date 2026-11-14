@@ -3,13 +3,6 @@ import React from "react";
 import { RESERVED_TENANT_SLUGS } from "@/shared/lib/tenant-context";
 import { DynamicPwaManifest } from "@/features/tenant";
 
-interface TenantStorefrontLayoutProps {
-  children: React.ReactNode;
-  params: Promise<{
-    slug: string;
-  }>;
-}
-
 export async function generateMetadata({
   params,
 }: {
@@ -25,16 +18,16 @@ export async function generateMetadata({
   };
 }
 
-export default async function TenantStorefrontLayout({
+export default function TenantStorefrontLayout({
   children,
-  params,
-}: TenantStorefrontLayoutProps) {
-  const { slug } = await params;
-  const isReserved = !slug || RESERVED_TENANT_SLUGS.has(slug.toLowerCase());
-
+}: {
+  children: React.ReactNode;
+}) {
   return (
     <>
-      {!isReserved && <DynamicPwaManifest slug={slug} />}
+      <React.Suspense fallback={null}>
+        <DynamicPwaManifest />
+      </React.Suspense>
       {children}
     </>
   );

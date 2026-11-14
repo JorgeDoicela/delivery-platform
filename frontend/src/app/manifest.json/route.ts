@@ -8,8 +8,6 @@ import {
 import { FALLBACK_TENANT_CONFIGS } from "@/features/tenant/store/useTenantStore";
 import type { TenantStorefrontConfigDto } from "@/shared/types/api";
 
-export const dynamic = "force-dynamic";
-
 export async function GET(request: NextRequest) {
   const url = new URL(request.url);
   let slug = url.searchParams.get("slug")?.trim() || null;
