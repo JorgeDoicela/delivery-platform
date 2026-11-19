@@ -13,6 +13,7 @@ public sealed class GetDriverOrdersEndpoint : IEndpoint
     {
         app.MapGet("/api/driver/orders", async (
             int? branchId,
+            bool? allBranches,
             GetDriverOrdersHandler handler,
             HttpContext httpContext,
             CancellationToken ct) =>
@@ -29,9 +30,12 @@ public sealed class GetDriverOrdersEndpoint : IEndpoint
                 );
             }
 
-            // Si no se suministra branchId por querystring, intentar extraer de claims
+            var isAllBranches = allBranches == true;
             int? effectiveBranchId = branchId;
-            if (!effectiveBranchId.HasValue)
+
+            // Si no se solicitan todas las sucursales y no se suministra branchId por querystring,
+            // intentar extraer de claims del token de sesión
+            if (!isAllBranches && !effectiveBranchId.HasValue)
             {
                 var branchClaim = httpContext.User.FindFirstValue("branch_id");
                 if (!string.IsNullOrWhiteSpace(branchClaim) && int.TryParse(branchClaim, out var parsedBranch))
@@ -40,7 +44,7 @@ public sealed class GetDriverOrdersEndpoint : IEndpoint
                 }
             }
 
-            var query = new GetDriverOrdersQuery(userId, effectiveBranchId);
+            var query = new GetDriverOrdersQuery(userId, effectiveBranchId, isAllBranches);
             var result = await handler.Handle(query, ct);
 
             return result.ToHttpResult();

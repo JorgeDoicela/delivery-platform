@@ -15,7 +15,7 @@ public static class GetDriverOrdersErrors
     );
 }
 
-public sealed record GetDriverOrdersQuery(Guid UserId, int? BranchId = null);
+public sealed record GetDriverOrdersQuery(Guid UserId, int? BranchId = null, bool AllBranches = false);
 
 public sealed record DriverOrderItemDto(
     string ProductName,
@@ -84,10 +84,14 @@ public sealed class GetDriverOrdersHandler : IHandler<GetDriverOrdersQuery, Resu
             return Result.Failure<DriverOrdersResponse>(GetDriverOrdersErrors.DriverNotFound);
         }
 
-        // Determinar sucursal operativa del motorizado
-        var branchId = query.BranchId
-            ?? driver.User.UserRoles.FirstOrDefault(ur => ur.RoleId == Role.Driver && ur.BranchId.HasValue)?.BranchId
-            ?? driver.User.UserRoles.FirstOrDefault(ur => ur.BranchId.HasValue)?.BranchId;
+        // Determinar sucursal operativa del motorizado (si AllBranches = true, no se acota a sucursal fija)
+        int? branchId = null;
+        if (!query.AllBranches)
+        {
+            branchId = query.BranchId
+                ?? driver.User.UserRoles.FirstOrDefault(ur => ur.RoleId == Role.Driver && ur.BranchId.HasValue)?.BranchId
+                ?? driver.User.UserRoles.FirstOrDefault(ur => ur.BranchId.HasValue)?.BranchId;
+        }
 
         // 2. Pedidos activos asignados al motorizado en curso (OnTheWay)
         var activeDeliveries = await _context.OrderDeliveries

@@ -45,8 +45,11 @@ export function useSmartScrollHeader(options: SmartScrollHeaderOptions = {}) {
   useEffect(() => {
     let ticking = false;
 
-    const updateHeader = () => {
-      const currentScrollY = window.scrollY;
+    const updateHeader = (targetScrollY?: number) => {
+      const currentScrollY =
+        typeof targetScrollY === "number"
+          ? targetScrollY
+          : (window.scrollY || document.documentElement.scrollTop || document.body.scrollTop || 0);
 
       // Protección contra rebote elástico en iOS y macOS
       if (currentScrollY <= 0) {
@@ -78,15 +81,23 @@ export function useSmartScrollHeader(options: SmartScrollHeaderOptions = {}) {
       ticking = false;
     };
 
-    const handleScroll = () => {
+    const handleScroll = (event?: Event) => {
       if (!ticking) {
         ticking = true;
-        window.requestAnimationFrame(updateHeader);
+        const target = event?.target;
+        const containerScroll =
+          target instanceof HTMLElement &&
+          target !== document.documentElement &&
+          target !== document.body
+            ? target.scrollTop
+            : undefined;
+
+        window.requestAnimationFrame(() => updateHeader(containerScroll));
       }
     };
 
-    window.addEventListener("scroll", handleScroll, { passive: true });
-    return () => window.removeEventListener("scroll", handleScroll);
+    window.addEventListener("scroll", handleScroll, { passive: true, capture: true });
+    return () => window.removeEventListener("scroll", handleScroll, { capture: true });
   }, [threshold, pinThreshold]);
 
   return { isVisible, isScrolled, setIsVisible };

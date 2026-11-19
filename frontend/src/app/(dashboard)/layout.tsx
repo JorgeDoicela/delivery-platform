@@ -17,7 +17,7 @@ function DashboardLayoutContent({
 }) {
   const pathname = usePathname();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-  const { isVisible: isBottomNavVisible } = useSmartScrollHeader({
+  const { isVisible, isScrolled } = useSmartScrollHeader({
     threshold: 15,
     pinThreshold: 76,
   });
@@ -98,6 +98,8 @@ function DashboardLayoutContent({
           canManageFranchise={canManageFranchise}
           isTenantAdmin={isTenantAdmin}
           isSuperAdmin={isSuperAdmin}
+          isHeaderVisible={isVisible}
+          isScrolled={isScrolled}
           onOpenMobileMenu={() => setIsMobileMenuOpen(true)}
         />
 
@@ -110,7 +112,7 @@ function DashboardLayoutContent({
           storefrontHref={storefrontHref}
         />
 
-        <main className="flex-1 p-3.5 sm:p-6 overflow-y-auto overflow-x-hidden flex flex-col bg-surface-canvas transition-colors duration-200 pb-24 md:pb-6">
+        <main className="flex-1 w-full p-3.5 sm:p-6 flex flex-col bg-surface-canvas transition-colors duration-200 pb-24 md:pb-6">
           {children}
         </main>
 
@@ -120,7 +122,7 @@ function DashboardLayoutContent({
           canManageFranchise={canManageFranchise}
           isTenantAdmin={isTenantAdmin}
           isSuperAdmin={isSuperAdmin}
-          isBottomNavVisible={isBottomNavVisible}
+          isBottomNavVisible={isVisible}
         />
       </div>
     </AuthGuard>

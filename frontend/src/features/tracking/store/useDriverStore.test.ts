@@ -218,7 +218,7 @@ describe('useDriverStore', () => {
     useDriverStore.getState().setSelectedBranchId(2);
 
     expect(useDriverStore.getState().selectedBranchId).toBe(2);
-    expect(getDriverOrdersSpy).toHaveBeenCalledWith(2);
+    expect(getDriverOrdersSpy).toHaveBeenCalledWith(2, false);
   });
 });
 

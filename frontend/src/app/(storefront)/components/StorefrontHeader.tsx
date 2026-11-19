@@ -2,7 +2,6 @@
 
 import React, { useState, useEffect } from "react";
 import Link from "next/link";
-import Image from "next/image";
 import { usePathname } from "next/navigation";
 import {
   User,
@@ -17,7 +16,7 @@ import {
   useCurrentTenantQuery,
 } from "@/features/tenant";
 import { useAuthStore, UserRole, isUserInRole } from "@/features/auth";
-import { ThemeToggle } from "@/shared/components/ThemeToggle";
+import { ThemeToggle, AppHeader } from "@/shared/components";
 import { useIsMounted } from "@/shared/hooks/useIsMounted";
 import { StorefrontMobileDrawer } from "./StorefrontMobileDrawer";
 import { useSmartScrollHeader } from "@/shared/hooks/useSmartScrollHeader";
@@ -119,91 +118,60 @@ export function StorefrontHeader() {
 
   return (
     <>
-      <header
+      <AppHeader
         onFocus={() => setIsVisible(true)}
-        className={`sticky top-0 z-40 bg-surface-card border-b border-surface-border will-change-transform transition-all duration-300 ease-in-out ${
-          isVisible
-            ? "translate-y-0 opacity-100"
-            : "-translate-y-full opacity-0 pointer-events-none"
-        } ${
-          isScrolled
-            ? "bg-surface-card/95 backdrop-blur-md"
-            : ""
-        }`}
-      >
-        <div className="max-w-7xl mx-auto px-2.5 sm:px-6 lg:px-8 h-[52px] sm:h-[76px] flex items-center justify-between gap-2 sm:gap-6">
-          <div className="flex items-center gap-2 sm:gap-4 lg:gap-7 min-w-0 shrink">
-            {/* Disparador de menú (3 líneas) al lado izquierdo antes del logo en pantallas < xl */}
-            <button
-              type="button"
-              onClick={() => setIsMobileMenuOpen(true)}
-              className="p-1.5 -ml-1 sm:-ml-2 rounded-full text-text-strong hover:bg-surface-card-hover cursor-pointer shrink-0 transition-colors xl:hidden"
-              aria-label="Abrir menú de navegación"
+        isVisible={isVisible}
+        isScrolled={isScrolled}
+        pinOnDesktop={false}
+        leadingAction={
+          <button
+            type="button"
+            onClick={() => setIsMobileMenuOpen(true)}
+            className="p-1.5 -ml-1 sm:-ml-2 rounded-full text-text-strong hover:bg-surface-card-hover cursor-pointer shrink-0 transition-colors xl:hidden"
+            aria-label="Abrir menú de navegación"
+          >
+            <Menu className="w-5 h-5 sm:w-6 sm:h-6" />
+          </button>
+        }
+        brand={{
+          name: brandName,
+          logo: brandLogo,
+          href: brandHomeHref,
+          tagline: brandTagline,
+          variant: "primary",
+        }}
+        navigation={
+          <nav className="hidden xl:flex items-center gap-6 text-[13px] sm:text-sm font-semibold text-text-strong">
+            <Link
+              href={brandHomeHref}
+              className={`transition-colors hover:text-brand-primary ${
+                isHomeActive ? "text-brand-primary font-bold" : ""
+              }`}
             >
-              <Menu className="w-5 h-5 sm:w-6 sm:h-6" />
-            </button>
-
-            {/* Logo y Nombre de Marca */}
-            <Link href={brandHomeHref} className="flex items-center gap-2 sm:gap-2.5 group min-w-0 shrink">
-              <div className="relative w-7 h-7 sm:w-10 sm:h-10 shrink-0">
-                <Image
-                  src={brandLogo}
-                  alt={`Logo ${brandName}`}
-                  width={40}
-                  height={40}
-                  priority
-                  className="w-full h-full object-contain"
-                />
-              </div>
-              <div className="min-w-0">
-                <span
-                  data-display-brand
-                  className="font-black text-lg sm:text-[26px] tracking-tight text-brand-primary block leading-none uppercase font-display truncate max-w-[150px] sm:max-w-none"
-                  suppressHydrationWarning
-                >
-                  {brandName}
-                </span>
-                <span
-                  className="text-[9px] sm:text-[10px] tracking-widest text-text-muted font-bold uppercase mt-0.5 truncate hidden sm:block"
-                  suppressHydrationWarning
-                >
-                  {brandTagline}
-                </span>
-              </div>
+              Inicio
             </Link>
-
-            <nav className="hidden xl:flex items-center gap-6 text-[13px] sm:text-sm font-semibold text-text-strong">
+            <Link
+              href={catalogHref}
+              className={`transition-colors hover:text-brand-primary ${
+                isCatalogActive ? "text-brand-primary font-bold" : ""
+              }`}
+            >
+              {isPlatformRoot ? "Restaurantes" : "Menú & Combos"}
+            </Link>
+            {isAuthenticated && (
               <Link
-                href={brandHomeHref}
+                href={routes.getPedidosHref()}
                 className={`transition-colors hover:text-brand-primary ${
-                  isHomeActive ? "text-brand-primary font-bold" : ""
+                  isPedidosActive ? "text-brand-primary font-bold" : ""
                 }`}
               >
-                Inicio
+                Mis Pedidos
               </Link>
-              <Link
-                href={catalogHref}
-                className={`transition-colors hover:text-brand-primary ${
-                  isCatalogActive ? "text-brand-primary font-bold" : ""
-                }`}
-              >
-                {isPlatformRoot ? "Restaurantes" : "Menú & Combos"}
-              </Link>
-              {isAuthenticated && (
-                <Link
-                  href={routes.getPedidosHref()}
-                  className={`transition-colors hover:text-brand-primary ${
-                    isPedidosActive ? "text-brand-primary font-bold" : ""
-                  }`}
-                >
-                  Mis Pedidos
-                </Link>
-              )}
-            </nav>
-          </div>
-
-          <div className="flex items-center gap-1.5 sm:gap-3 shrink-0">
-            {/* El conmutador multi-marca solo se expone en la landing de la plataforma (/); en la tienda del restaurante se ofrece el selector de sucursales */}
+            )}
+          </nav>
+        }
+        actions={
+          <>
             <div className="hidden sm:block">
               {isPlatformRoot ? (
                 <TenantSwitcher variant="auto" />
@@ -240,9 +208,9 @@ export function StorefrontHeader() {
             </Link>
 
             <CartButtonBadge />
-          </div>
-        </div>
-      </header>
+          </>
+        }
+      />
 
       {/* Drawer Deslizante Móvil Modularizado */}
       <StorefrontMobileDrawer

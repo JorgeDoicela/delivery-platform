@@ -4,6 +4,7 @@ import { useEffect } from 'react';
 import { RefreshCw, AlertCircle, PackageCheck, ChefHat, BarChart3 } from 'lucide-react';
 import { useDriverStore } from '../store/useDriverStore';
 import { useDriverHub } from '../hooks/useDriverHub';
+import { useTenantStore } from '@/features/tenant';
 import { DriverHeader } from './DriverHeader';
 import { ActiveDeliveryTab } from './ActiveDeliveryTab';
 import { AvailableOrdersTab } from './AvailableOrdersTab';
@@ -45,11 +46,13 @@ export function DriverDeliveryView({ initialOrderId }: DriverDeliveryViewProps) 
     }
   }, [initialOrderId, setSelectedOrderId, setActiveTab]);
 
-  // Suscripción en tiempo real a SignalR (Cocina y Despacho según sucursal activa)
+  // Suscripción en tiempo real a SignalR (Cocina y Despacho según sucursal activa y tenant)
   const selectedBranchId = useDriverStore((s) => s.selectedBranchId);
   const effectiveBranchId = selectedBranchId !== null ? selectedBranchId : profile?.branchId;
+  const tenantSlug = useTenantStore((s) => s.tenantSlug);
   const { connectionStatus } = useDriverHub({
     branchId: effectiveBranchId,
+    tenantSlug,
     enabled: Boolean(profile),
   });
 

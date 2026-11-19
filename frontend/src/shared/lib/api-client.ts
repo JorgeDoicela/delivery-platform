@@ -408,8 +408,14 @@ export const apiClient = {
     },
 
     // 14. Repartidor: Bandejas de pedidos (Activos, Disponibles, Entregados hoy)
-    async getDriverOrders(branchId?: number): Promise<DriverOrdersResponse> {
-        const query = branchId ? `?branchId=${branchId}` : "";
+    async getDriverOrders(branchId?: number | null, allBranches?: boolean): Promise<DriverOrdersResponse> {
+        const params = new URLSearchParams();
+        if (allBranches) {
+            params.set("allBranches", "true");
+        } else if (branchId !== undefined && branchId !== null) {
+            params.set("branchId", String(branchId));
+        }
+        const query = params.toString() ? `?${params.toString()}` : "";
         const res = await fetch(`${getApiBaseUrl()}/api/driver/orders${query}`, {
             method: "GET",
             headers: buildHeaders(),

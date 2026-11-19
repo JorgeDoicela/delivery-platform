@@ -11,10 +11,11 @@ export type DriverConnectionStatus = 'connected' | 'reconnecting' | 'disconnecte
 
 interface UseDriverHubOptions {
   branchId?: number | null;
+  tenantSlug?: string | null;
   enabled?: boolean;
 }
 
-export function useDriverHub({ branchId, enabled = true }: UseDriverHubOptions = {}) {
+export function useDriverHub({ branchId, tenantSlug, enabled = true }: UseDriverHubOptions = {}) {
   const [connectionStatus, setConnectionStatus] = useState<DriverConnectionStatus>('disconnected');
   const handleOrderStatusChange = useDriverStore((s) => s.handleOrderStatusChange);
   const fetchDashboard = useDriverStore((s) => s.fetchDashboard);
@@ -47,6 +48,9 @@ export function useDriverHub({ branchId, enabled = true }: UseDriverHubOptions =
     connection.onreconnected(async () => {
       if (!isMounted) return;
       setConnectionStatus('connected');
+      if (tenantSlug) {
+        await connection.invoke('JoinTenantChannel', tenantSlug).catch(() => {});
+      }
       if (branchId) {
         await connection.invoke('JoinBranchKitchen', branchId).catch(() => {});
       }
@@ -99,6 +103,9 @@ export function useDriverHub({ branchId, enabled = true }: UseDriverHubOptions =
           return;
         }
         setConnectionStatus('connected');
+        if (tenantSlug) {
+          await connection.invoke('JoinTenantChannel', tenantSlug).catch(() => {});
+        }
         if (branchId) {
           await connection.invoke('JoinBranchKitchen', branchId).catch(() => {});
         }
@@ -137,7 +144,7 @@ export function useDriverHub({ branchId, enabled = true }: UseDriverHubOptions =
         connectionRef.current = null;
       }
     };
-  }, [branchId, enabled, handleOrderStatusChange, fetchDashboard]);
+  }, [branchId, tenantSlug, enabled, handleOrderStatusChange, fetchDashboard]);
 
   return { connectionStatus };
 }

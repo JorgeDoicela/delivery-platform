@@ -19,7 +19,6 @@ export function DriverHeader({
   profile,
   shiftSummary,
   onToggleAvailability,
-  connectionStatus = 'connected',
 }: DriverHeaderProps) {
   const [isToggling, setIsToggling] = useState(false);
   const isAvailable = profile?.isAvailable ?? true;
@@ -50,12 +49,12 @@ export function DriverHeader({
   ];
 
   return (
-    <div className="bg-surface-card border border-surface-border rounded-3xl p-4 sm:p-5 shadow-xs transition-colors duration-200 space-y-3.5">
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+    <div className="bg-transparent sm:bg-surface-card border-b border-surface-border sm:border sm:border-surface-border rounded-none sm:rounded-3xl pb-3.5 pt-1 sm:p-5 shadow-none sm:shadow-xs transition-colors duration-200 space-y-3">
+      <div className="flex items-center justify-between gap-3">
         {/* Identidad del Repartidor */}
         <div className="flex items-center gap-3 min-w-0">
-          <div className="w-12 h-12 rounded-2xl bg-surface-canvas border border-surface-border flex items-center justify-center text-brand-primary shrink-0">
-            {isMotorcycle ? <Bike className="w-6 h-6" /> : <Car className="w-6 h-6" />}
+          <div className="text-brand-primary shrink-0">
+            {isMotorcycle ? <Bike className="w-7 h-7" /> : <Car className="w-7 h-7" />}
           </div>
           <div className="min-w-0">
             <div className="flex items-center gap-2">
@@ -63,14 +62,14 @@ export function DriverHeader({
                 {profile?.fullName || 'Repartidor'}
               </h1>
               {profile?.licensePlate && (
-                <span className="font-mono text-[10px] font-bold px-2 py-0.5 rounded-md bg-surface-canvas border border-surface-border text-text-muted shrink-0">
-                  {profile.licensePlate}
+                <span className="font-mono text-xs text-text-muted shrink-0 font-bold">
+                  • {profile.licensePlate}
                 </span>
               )}
             </div>
 
             {branches.length > 1 ? (
-              <div className="flex items-center gap-1.5 mt-1">
+              <div className="flex items-center gap-1.5 mt-0.5">
                 <Select<string>
                   options={branchOptions}
                   value={selectedBranchId ? String(selectedBranchId) : ""}
@@ -96,38 +95,12 @@ export function DriverHeader({
         </div>
 
         {/* Acciones y Estado de Disponibilidad */}
-        <div className="flex items-center gap-2 self-end sm:self-auto shrink-0">
-          {connectionStatus === 'connected' ? (
-            <div
-              className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-status-success/15 border border-status-success/30 text-status-success text-[11px] font-bold uppercase tracking-wider font-mono select-none shadow-xs"
-              title="Sincronización en tiempo real activa vía WebSockets"
-            >
-              <span className="w-2 h-2 rounded-full bg-status-success animate-pulse" />
-              <span>En Vivo</span>
-            </div>
-          ) : connectionStatus === 'reconnecting' ? (
-            <div
-              className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-status-warning/15 border border-status-warning/30 text-status-warning text-[11px] font-bold uppercase tracking-wider font-mono select-none shadow-xs"
-              title="Reconectando con el servidor..."
-            >
-              <span className="w-2 h-2 rounded-full bg-status-warning animate-ping" />
-              <span>Reconectando</span>
-            </div>
-          ) : (
-            <div
-              className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-surface-canvas border border-surface-border text-text-muted text-[11px] font-bold uppercase tracking-wider font-mono select-none shadow-xs"
-              title="Sincronización automática activa"
-            >
-              <span className="w-2 h-2 rounded-full bg-neutral-400" />
-              <span>En Línea</span>
-            </div>
-          )}
-
+        <div className="flex items-center shrink-0">
           <button
             type="button"
             onClick={handleToggle}
             disabled={isToggling}
-            className={`flex items-center gap-2 px-4 py-2.5 rounded-full text-xs font-bold uppercase tracking-wider border transition-all cursor-pointer ${
+            className={`flex items-center gap-2 px-4 py-2 rounded-full text-xs font-bold uppercase tracking-wider border transition-all cursor-pointer ${
               isAvailable
                 ? 'bg-status-success/15 text-status-success border-status-success/40 hover:bg-status-success/25'
                 : 'bg-status-warning/15 text-status-warning border-status-warning/40 hover:bg-status-warning/25'
@@ -149,8 +122,8 @@ export function DriverHeader({
       </div>
 
       {/* Resumen Rápido de Turno */}
-      <div className="grid grid-cols-2 gap-2.5 pt-1 border-t border-surface-border text-xs">
-        <div className="flex items-center gap-2 bg-surface-canvas px-3.5 py-2.5 rounded-2xl border border-surface-border">
+      <div className="grid grid-cols-2 gap-2 pt-2 border-t border-surface-border text-xs">
+        <div className="flex items-center gap-2.5 py-1">
           <Package className="w-4 h-4 text-brand-primary shrink-0" />
           <div className="min-w-0">
             <span className="text-[10px] text-text-muted block leading-none">Entregados hoy</span>
@@ -160,7 +133,7 @@ export function DriverHeader({
           </div>
         </div>
 
-        <div className="flex items-center gap-2 bg-surface-canvas px-3.5 py-2.5 rounded-2xl border border-surface-border">
+        <div className="flex items-center gap-2.5 py-1">
           <DollarSign className="w-4 h-4 text-status-success shrink-0" />
           <div className="min-w-0">
             <span className="text-[10px] text-text-muted block leading-none">Efectivo en mano</span>

@@ -53,10 +53,14 @@ export const useDriverStore = create<DriverStoreState>()((set, get) => ({
   fetchDashboard: async (branchId?: number | null) => {
     set({ loading: true, error: null });
     try {
-      const nextBranchId = branchId !== undefined ? branchId : get().selectedBranchId;
+      const isExplicitBranch = branchId !== undefined;
+      const currentSelectedBranch = get().selectedBranchId;
+      const effectiveBranchId = isExplicitBranch ? branchId : currentSelectedBranch;
+      const isAllBranches = isExplicitBranch && branchId === null;
+
       const [profileData, ordersData] = await Promise.all([
         apiClient.getDriverProfile(),
-        apiClient.getDriverOrders(nextBranchId ?? undefined),
+        apiClient.getDriverOrders(effectiveBranchId ?? undefined, isAllBranches),
       ]);
 
       const active = ordersData.activeOrders || [];
@@ -69,7 +73,9 @@ export const useDriverStore = create<DriverStoreState>()((set, get) => ({
           : null;
 
       // Si aún no se ha seleccionado sucursal, sincronizar con la sucursal asignada del perfil
-      const resolvedBranchId = nextBranchId !== undefined ? nextBranchId : (profileData?.branchId ?? null);
+      const resolvedBranchId = isExplicitBranch
+        ? branchId
+        : (currentSelectedBranch ?? profileData?.branchId ?? null);
 
       set({
         profile: profileData,

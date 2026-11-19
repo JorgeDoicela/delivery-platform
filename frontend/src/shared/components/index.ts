@@ -20,3 +20,16 @@ export {
 } from "./Select";
 
 export { ThemeToggle } from "./ThemeToggle";
+
+export {
+  AppHeader,
+  AppHeaderBrand,
+  AppHeaderLeading,
+  AppHeaderNav,
+  AppHeaderActions,
+  type AppHeaderProps,
+  type AppHeaderBrandProps,
+  type AppHeaderLeadingProps,
+  type AppHeaderNavProps,
+  type AppHeaderActionsProps,
+} from "./AppHeader";

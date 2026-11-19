@@ -75,15 +75,13 @@ export function ActiveDeliveryTab({
 
   if (!currentOrder || activeOrders.length === 0) {
     return (
-      <div className="bg-surface-card border border-surface-border rounded-3xl p-8 sm:p-12 text-center shadow-xs space-y-5 my-2">
-        <div className="w-16 h-16 rounded-full bg-surface-canvas border border-surface-border mx-auto flex items-center justify-center text-text-muted">
-          <PackageCheck className="w-8 h-8" />
-        </div>
+      <div className="border-0 sm:border sm:border-surface-border rounded-none sm:rounded-3xl bg-transparent sm:bg-surface-card p-6 sm:p-12 text-center shadow-none sm:shadow-xs space-y-4 my-2">
+        <PackageCheck className="w-12 h-12 text-text-muted/60 mx-auto" strokeWidth={1.5} />
         <div>
           <h3 className="font-display font-black text-xl uppercase tracking-tight text-text-strong">
             Sin Entregas en Curso
           </h3>
-          <p className="text-xs text-text-muted max-w-sm mx-auto mt-1.5 leading-relaxed">
+          <p className="text-xs text-text-muted max-w-sm mx-auto mt-1 leading-relaxed">
             Actualmente no tienes ningún pedido asignado en ruta. Revisa las comandas listas en cocina para iniciar un reparto.
           </p>
         </div>
