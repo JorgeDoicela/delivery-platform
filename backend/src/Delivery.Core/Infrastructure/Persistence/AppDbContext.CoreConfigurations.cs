@@ -198,6 +198,35 @@ public partial class AppDbContext
             ca.HasQueryFilter(x => CurrentTenantId == null || x.User.TenantId == null || x.User.TenantId == CurrentTenantId);
         });
 
+        modelBuilder.Entity<WebAuthnCredential>(w =>
+        {
+            w.ToTable("WebAuthnCredentials");
+            w.HasKey(x => x.Id);
+            w.Property(x => x.CredentialId).IsRequired();
+            w.HasIndex(x => x.CredentialId).IsUnique();
+            w.Property(x => x.PublicKey).IsRequired();
+            w.Property(x => x.AttestationFormat).HasMaxLength(50).IsRequired();
+            w.Property(x => x.CredentialType).HasMaxLength(50).IsRequired();
+            w.Property(x => x.FriendlyName).HasMaxLength(150).IsRequired();
+            w.Property(x => x.AuthenticatorType).HasMaxLength(50);
+            w.Property(x => x.TransportsJson).HasColumnType("text");
+
+            w.HasIndex(x => new { x.UserId, x.IsActive });
+            w.HasIndex(x => new { x.TenantId, x.UserId });
+
+            w.HasOne(x => x.User)
+                .WithMany(x => x.WebAuthnCredentials)
+                .HasForeignKey(x => x.UserId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            w.HasOne(x => x.Tenant)
+                .WithMany()
+                .HasForeignKey(x => x.TenantId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            w.HasQueryFilter(x => CurrentTenantId == null || x.TenantId == null || x.TenantId == CurrentTenantId);
+        });
+
         // -------------------------------------------------------------
         // 3. Sucursales, Salón y Geocercas PostGIS
         // -------------------------------------------------------------

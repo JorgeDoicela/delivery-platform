@@ -84,11 +84,12 @@ public class VerticalSliceArchitectureRegistrationTests
         // Act
         services.AddDeliveryFeatures();
 
-        // Assert: Deben registrarse exactamente 47 endpoints autónomos
+        // Assert: Deben registrarse exactamente 48 endpoints autónomos
         var endpointDescriptors = services.Where(s => s.ServiceType == typeof(IEndpoint)).ToList();
-        endpointDescriptors.Should().HaveCount(47);
+        endpointDescriptors.Should().HaveCount(48);
 
         var endpointImplementationTypes = endpointDescriptors.Select(d => d.ImplementationType).ToHashSet();
+        endpointImplementationTypes.Should().Contain(typeof(Delivery.Features.Auth.WebAuthn.WebAuthnEndpoints));
         endpointImplementationTypes.Should().Contain(typeof(ResolveBranchEndpoint));
         endpointImplementationTypes.Should().Contain(typeof(GetBranchCapacityEndpoint));
         endpointImplementationTypes.Should().Contain(typeof(Delivery.Features.Branches.GetBranches.GetBranchesEndpoint));

@@ -12,6 +12,7 @@ import { useAuthStore } from "../store/useAuthStore";
 import { resolvePostLoginRedirect } from "../lib/redirectByRole";
 import { useCurrentTenantQuery, useTenantStore } from "@/features/tenant";
 import { GoogleSignInButton } from "./GoogleSignInButton";
+import { PasskeySignInButton } from "./PasskeySignInButton";
 import { useTenantRoutes, resolveTenantRouting } from "@/shared/lib/tenant-routing";
 
 interface LoginFormProps {
@@ -239,6 +240,8 @@ export function LoginForm({
           <span>Acceder al Sistema</span>
         )}
       </button>
+
+      <PasskeySignInButton redirectUrl={redirectUrl} />
 
       <GoogleSignInButton redirectUrl={redirectUrl} />
 

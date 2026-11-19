@@ -24,5 +24,6 @@ public class User
     public ICollection<PasswordResetToken> PasswordResetTokens { get; set; } = new List<PasswordResetToken>();
     public ICollection<EmailVerificationToken> EmailVerificationTokens { get; set; } = new List<EmailVerificationToken>();
     public ICollection<CustomerAddress> Addresses { get; set; } = new List<CustomerAddress>();
+    public ICollection<WebAuthnCredential> WebAuthnCredentials { get; set; } = new List<WebAuthnCredential>();
 }
 

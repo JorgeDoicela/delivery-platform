@@ -21,6 +21,9 @@ public static class DependencyInjection
         services.AddSingleton<IPasswordHasher, BCryptPasswordHasher>();
         services.AddSingleton<ITokenProvider, JwtTokenProvider>();
         services.AddScoped<Delivery.Features.Auth.GoogleAuth.IGoogleTokenValidator, Delivery.Features.Auth.GoogleAuth.GoogleTokenValidator>();
+        services.AddSingleton<IWebAuthnChallengeStore, RedisWebAuthnChallengeStore>();
+        services.AddScoped<IWebAuthnRelyingPartyResolver, WebAuthnRelyingPartyResolver>();
+        services.AddScoped<IWebAuthnProvider, Fido2WebAuthnProvider>();
 
         // 0.1 Servicios de Mensajería y Correo Electrónico SMTP
         services.AddSingleton<IEmailTemplateEngine, HtmlEmailTemplateEngine>();

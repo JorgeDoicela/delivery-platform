@@ -51,5 +51,39 @@ public static class AuthErrors
     public static readonly Error EmailAlreadyVerified = new(
         "Auth.EmailAlreadyVerified",
         "El correo electrónico ya ha sido verificado previamente.");
+
+    public static readonly Error PasskeyChallengeExpired = new(
+        "Auth.PasskeyChallengeExpired",
+        "El desafío de autenticación biométrica ha expirado o no es válido. Por favor, intenta de nuevo.");
+
+    public static readonly Error PasskeyVerificationFailed = new(
+        "Auth.PasskeyVerificationFailed",
+        "La verificación criptográfica de la llave de acceso o biometría (Passkey) ha fallado.");
+
+    public static readonly Error PasskeyNotFound = new(
+        "Auth.PasskeyNotFound",
+        "No se encontró una llave de acceso válida para esta cuenta.");
+
+    public static readonly Error PasskeyAlreadyRegistered = new(
+        "Auth.PasskeyAlreadyRegistered",
+        "Esta llave de acceso ya se encuentra registrada en la cuenta.");
+
+    public static readonly Error PasskeyCloneDetected = new(
+        "Auth.PasskeyCloneDetected",
+        "Alerta de seguridad: se detectó una discrepancia en el contador de firmas del dispositivo. Se rechazó el acceso por precaución.");
+
+    public static readonly Error PasskeyNotBelongsToUser = new(
+        "Auth.PasskeyNotBelongsToUser",
+        "La llave de acceso especificada no pertenece al usuario actual.");
+
+    public static readonly Error WebAuthnCredentialNotFound = PasskeyNotFound;
+
+    public static readonly Error UnauthorizedTenant = new(
+        "Auth.UnauthorizedTenant",
+        "El usuario no tiene autorización para operar en el establecimiento seleccionado.");
+
+    public static Error WebAuthnVerificationFailed(string detail) => new(
+        "Auth.WebAuthnVerificationFailed",
+        $"La verificación criptográfica de la llave de acceso falló: {detail}");
 }
 

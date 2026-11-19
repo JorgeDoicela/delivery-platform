@@ -8,6 +8,7 @@ import {
   type ChangePasswordFormData,
 } from "../schemas/accountSchemas";
 import { useAccountStore } from "../store/useAccountStore";
+import { PasskeySettingsSection } from "./PasskeySettingsSection";
 
 export function AccountSecuritySection() {
   const isSaving = useAccountStore((s) => s.isSaving);
@@ -138,6 +139,8 @@ export function AccountSecuritySection() {
           </button>
         </div>
       </form>
+
+      <PasskeySettingsSection />
     </div>
   );
 }

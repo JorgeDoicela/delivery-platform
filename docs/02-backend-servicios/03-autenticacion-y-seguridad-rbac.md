@@ -328,6 +328,69 @@ policy.SetIsOriginAllowed(origin =>
 
 ---
 
+## 8. Autenticación Biométrica y Passkeys (FIDO2 / WebAuthn)
+
+La plataforma incorpora soporte nativo para autenticación sin contraseña (*passwordless*) y segundo factor resistente a phishing mediante el estándar W3C WebAuthn / FIDO2 (Passkeys). Permite a los usuarios y operadores autenticarse con Face ID, Touch ID, Windows Hello o llaves de hardware (YubiKey).
+
+### 8.1. Arquitectura de Aislamiento Multi-Tenant (RP ID y Orígenes)
+
+Dado que la plataforma soporta dominio raíz, subdominios por comercio (`tenant.mesafy.doicela.dev`) y dominios personalizados (`CustomDomain`), la resolución de la entidad Relying Party (RP ID) es dinámica:
+
+| Contexto de Red | Origen Detectado | RP ID Resuelto | Alcance de la Credencial |
+| :--- | :--- | :--- | :--- |
+| **Desarrollo Local** | `http://localhost:3005` | `localhost` | Aislado a desarrollo local |
+| **Subdominio de Plataforma** | `https://la-granjita.mesafy.doicela.dev` | `mesafy.doicela.dev` | Compartida entre todos los subdominios de la plataforma |
+| **Dominio Personalizado** | `https://pedidos.lagranjita.com` | `pedidos.lagranjita.com` | Estricta al dominio propio del establecimiento |
+
+### 8.2. Almacenamiento y Ciclo de Vida de Desafíos (Challenges)
+
+* **Consumo Atómico de Desafíos:** Los desafíos criptográficos generados se persisten temporalmente en Redis bajo la clave `webauthn:reg:{userId}` o `webauthn:login:{sessionId}` con TTL de 5 minutos.
+* **Prevención de Replay:** La extracción se ejecuta mediante `StringGetDeleteAsync`, asegurando que cada desafío sea estrictamente monouso y destruido inmediatamente tras su primera lectura.
+* **Protección contra Autenticadores Clonados:** Cada aserción valida que el contador de firmas entrante (`SignCount`) sea estrictamente superior al último registrado en la entidad `WebAuthnCredential`. Discrepancias provocan el rechazo inmediato por alerta de clonación.
+
+### 8.3. Diagrama de Secuencia WebAuthn (Login)
+
+```mermaid
+sequenceDiagram
+    autonumber
+    actor Usuario as Navegador / Dispositivo
+    participant Frontend as usePasskeyAuth / @simplewebauthn
+    participant API as WebAuthnEndpoints (POST /login/complete)
+    participant Provider as Fido2WebAuthnProvider
+    participant Redis as Redis (ChallengeStore)
+    participant DB as PostgreSQL (WebAuthnCredentials)
+
+    Usuario->>Frontend: Clic en "Iniciar con Llave de Acceso"
+    Frontend->>API: POST /api/v1/auth/webauthn/login/options { email, tenantSlug }
+    API->>Provider: GenerateLoginOptionsAsync()
+    Provider->>Redis: Almacena AssertionOptions (TTL 5 min)
+    API-->>Frontend: { options, sessionId }
+    Frontend->>Usuario: startAuthentication(options) -> Diálogo biométrico del SO
+    Usuario-->>Frontend: Aserción firmada por hardware seguro
+    Frontend->>API: POST /api/v1/auth/webauthn/login/complete { sessionId, assertion, tenantSlug }
+    API->>Redis: RetrieveAndRemoveChallengeAsync(sessionId) (atómico)
+    API->>DB: Busca WebAuthnCredential por CredentialId (RawId)
+    API->>Provider: VerifyLoginAsync(assertion, storedPublicKey, signCount)
+    Provider-->>API: VerifyAssertionResult (SignCount actualizado)
+    API->>DB: Actualiza SignCount y LastUsedAt
+    API->>API: Emite JWT Access Token (15 min) y Refresh Token (7 días)
+    API-->>Frontend: Set-Cookie: refreshToken<br/>Body: { accessToken, user, expiresAt }
+```
+
+### 8.4. Catálogo de Endpoints WebAuthn
+
+| Método | Ruta | Autorización | Propósito |
+| :--- | :--- | :--- | :--- |
+| `POST` | `/api/v1/auth/webauthn/register/options` | `Bearer Token` | Genera desafío y parámetros de creación de credencial |
+| `POST` | `/api/v1/auth/webauthn/register/complete` | `Bearer Token` | Valida atestación del authenticator y persiste la Passkey |
+| `POST` | `/api/v1/auth/webauthn/login/options` | Público | Genera desafío de autenticación para login biométrico |
+| `POST` | `/api/v1/auth/webauthn/login/complete` | Público | Verifica firma de hardware y emite sesión JWT |
+| `GET` | `/api/v1/auth/webauthn/credentials` | `Bearer Token` | Lista las llaves registradas del usuario autenticado |
+| `PATCH` | `/api/v1/auth/webauthn/credentials/{id}` | `Bearer Token` | Actualiza el nombre amigable de una llave de acceso |
+| `DELETE` | `/api/v1/auth/webauthn/credentials/{id}` | `Bearer Token` | Revoca y elimina permanentemente una llave de acceso |
+
+---
+
 ## Navegacion de Documentacion
 * **Anterior:** [02. SignalR Hubs](./02-signalr-hubs.md)
 * **Siguiente:** [04. Motor Multitenant y Personalizacion](./04-multitenancy-y-personalizacion.md)
