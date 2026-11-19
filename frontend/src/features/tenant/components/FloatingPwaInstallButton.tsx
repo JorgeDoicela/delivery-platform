@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState } from "react";
-import { Download, Share, PlusSquare, X, Smartphone, CheckCircle2 } from "lucide-react";
+import { ArrowDownToLine, Share, PlusSquare, X, Smartphone, CheckCircle2 } from "lucide-react";
 import { usePwaInstall } from "../hooks/usePwaInstall";
 import { useCurrentTenantQuery } from "../hooks/useTenantQueries";
 import { useCartStore } from "@/features/cart";
@@ -51,22 +51,22 @@ export function FloatingPwaInstallButton() {
           onClick={handleInstallClick}
           aria-label={`Instalar aplicación de ${appDisplayName}`}
           title={`Instalar aplicación de ${appDisplayName}`}
-          className="flex items-center justify-center w-12 h-12 sm:w-14 sm:h-14 bg-neutral-900 hover:bg-neutral-800 dark:bg-neutral-100 dark:hover:bg-white text-white dark:text-neutral-950 rounded-full shadow-lg hover:shadow-2xl hover:scale-110 active:scale-95 transition-all duration-300 focus:outline-hidden focus:ring-4 focus:ring-brand-primary/40 cursor-pointer shrink-0 border border-white/20 dark:border-neutral-300/40"
+          className="group flex items-center justify-center w-9 h-9 sm:w-10 sm:h-10 bg-surface-card/95 hover:bg-surface-card-hover text-text-strong hover:text-brand-primary rounded-full shadow-md hover:shadow-lg hover:scale-105 active:scale-95 transition-all duration-300 focus:outline-hidden focus:ring-2 focus:ring-brand-primary/40 cursor-pointer shrink-0 border border-surface-border/90 hover:border-brand-primary/40 backdrop-blur-md"
         >
           {isSuccessFeedback ? (
-            <CheckCircle2 className="w-5 h-5 sm:w-6 sm:h-6 text-emerald-400 dark:text-emerald-600 animate-scaleIn" />
+            <CheckCircle2 className="w-4 h-4 sm:w-4.5 sm:h-4.5 text-emerald-500 animate-scaleIn" />
           ) : (
-            <Download className="w-5 h-5 sm:w-6 sm:h-6 animate-pulse" />
+            <ArrowDownToLine className="w-4 h-4 sm:w-4.5 sm:h-4.5 transition-transform duration-200 group-hover:translate-y-0.5" />
           )}
         </button>
 
         {/* Tooltip flotante en hover para escritorio */}
         <div
           role="tooltip"
-          className="absolute right-full mr-3 top-1/2 -translate-y-1/2 hidden md:group-hover:flex items-center whitespace-nowrap px-3 py-1.5 rounded-lg bg-neutral-900/95 dark:bg-neutral-800 text-white text-xs font-bold tracking-tight shadow-xl border border-surface-border pointer-events-none transition-opacity duration-200"
+          className="absolute right-full mr-2.5 top-1/2 -translate-y-1/2 hidden md:group-hover:flex items-center whitespace-nowrap px-2.5 py-1 rounded-lg bg-surface-card/95 backdrop-blur-md text-text-strong text-[11px] font-bold tracking-tight shadow-lg border border-surface-border pointer-events-none transition-opacity duration-200"
         >
           <span>Instalar App de {appDisplayName}</span>
-          <div className="absolute left-full top-1/2 -translate-y-1/2 border-4 border-transparent border-l-neutral-900/95 dark:border-l-neutral-800" />
+          <div className="absolute left-full top-1/2 -translate-y-1/2 border-4 border-transparent border-l-surface-border" />
         </div>
       </div>
 

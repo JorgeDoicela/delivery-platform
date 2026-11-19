@@ -4,6 +4,8 @@ import { RESERVED_TENANT_SLUGS } from "@/shared/lib/tenant-context";
 import { FALLBACK_TENANT_CONFIGS } from "@/features/tenant/store/useTenantStore";
 import { DynamicPwaManifest } from "@/features/tenant";
 
+export const instant = false;
+
 export async function generateMetadata({
   params,
 }: {
