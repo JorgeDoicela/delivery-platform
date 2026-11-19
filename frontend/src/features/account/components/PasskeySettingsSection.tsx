@@ -72,7 +72,7 @@ export function PasskeySettingsSection() {
     setErrorMessage(null);
     setSuccessMessage(null);
 
-    const friendlyName = `Llave de acceso (${new Date().toLocaleDateString("es-ES", {
+    const friendlyName = `Mi dispositivo (${new Date().toLocaleDateString("es-ES", {
       day: "2-digit",
       month: "short",
       hour: "2-digit",
@@ -81,7 +81,7 @@ export function PasskeySettingsSection() {
 
     const newCred = await registerPasskey(friendlyName, tenant?.slug);
     if (newCred) {
-      setSuccessMessage("¡Llave de acceso registrada exitosamente! Ahora puedes iniciar sesión con biometría.");
+      setSuccessMessage("Dispositivo activado con éxito. Ahora puedes entrar directamente con tu huella o rostro.");
       reloadCredentials();
     }
   };
@@ -103,11 +103,11 @@ export function PasskeySettingsSection() {
       setIsUpdating(true);
       setErrorMessage(null);
       await webauthnApi.updateCredential(id, editingName.trim());
-      setSuccessMessage("Nombre de la llave de acceso actualizado.");
+      setSuccessMessage("Nombre del dispositivo actualizado.");
       setEditingId(null);
       reloadCredentials();
     } catch (err: unknown) {
-      setErrorMessage(err instanceof Error ? err.message : "Error al actualizar el nombre de la llave.");
+      setErrorMessage(err instanceof Error ? err.message : "Error al actualizar el nombre del dispositivo.");
     } finally {
       setIsUpdating(false);
     }
@@ -118,10 +118,10 @@ export function PasskeySettingsSection() {
       setDeletingId(id);
       setErrorMessage(null);
       await webauthnApi.deleteCredential(id);
-      setSuccessMessage("Llave de acceso eliminada correctamente.");
+      setSuccessMessage("Dispositivo desactivado correctamente.");
       reloadCredentials();
     } catch (err: unknown) {
-      setErrorMessage(err instanceof Error ? err.message : "Error al eliminar la llave de acceso.");
+      setErrorMessage(err instanceof Error ? err.message : "Error al desactivar el dispositivo.");
     } finally {
       setDeletingId(null);
     }
@@ -136,11 +136,11 @@ export function PasskeySettingsSection() {
           <div className="flex items-center gap-2">
             <Fingerprint className="w-5 h-5 text-brand-primary" />
             <h2 className="text-lg font-black text-text-strong font-display uppercase tracking-tight">
-              Llaves de Acceso y Biometría (Passkeys / FIDO2)
+              Acceso Rápido con Huella o Rostro
             </h2>
           </div>
           <p className="text-xs text-text-muted mt-1 max-w-xl">
-            Inicia sesión al instante sin necesidad de recordar contraseñas mediante Face ID, Touch ID, Windows Hello o llaves de seguridad físicas YubiKey.
+            Entra a tu cuenta en un segundo usando la huella o el reconocimiento facial de tu celular o computadora, sin tener que escribir tu contraseña.
           </p>
         </div>
 
@@ -154,12 +154,12 @@ export function PasskeySettingsSection() {
             {isRegistering ? (
               <>
                 <Loader2 className="w-3.5 h-3.5 animate-spin" />
-                <span>Registrando...</span>
+                <span>Activando...</span>
               </>
             ) : (
               <>
                 <Plus className="w-3.5 h-3.5 stroke-[2.5]" />
-                <span>Agregar Llave</span>
+                <span>Activar en este equipo</span>
               </>
             )}
           </button>
@@ -168,9 +168,9 @@ export function PasskeySettingsSection() {
 
       {!isSupported && (
         <div className="p-4 bg-amber-50 dark:bg-amber-950/30 border border-amber-200 dark:border-amber-800/60 rounded-2xl text-xs text-amber-800 dark:text-amber-300">
-          <p className="font-semibold">Navegador no compatible</p>
+          <p className="font-semibold">Función no disponible en este navegador</p>
           <p className="text-[11px] mt-0.5 opacity-90">
-            Tu navegador actual no admite la API WebAuthn / Passkeys. Para utilizarlas, abre la aplicación en un navegador moderno como Safari, Chrome, Edge o Firefox.
+            Tu navegador actual no permite entrar con huella o rostro. Puedes usar esta función abriendo la página desde Safari, Google Chrome o Microsoft Edge.
           </p>
         </div>
       )}
@@ -197,10 +197,10 @@ export function PasskeySettingsSection() {
         <div className="text-center py-8 px-4 border border-dashed border-surface-border rounded-2xl bg-surface-canvas/50 space-y-2">
           <KeyRound className="w-8 h-8 text-text-subtle mx-auto stroke-[1.5]" />
           <p className="text-xs font-bold text-text-strong font-display uppercase tracking-wide">
-            No tienes llaves de acceso registradas
+            No tienes dispositivos activados todavía
           </p>
           <p className="text-[11px] text-text-muted max-w-sm mx-auto">
-            Agrega tu dispositivo actual para disfrutar de inicios de sesión rápidos, seguros y protegidos contra ataques de phishing.
+            Activa tu teléfono o computadora actual para entrar a tu cuenta de forma más rápida y segura.
           </p>
         </div>
       ) : (
@@ -295,7 +295,7 @@ export function PasskeySettingsSection() {
                     type="button"
                     onClick={() => handleDelete(cred.id)}
                     disabled={isDeleting}
-                    aria-label={`Eliminar llave ${cred.friendlyName}`}
+                    aria-label={`Desactivar ${cred.friendlyName}`}
                     className="p-2 text-text-subtle hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-950/30 rounded-xl transition-colors disabled:opacity-50 cursor-pointer"
                   >
                     {isDeleting ? (

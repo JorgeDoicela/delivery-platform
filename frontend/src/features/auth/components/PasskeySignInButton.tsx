@@ -74,21 +74,21 @@ export function PasskeySignInButton({
         type="button"
         onClick={handlePasskeyLogin}
         disabled={isLoading}
-        aria-label="Iniciar sesión con biometría o llave de acceso (Passkey)"
+        aria-label="Entrar con huella o reconocimiento facial"
         className="w-full min-h-[48px] bg-surface-card hover:bg-surface-card-hover active:scale-[0.99] text-text-strong font-bold text-xs uppercase tracking-wider font-display rounded-xl border border-surface-border hover:border-brand-primary/50 shadow-2xs transition-all flex items-center justify-center gap-2.5 disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer px-4"
       >
         {isLoading ? (
           <>
             <Loader2 className="w-4 h-4 animate-spin text-brand-primary" />
             <span className="font-sans normal-case text-xs text-text-muted">
-              Esperando confirmación biométrica...
+              Verifica tu huella o rostro en tu equipo...
             </span>
           </>
         ) : (
           <>
             <Fingerprint className="w-4 h-4 text-brand-primary shrink-0" />
             <span className="font-sans normal-case text-xs font-semibold">
-              Iniciar con Llave de Acceso (Passkey / Biometría)
+              Entrar con Huella o Rostro
             </span>
           </>
         )}

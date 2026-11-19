@@ -39,7 +39,7 @@ export function usePasskeyAuth(): UsePasskeyAuthReturn {
   const loginWithPasskey = useCallback(
     async (email?: string, tenantSlug?: string): Promise<boolean> => {
       if (!browserSupportsWebAuthn()) {
-        setError("Tu navegador o dispositivo no soporta autenticación biométrica (Passkeys / FIDO2).");
+        setError("Tu dispositivo o navegador actual no permite ingresar con huella o rostro.");
         return false;
       }
 
@@ -71,16 +71,15 @@ export function usePasskeyAuth(): UsePasskeyAuthReturn {
           if (err.code === "ERROR_PASSTHROUGH_SEE_CAUSE_PROPERTY") {
             const cause = err.cause as { name?: string };
             if (cause?.name === "NotAllowedError") {
-              // Operación cancelada por el usuario en el diálogo biométrico
-              setError("Inicio de sesión biométrico cancelado.");
+              setError("Acceso cancelado. Puedes intentar de nuevo o ingresar con tu contraseña.");
               return false;
             }
           }
-          setError(err.message || "Error en la verificación biométrica.");
+          setError(err.message || "No se pudo verificar tu huella o rostro.");
         } else if (err instanceof Error) {
           setError(err.message);
         } else {
-          setError("No se pudo completar el inicio de sesión con llave de acceso.");
+          setError("No pudimos iniciar sesión en este momento.");
         }
         return false;
       } finally {
@@ -93,7 +92,7 @@ export function usePasskeyAuth(): UsePasskeyAuthReturn {
   const registerPasskey = useCallback(
     async (friendlyName?: string, tenantSlug?: string): Promise<WebAuthnCredentialItem | null> => {
       if (!browserSupportsWebAuthn()) {
-        setError("Tu navegador no soporta el registro de llaves de acceso (Passkeys).");
+        setError("Tu navegador no permite activar el acceso con huella o rostro.");
         return null;
       }
 
@@ -116,15 +115,15 @@ export function usePasskeyAuth(): UsePasskeyAuthReturn {
           if (err.code === "ERROR_PASSTHROUGH_SEE_CAUSE_PROPERTY") {
             const cause = err.cause as { name?: string };
             if (cause?.name === "NotAllowedError") {
-              setError("Registro biométrico cancelado por el usuario.");
+              setError("Activación cancelada en tu dispositivo.");
               return null;
             }
           }
-          setError(err.message || "Error al registrar la llave de acceso.");
+          setError(err.message || "No se pudo activar el acceso en este equipo.");
         } else if (err instanceof Error) {
           setError(err.message);
         } else {
-          setError("No se pudo completar el registro de la llave de acceso.");
+          setError("No se pudo completar la activación en este equipo.");
         }
         return null;
       } finally {
