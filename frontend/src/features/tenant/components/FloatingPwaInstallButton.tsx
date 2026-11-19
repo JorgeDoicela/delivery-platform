@@ -45,7 +45,7 @@ export function FloatingPwaInstallButton() {
 
   return (
     <>
-      <div className="relative group">
+      <div className="relative group pointer-events-auto">
         <button
           type="button"
           onClick={handleInstallClick}

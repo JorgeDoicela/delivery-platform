@@ -39,26 +39,31 @@ function subscribeToStandalone(callback: () => void): () => void {
     };
   }
 
-  const mediaQuery =
-    typeof window.matchMedia === "function"
-      ? window.matchMedia("(display-mode: standalone)")
-      : null;
+  const mm = typeof window.matchMedia === "function" ? window.matchMedia : null;
+  const standaloneQuery = mm ? mm("(display-mode: standalone)") : null;
+  const fullscreenQuery = mm ? mm("(display-mode: fullscreen)") : null;
+  const minimalUiQuery = mm ? mm("(display-mode: minimal-ui)") : null;
 
   const handleInstalled = () => {
     hasAppInstalledEvent = true;
+    try {
+      localStorage.setItem("mesafy_pwa_installed", "1");
+    } catch {
+      // Ignorar restricciones en navegacion privada
+    }
     notifyListeners();
   };
 
-  if (mediaQuery?.addEventListener) {
-    mediaQuery.addEventListener("change", callback);
-  }
+  standaloneQuery?.addEventListener?.("change", callback);
+  fullscreenQuery?.addEventListener?.("change", callback);
+  minimalUiQuery?.addEventListener?.("change", callback);
   window.addEventListener("appinstalled", handleInstalled);
 
   return () => {
     listeners.delete(callback);
-    if (mediaQuery?.removeEventListener) {
-      mediaQuery.removeEventListener("change", callback);
-    }
+    standaloneQuery?.removeEventListener?.("change", callback);
+    fullscreenQuery?.removeEventListener?.("change", callback);
+    minimalUiQuery?.removeEventListener?.("change", callback);
     window.removeEventListener("appinstalled", handleInstalled);
   };
 }
@@ -66,11 +71,28 @@ function subscribeToStandalone(callback: () => void): () => void {
 function getStandaloneSnapshot(): boolean {
   if (typeof window === "undefined") return false;
   if (hasAppInstalledEvent) return true;
-  return Boolean(
-    (typeof window.matchMedia === "function" &&
-      window.matchMedia("(display-mode: standalone)").matches) ||
-      (window.navigator as unknown as { standalone?: boolean })?.standalone === true
-  );
+
+  // 1. Detección nativa por media query W3C (Chrome, Edge, Samsung Internet, Android, Windows)
+  const isDisplayModeStandalone =
+    typeof window.matchMedia === "function" &&
+    (window.matchMedia("(display-mode: standalone)").matches ||
+      window.matchMedia("(display-mode: fullscreen)").matches ||
+      window.matchMedia("(display-mode: minimal-ui)").matches);
+
+  // 2. Detección nativa de iOS / iPadOS Safari (cuando se abre desde el icono en pantalla de inicio)
+  const isIosStandalone =
+    (window.navigator as unknown as { standalone?: boolean })?.standalone === true;
+
+  // 3. Detección de Android Trusted Web Activity (TWA o WebAPK empaquetada)
+  const isAndroidApp =
+    typeof document !== "undefined" && document.referrer.startsWith("android-app://");
+
+  // 4. Parámetro de origen o sesión PWA previa
+  const isUrlPwa =
+    typeof window.location?.search === "string" &&
+    (window.location.search.includes("mode=pwa") || window.location.search.includes("source=pwa"));
+
+  return Boolean(isDisplayModeStandalone || isIosStandalone || isAndroidApp || isUrlPwa);
 }
 
 function getServerSnapshot(): boolean {
