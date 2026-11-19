@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import React from "react";
 import { RESERVED_TENANT_SLUGS } from "@/shared/lib/tenant-context";
+import { FALLBACK_TENANT_CONFIGS } from "@/features/tenant/store/useTenantStore";
 import { DynamicPwaManifest } from "@/features/tenant";
 
 export async function generateMetadata({
@@ -13,10 +14,14 @@ export async function generateMetadata({
     return {};
   }
 
-  const logoUrl = `/images/tenants/${encodeURIComponent(slug)}/identidad/logo.png`;
+  const normalizedSlug = slug.toLowerCase();
+  const fallback = FALLBACK_TENANT_CONFIGS[normalizedSlug];
+  const logoUrl =
+    fallback?.logoUrl ||
+    `/images/tenants/${encodeURIComponent(normalizedSlug)}/identidad/logo.png`;
 
   return {
-    manifest: `/manifest.json?slug=${encodeURIComponent(slug)}`,
+    manifest: `/manifest.json?slug=${encodeURIComponent(normalizedSlug)}`,
     icons: {
       icon: [
         {
