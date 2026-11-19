@@ -4,7 +4,7 @@ import { useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useForm } from "react-hook-form";
+import { useForm, useWatch } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Loader2, AlertCircle, Eye, EyeOff } from "lucide-react";
 import { loginSchema, type LoginFormData } from "../schemas/loginSchema";
@@ -41,7 +41,7 @@ export function LoginForm({
   const {
     register,
     handleSubmit,
-    watch,
+    control,
     formState: { errors, isSubmitting },
   } = useForm<LoginFormData>({
     resolver: zodResolver(loginSchema),
@@ -50,6 +50,8 @@ export function LoginForm({
       password: "",
     },
   });
+
+  const watchedEmail = useWatch({ control, name: "email" });
 
   const onSubmit = async (data: LoginFormData) => {
     setFormError(null);
@@ -244,7 +246,7 @@ export function LoginForm({
 
       <GoogleSignInButton redirectUrl={redirectUrl} />
 
-      <PasskeySignInButton redirectUrl={redirectUrl} emailHint={watch("email")} />
+      <PasskeySignInButton redirectUrl={redirectUrl} emailHint={watchedEmail} />
 
       {/* Enlace alternativo para crear cuenta */}
       <div className="pt-2 text-center border-t border-surface-border/60">
