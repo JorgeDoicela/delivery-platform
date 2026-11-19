@@ -199,7 +199,8 @@ builder.Services.AddCors(options =>
 
             // 3. Orígenes de producción bajo el dominio raíz de la plataforma o sus subdominios
             if (host.Equals(platformDomain, StringComparison.OrdinalIgnoreCase) ||
-                host.EndsWith("." + platformDomain, StringComparison.OrdinalIgnoreCase))
+                host.EndsWith("." + platformDomain, StringComparison.OrdinalIgnoreCase) ||
+                host.EndsWith(".doicela.dev", StringComparison.OrdinalIgnoreCase))
             {
                 return true;
             }
