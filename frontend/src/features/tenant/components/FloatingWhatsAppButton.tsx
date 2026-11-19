@@ -57,7 +57,7 @@ export function FloatingWhatsAppButton({ isEmbedded = false }: FloatingWhatsAppB
   return (
     <aside
       aria-label="Contacto por WhatsApp"
-      className="fixed bottom-[68px] right-3.5 sm:bottom-6 sm:right-6 z-40 select-none print:hidden"
+      className="fixed bottom-[56px] right-3 sm:bottom-6 sm:right-6 z-40 select-none print:hidden"
     >
       {buttonElement}
     </aside>
