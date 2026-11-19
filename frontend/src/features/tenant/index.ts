@@ -11,4 +11,7 @@ export * from "./components/PlatformTenantsGovernanceView";
 export * from "./components/RestaurantStorefrontView";
 export * from "./components/RestaurantDedicatedMenuView";
 export * from "./components/FloatingWhatsAppButton";
+export * from "./components/FloatingPwaInstallButton";
+export * from "./components/FloatingStorefrontActions";
 export * from "./components/DynamicPwaManifest";
+export * from "./hooks/usePwaInstall";
