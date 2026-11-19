@@ -42,8 +42,10 @@ export async function GET(request: NextRequest) {
     }
   }
 
-  // Fallback 2: Inspeccionar el host para subdominios multi-tenant
+  // Fallback 2: Inspeccionar el host para subdominios multi-tenant o dominios propios
   const host = request.headers.get("host") || "";
+  const isStrictCustomDomain = Boolean(host && !isPlatformHost(host) && !getTenantSubdomain(host));
+
   if (!slug && host) {
     const subdomain = getTenantSubdomain(host);
     if (subdomain && !RESERVED_TENANT_SLUGS.has(subdomain.toLowerCase())) {
@@ -56,24 +58,35 @@ export async function GET(request: NextRequest) {
     slug = null;
   }
 
-  // CASO A: MANIFEST MULTI-TENANT (Tienda o Sucursal)
-  if (slug) {
+  // CASO A: MANIFEST MULTI-TENANT (Tienda, Sucursal o Dominio Personalizado)
+  if (slug || isStrictCustomDomain) {
     const isCustomDomain = !isPlatformHost(host) || Boolean(getTenantSubdomain(host));
-
     let tenantConfig: TenantStorefrontConfigDto | null = null;
     try {
+      const headers: Record<string, string> = {};
+      if (slug) {
+        headers["X-Tenant-Slug"] = slug;
+      } else if (host) {
+        headers["X-Tenant-Domain"] = host.split(":")[0];
+      }
+
       const res = await fetch(`${getApiBaseUrl()}/api/tenants/current`, {
-        headers: {
-          "X-Tenant-Slug": slug,
-        },
+        headers,
         cache: "no-store",
         signal: AbortSignal.timeout(1500),
       });
       if (res.ok) {
         tenantConfig = await res.json();
+        if (!slug && tenantConfig?.slug) {
+          slug = tenantConfig.slug;
+        }
       }
     } catch {
       // Si la API no esta disponible o falla, usar configuracion fallback
+    }
+
+    if (!slug) {
+      slug = "la-granjita";
     }
 
     if (!tenantConfig) {

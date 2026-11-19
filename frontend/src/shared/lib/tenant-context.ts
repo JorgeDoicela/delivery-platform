@@ -14,11 +14,21 @@ export const PLATFORM_HOSTS = new Set([
   "platform.mesafy.com",
 ]);
 
+export const PLATFORM_BASE_DOMAINS = [
+  "mesafy.com",
+  "mesafy.app",
+  "mesafy.dev",
+  "mesafy.doicela.dev",
+];
+
 if (typeof process !== "undefined" && process.env?.NEXT_PUBLIC_PLATFORM_DOMAIN) {
   const envDomain = process.env.NEXT_PUBLIC_PLATFORM_DOMAIN.toLowerCase().trim();
   if (envDomain) {
     PLATFORM_HOSTS.add(envDomain);
     PLATFORM_HOSTS.add(`www.${envDomain}`);
+    if (!PLATFORM_BASE_DOMAINS.includes(envDomain)) {
+      PLATFORM_BASE_DOMAINS.push(envDomain);
+    }
   }
 }
 
@@ -39,6 +49,15 @@ export function getTenantSubdomain(hostname?: string): string | null {
   if (cleanHost === "localhost" || cleanHost === "127.0.0.1" || cleanHost === "::1") {
     return null;
   }
+
+  // Un subdominio solo pertenece a la plataforma si el dominio padre es un host base de Mesafy
+  const isPlatformSub = PLATFORM_BASE_DOMAINS.some((base) =>
+    cleanHost.endsWith(`.${base}`)
+  );
+  if (!isPlatformSub) {
+    return null;
+  }
+
   const parts = cleanHost.split(".");
   const reservedSubdomains = new Set([
     "www",

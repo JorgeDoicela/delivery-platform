@@ -5,8 +5,11 @@ import {
   getTenantSubdomain,
   RESERVED_TENANT_SLUGS,
   DEFAULT_TENANT_SLUG,
+  PLATFORM_BASE_DOMAINS,
 } from "./tenant-context";
 import { useTenantStore } from "@/features/tenant/store/useTenantStore";
+
+export { PLATFORM_BASE_DOMAINS };
 
 export interface TenantRoutingResolution {
   hostname: string;
@@ -42,13 +45,6 @@ export interface ResolveRoutingOptions {
   explicitSlug?: string | null;
   storeSlug?: string | null;
 }
-
-export const PLATFORM_BASE_DOMAINS = [
-  "mesafy.com",
-  "mesafy.app",
-  "mesafy.dev",
-  "mesafy.doicela.dev",
-];
 
 /**
  * Resuelve de forma pura el contexto de navegación multi-tenant y multi-sucursal.

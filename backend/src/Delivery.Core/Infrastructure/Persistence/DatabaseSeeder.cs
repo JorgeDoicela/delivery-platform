@@ -222,6 +222,12 @@ public static partial class DatabaseSeeder
         else
         {
             var needsSave = false;
+            if (string.IsNullOrWhiteSpace(settings.CustomDomain))
+            {
+                settings.CustomDomain = "asaderolagranjita.doicela.dev";
+                needsSave = true;
+            }
+
             if (settings.BaseDeliveryFee <= 0m)
             {
                 settings.BaseDeliveryFee = 1.50m;

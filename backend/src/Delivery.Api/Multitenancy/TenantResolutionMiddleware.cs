@@ -88,42 +88,6 @@ public class TenantResolutionMiddleware
             }
         }
 
-        // 2. Header explícito X-Tenant-Slug (permitido para SuperAdmin y navegación de Storefront público)
-        if (context.Request.Headers.TryGetValue("X-Tenant-Slug", out var headerSlugValues))
-        {
-            var explicitSlug = headerSlugValues.ToString().Trim().ToLowerInvariant();
-            if (!string.IsNullOrWhiteSpace(explicitSlug))
-            {
-                var explicitTenant = await dbContext.Tenants
-                    .IgnoreQueryFilters()
-                    .AsNoTracking()
-                    .FirstOrDefaultAsync(t => t.Slug == explicitSlug && t.IsActive);
-
-                if (explicitTenant == null)
-                {
-                    context.Response.StatusCode = StatusCodes.Status404NotFound;
-                    context.Response.ContentType = "application/problem+json";
-                    var problem = new ProblemDetails
-                    {
-                        Status = StatusCodes.Status404NotFound,
-                        Title = "Negocio no encontrado",
-                        Detail = $"No existe un negocio activo registrado bajo el identificador '{explicitSlug}'.",
-                        Type = "https://tools.ietf.org/html/rfc7807"
-                    };
-                    await context.Response.WriteAsJsonAsync(problem);
-                    return;
-                }
-
-                tenantContext.SetTenant(explicitTenant.Id, explicitTenant.Slug);
-                await _next(context);
-                return;
-            }
-        }
-
-        string? tenantSlug = null;
-
-        // 3. Detección de Host / Dominio: Prioriza cabeceras de proxy reverso (X-Tenant-Domain, X-Forwarded-Host)
-        // permitiendo que frontends en dominios personalizados o subdominios comuniquen el host original a la API.
         string? domainHeader = null;
         if (context.Request.Headers.TryGetValue("X-Tenant-Domain", out var domainValues))
         {
@@ -141,6 +105,50 @@ public class TenantResolutionMiddleware
         {
             host = host.Split(':')[0];
         }
+
+        // 2. Header explícito X-Tenant-Slug (permitido para SuperAdmin y navegación de Storefront público)
+        if (context.Request.Headers.TryGetValue("X-Tenant-Slug", out var headerSlugValues))
+        {
+            var explicitSlug = headerSlugValues.ToString().Trim().ToLowerInvariant();
+            if (!string.IsNullOrWhiteSpace(explicitSlug))
+            {
+                var explicitTenant = await dbContext.Tenants
+                    .IgnoreQueryFilters()
+                    .AsNoTracking()
+                    .FirstOrDefaultAsync(t => t.Slug == explicitSlug && t.IsActive);
+
+                if (explicitTenant != null)
+                {
+                    tenantContext.SetTenant(explicitTenant.Id, explicitTenant.Slug);
+                    await _next(context);
+                    return;
+                }
+
+                // Si el slug explícito no existe pero la petición proviene de un dominio personalizado registrado,
+                // no abortar inmediatamente con 404; permitir que continúe a la resolución por host.
+                var hasCustomDomainMatch = await dbContext.TenantSettings
+                    .IgnoreQueryFilters()
+                    .AsNoTracking()
+                    .AnyAsync(ts => ts.CustomDomain != null && ts.CustomDomain.ToLower() == host && ts.Tenant.IsActive);
+
+                if (!hasCustomDomainMatch)
+                {
+                    context.Response.StatusCode = StatusCodes.Status404NotFound;
+                    context.Response.ContentType = "application/problem+json";
+                    var problem = new ProblemDetails
+                    {
+                        Status = StatusCodes.Status404NotFound,
+                        Title = "Negocio no encontrado",
+                        Detail = $"No existe un negocio activo registrado bajo el identificador '{explicitSlug}'.",
+                        Type = "https://tools.ietf.org/html/rfc7807"
+                    };
+                    await context.Response.WriteAsJsonAsync(problem);
+                    return;
+                }
+            }
+        }
+
+        string? tenantSlug = null;
 
         // 4. Detección por Dominio Personalizado (CustomDomain en TenantSettings)
         if (host != "localhost" && host != "127.0.0.1")
@@ -162,14 +170,23 @@ public class TenantResolutionMiddleware
                 return;
             }
 
-            // 5. Detección por Subdominio ({slug}.dominio.com)
+            // 5. Detección por Subdominio ({slug}.mesafy.com / {slug}.mesafy.doicela.dev)
             var parts = host.Split('.');
             var reservedSubdomains = new HashSet<string>(StringComparer.OrdinalIgnoreCase)
             {
                 "www", "api", "mesafy", "platform", "app", "admin", "mail", "cdn", "assets", "static"
             };
 
-            if (parts.Length > 2 && !reservedSubdomains.Contains(parts[0]))
+            var platformDomain = Environment.GetEnvironmentVariable("NEXT_PUBLIC_PLATFORM_DOMAIN")
+                ?? Environment.GetEnvironmentVariable("PLATFORM_DOMAIN")
+                ?? "mesafy.doicela.dev";
+
+            var isPlatformDomain = host.Equals(platformDomain, StringComparison.OrdinalIgnoreCase) ||
+                                   host.EndsWith("." + platformDomain, StringComparison.OrdinalIgnoreCase) ||
+                                   host.EndsWith(".mesafy.com", StringComparison.OrdinalIgnoreCase) ||
+                                   host.EndsWith(".mesafy.dev", StringComparison.OrdinalIgnoreCase);
+
+            if (isPlatformDomain && parts.Length > 2 && !reservedSubdomains.Contains(parts[0]))
             {
                 tenantSlug = parts[0];
             }
