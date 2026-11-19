@@ -43,14 +43,10 @@ export function FloatingWhatsAppButton() {
         target="_blank"
         rel="noopener noreferrer"
         aria-label={`Chatear por WhatsApp con ${brandName}`}
-        className="group flex items-center gap-2.5 bg-[#25D366] hover:bg-[#20ba5a] text-white p-3 sm:px-4 sm:py-3 rounded-full shadow-lg hover:shadow-2xl hover:scale-105 active:scale-95 transition-all duration-300 focus:outline-hidden focus:ring-4 focus:ring-[#25D366]/40 cursor-pointer"
+        title={`Chatear por WhatsApp con ${brandName}`}
+        className="group flex items-center justify-center w-12 h-12 sm:w-14 sm:h-14 bg-[#25D366] hover:bg-[#20ba5a] text-white rounded-full shadow-lg hover:shadow-2xl hover:scale-110 active:scale-95 transition-all duration-300 focus:outline-hidden focus:ring-4 focus:ring-[#25D366]/40 cursor-pointer shrink-0"
       >
-        <span className="relative flex items-center justify-center shrink-0">
-          <WhatsAppIcon className="w-6 h-6 sm:w-7 sm:h-7" />
-        </span>
-        <span className="hidden sm:inline font-bold text-xs uppercase tracking-wider font-display">
-          WhatsApp
-        </span>
+        <WhatsAppIcon className="w-6 h-6 sm:w-7 sm:h-7" />
       </a>
     </aside>
   );

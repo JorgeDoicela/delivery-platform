@@ -32,7 +32,7 @@ describe("Dynamic Multi-Tenant PWA Manifest Handler", () => {
 
     expect(manifest.id).toBe("/la-granjita");
     expect(manifest.start_url).toBe("/la-granjita");
-    expect(manifest.scope).toBe("/la-granjita/");
+    expect(manifest.scope).toBe("/la-granjita");
     expect(manifest.name).toBe("La Granjita - Asadero");
     expect(manifest.short_name).toBe("La Granjita");
     expect(manifest.theme_color).toBe("#E4002B");
@@ -51,7 +51,7 @@ describe("Dynamic Multi-Tenant PWA Manifest Handler", () => {
 
     expect(manifest.id).toBe("/la-granjita?branch=1");
     expect(manifest.start_url).toBe("/la-granjita?branch=1");
-    expect(manifest.scope).toBe("/la-granjita/");
+    expect(manifest.scope).toBe("/la-granjita");
     expect(manifest.name).toBe("La Granjita • Sucursal Guamaní");
     expect(manifest.short_name).toBe("La Granjita (Guamaní)");
   });
@@ -69,7 +69,7 @@ describe("Dynamic Multi-Tenant PWA Manifest Handler", () => {
 
     expect(manifest.id).toBe("/brasas-del-valle");
     expect(manifest.start_url).toBe("/brasas-del-valle");
-    expect(manifest.scope).toBe("/brasas-del-valle/");
+    expect(manifest.scope).toBe("/brasas-del-valle");
     expect(manifest.name).toBe("Brasas del Valle - Parrilla & Cortes Madurados");
     expect(manifest.short_name).toBe("Brasas del Valle");
     expect(manifest.theme_color).toBe("#047857");

@@ -59,7 +59,22 @@ export function StorefrontMobileDrawer({
   operationalLabel,
   onLogout,
 }: StorefrontMobileDrawerProps) {
-  if (!isOpen) return null;
+  React.useEffect(() => {
+    if (!isOpen) return;
+
+    document.body.style.overflow = "hidden";
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === "Escape") {
+        onClose();
+      }
+    };
+
+    window.addEventListener("keydown", handleKeyDown);
+    return () => {
+      document.body.style.overflow = "";
+      window.removeEventListener("keydown", handleKeyDown);
+    };
+  }, [isOpen, onClose]);
 
   const hasMultipleBranches =
     isPlatformRoot || Boolean(tenant?.branches && tenant.branches.length > 1);
@@ -69,15 +84,28 @@ export function StorefrontMobileDrawer({
       role="dialog"
       aria-modal="true"
       aria-label="Menú de navegación móvil"
-      className="fixed inset-0 z-50 xl:hidden animate-in fade-in duration-200"
+      aria-hidden={!isOpen}
+      className={`fixed inset-0 z-50 xl:hidden overflow-hidden transition-[visibility] duration-300 ${
+        isOpen ? "visible pointer-events-auto" : "invisible pointer-events-none"
+      }`}
     >
+      {/* Backdrop difuminado con fade suave y blur de cristal */}
       <div
-        className="fixed inset-0 bg-neutral-950/60 backdrop-blur-xs transition-opacity"
+        className={`fixed inset-0 bg-neutral-950/60 backdrop-blur-sm transition-opacity duration-300 ease-out ${
+          isOpen ? "opacity-100" : "opacity-0"
+        }`}
         onClick={onClose}
         aria-hidden="true"
       />
 
-      <div className="fixed inset-y-0 left-0 w-[85vw] max-w-sm bg-surface-card border-r border-surface-border shadow-2xl flex flex-col justify-between z-10 animate-in slide-in-from-left duration-300">
+      {/* Panel deslizante lateral con curva spring táctil suave */}
+      <div
+        className={`fixed inset-y-0 left-0 w-[85vw] max-w-xs sm:max-w-sm bg-surface-card border-r border-surface-border shadow-2xl flex flex-col justify-between z-10 will-change-transform transition-transform duration-300 ${
+          isOpen
+            ? "translate-x-0 ease-[cubic-bezier(0.16,1,0.3,1)]"
+            : "-translate-x-full ease-in"
+        }`}
+      >
         {/* Cabecera del Drawer */}
         <div className="h-[52px] sm:h-[76px] px-4 sm:px-6 flex items-center justify-between gap-3 shrink-0">
           <div className="flex items-center gap-2 sm:gap-2.5 group min-w-0 shrink">

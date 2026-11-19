@@ -156,7 +156,7 @@ export async function GET(request: NextRequest) {
       ? `/${slug}?branch=${matchedBranch.id}`
       : `/${slug}`;
 
-    const scope = isCustomDomain ? "/" : `/${slug}/`;
+    const scope = isCustomDomain ? "/" : `/${slug}`;
     const appId = isCustomDomain
       ? matchedBranch
         ? `/?branch=${matchedBranch.id}`

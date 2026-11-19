@@ -6,6 +6,7 @@ export { ModifierModal } from "./components/ModifierModal";
 export { InventoryManagerView } from "./components/InventoryManagerView";
 export { OrderModeSelector } from "./components/OrderModeSelector";
 export { PromotionalBanners } from "./components/PromotionalBanners";
+export { CategoryVerticalDotsNav } from "./components/CategoryVerticalDotsNav";
 export { useMenuQuery } from "./hooks/useMenuQuery";
 export { usePopularProductsQuery } from "./hooks/usePopularProductsQuery";
 

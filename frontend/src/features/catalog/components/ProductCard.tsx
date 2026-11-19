@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import React, { useState } from "react";
 import Image from "next/image";
 import type { MenuProductDto } from "@/shared/types/api";
 import { formatCurrency } from "@/shared/lib/utils";
@@ -9,9 +9,13 @@ import { Plus } from "lucide-react";
 
 interface ProductCardProps {
   product: MenuProductDto;
+  priority?: boolean;
 }
 
-export function ProductCard({ product }: ProductCardProps) {
+export const ProductCard = React.memo(function ProductCard({
+  product,
+  priority = false,
+}: ProductCardProps) {
   const [isModalOpen, setIsModalOpen] = useState(false);
 
   // Fallback seguro a imagen de producto por defecto si no viene definida
@@ -40,6 +44,8 @@ export function ProductCard({ product }: ProductCardProps) {
                 src={displayImage}
                 alt={product.name}
                 fill
+                priority={priority}
+                loading={priority ? "eager" : undefined}
                 sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw"
                 className="object-contain object-center group-hover:scale-105 transition-transform duration-500 ease-out"
               />
@@ -79,4 +85,4 @@ export function ProductCard({ product }: ProductCardProps) {
       )}
     </>
   );
-}
+});

@@ -1,9 +1,11 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
+import Link from "next/link";
 import type { TenantStorefrontConfigDto, TenantBranchSummaryDto } from "@/shared/types/api";
 import { useBranchesQuery } from "../hooks/useTenantQueries";
 import { getBranchOperatingStatus } from "@/shared/lib/schedule";
+import { useTenantRoutes } from "@/shared/lib/tenant-routing";
 import { BranchMapViewer } from "./BranchMapViewer";
 
 interface StorefrontBranchShowcaseProps {
@@ -28,6 +30,7 @@ export function StorefrontBranchShowcase({ tenant }: StorefrontBranchShowcasePro
         }))
       : (tenant?.branches ?? []);
 
+  const routes = useTenantRoutes(tenant?.slug);
   const [selectedBranchId, setSelectedBranchId] = useState<number | null>(null);
   const [currentTime, setCurrentTime] = useState(() => new Date());
 
@@ -43,6 +46,8 @@ export function StorefrontBranchShowcase({ tenant }: StorefrontBranchShowcasePro
 
   const activeBranch: TenantBranchSummaryDto =
     branches.find((b) => b.id === selectedBranchId) || branches[0];
+
+  const menuUrl = routes.getCatalogHref(activeBranch.id);
 
   // Limpiar cualquier prefijo residual "Matriz" para nombres amigables
   const branchDisplayName =
@@ -197,12 +202,12 @@ export function StorefrontBranchShowcase({ tenant }: StorefrontBranchShowcasePro
               Cómo Llegar en Maps
             </a>
 
-            <a
-              href="#catalogo"
+            <Link
+              href={menuUrl}
               className="w-full sm:w-auto inline-flex items-center justify-center bg-surface-canvas hover:bg-surface-card-hover text-text-strong text-[11px] sm:text-xs font-bold font-display uppercase tracking-wider px-4 sm:px-6 py-2.5 sm:py-3.5 rounded-full shadow-2xs hover:shadow-xs transition-all active:scale-95 text-center"
             >
               {opStatus.isOpen ? "Ver Menú & Ordenar" : "Ver Menú"}
-            </a>
+            </Link>
           </div>
         </div>
 

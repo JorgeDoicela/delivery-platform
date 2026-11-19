@@ -87,8 +87,12 @@ export function PopularProductsSection({
 
       {/* Grid de Productos Más Populares: 2 columnas en móvil, 4 en escritorio */}
       <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3.5 sm:gap-5">
-        {popularProducts.map((product) => (
-          <ProductCard key={product.id} product={product} />
+        {popularProducts.map((product, idx) => (
+          <ProductCard
+            key={product.id}
+            product={product}
+            priority={idx < 4}
+          />
         ))}
       </div>
 
