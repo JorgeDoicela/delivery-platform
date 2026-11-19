@@ -97,6 +97,7 @@ describe("usePasskeyAuth", () => {
         fullName: "User Test",
         role: "Customer",
         tenantId: null,
+        branchId: null,
         isActive: true,
       },
       expiresAt: "2026-11-20T00:00:00Z",
