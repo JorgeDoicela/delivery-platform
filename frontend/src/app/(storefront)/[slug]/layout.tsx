@@ -13,8 +13,20 @@ export async function generateMetadata({
     return {};
   }
 
+  const logoUrl = `/images/tenants/${encodeURIComponent(slug)}/identidad/logo.png`;
+
   return {
     manifest: `/manifest.json?slug=${encodeURIComponent(slug)}`,
+    icons: {
+      icon: [
+        {
+          url: logoUrl,
+          type: "image/png",
+        },
+      ],
+      apple: logoUrl,
+      shortcut: logoUrl,
+    },
   };
 }
 

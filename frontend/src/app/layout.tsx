@@ -32,6 +32,16 @@ export const metadata: Metadata = {
   description:
     "Gestión integral para restaurantes: punto de venta, atención en salón y cocina, facturación electrónica y pedidos directos en tiempo real.",
   manifest: "/manifest.json",
+  icons: {
+    icon: [
+      {
+        url: "/images/platform/logo.png",
+        type: "image/png",
+      },
+    ],
+    apple: "/images/platform/logo.png",
+    shortcut: "/images/platform/logo.png",
+  },
 };
 
 export default function RootLayout({
