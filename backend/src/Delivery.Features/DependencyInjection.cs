@@ -17,6 +17,7 @@ public static class DependencyInjection
         var assembly = typeof(DependencyInjection).Assembly;
 
         // 0. Servicios de Seguridad y Autenticacion
+        services.AddHttpContextAccessor();
         services.AddHttpClient();
         services.AddSingleton<IPasswordHasher, BCryptPasswordHasher>();
         services.AddSingleton<ITokenProvider, JwtTokenProvider>();
