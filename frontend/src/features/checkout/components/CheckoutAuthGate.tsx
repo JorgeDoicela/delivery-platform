@@ -269,7 +269,7 @@ export function CheckoutAuthGate() {
 
       <div className="pt-1 flex flex-col gap-2 justify-center">
         <GoogleSignInButton />
-        <PasskeySignInButton />
+        <PasskeySignInButton emailHint={tab === "login" && loginEmail ? loginEmail : undefined} />
       </div>
     </div>
   );

@@ -41,6 +41,7 @@ export function LoginForm({
   const {
     register,
     handleSubmit,
+    watch,
     formState: { errors, isSubmitting },
   } = useForm<LoginFormData>({
     resolver: zodResolver(loginSchema),
@@ -243,7 +244,7 @@ export function LoginForm({
 
       <GoogleSignInButton redirectUrl={redirectUrl} />
 
-      <PasskeySignInButton redirectUrl={redirectUrl} />
+      <PasskeySignInButton redirectUrl={redirectUrl} emailHint={watch("email")} />
 
       {/* Enlace alternativo para crear cuenta */}
       <div className="pt-2 text-center border-t border-surface-border/60">

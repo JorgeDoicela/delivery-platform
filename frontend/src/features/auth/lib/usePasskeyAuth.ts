@@ -71,7 +71,9 @@ export function usePasskeyAuth(): UsePasskeyAuthReturn {
           if (err.code === "ERROR_PASSTHROUGH_SEE_CAUSE_PROPERTY") {
             const cause = err.cause as { name?: string };
             if (cause?.name === "NotAllowedError") {
-              setError("Acceso cancelado. Puedes intentar de nuevo o ingresar con tu contraseña.");
+              setError(
+                "No se encontró una huella o rostro registrada en este equipo o se canceló el intento. Si aún no tienes cuenta, crea una gratis; o ingresa con tu correo y contraseña para activarla."
+              );
               return false;
             }
           }
