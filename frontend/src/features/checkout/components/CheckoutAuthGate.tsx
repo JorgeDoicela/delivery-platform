@@ -4,6 +4,7 @@ import { useState } from "react";
 import { useAuthStore } from "@/features/auth";
 import { useTenantStore } from "@/features/tenant";
 import { GoogleSignInButton } from "@/features/auth/components/GoogleSignInButton";
+import { PasskeySignInButton } from "@/features/auth/components/PasskeySignInButton";
 import { Lock, UserPlus, LogIn, AlertCircle, Loader2 } from "lucide-react";
 
 export function CheckoutAuthGate() {
@@ -266,8 +267,9 @@ export function CheckoutAuthGate() {
         </div>
       </div>
 
-      <div className="pt-1 flex justify-center">
+      <div className="pt-1 flex flex-col gap-2 justify-center">
         <GoogleSignInButton />
+        <PasskeySignInButton />
       </div>
     </div>
   );

@@ -241,9 +241,9 @@ export function LoginForm({
         )}
       </button>
 
-      <PasskeySignInButton redirectUrl={redirectUrl} />
-
       <GoogleSignInButton redirectUrl={redirectUrl} />
+
+      <PasskeySignInButton redirectUrl={redirectUrl} />
 
       {/* Enlace alternativo para crear cuenta */}
       <div className="pt-2 text-center border-t border-surface-border/60">
