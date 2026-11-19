@@ -1,5 +1,5 @@
 import { useQuery } from "@tanstack/react-query";
-import { apiClient } from "@/shared/lib/api-client";
+import { apiClient, getApiClientTenantDomain } from "@/shared/lib/api-client";
 import type { MenuProductDto } from "@/shared/types/api";
 import { useTenantStore } from "@/features/tenant/store/useTenantStore";
 
@@ -11,9 +11,11 @@ export function usePopularProductsQuery(
   const storeSlug = useTenantStore((s) => s.tenantSlug);
   const targetSlug = slugOverride !== undefined ? slugOverride : storeSlug;
   const tenantSlug = targetSlug?.trim().toLowerCase() || null;
+  const domain = typeof window !== "undefined" ? getApiClientTenantDomain() : null;
+  const isCustomDomain = Boolean(domain);
 
   return useQuery<MenuProductDto[], Error>({
-    queryKey: ["catalog", "popular", tenantSlug, limit, days],
+    queryKey: ["catalog", "popular", tenantSlug, domain, limit, days],
     queryFn: async () => {
       try {
         return await apiClient.getPopularProducts(limit, days, tenantSlug ?? undefined);
@@ -29,7 +31,7 @@ export function usePopularProductsQuery(
         }
       }
     },
-    enabled: Boolean(tenantSlug),
+    enabled: Boolean(tenantSlug || isCustomDomain),
     staleTime: 1000 * 60 * 5, // 5 minutos de frescura en cliente (coordinado con caché Redis)
     retry: 2,
   });

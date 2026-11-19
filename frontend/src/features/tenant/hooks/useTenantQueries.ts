@@ -16,23 +16,30 @@ import {
   getFallbackTenantConfig,
   useTenantStore,
 } from "../store/useTenantStore";
+import { getApiClientTenantDomain } from "@/shared/lib/api-client";
 
 export function useCurrentTenantQuery(slugOverride?: string | null) {
   const storeSlug = useTenantStore((s) => s.tenantSlug);
   const targetSlug = slugOverride !== undefined ? slugOverride : storeSlug;
   const normalizedSlug = targetSlug?.trim().toLowerCase() || null;
+  const domain = typeof window !== "undefined" ? getApiClientTenantDomain() : null;
+  const isCustomDomain = Boolean(domain);
 
   return useQuery<TenantStorefrontConfigDto | null>({
-    queryKey: ["tenant", "current", normalizedSlug],
+    queryKey: ["tenant", "current", normalizedSlug, domain],
     queryFn: async () => {
-      if (!normalizedSlug) return null;
+      if (!normalizedSlug && !isCustomDomain) return null;
       try {
-        return await apiClient.getCurrentTenant(normalizedSlug);
+        const result = await apiClient.getCurrentTenant(normalizedSlug ?? undefined);
+        if (result?.slug && result.slug !== storeSlug) {
+          useTenantStore.getState().setTenantSlug(result.slug);
+        }
+        return result;
       } catch {
-        return getFallbackTenantConfig(normalizedSlug);
+        return normalizedSlug ? getFallbackTenantConfig(normalizedSlug) : null;
       }
     },
-    enabled: Boolean(normalizedSlug),
+    enabled: Boolean(normalizedSlug || isCustomDomain),
     placeholderData: normalizedSlug ? () => getFallbackTenantConfig(normalizedSlug) : undefined,
     staleTime: 1000 * 60 * 2,
   });
@@ -57,15 +64,18 @@ export function useBranchesQuery(slugOverride?: string | null) {
   const storeSlug = useTenantStore((s) => s.tenantSlug);
   const targetSlug = slugOverride !== undefined ? slugOverride : storeSlug;
   const normalizedSlug = targetSlug?.trim().toLowerCase() || null;
+  const domain = typeof window !== "undefined" ? getApiClientTenantDomain() : null;
+  const isCustomDomain = Boolean(domain);
 
   return useQuery<BranchDetailDto[]>({
-    queryKey: ["branches", normalizedSlug],
+    queryKey: ["branches", normalizedSlug, domain],
     queryFn: async () => {
-      if (!normalizedSlug) return [];
+      if (!normalizedSlug && !isCustomDomain) return [];
       try {
         return await apiClient.getBranches();
       } catch {
-        const fallback = getFallbackTenantConfig(normalizedSlug);
+        const fallbackSlug = normalizedSlug || "la-granjita";
+        const fallback = getFallbackTenantConfig(fallbackSlug);
         return fallback.branches.map((b) => ({
           ...b,
           sriEstablishmentCode: "001",
@@ -73,7 +83,7 @@ export function useBranchesQuery(slugOverride?: string | null) {
         }));
       }
     },
-    enabled: Boolean(normalizedSlug),
+    enabled: Boolean(normalizedSlug || isCustomDomain),
     staleTime: 1000 * 60 * 2,
   });
 }
