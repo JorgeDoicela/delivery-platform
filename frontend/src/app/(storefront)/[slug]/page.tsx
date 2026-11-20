@@ -1,5 +1,6 @@
 import React, { Suspense } from "react";
 import { notFound } from "next/navigation";
+import { connection } from "next/server";
 import { RestaurantStorefrontView } from "@/features/tenant/components/RestaurantStorefrontView";
 import { RESERVED_TENANT_SLUGS } from "@/features/tenant/constants";
 
@@ -10,6 +11,7 @@ interface RestaurantPageProps {
 }
 
 export async function generateMetadata({ params }: RestaurantPageProps) {
+  await connection();
   const { slug } = await params;
   if (RESERVED_TENANT_SLUGS.has(slug.toLowerCase())) {
     return {

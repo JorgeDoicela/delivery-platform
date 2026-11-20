@@ -1,5 +1,6 @@
 import React, { Suspense } from "react";
 import { notFound } from "next/navigation";
+import { connection } from "next/server";
 import { RestaurantStorefrontView } from "@/features/tenant/components/RestaurantStorefrontView";
 import { RESERVED_TENANT_SLUGS } from "@/shared/lib/tenant-context";
 
@@ -11,6 +12,7 @@ interface BranchPageProps {
 }
 
 export async function generateMetadata({ params }: BranchPageProps) {
+  await connection();
   const { slug, branchId } = await params;
   if (RESERVED_TENANT_SLUGS.has(slug.toLowerCase())) {
     return {

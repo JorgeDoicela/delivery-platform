@@ -1,5 +1,6 @@
 import React, { Suspense } from "react";
 import { notFound } from "next/navigation";
+import { connection } from "next/server";
 import { CatalogSection } from "@/features/catalog";
 import { RESERVED_TENANT_SLUGS } from "@/shared/lib/tenant-context";
 import { Loader2 } from "lucide-react";
@@ -11,6 +12,7 @@ interface TenantCatalogPageProps {
 }
 
 export async function generateMetadata({ params }: TenantCatalogPageProps) {
+  await connection();
   const { slug } = await params;
   if (RESERVED_TENANT_SLUGS.has(slug.toLowerCase())) {
     return { title: "No Encontrado | Mesafy" };

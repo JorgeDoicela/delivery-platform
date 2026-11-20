@@ -1,5 +1,6 @@
 import React, { Suspense } from "react";
 import { headers } from "next/headers";
+import { connection } from "next/server";
 import type { Metadata } from "next";
 import { PlatformLandingView } from "@/features/platform";
 import { RestaurantStorefrontView } from "@/features/tenant/components/RestaurantStorefrontView";
@@ -7,6 +8,7 @@ import { isPlatformHost, getTenantSubdomain } from "@/shared/lib/api-client";
 import { getFallbackTenantConfigByDomain } from "@/features/tenant/store/useTenantStore";
 
 export async function generateMetadata(): Promise<Metadata> {
+  await connection();
   const headersList = await headers();
   const rawHost =
     headersList.get("x-tenant-host") ||

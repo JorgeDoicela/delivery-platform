@@ -1,4 +1,5 @@
 import React, { Suspense } from "react";
+import { connection } from "next/server";
 import { RestaurantStorefrontView } from "@/features/tenant/components/RestaurantStorefrontView";
 
 interface BranchPageProps {
@@ -8,6 +9,7 @@ interface BranchPageProps {
 }
 
 export async function generateMetadata({ params }: BranchPageProps) {
+  await connection();
   const { branchId } = await params;
   return {
     title: `Sucursal ${branchId} | Pedidos y Delivery en Línea`,

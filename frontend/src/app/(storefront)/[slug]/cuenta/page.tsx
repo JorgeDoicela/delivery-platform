@@ -1,5 +1,6 @@
 import React, { Suspense } from "react";
 import { notFound } from "next/navigation";
+import { connection } from "next/server";
 import { RESERVED_TENANT_SLUGS } from "@/features/tenant/constants";
 import { AuthGuard } from "@/features/auth/components/AuthGuard";
 import { AccountDashboardView } from "@/features/account";
@@ -12,6 +13,7 @@ interface TenantAccountPageProps {
 }
 
 export async function generateMetadata({ params }: TenantAccountPageProps) {
+  await connection();
   const { slug } = await params;
   if (RESERVED_TENANT_SLUGS.has(slug.toLowerCase())) {
     return {

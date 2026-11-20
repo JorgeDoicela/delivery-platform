@@ -2,6 +2,7 @@ import React, { Suspense } from "react";
 import LoginPage from "../../login/page";
 import { RESERVED_TENANT_SLUGS } from "@/shared/lib/tenant-context";
 import { notFound } from "next/navigation";
+import { connection } from "next/server";
 import { Loader2 } from "lucide-react";
 
 interface TenantLoginPageProps {
@@ -11,6 +12,7 @@ interface TenantLoginPageProps {
 }
 
 export async function generateMetadata({ params }: TenantLoginPageProps) {
+  await connection();
   const { slug } = await params;
   if (RESERVED_TENANT_SLUGS.has(slug.toLowerCase())) {
     return {
