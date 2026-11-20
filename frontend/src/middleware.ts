@@ -39,8 +39,22 @@ export function middleware(request: NextRequest) {
     }
   }
 
-  const hostname = request.headers.get("host")?.split(":")[0]?.toLowerCase();
-  const response = NextResponse.next();
+  const rawHost =
+    request.headers.get("x-forwarded-host") ||
+    request.headers.get("host");
+  const hostname = rawHost?.split(":")[0]?.toLowerCase();
+
+  const requestHeaders = new Headers(request.headers);
+  if (hostname) {
+    requestHeaders.set("x-tenant-host", hostname);
+  }
+
+  const response = NextResponse.next({
+    request: {
+      headers: requestHeaders,
+    },
+  });
+
   if (hostname) {
     response.headers.set("x-custom-domain", hostname);
   }
@@ -49,17 +63,14 @@ export function middleware(request: NextRequest) {
 
 export const config = {
   matcher: [
-    "/cocina/:path*",
-    "/kitchen/:path*",
-    "/admin/:path*",
-    "/superadmin/:path*",
-    "/driver/:path*",
-    "/repartidor/:path*",
-    "/active-delivery/:path*",
-    "/:slug/cocina/:path*",
-    "/:slug/kitchen/:path*",
-    "/:slug/repartidor/:path*",
-    "/:slug/active-delivery/:path*",
-    "/:slug/admin/:path*",
+    /*
+     * Intercepta todas las rutas excepto:
+     * - _next/static (archivos estáticos compilados)
+     * - _next/image (optimización de imágenes)
+     * - favicon.ico, sitemap.xml, robots.txt
+     * - imágenes públicas (/images/*)
+     * - archivos PWA (sw.js, manifest.webmanifest)
+     */
+    "/((?!_next/static|_next/image|favicon.ico|sitemap.xml|robots.txt|images|sw.js|manifest.webmanifest).*)",
   ],
 };

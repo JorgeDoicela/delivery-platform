@@ -79,11 +79,15 @@ export function getTenantSubdomain(hostname?: string): string | null {
   return null;
 }
 
-export function getApiClientTenantDomain(): string | null {
-  if (typeof window === "undefined") return null;
-  const host = window.location.hostname.toLowerCase().trim();
-  if (!isPlatformHost(host) && !getTenantSubdomain(host)) {
-    return host;
+export function getApiClientTenantDomain(hostname?: string): string | null {
+  let host = hostname;
+  if (!host && typeof window !== "undefined") {
+    host = window.location.hostname;
+  }
+  if (!host) return null;
+  const clean = host.split(":")[0].toLowerCase().trim();
+  if (!isPlatformHost(clean) && !getTenantSubdomain(clean)) {
+    return clean;
   }
   return null;
 }

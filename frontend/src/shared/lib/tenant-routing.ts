@@ -1,4 +1,3 @@
-import { useSyncExternalStore } from "react";
 import { usePathname } from "next/navigation";
 import {
   isPlatformHost,
@@ -7,6 +6,7 @@ import {
   DEFAULT_TENANT_SLUG,
   PLATFORM_BASE_DOMAINS,
 } from "./tenant-context";
+import { useTenantHost } from "./tenant-host-context";
 import { useTenantStore } from "@/features/tenant/store/useTenantStore";
 
 export { PLATFORM_BASE_DOMAINS };
@@ -235,28 +235,13 @@ export function resolveTenantRouting(
   };
 }
 
-const noopSubscribe = () => () => {};
-
-function getWindowHostname(): string {
-  if (typeof window === "undefined") return "localhost";
-  return window.location.hostname;
-}
-
-function getServerHostname(): string {
-  return "localhost";
-}
-
 /**
  * Hook de React para acceder a las rutas canónicas del tenant activo con reactividad completa.
  */
 export function useTenantRoutes(explicitSlug?: string | null): TenantRoutingResolution {
   const pathname = usePathname() || "/";
   const storeSlug = useTenantStore((s) => s.tenantSlug);
-  const hostname = useSyncExternalStore(
-    noopSubscribe,
-    getWindowHostname,
-    getServerHostname
-  );
+  const hostname = useTenantHost();
 
   return resolveTenantRouting({
     pathname,

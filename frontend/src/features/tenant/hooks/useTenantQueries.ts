@@ -14,15 +14,18 @@ import type {
 import {
   FALLBACK_PUBLIC_TENANTS,
   getFallbackTenantConfig,
+  getFallbackTenantConfigByDomain,
   useTenantStore,
 } from "../store/useTenantStore";
 import { getApiClientTenantDomain } from "@/shared/lib/api-client";
+import { useTenantHost } from "@/shared/lib/tenant-host-context";
 
 export function useCurrentTenantQuery(slugOverride?: string | null) {
   const storeSlug = useTenantStore((s) => s.tenantSlug);
   const targetSlug = slugOverride !== undefined ? slugOverride : storeSlug;
   const normalizedSlug = targetSlug?.trim().toLowerCase() || null;
-  const domain = typeof window !== "undefined" ? getApiClientTenantDomain() : null;
+  const host = useTenantHost();
+  const domain = getApiClientTenantDomain(host);
   const isCustomDomain = Boolean(domain);
 
   return useQuery<TenantStorefrontConfigDto | null>({
@@ -36,11 +39,17 @@ export function useCurrentTenantQuery(slugOverride?: string | null) {
         }
         return result;
       } catch {
-        return normalizedSlug ? getFallbackTenantConfig(normalizedSlug) : null;
+        if (normalizedSlug) return getFallbackTenantConfig(normalizedSlug);
+        if (domain) return getFallbackTenantConfigByDomain(domain);
+        return null;
       }
     },
     enabled: Boolean(normalizedSlug || isCustomDomain),
-    placeholderData: normalizedSlug ? () => getFallbackTenantConfig(normalizedSlug) : undefined,
+    placeholderData: () => {
+      if (normalizedSlug) return getFallbackTenantConfig(normalizedSlug);
+      if (domain) return getFallbackTenantConfigByDomain(domain);
+      return undefined;
+    },
     staleTime: 1000 * 60 * 2,
   });
 }

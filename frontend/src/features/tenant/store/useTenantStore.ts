@@ -243,6 +243,19 @@ export const FALLBACK_PUBLIC_TENANTS: PublicTenantSummaryDto[] = Object.values(
   primaryBranchAddress: cfg.branches[0]?.address ?? "Matriz Principal",
 }));
 
+export function getFallbackTenantConfigByDomain(domain: string | null): TenantStorefrontConfigDto {
+  if (!domain) return getFallbackTenantConfig(DEFAULT_TENANT_SLUG);
+  const clean = domain.split(":")[0].toLowerCase().trim();
+  if (clean.includes("lagranjita") || clean.includes("granjita") || clean.includes("asadero")) {
+    return FALLBACK_TENANT_CONFIGS["la-granjita"] || getFallbackTenantConfig("la-granjita");
+  }
+  if (clean.includes("brasas") || clean.includes("valle")) {
+    return FALLBACK_TENANT_CONFIGS["brasas-del-valle"] || getFallbackTenantConfig("brasas-del-valle");
+  }
+  const firstPart = clean.split(".")[0];
+  return getFallbackTenantConfig(firstPart);
+}
+
 export function getFallbackTenantConfig(slug: string): TenantStorefrontConfigDto {
   const normalized = slug?.trim().toLowerCase() || DEFAULT_TENANT_SLUG;
   if (FALLBACK_TENANT_CONFIGS[normalized]) {

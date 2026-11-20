@@ -1,72 +1,95 @@
-"use client";
-
 import React, { Suspense } from "react";
-import { useSearchParams } from "next/navigation";
+import { headers } from "next/headers";
+import type { Metadata } from "next";
 import { PlatformLandingView } from "@/features/platform";
 import { RestaurantStorefrontView } from "@/features/tenant/components/RestaurantStorefrontView";
 import { isPlatformHost, getTenantSubdomain } from "@/shared/lib/api-client";
+import { getFallbackTenantConfigByDomain } from "@/features/tenant/store/useTenantStore";
 
-const noopSubscribe = () => () => {};
+export async function generateMetadata(): Promise<Metadata> {
+  const headersList = await headers();
+  const rawHost =
+    headersList.get("x-tenant-host") ||
+    headersList.get("x-forwarded-host") ||
+    headersList.get("host")?.split(":")[0] ||
+    "";
+  const host = rawHost.toLowerCase().trim();
 
-function getSubdomainSnapshot(): string | null {
-  if (typeof window === "undefined") return null;
-  return getTenantSubdomain(window.location.hostname);
+  if (!isPlatformHost(host)) {
+    const fallback = getFallbackTenantConfigByDomain(host);
+    if (fallback) {
+      return {
+        title: `${fallback.name} | ${fallback.tagline}`,
+        description: fallback.tagline,
+      };
+    }
+  }
+
+  const subdomain = getTenantSubdomain(host);
+  if (subdomain) {
+    const fallback = getFallbackTenantConfigByDomain(subdomain);
+    if (fallback) {
+      return {
+        title: `${fallback.name} | ${fallback.tagline}`,
+        description: fallback.tagline,
+      };
+    }
+  }
+
+  return {
+    title: "Mesafy | Plataforma Gastronómica & Pedidos Multi-Restaurante",
+    description: "Plataforma multitenant de pedidos en línea, terminales de salón/POS y delivery.",
+  };
 }
 
-function getIsCustomDomainSnapshot(): boolean {
-  if (typeof window === "undefined") return false;
-  return !isPlatformHost(window.location.hostname);
-}
+async function ServerTenantHomePage({
+  searchParams,
+}: {
+  searchParams: Promise<{ [key: string]: string | string[] | undefined }>;
+}) {
+  const headersList = await headers();
+  const rawHost =
+    headersList.get("x-tenant-host") ||
+    headersList.get("x-forwarded-host") ||
+    headersList.get("host")?.split(":")[0] ||
+    "localhost";
+  const host = rawHost.toLowerCase().trim();
 
-function getServerSnapshot(): string | null {
-  return null;
-}
-
-function getServerBooleanSnapshot(): boolean {
-  return false;
-}
-
-function HomePageContent() {
-  const searchParams = useSearchParams();
-  const subdomainSlug = React.useSyncExternalStore(
-    noopSubscribe,
-    getSubdomainSnapshot,
-    getServerSnapshot
-  );
-  const isCustomDomain = React.useSyncExternalStore(
-    noopSubscribe,
-    getIsCustomDomainSnapshot,
-    getServerBooleanSnapshot
-  );
-
+  const resolvedSearchParams = await searchParams;
   const explicitBrand =
-    searchParams.get("marca") ||
-    searchParams.get("restaurante") ||
-    searchParams.get("tenant");
+    (typeof resolvedSearchParams.marca === "string" ? resolvedSearchParams.marca : undefined) ||
+    (typeof resolvedSearchParams.restaurante === "string" ? resolvedSearchParams.restaurante : undefined) ||
+    (typeof resolvedSearchParams.tenant === "string" ? resolvedSearchParams.tenant : undefined);
 
   // 1. Si se navega con parámetro de restaurante explícito (?marca=la-granjita)
   if (explicitBrand) {
     return <RestaurantStorefrontView initialSlug={explicitBrand} />;
   }
 
-  // 2. Detección de Subdominio en navegador (ej. lagranjita.mesafy.doicela.dev)
+  // 2. Detección de Subdominio en cabecera HTTP del servidor (ej. lagranjita.mesafy.doicela.dev)
+  const subdomainSlug = getTenantSubdomain(host);
   if (subdomainSlug) {
     return <RestaurantStorefrontView initialSlug={subdomainSlug} />;
   }
 
-  // 3. Dominio Personalizado de Negocio (ej. pedidos.lagranjita.com)
-  if (isCustomDomain) {
-    return <RestaurantStorefrontView />;
+  // 3. Dominio Personalizado de Negocio (ej. asaderolagranjita.doicela.dev, pedidos.lagranjita.com)
+  if (!isPlatformHost(host)) {
+    const fallback = getFallbackTenantConfigByDomain(host);
+    return <RestaurantStorefrontView initialSlug={fallback?.slug} />;
   }
 
   // 4. Por defecto en la raíz de la plataforma: Directorio multimarca global
   return <PlatformLandingView />;
 }
 
-export default function StorefrontHomePage() {
+export default function StorefrontHomePage({
+  searchParams,
+}: {
+  searchParams: Promise<{ [key: string]: string | string[] | undefined }>;
+}) {
   return (
     <Suspense fallback={<div className="min-h-screen bg-surface-canvas" />}>
-      <HomePageContent />
+      <ServerTenantHomePage searchParams={searchParams} />
     </Suspense>
   );
 }
