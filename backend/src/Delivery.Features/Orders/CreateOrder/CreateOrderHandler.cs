@@ -402,7 +402,11 @@ public sealed class CreateOrderHandler : IHandler<CreateOrderCommand, Result<Cre
                 i.ProductNameSnapshot,
                 i.Quantity,
                 i.Modifiers.Select(m => new KitchenTicketModifierDto(m.ModifierNameSnapshot)).ToList()
-            )).ToList()
+            )).ToList(),
+            order.PaymentMethod,
+            order.TransferReceiptUrl,
+            order.Total,
+            order.ChangeDue
         );
 
         // Notificación en tiempo real al Kitchen Display System (KDS) de la sucursal

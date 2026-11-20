@@ -21,10 +21,12 @@ export default async function TenantCocinaPage({ params }: TenantCocinaPageProps
     <AuthGuard
       allowedRoles={[
         UserRole.KitchenStaff,
+        UserRole.Cashier,
         UserRole.BranchManager,
         UserRole.TenantAdmin,
         UserRole.SuperAdmin,
         'KitchenStaff',
+        'Cashier',
         'BranchManager',
         'TenantAdmin',
         'SuperAdmin',

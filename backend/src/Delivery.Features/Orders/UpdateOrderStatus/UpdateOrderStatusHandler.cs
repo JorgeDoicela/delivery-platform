@@ -111,6 +111,7 @@ public sealed class UpdateOrderStatusHandler : IHandler<UpdateOrderStatusCommand
 
             (OrderStatus.InKitchen, OrderStatus.ReadyForDelivery) => true,
             (OrderStatus.ReadyForDelivery, OrderStatus.OnTheWay) => true,
+            (OrderStatus.ReadyForDelivery, OrderStatus.Delivered) => order.DeliveryType == DeliveryType.Takeout,
             (OrderStatus.OnTheWay, OrderStatus.Delivered) => true,
 
             _ => false

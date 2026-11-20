@@ -116,6 +116,7 @@ export function useKitchenOrders(branchId: number) {
 
         setOrders((prev) => {
           const activeStatuses = [
+            OrderStatus.PendingValidation,
             OrderStatus.Confirmed,
             OrderStatus.InKitchen,
             OrderStatus.ReadyForDelivery,
@@ -177,6 +178,7 @@ export function useKitchenOrders(branchId: number) {
       await apiClient.updateOrderStatus(orderId, nextStatus);
       setOrders((prev) => {
         const activeStatuses = [
+          OrderStatus.PendingValidation,
           OrderStatus.Confirmed,
           OrderStatus.InKitchen,
           OrderStatus.ReadyForDelivery,
@@ -194,6 +196,26 @@ export function useKitchenOrders(branchId: number) {
     }
   };
 
+  const approveTransfer = async (
+    orderId: string,
+    isApproved: boolean,
+    rejectionReason?: string
+  ) => {
+    try {
+      await apiClient.approveTransferOrder(orderId, isApproved, rejectionReason);
+      setOrders((prev) => {
+        if (!isApproved) {
+          return prev.filter((o) => o.orderId !== orderId);
+        }
+        return prev.map((o) =>
+          o.orderId === orderId ? { ...o, status: OrderStatus.Confirmed } : o
+        );
+      });
+    } catch {
+      fetchOrders();
+    }
+  };
+
   return {
     orders,
     loading,
@@ -201,5 +223,6 @@ export function useKitchenOrders(branchId: number) {
     connectionStatus,
     refresh: fetchOrders,
     advanceOrderStatus,
+    approveTransfer,
   };
 }

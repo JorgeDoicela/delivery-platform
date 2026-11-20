@@ -333,6 +333,20 @@ export const apiClient = {
         return handleResponse<void>(res);
     },
 
+    // 7.1 Órdenes: Validación o rechazo de transferencia bancaria
+    async approveTransferOrder(
+        orderId: string,
+        isApproved: boolean,
+        rejectionReason?: string
+    ): Promise<{ orderId: string; newStatus: number; message: string }> {
+        const res = await fetch(`${getApiBaseUrl()}/api/orders/${orderId}/transfer-approval`, {
+            method: "POST",
+            headers: buildHeaders(),
+            body: JSON.stringify({ orderId, isApproved, rejectionReason }),
+        });
+        return handleResponse<{ orderId: string; newStatus: number; message: string }>(res);
+    },
+
     // 8. Repartidor: Ingesta de geoposición satelital
     async ingestDriverLocation(
         driverId: string,

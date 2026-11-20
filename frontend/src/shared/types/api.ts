@@ -183,6 +183,10 @@ export interface KitchenOrderTicketDto {
   addressReference: string;
   createdAt: string;
   items: KitchenTicketItemDto[];
+  paymentMethod?: PaymentMethod;
+  transferReceiptUrl?: string | null;
+  total?: number;
+  changeDue?: number | null;
 }
 
 export interface DriverLocationResponse {

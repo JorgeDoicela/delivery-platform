@@ -1,15 +1,16 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { KitchenOrderTicketDto, OrderStatus, DeliveryType } from '@/shared/types/api';
-import { Clock, ChefHat, CheckCircle2, Bike, Store, AlertTriangle } from 'lucide-react';
+import { KitchenOrderTicketDto, OrderStatus, DeliveryType, PaymentMethod } from '@/shared/types/api';
+import { Clock, ChefHat, CheckCircle2, Bike, Store, AlertTriangle, Receipt, ExternalLink, Check, X } from 'lucide-react';
 
 interface KitchenTicketCardProps {
   order: KitchenOrderTicketDto;
   onAdvance: (orderId: string, nextStatus: OrderStatus) => Promise<void>;
+  onApproveTransfer?: (orderId: string, isApproved: boolean, rejectionReason?: string) => Promise<void>;
 }
 
-export function KitchenTicketCard({ order, onAdvance }: KitchenTicketCardProps) {
+export function KitchenTicketCard({ order, onAdvance, onApproveTransfer }: KitchenTicketCardProps) {
   const [elapsedMinutes, setElapsedMinutes] = useState(0);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
@@ -35,6 +36,16 @@ export function KitchenTicketCard({ order, onAdvance }: KitchenTicketCardProps) 
     }
   };
 
+  const handleApprove = async (isApproved: boolean) => {
+    if (!onApproveTransfer) return;
+    setIsSubmitting(true);
+    try {
+      await onApproveTransfer(order.orderId, isApproved);
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
   // Semáforo de tiempos
   let timerBadgeColor = 'bg-status-success/15 text-status-success border-status-success/30';
   if (elapsedMinutes >= 25) {
@@ -44,6 +55,7 @@ export function KitchenTicketCard({ order, onAdvance }: KitchenTicketCardProps) 
   }
 
   const isTakeout = order.deliveryType === DeliveryType.Takeout;
+  const isPendingValidation = order.status === OrderStatus.PendingValidation;
 
   return (
     <div className="bg-surface-card border border-surface-border rounded-2xl shadow-sm flex flex-col justify-between overflow-hidden transition-colors duration-200">
@@ -62,7 +74,7 @@ export function KitchenTicketCard({ order, onAdvance }: KitchenTicketCardProps) 
           >
             {isTakeout ? (
               <>
-                <Store className="h-3 w-3" /> Para Llevar
+                <Store className="h-3 w-3" /> Mostrador
               </>
             ) : (
               <>
@@ -82,15 +94,48 @@ export function KitchenTicketCard({ order, onAdvance }: KitchenTicketCardProps) 
         </div>
       </div>
 
-      {/* Datos del Cliente */}
-      <div className="px-3.5 pt-2.5 pb-1.5 border-b border-surface-border text-xs">
-        <p className="font-bold text-text-strong truncate">{order.customerName}</p>
+      {/* Datos del Cliente y Pago */}
+      <div className="px-3.5 pt-2.5 pb-2 border-b border-surface-border text-xs space-y-1">
+        <div className="flex items-center justify-between">
+          <p className="font-bold text-text-strong truncate">{order.customerName}</p>
+          {order.total !== undefined && order.total > 0 && (
+            <span className="font-mono font-black text-brand-primary text-xs">
+              ${order.total.toFixed(2)}
+            </span>
+          )}
+        </div>
         {!isTakeout && order.addressStreet && (
-          <p className="text-text-muted text-[11px] truncate mt-0.5">
+          <p className="text-text-muted text-[11px] truncate">
             {order.addressStreet} {order.addressReference && `(${order.addressReference})`}
           </p>
         )}
+        {order.paymentMethod === PaymentMethod.Cash && order.changeDue !== undefined && order.changeDue !== null && order.changeDue > 0 && (
+          <p className="text-[11px] text-status-warning font-semibold">
+            Cambio a entregar: ${order.changeDue.toFixed(2)}
+          </p>
+        )}
       </div>
+
+      {/* Bloque especial de Transferencia Bancaria por Validar */}
+      {isPendingValidation && (
+        <div className="px-3.5 py-2.5 bg-status-warning/10 border-b border-status-warning/20 text-xs">
+          <div className="flex items-center justify-between">
+            <span className="text-[11px] font-bold text-status-warning uppercase tracking-wider flex items-center gap-1">
+              <Receipt className="h-3.5 w-3.5" /> Transferencia por validar
+            </span>
+            {order.transferReceiptUrl && (
+              <a
+                href={order.transferReceiptUrl}
+                target="_blank"
+                rel="noreferrer"
+                className="inline-flex items-center gap-1 text-[11px] font-bold text-brand-primary hover:underline"
+              >
+                Ver Comprobante <ExternalLink className="h-3 w-3" />
+              </a>
+            )}
+          </div>
+        </div>
+      )}
 
       {/* Lista de Items */}
       <div className="p-3.5 space-y-2.5 flex-1 overflow-y-auto max-h-60 divide-y divide-surface-border">
@@ -120,8 +165,29 @@ export function KitchenTicketCard({ order, onAdvance }: KitchenTicketCardProps) 
         ))}
       </div>
 
-      {/* Acciones de Flujo de Cocina */}
+      {/* Acciones de Flujo de Cocina y Mostrador */}
       <div className="p-3 bg-surface-canvas border-t border-surface-border">
+        {isPendingValidation && (
+          <div className="flex items-center gap-2">
+            <button
+              onClick={() => handleApprove(false)}
+              disabled={isSubmitting}
+              className="flex-1 flex items-center justify-center gap-1 py-2 px-3 bg-surface-card hover:bg-status-danger/10 text-status-danger border border-status-danger/30 text-xs font-bold uppercase tracking-wider rounded-full transition-all active:scale-95 disabled:opacity-50 cursor-pointer"
+            >
+              <X className="h-3.5 w-3.5" />
+              Rechazar
+            </button>
+            <button
+              onClick={() => handleApprove(true)}
+              disabled={isSubmitting}
+              className="flex-1 flex items-center justify-center gap-1 py-2 px-3 bg-status-success hover:bg-status-success/90 text-white text-xs font-bold uppercase tracking-wider rounded-full shadow-md transition-all active:scale-95 disabled:opacity-50 cursor-pointer"
+            >
+              <Check className="h-3.5 w-3.5" />
+              Aprobar
+            </button>
+          </div>
+        )}
+
         {order.status === OrderStatus.Confirmed && (
           <button
             onClick={() => handleAdvance(OrderStatus.InKitchen)}
@@ -140,19 +206,30 @@ export function KitchenTicketCard({ order, onAdvance }: KitchenTicketCardProps) 
             className="w-full flex items-center justify-center gap-2 py-2.5 px-4 bg-status-info hover:bg-status-info/80 text-white text-xs font-bold uppercase tracking-wider rounded-full shadow-md transition-all active:scale-95 disabled:opacity-50 cursor-pointer"
           >
             <CheckCircle2 className="h-4 w-4" />
-            {isSubmitting ? 'Guardando...' : 'Listo para Reparto'}
+            {isSubmitting ? 'Guardando...' : isTakeout ? 'Listo en Mostrador' : 'Listo para Reparto'}
           </button>
         )}
 
         {order.status === OrderStatus.ReadyForDelivery && (
-          <button
-            onClick={() => handleAdvance(OrderStatus.OnTheWay)}
-            disabled={isSubmitting}
-            className="w-full flex items-center justify-center gap-2 py-2.5 px-4 bg-status-success hover:bg-status-success/80 text-white text-xs font-bold uppercase tracking-wider rounded-full shadow-md transition-all active:scale-95 disabled:opacity-50 cursor-pointer"
-          >
-            <Bike className="h-4 w-4" />
-            {isSubmitting ? 'Despachando...' : 'Despachar / En Camino'}
-          </button>
+          isTakeout ? (
+            <button
+              onClick={() => handleAdvance(OrderStatus.Delivered)}
+              disabled={isSubmitting}
+              className="w-full flex items-center justify-center gap-2 py-2.5 px-4 bg-status-success hover:bg-status-success/80 text-white text-xs font-bold uppercase tracking-wider rounded-full shadow-md transition-all active:scale-95 disabled:opacity-50 cursor-pointer"
+            >
+              <Store className="h-4 w-4" />
+              {isSubmitting ? 'Entregando...' : 'Entregar en Mostrador'}
+            </button>
+          ) : (
+            <button
+              onClick={() => handleAdvance(OrderStatus.OnTheWay)}
+              disabled={isSubmitting}
+              className="w-full flex items-center justify-center gap-2 py-2.5 px-4 bg-status-success hover:bg-status-success/80 text-white text-xs font-bold uppercase tracking-wider rounded-full shadow-md transition-all active:scale-95 disabled:opacity-50 cursor-pointer"
+            >
+              <Bike className="h-4 w-4" />
+              {isSubmitting ? 'Despachando...' : 'Despachar / En Camino'}
+            </button>
+          )
         )}
       </div>
     </div>

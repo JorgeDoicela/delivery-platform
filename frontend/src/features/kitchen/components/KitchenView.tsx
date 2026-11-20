@@ -56,14 +56,15 @@ export function KitchenView() {
 
   const activeBranch = branches.find((b) => b.id === branchId);
 
-  const { orders, error, connectionStatus, advanceOrderStatus } =
+  const { orders, error, connectionStatus, advanceOrderStatus, approveTransfer } =
     useKitchenOrders(branchId);
 
+  const pendingValidationOrders = orders.filter((o) => o.status === OrderStatus.PendingValidation);
   const confirmedOrders = orders.filter((o) => o.status === OrderStatus.Confirmed);
   const inKitchenOrders = orders.filter((o) => o.status === OrderStatus.InKitchen);
   const readyOrders = orders.filter((o) => o.status === OrderStatus.ReadyForDelivery);
 
-  const [mobileColumn, setMobileColumn] = useState<"confirmed" | "inkitchen" | "ready">("confirmed");
+  const [mobileColumn, setMobileColumn] = useState<"pending" | "confirmed" | "inkitchen" | "ready">("confirmed");
 
   return (
     <div className="space-y-4">
@@ -147,6 +148,33 @@ export function KitchenView() {
         </div>
       )}
 
+      {/* Alerta / Sección destacada de transferencias pendientes de validación para cajeros */}
+      {pendingValidationOrders.length > 0 && (
+        <div className="bg-status-warning/10 border border-status-warning/30 rounded-2xl p-4 shadow-xs">
+          <div className="flex items-center justify-between pb-3 border-b border-status-warning/20">
+            <div className="flex items-center gap-2">
+              <span className="w-2.5 h-2.5 rounded-full bg-status-warning animate-ping" />
+              <h2 className="text-xs sm:text-sm font-black uppercase tracking-wider text-text-strong font-display">
+                Comprobantes de Transferencia por Validar
+              </h2>
+            </div>
+            <span className="bg-status-warning/20 text-status-warning px-2.5 py-0.5 rounded-full border border-status-warning/40 font-mono text-xs font-bold">
+              {pendingValidationOrders.length} {pendingValidationOrders.length === 1 ? 'pendiente' : 'pendientes'}
+            </span>
+          </div>
+          <div className="mt-3 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+            {pendingValidationOrders.map((order) => (
+              <KitchenTicketCard
+                key={order.orderId}
+                order={order}
+                onAdvance={advanceOrderStatus}
+                onApproveTransfer={approveTransfer}
+              />
+            ))}
+          </div>
+        </div>
+      )}
+
       {/* Selector de Columnas en Dispositivos Móviles (< md) */}
       <div className="flex md:hidden items-center gap-1.5 p-1 bg-surface-card border border-surface-border rounded-2xl shadow-xs">
         <button
@@ -220,6 +248,7 @@ export function KitchenView() {
                   key={order.orderId}
                   order={order}
                   onAdvance={advanceOrderStatus}
+                  onApproveTransfer={approveTransfer}
                 />
               ))
             )}
@@ -250,6 +279,7 @@ export function KitchenView() {
                   key={order.orderId}
                   order={order}
                   onAdvance={advanceOrderStatus}
+                  onApproveTransfer={approveTransfer}
                 />
               ))
             )}
@@ -280,6 +310,7 @@ export function KitchenView() {
                   key={order.orderId}
                   order={order}
                   onAdvance={advanceOrderStatus}
+                  onApproveTransfer={approveTransfer}
                 />
               ))
             )}

@@ -18,6 +18,10 @@ public sealed record KitchenOrderTicketDto(
     string AddressStreet,
     string AddressReference,
     DateTime CreatedAt,
-    List<KitchenTicketItemDto> Items
+    List<KitchenTicketItemDto> Items,
+    PaymentMethod PaymentMethod = PaymentMethod.CashOnDelivery,
+    string? TransferReceiptUrl = null,
+    decimal Total = 0m,
+    decimal? ChangeDue = null
 );
 

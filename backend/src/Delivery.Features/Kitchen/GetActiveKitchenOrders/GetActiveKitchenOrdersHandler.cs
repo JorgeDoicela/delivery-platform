@@ -42,6 +42,7 @@ public sealed class GetActiveKitchenOrdersHandler : IHandler<GetActiveKitchenOrd
 
         var activeStatuses = new[]
         {
+            OrderStatus.PendingValidation,
             OrderStatus.Confirmed,
             OrderStatus.InKitchen,
             OrderStatus.ReadyForDelivery
@@ -67,7 +68,11 @@ public sealed class GetActiveKitchenOrdersHandler : IHandler<GetActiveKitchenOrd
                 i.ProductNameSnapshot,
                 i.Quantity,
                 i.Modifiers.Select(m => new KitchenTicketModifierDto(m.ModifierNameSnapshot)).ToList()
-            )).ToList()
+            )).ToList(),
+            o.PaymentMethod,
+            o.TransferReceiptUrl,
+            o.Total,
+            o.ChangeDue
         )).ToList();
 
         return Result.Success(tickets);
