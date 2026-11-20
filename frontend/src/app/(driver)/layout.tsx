@@ -48,7 +48,7 @@ function DriverLayoutContent({
   });
 
   const { data: tenant } = useCurrentTenantQuery(activeTenantSlug);
-  const brandName = tenant?.name || "La Granjita";
+  const brandName = tenant?.name || user?.tenantName || "Restaurante";
   const brandLogo = tenant?.logoUrl || "/images/shared/placeholders/logo-default.png";
   const brandHomeHref = routes.getHomeHref();
 

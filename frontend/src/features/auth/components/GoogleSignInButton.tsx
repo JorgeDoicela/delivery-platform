@@ -6,7 +6,7 @@ import { Loader2 } from "lucide-react";
 import { useAuthStore } from "../store/useAuthStore";
 import { useCurrentTenantQuery, useTenantStore } from "@/features/tenant";
 import { resolvePostLoginRedirect } from "../lib/redirectByRole";
-import { resolveTenantRouting } from "@/shared/lib/tenant-routing";
+import { resolveTenantRouting, useTenantRoutes } from "@/shared/lib/tenant-routing";
 import { GoogleDevAuthModal } from "./GoogleDevAuthModal";
 
 interface GoogleSignInButtonProps {
@@ -60,6 +60,7 @@ export function GoogleSignInButton({
   const router = useRouter();
   const loginWithGoogle = useAuthStore((s) => s.loginWithGoogle);
   const { data: tenant } = useCurrentTenantQuery();
+  const routes = useTenantRoutes(tenant?.slug);
   const [isLoading, setIsLoading] = useState(false);
   const [showConfigModal, setShowConfigModal] = useState(false);
   const [diagnosticReason, setDiagnosticReason] = useState<string | null>(null);
@@ -75,8 +76,9 @@ export function GoogleSignInButton({
     async (idToken: string) => {
       setIsLoading(true);
       try {
-        const activeTenantSlug =
-          tenant?.slug || useTenantStore.getState().tenantSlug || undefined;
+        const activeTenantSlug = routes.isPlatformRoot
+          ? undefined
+          : (tenant?.slug || useTenantStore.getState().tenantSlug || undefined);
 
         const success = await loginWithGoogle({
           idToken,
@@ -91,7 +93,7 @@ export function GoogleSignInButton({
           }
 
           const tenantSlug =
-            loggedUser?.tenantSlug || activeTenantSlug || "la-granjita";
+            loggedUser?.tenantSlug || activeTenantSlug || undefined;
 
           const routing = resolveTenantRouting({
             explicitSlug: tenantSlug,
@@ -125,7 +127,7 @@ export function GoogleSignInButton({
         setIsLoading(false);
       }
     },
-    [loginWithGoogle, tenant?.slug, redirectUrl, router, onSuccess, onError]
+    [loginWithGoogle, tenant?.slug, routes.isPlatformRoot, redirectUrl, router, onSuccess, onError]
   );
 
   useEffect(() => {

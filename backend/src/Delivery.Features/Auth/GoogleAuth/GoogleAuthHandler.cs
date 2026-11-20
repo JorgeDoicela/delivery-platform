@@ -48,44 +48,50 @@ public class GoogleAuthHandler : IHandler<GoogleAuthCommand, Result<GoogleAuthRe
             var requestedSlug = request.TenantSlug.Trim().ToLowerInvariant();
             tenant = await _context.Tenants.IgnoreQueryFilters()
                 .FirstOrDefaultAsync(t => t.Slug == requestedSlug, cancellationToken);
+
+            if (tenant == null)
+            {
+                return Result.Failure<GoogleAuthResponse>(AuthErrors.TenantNotFound);
+            }
         }
         else if (_tenantContext.TenantId.HasValue)
         {
             tenant = await _context.Tenants.IgnoreQueryFilters()
                 .FirstOrDefaultAsync(t => t.Id == _tenantContext.TenantId.Value, cancellationToken);
-        }
-        else
-        {
-            tenant = await _context.Tenants.IgnoreQueryFilters()
-                .FirstOrDefaultAsync(t => t.Slug == "la-granjita", cancellationToken)
-                ?? await _context.Tenants.IgnoreQueryFilters()
-                    .Where(t => t.IsActive)
-                    .OrderBy(t => t.Id)
-                    .FirstOrDefaultAsync(cancellationToken);
-        }
 
-        if (tenant == null)
-        {
-            return Result.Failure<GoogleAuthResponse>(AuthErrors.TenantNotFound);
+            if (tenant == null)
+            {
+                return Result.Failure<GoogleAuthResponse>(AuthErrors.TenantNotFound);
+            }
         }
-
-        if (!tenant.IsActive)
-        {
-            return Result.Failure<GoogleAuthResponse>(AuthErrors.TenantInactive);
-        }
+        // Si no se proporcionó TenantSlug ni existe TenantId en el contexto,
+        // la autenticación federada se efectúa en la Plataforma Global (mesafy.doicela.dev).
+        // tenant permanece en null para comensales globales.
 
         // 3. Búsqueda de usuario existente por correo verificado
         var emailLower = googlePayload.Email.Trim().ToLower(CultureInfo.InvariantCulture);
+        User? user;
 
 #pragma warning disable CA1862, CA1304, CA1311
-        var user = await _context.Users.IgnoreQueryFilters()
-            .Include(u => u.Tenant)
-            .Include(u => u.UserRoles)
-                .ThenInclude(ur => ur.Role)
-            .FirstOrDefaultAsync(u => (u.TenantId == tenant.Id || u.TenantId == null) && u.Email.ToLower() == emailLower, cancellationToken);
+        if (tenant != null)
+        {
+            user = await _context.Users.IgnoreQueryFilters()
+                .Include(u => u.Tenant)
+                .Include(u => u.UserRoles)
+                    .ThenInclude(ur => ur.Role)
+                .FirstOrDefaultAsync(u => (u.TenantId == tenant.Id || u.TenantId == null) && u.Email.ToLower() == emailLower, cancellationToken);
 
-        // Si el usuario existe en otro tenant y no se forzó tenantSlug en request, resolver su propio tenant
-        if (user == null && string.IsNullOrWhiteSpace(request.TenantSlug))
+            if (user == null)
+            {
+                var otherTenantUser = await _context.Users.IgnoreQueryFilters()
+                    .FirstOrDefaultAsync(u => u.Email.ToLower() == emailLower, cancellationToken);
+                if (otherTenantUser?.TenantId != null && otherTenantUser.TenantId != tenant.Id)
+                {
+                    return Result.Failure<GoogleAuthResponse>(AuthErrors.UnauthorizedTenant);
+                }
+            }
+        }
+        else
         {
             user = await _context.Users.IgnoreQueryFilters()
                 .Include(u => u.Tenant)
@@ -95,6 +101,10 @@ public class GoogleAuthHandler : IHandler<GoogleAuthCommand, Result<GoogleAuthRe
 
             if (user?.Tenant != null)
             {
+                if (!user.Tenant.IsActive)
+                {
+                    return Result.Failure<GoogleAuthResponse>(AuthErrors.TenantInactive);
+                }
                 tenant = user.Tenant;
             }
         }
@@ -106,7 +116,7 @@ public class GoogleAuthHandler : IHandler<GoogleAuthCommand, Result<GoogleAuthRe
             user = new User
             {
                 Id = Guid.NewGuid(),
-                TenantId = tenant.Id,
+                TenantId = tenant?.Id,
                 Email = emailLower,
                 FullName = !string.IsNullOrWhiteSpace(googlePayload.Name) ? googlePayload.Name.Trim() : emailLower.Split('@')[0],
                 Phone = string.Empty,
@@ -127,28 +137,31 @@ public class GoogleAuthHandler : IHandler<GoogleAuthCommand, Result<GoogleAuthRe
 
             await _context.UserRoles.AddAsync(userRole, cancellationToken);
 
-            // Registro en directorio de clientes del tenant
+            // Registro en directorio de clientes del tenant (solo si pertenece a un comercio específico)
+            if (tenant != null)
+            {
 #pragma warning disable CA1862, CA1304, CA1311
-            var customer = await _context.Customers.IgnoreQueryFilters()
-                .FirstOrDefaultAsync(c => c.TenantId == tenant.Id && c.Email != null && c.Email.ToLower() == emailLower, cancellationToken);
+                var customer = await _context.Customers.IgnoreQueryFilters()
+                    .FirstOrDefaultAsync(c => c.TenantId == tenant.Id && c.Email != null && c.Email.ToLower() == emailLower, cancellationToken);
 #pragma warning restore CA1862, CA1304, CA1311
 
-            if (customer == null)
-            {
-                customer = new Customer
+                if (customer == null)
                 {
-                    Id = Guid.NewGuid(),
-                    TenantId = tenant.Id,
-                    FullName = user.FullName,
-                    Email = user.Email,
-                    Phone = user.Phone,
-                    IdentificationType = "CONSUMIDOR_FINAL",
-                    IdentificationNumber = $"CF-{user.Id:N}"[..18],
-                    CreatedAt = DateTime.UtcNow,
-                    TotalOrdersCount = 0
-                };
+                    customer = new Customer
+                    {
+                        Id = Guid.NewGuid(),
+                        TenantId = tenant.Id,
+                        FullName = user.FullName,
+                        Email = user.Email,
+                        Phone = user.Phone,
+                        IdentificationType = "CONSUMIDOR_FINAL",
+                        IdentificationNumber = $"CF-{user.Id:N}"[..18],
+                        CreatedAt = DateTime.UtcNow,
+                        TotalOrdersCount = 0
+                    };
 
-                await _context.Customers.AddAsync(customer, cancellationToken);
+                    await _context.Customers.AddAsync(customer, cancellationToken);
+                }
             }
 
             await _context.SaveChangesAsync(cancellationToken);
@@ -157,6 +170,11 @@ public class GoogleAuthHandler : IHandler<GoogleAuthCommand, Result<GoogleAuthRe
         }
 
         // 5. Verificación de estado de cuenta y confirmación de correo
+        if (user.TenantId.HasValue && tenant != null && !tenant.IsActive)
+        {
+            return Result.Failure<GoogleAuthResponse>(AuthErrors.TenantInactive);
+        }
+
         if (!user.IsActive)
         {
             return Result.Failure<GoogleAuthResponse>(AuthErrors.UserInactive);
@@ -208,7 +226,7 @@ public class GoogleAuthHandler : IHandler<GoogleAuthCommand, Result<GoogleAuthRe
             user.Phone,
             primaryRole,
             user.TenantId,
-            user.Tenant?.Slug ?? tenant.Slug,
+            user.Tenant?.Slug ?? tenant?.Slug,
             primaryBranchId,
             user.IsActive,
             roleNames,

@@ -6,7 +6,7 @@ import { Fingerprint, Loader2, AlertCircle } from "lucide-react";
 import { usePasskeyAuth } from "../lib/usePasskeyAuth";
 import { useAuthStore } from "../store/useAuthStore";
 import { useCurrentTenantQuery, useTenantStore } from "@/features/tenant";
-import { resolveTenantRouting } from "@/shared/lib/tenant-routing";
+import { resolveTenantRouting, useTenantRoutes } from "@/shared/lib/tenant-routing";
 import { resolvePostLoginRedirect } from "../lib/redirectByRole";
 
 interface PasskeySignInButtonProps {
@@ -20,6 +20,7 @@ export function PasskeySignInButton({
 }: PasskeySignInButtonProps) {
   const router = useRouter();
   const { data: tenant } = useCurrentTenantQuery();
+  const routes = useTenantRoutes(tenant?.slug);
   const { isSupported, isLoading, error, loginWithPasskey, clearError } = usePasskeyAuth();
   const [localError, setLocalError] = useState<string | null>(null);
 
@@ -31,7 +32,9 @@ export function PasskeySignInButton({
     setLocalError(null);
     clearError();
 
-    const tenantSlug = tenant?.slug || useTenantStore.getState().tenantSlug || undefined;
+    const tenantSlug = routes.isPlatformRoot
+      ? undefined
+      : (tenant?.slug || useTenantStore.getState().tenantSlug || undefined);
     const success = await loginWithPasskey(emailHint || undefined, tenantSlug);
 
     if (success) {
@@ -41,7 +44,7 @@ export function PasskeySignInButton({
       }
 
       const activeSlug =
-        loggedUser?.tenantSlug || useTenantStore.getState().tenantSlug || "la-granjita";
+        loggedUser?.tenantSlug || tenantSlug || undefined;
 
       const routing = resolveTenantRouting({
         explicitSlug: activeSlug,

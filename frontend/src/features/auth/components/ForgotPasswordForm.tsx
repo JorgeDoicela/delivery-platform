@@ -27,9 +27,11 @@ export function ForgotPasswordForm({
   const forgotPasswordAction = useAuthStore((s) => s.forgotPassword);
   const { data: tenant } = useCurrentTenantQuery();
   const routes = useTenantRoutes(tenant?.slug);
-  const brandName = tenant?.name || "La Granjita";
-  const brandTagline = tenant?.tagline || "Asadero";
-  const brandLogo = tenant?.logoUrl || "/images/shared/placeholders/logo-default.png";
+  const brandName = routes.isPlatformRoot ? "Mesafy" : (tenant?.name || "Mesafy");
+  const brandTagline = routes.isPlatformRoot ? "Plataforma Gastronómica" : (tenant?.tagline || "Pedidos en línea");
+  const brandLogo = routes.isPlatformRoot
+    ? "/images/shared/placeholders/logo-default.png"
+    : (tenant?.logoUrl || "/images/shared/placeholders/logo-default.png");
 
   const [formError, setFormError] = useState<string | null>(null);
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
@@ -49,7 +51,9 @@ export function ForgotPasswordForm({
     setFormError(null);
     setSuccessMessage(null);
 
-    const activeTenantSlug = tenant?.slug || useTenantStore.getState().tenantSlug || undefined;
+    const activeTenantSlug = routes.isPlatformRoot
+      ? undefined
+      : (tenant?.slug || useTenantStore.getState().tenantSlug || undefined);
 
     const result = await forgotPasswordAction({
       email: data.email,

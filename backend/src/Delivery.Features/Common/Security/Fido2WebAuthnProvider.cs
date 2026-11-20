@@ -5,7 +5,7 @@ using Microsoft.Extensions.Logging;
 
 namespace Delivery.Features.Common.Security;
 
-public class Fido2WebAuthnProvider : IWebAuthnProvider
+public partial class Fido2WebAuthnProvider : IWebAuthnProvider
 {
     private readonly IWebAuthnRelyingPartyResolver _rpResolver;
     private readonly IWebAuthnChallengeStore _challengeStore;
@@ -60,7 +60,7 @@ public class Fido2WebAuthnProvider : IWebAuthnProvider
         var serialized = options.ToJson();
         await _challengeStore.StoreChallengeAsync(challengeKey, serialized, TimeSpan.FromMinutes(5), cancellationToken);
 
-        _logger.LogInformation("WebAuthn: Opciones de registro generadas para UserId: {UserId}, RP: {RpId}", user.Id, config.RPID);
+        LogRegistrationOptionsGenerated(_logger, user.Id, config.RPID ?? string.Empty);
         return options;
     }
 
@@ -91,7 +91,7 @@ public class Fido2WebAuthnProvider : IWebAuthnProvider
         };
 
         var result = await fido2.MakeNewCredentialAsync(makeParams, cancellationToken);
-        _logger.LogInformation("WebAuthn: Registro verificado exitosamente para UserId: {UserId}", userId);
+        LogRegistrationVerified(_logger, userId);
         return result;
     }
 
@@ -122,7 +122,7 @@ public class Fido2WebAuthnProvider : IWebAuthnProvider
         var serialized = options.ToJson();
         await _challengeStore.StoreChallengeAsync(challengeKey, serialized, TimeSpan.FromMinutes(5), cancellationToken);
 
-        _logger.LogInformation("WebAuthn: Opciones de login generadas con SessionId: {SessionId}, RP: {RpId}", sessionId, config.RPID);
+        LogLoginOptionsGenerated(_logger, sessionId, config.RPID ?? string.Empty);
         return (options, sessionId);
     }
 
@@ -167,7 +167,19 @@ public class Fido2WebAuthnProvider : IWebAuthnProvider
         };
 
         var result = await fido2.MakeAssertionAsync(makeParams, cancellationToken);
-        _logger.LogInformation("WebAuthn: Aserción verificada exitosamente para UserId: {UserId}", expectedUserId);
+        LogLoginVerified(_logger, expectedUserId);
         return result;
     }
+
+    [LoggerMessage(EventId = 1, Level = LogLevel.Information, Message = "WebAuthn: Opciones de registro generadas para UserId: {UserId}, RP: {RpId}")]
+    private static partial void LogRegistrationOptionsGenerated(ILogger logger, Guid userId, string rpId);
+
+    [LoggerMessage(EventId = 2, Level = LogLevel.Information, Message = "WebAuthn: Registro verificado exitosamente para UserId: {UserId}")]
+    private static partial void LogRegistrationVerified(ILogger logger, Guid userId);
+
+    [LoggerMessage(EventId = 3, Level = LogLevel.Information, Message = "WebAuthn: Opciones de login generadas con SessionId: {SessionId}, RP: {RpId}")]
+    private static partial void LogLoginOptionsGenerated(ILogger logger, string sessionId, string rpId);
+
+    [LoggerMessage(EventId = 4, Level = LogLevel.Information, Message = "WebAuthn: Aserción verificada exitosamente para UserId: {UserId}")]
+    private static partial void LogLoginVerified(ILogger logger, Guid userId);
 }

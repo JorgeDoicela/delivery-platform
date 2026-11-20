@@ -3,6 +3,7 @@ import {
   getApiBaseUrl,
   getApiClientAccessToken,
   getApiClientTenantSlug,
+  getApiClientTenantDomain,
 } from "@/shared/lib/api-client";
 import { isJwtExpired } from "@/shared/lib/jwt";
 import { useAuthStore } from "@/features/auth/store/useAuthStore";
@@ -26,6 +27,11 @@ function buildHeaders(extra?: HeadersInit, isFormData = false): HeadersInit {
   const slug = getApiClientTenantSlug();
   if (slug) {
     headers["X-Tenant-Slug"] = slug;
+  }
+
+  const domain = getApiClientTenantDomain();
+  if (domain) {
+    headers["X-Tenant-Domain"] = domain;
   }
 
   const token = getApiClientAccessToken();

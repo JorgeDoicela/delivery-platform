@@ -1,6 +1,7 @@
 import {
   ApiClientError,
   getApiClientTenantSlug,
+  getApiClientTenantDomain,
   getApiBaseUrl,
 } from "@/shared/lib/api-client";
 import type {
@@ -53,47 +54,53 @@ async function handleAuthResponse<T>(response: Response): Promise<T> {
   return response.json();
 }
 
+function buildAuthHeaders(
+  extraHeaders?: Record<string, string>,
+  tenantSlugOverride?: string
+): Record<string, string> {
+  const slug = tenantSlugOverride || getApiClientTenantSlug();
+  const domain = getApiClientTenantDomain();
+
+  return {
+    "Content-Type": "application/json",
+    ...(slug ? { "X-Tenant-Slug": slug } : {}),
+    ...(domain ? { "X-Tenant-Domain": domain } : {}),
+    ...extraHeaders,
+  };
+}
+
 let inFlightRefreshPromise: Promise<RefreshTokenResponse> | null = null;
 
 export const authApi = {
   async login(credentials: LoginFormData): Promise<LoginResponse> {
-    const tenantSlug = getApiClientTenantSlug();
+    const tenantSlug = credentials.tenantSlug || getApiClientTenantSlug() || undefined;
     const res = await fetch(`${getApiBaseUrl()}/api/v1/auth/login`, {
       method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        ...(tenantSlug ? { "X-Tenant-Slug": tenantSlug } : {}),
-      },
+      headers: buildAuthHeaders(undefined, tenantSlug),
       credentials: "include",
-      body: JSON.stringify({ ...credentials, tenantSlug }),
+      body: JSON.stringify({ ...credentials, ...(tenantSlug ? { tenantSlug } : {}) }),
     });
     return handleAuthResponse<LoginResponse>(res);
   },
 
   async register(data: RegisterRequest): Promise<RegisterResponse> {
-    const tenantSlug = getApiClientTenantSlug();
+    const tenantSlug = data.tenantSlug || getApiClientTenantSlug() || undefined;
     const res = await fetch(`${getApiBaseUrl()}/api/v1/auth/register`, {
       method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        ...(tenantSlug ? { "X-Tenant-Slug": tenantSlug } : {}),
-      },
+      headers: buildAuthHeaders(undefined, tenantSlug),
       credentials: "include",
-      body: JSON.stringify({ ...data, tenantSlug: data.tenantSlug || tenantSlug }),
+      body: JSON.stringify({ ...data, ...(tenantSlug ? { tenantSlug } : {}) }),
     });
     return handleAuthResponse<RegisterResponse>(res);
   },
 
   async loginWithGoogle(data: GoogleAuthRequest): Promise<GoogleAuthResponse> {
-    const tenantSlug = getApiClientTenantSlug();
+    const tenantSlug = data.tenantSlug || getApiClientTenantSlug() || undefined;
     const res = await fetch(`${getApiBaseUrl()}/api/v1/auth/google`, {
       method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        ...(tenantSlug ? { "X-Tenant-Slug": tenantSlug } : {}),
-      },
+      headers: buildAuthHeaders(undefined, tenantSlug),
       credentials: "include",
-      body: JSON.stringify({ ...data, tenantSlug: data.tenantSlug || tenantSlug }),
+      body: JSON.stringify({ ...data, ...(tenantSlug ? { tenantSlug } : {}) }),
     });
     return handleAuthResponse<GoogleAuthResponse>(res);
   },
@@ -105,13 +112,9 @@ export const authApi = {
 
     inFlightRefreshPromise = (async () => {
       try {
-        const tenantSlug = getApiClientTenantSlug();
         const res = await fetch(`${getApiBaseUrl()}/api/v1/auth/refresh`, {
           method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            ...(tenantSlug ? { "X-Tenant-Slug": tenantSlug } : {}),
-          },
+          headers: buildAuthHeaders(),
           credentials: "include",
           body: JSON.stringify({}),
         });
@@ -125,60 +128,45 @@ export const authApi = {
   },
 
   async getCurrentUser(accessToken?: string | null): Promise<AuthUser> {
-    const tenantSlug = getApiClientTenantSlug();
-    const headers: Record<string, string> = {
-      "Content-Type": "application/json",
-      ...(tenantSlug ? { "X-Tenant-Slug": tenantSlug } : {}),
-    };
-
+    const extraHeaders: Record<string, string> = {};
     if (accessToken) {
-      headers["Authorization"] = `Bearer ${accessToken}`;
+      extraHeaders["Authorization"] = `Bearer ${accessToken}`;
     }
 
     const res = await fetch(`${getApiBaseUrl()}/api/v1/auth/me`, {
       method: "GET",
-      headers,
+      headers: buildAuthHeaders(extraHeaders),
       credentials: "include",
     });
     return handleAuthResponse<AuthUser>(res);
   },
 
   async forgotPassword(data: ForgotPasswordRequest): Promise<ForgotPasswordResponse> {
-    const tenantSlug = getApiClientTenantSlug();
+    const tenantSlug = data.tenantSlug || getApiClientTenantSlug() || undefined;
     const res = await fetch(`${getApiBaseUrl()}/api/v1/auth/forgot-password`, {
       method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        ...(tenantSlug ? { "X-Tenant-Slug": tenantSlug } : {}),
-      },
+      headers: buildAuthHeaders(undefined, tenantSlug),
       credentials: "include",
-      body: JSON.stringify({ ...data, tenantSlug: data.tenantSlug || tenantSlug }),
+      body: JSON.stringify({ ...data, ...(tenantSlug ? { tenantSlug } : {}) }),
     });
     return handleAuthResponse<ForgotPasswordResponse>(res);
   },
 
   async resetPassword(data: ResetPasswordRequest): Promise<ResetPasswordResponse> {
-    const tenantSlug = getApiClientTenantSlug();
+    const tenantSlug = data.tenantSlug || getApiClientTenantSlug() || undefined;
     const res = await fetch(`${getApiBaseUrl()}/api/v1/auth/reset-password`, {
       method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        ...(tenantSlug ? { "X-Tenant-Slug": tenantSlug } : {}),
-      },
+      headers: buildAuthHeaders(undefined, tenantSlug),
       credentials: "include",
-      body: JSON.stringify({ ...data, tenantSlug: data.tenantSlug || tenantSlug }),
+      body: JSON.stringify({ ...data, ...(tenantSlug ? { tenantSlug } : {}) }),
     });
     return handleAuthResponse<ResetPasswordResponse>(res);
   },
 
   async verifyEmail(data: VerifyEmailRequest): Promise<VerifyEmailResponse> {
-    const tenantSlug = getApiClientTenantSlug();
     const res = await fetch(`${getApiBaseUrl()}/api/v1/auth/verify-email`, {
       method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        ...(tenantSlug ? { "X-Tenant-Slug": tenantSlug } : {}),
-      },
+      headers: buildAuthHeaders(),
       credentials: "include",
       body: JSON.stringify(data),
     });
@@ -186,27 +174,20 @@ export const authApi = {
   },
 
   async resendVerification(data: ResendVerificationRequest): Promise<ResendVerificationResponse> {
-    const tenantSlug = getApiClientTenantSlug();
+    const tenantSlug = data.tenantSlug || getApiClientTenantSlug() || undefined;
     const res = await fetch(`${getApiBaseUrl()}/api/v1/auth/resend-verification`, {
       method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        ...(tenantSlug ? { "X-Tenant-Slug": tenantSlug } : {}),
-      },
+      headers: buildAuthHeaders(undefined, tenantSlug),
       credentials: "include",
-      body: JSON.stringify({ ...data, tenantSlug: data.tenantSlug || tenantSlug }),
+      body: JSON.stringify({ ...data, ...(tenantSlug ? { tenantSlug } : {}) }),
     });
     return handleAuthResponse<ResendVerificationResponse>(res);
   },
 
   async logout(): Promise<void> {
-    const tenantSlug = getApiClientTenantSlug();
     await fetch(`${getApiBaseUrl()}/api/v1/auth/logout`, {
       method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        ...(tenantSlug ? { "X-Tenant-Slug": tenantSlug } : {}),
-      },
+      headers: buildAuthHeaders(),
       credentials: "include",
       body: JSON.stringify({}),
     });

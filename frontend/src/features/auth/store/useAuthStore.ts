@@ -5,6 +5,7 @@ import { isJwtExpired } from "@/shared/lib/jwt";
 import {
   setApiClientAccessToken,
   setApiClientTenantSlug,
+  isPlatformHost,
 } from "@/shared/lib/api-client";
 import type {
   AuthState,
@@ -23,21 +24,24 @@ import type { LoginFormData } from "../schemas/loginSchema";
 
 const SESSION_STORAGE_KEY = "delivery_has_session";
 
-function normalizeAuthUser(user: AuthUser, forceSyncTenant = false): AuthUser {
+function normalizeAuthUser(user: AuthUser): AuthUser {
   const primaryRole = user.role || user.roles?.[0] || "Customer";
   const isSuperAdmin =
     primaryRole === "SuperAdmin" ||
     Number(primaryRole) === 1 ||
     user.roles?.includes("SuperAdmin");
 
-  if (user.tenantSlug) {
+  if (user.tenantSlug && typeof window !== "undefined") {
+    const isPlatform = isPlatformHost(window.location.hostname);
     const isOperationalPath =
-      typeof window !== "undefined" &&
       /^\/([a-z0-9_-]+\/)?(cocina|kitchen|admin|repartidor|active-delivery)(\/|$)/i.test(
         window.location.pathname
       );
 
-    if (forceSyncTenant || (isOperationalPath && !isSuperAdmin)) {
+    // Solo persistir active_tenant_slug si el usuario está en un dominio propio del tenant (!isPlatform)
+    // o en una ruta operativa de cocina/admin/repartidor.
+    // En la plataforma global (mesafy.doicela.dev), NUNCA fijar el tenant en localStorage para no secuestrar la plataforma multimarca.
+    if (!isPlatform || (isOperationalPath && !isSuperAdmin)) {
       setApiClientTenantSlug(user.tenantSlug);
     }
   }
@@ -100,7 +104,7 @@ export const useAuthStore = create<AuthStore>()(
         set({ status: "loading", error: null });
         try {
           const response = await authApi.login(credentials);
-          const normalizedUser = normalizeAuthUser(response.user, true);
+          const normalizedUser = normalizeAuthUser(response.user);
           setApiClientAccessToken(response.accessToken);
 
           if (typeof window !== "undefined") {
@@ -139,7 +143,7 @@ export const useAuthStore = create<AuthStore>()(
         set({ status: "loading", error: null });
         try {
           const response = await authApi.register(data);
-          const normalizedUser = normalizeAuthUser(response.user, true);
+          const normalizedUser = normalizeAuthUser(response.user);
           setApiClientAccessToken(response.accessToken);
 
           if (typeof window !== "undefined") {
@@ -178,7 +182,7 @@ export const useAuthStore = create<AuthStore>()(
         set({ status: "loading", error: null });
         try {
           const response = await authApi.loginWithGoogle(data);
-          const normalizedUser = normalizeAuthUser(response.user, true);
+          const normalizedUser = normalizeAuthUser(response.user);
           setApiClientAccessToken(response.accessToken);
 
           if (typeof window !== "undefined") {
@@ -287,6 +291,9 @@ export const useAuthStore = create<AuthStore>()(
         } finally {
           setApiClientAccessToken(null);
           if (typeof window !== "undefined") {
+            if (isPlatformHost(window.location.hostname)) {
+              setApiClientTenantSlug(null);
+            }
             localStorage.removeItem(SESSION_STORAGE_KEY);
           }
 

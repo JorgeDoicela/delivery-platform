@@ -34,7 +34,7 @@ public class LoginOptionsHandler : IHandler<LoginOptionsCommand, Result<WebAuthn
         if (!string.IsNullOrWhiteSpace(command.TenantSlug))
         {
             var slugLower = command.TenantSlug.Trim().ToLowerInvariant();
-            tenant = await _context.Tenants.FirstOrDefaultAsync(t => t.Slug.ToLower() == slugLower, cancellationToken);
+            tenant = await _context.Tenants.FirstOrDefaultAsync(t => string.Equals(t.Slug, slugLower, StringComparison.OrdinalIgnoreCase), cancellationToken);
         }
 
         if (!string.IsNullOrWhiteSpace(command.Email))
@@ -50,7 +50,7 @@ public class LoginOptionsHandler : IHandler<LoginOptionsCommand, Result<WebAuthn
                 query = query.Where(u => u.TenantId == tenant.Id || u.TenantId == null);
             }
 
-            user = await query.FirstOrDefaultAsync(u => u.Email.ToLower() == emailLower, cancellationToken);
+            user = await query.FirstOrDefaultAsync(u => string.Equals(u.Email, emailLower, StringComparison.OrdinalIgnoreCase), cancellationToken);
 
             if (user != null)
             {

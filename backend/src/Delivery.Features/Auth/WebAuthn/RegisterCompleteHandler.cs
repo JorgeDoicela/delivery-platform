@@ -49,7 +49,7 @@ public class RegisterCompleteHandler : IHandler<RegisterCompleteCommand, Result<
         if (tenant == null && !string.IsNullOrWhiteSpace(command.TenantSlug))
         {
             var slugLower = command.TenantSlug.Trim().ToLowerInvariant();
-            tenant = await _context.Tenants.FirstOrDefaultAsync(t => t.Slug.ToLower() == slugLower, cancellationToken);
+            tenant = await _context.Tenants.FirstOrDefaultAsync(t => string.Equals(t.Slug, slugLower, StringComparison.OrdinalIgnoreCase), cancellationToken);
         }
 
         RegisteredPublicKeyCredential verified;

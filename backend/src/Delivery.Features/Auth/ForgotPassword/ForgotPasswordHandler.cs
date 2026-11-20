@@ -58,7 +58,7 @@ public sealed class ForgotPasswordHandler : IHandler<ForgotPasswordRequest, Resu
 
         var emailLower = request.Email.Trim().ToLowerInvariant();
 
-        // 1. Resolución del Tenant
+        // 1. Resolución del Tenant (priorizando TenantSlug explícito o contexto del host)
         Tenant? tenant = null;
         if (!string.IsNullOrWhiteSpace(request.TenantSlug))
         {
@@ -73,22 +73,12 @@ public sealed class ForgotPasswordHandler : IHandler<ForgotPasswordRequest, Resu
                 .IgnoreQueryFilters()
                 .FirstOrDefaultAsync(t => t.Id == _tenantContext.TenantId.Value, cancellationToken);
         }
-        else
-        {
-            tenant = await _context.Tenants
-                .IgnoreQueryFilters()
-                .FirstOrDefaultAsync(t => t.Slug == "la-granjita", cancellationToken)
-                ?? await _context.Tenants
-                    .IgnoreQueryFilters()
-                    .Where(t => t.IsActive)
-                    .OrderBy(t => t.Id)
-                    .FirstOrDefaultAsync(cancellationToken);
-        }
 
         // 2. Búsqueda de usuario (protección anti-enumeración de usuarios)
 #pragma warning disable CA1862, CA1304, CA1311
         var user = await _context.Users
             .IgnoreQueryFilters()
+            .Include(u => u.Tenant)
             .FirstOrDefaultAsync(u =>
                 (tenant == null || u.TenantId == tenant.Id || u.TenantId == null) &&
                 u.Email.ToLower() == emailLower,
@@ -132,20 +122,22 @@ public sealed class ForgotPasswordHandler : IHandler<ForgotPasswordRequest, Resu
         await _context.SaveChangesAsync(cancellationToken);
 
         // 6. Preparar contexto de marca y despacho por correo electrónico
-        var brand = tenant != null
+        var targetTenant = tenant ?? user.Tenant;
+        var brand = targetTenant != null
             ? new BrandEmailContext
             {
-                BrandName = tenant.Name,
-                BrandTagline = tenant.Tagline,
-                PrimaryColor = tenant.BrandPrimaryColor ?? "#E4002B",
-                LogoUrl = tenant.LogoUrl,
-                SupportEmail = tenant.ContactEmail,
-                SupportPhone = tenant.ContactPhone
+                BrandName = targetTenant.Name,
+                BrandTagline = targetTenant.Tagline,
+                PrimaryColor = targetTenant.BrandPrimaryColor ?? "#E4002B",
+                LogoUrl = targetTenant.LogoUrl,
+                SupportEmail = targetTenant.ContactEmail,
+                SupportPhone = targetTenant.ContactPhone
             }
             : BrandEmailContext.DefaultPlatform;
 
-        var targetSlug = tenant?.Slug ?? "la-granjita";
-        var resetUrl = $"https://mesafy.doicela.dev/{targetSlug}/login?tab=reset-password&token={rawToken}&email={Uri.EscapeDataString(user.Email)}";
+        var resetUrl = targetTenant != null
+            ? $"https://mesafy.doicela.dev/{targetTenant.Slug}/login?tab=reset-password&token={rawToken}&email={Uri.EscapeDataString(user.Email)}"
+            : $"https://mesafy.doicela.dev/login?tab=reset-password&token={rawToken}&email={Uri.EscapeDataString(user.Email)}";
 
         var emailModel = new PasswordResetEmailModel
         {

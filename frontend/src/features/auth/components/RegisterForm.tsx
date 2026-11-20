@@ -31,9 +31,11 @@ export function RegisterForm({
   const registerAction = useAuthStore((s) => s.register);
   const { data: tenant } = useCurrentTenantQuery();
   const routes = useTenantRoutes(tenant?.slug);
-  const brandName = tenant?.name || "La Granjita";
-  const brandTagline = tenant?.tagline || "Asadero";
-  const brandLogo = tenant?.logoUrl || "/images/shared/placeholders/logo-default.png";
+  const brandName = routes.isPlatformRoot ? "Mesafy" : (tenant?.name || "Mesafy");
+  const brandTagline = routes.isPlatformRoot ? "Plataforma Gastronómica" : (tenant?.tagline || "Pedidos en línea");
+  const brandLogo = routes.isPlatformRoot
+    ? "/images/shared/placeholders/logo-default.png"
+    : (tenant?.logoUrl || "/images/shared/placeholders/logo-default.png");
 
   const [formError, setFormError] = useState<string | null>(null);
   const [showPassword, setShowPassword] = useState(false);
@@ -54,7 +56,9 @@ export function RegisterForm({
 
   const onSubmit = async (data: RegisterFormData) => {
     setFormError(null);
-    const activeTenantSlug = tenant?.slug || useTenantStore.getState().tenantSlug || undefined;
+    const activeTenantSlug = routes.isPlatformRoot
+      ? undefined
+      : (tenant?.slug || useTenantStore.getState().tenantSlug || undefined);
 
     const success = await registerAction({
       email: data.email,
@@ -70,7 +74,7 @@ export function RegisterForm({
       }
 
       const loggedUser = useAuthStore.getState().user;
-      const tenantSlug = loggedUser?.tenantSlug || activeTenantSlug || "la-granjita";
+      const tenantSlug = loggedUser?.tenantSlug || activeTenantSlug || undefined;
       const routing = resolveTenantRouting({
         explicitSlug: tenantSlug,
         pathname: typeof window !== "undefined" ? window.location.pathname : "/",

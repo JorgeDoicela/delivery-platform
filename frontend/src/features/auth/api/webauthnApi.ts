@@ -2,6 +2,7 @@ import {
   ApiClientError,
   getApiClientAccessToken,
   getApiClientTenantSlug,
+  getApiClientTenantDomain,
   getApiBaseUrl,
 } from "@/shared/lib/api-client";
 import type {
@@ -62,13 +63,17 @@ function getAuthHeaders(includeTenant = true): HeadersInit {
 
   const token = getApiClientAccessToken();
   if (token) {
-    headers["Authorization"] = `Bearer ${token}`;
+    (headers as Record<string, string>)["Authorization"] = `Bearer ${token}`;
   }
 
   if (includeTenant) {
     const tenantSlug = getApiClientTenantSlug();
     if (tenantSlug) {
-      headers["X-Tenant-Slug"] = tenantSlug;
+      (headers as Record<string, string>)["X-Tenant-Slug"] = tenantSlug;
+    }
+    const tenantDomain = getApiClientTenantDomain();
+    if (tenantDomain) {
+      (headers as Record<string, string>)["X-Tenant-Domain"] = tenantDomain;
     }
   }
 

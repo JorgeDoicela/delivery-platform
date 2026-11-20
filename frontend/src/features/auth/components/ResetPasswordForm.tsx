@@ -31,9 +31,11 @@ export function ResetPasswordForm({
   const resetPasswordAction = useAuthStore((s) => s.resetPassword);
   const { data: tenant } = useCurrentTenantQuery();
   const routes = useTenantRoutes(tenant?.slug);
-  const brandName = tenant?.name || "La Granjita";
-  const brandTagline = tenant?.tagline || "Asadero";
-  const brandLogo = tenant?.logoUrl || "/images/shared/placeholders/logo-default.png";
+  const brandName = routes.isPlatformRoot ? "Mesafy" : (tenant?.name || "Mesafy");
+  const brandTagline = routes.isPlatformRoot ? "Plataforma Gastronómica" : (tenant?.tagline || "Pedidos en línea");
+  const brandLogo = routes.isPlatformRoot
+    ? "/images/shared/placeholders/logo-default.png"
+    : (tenant?.logoUrl || "/images/shared/placeholders/logo-default.png");
 
   const [formError, setFormError] = useState<string | null>(null);
   const [success, setSuccess] = useState(false);
@@ -56,7 +58,9 @@ export function ResetPasswordForm({
 
   const onSubmit = async (data: ResetPasswordFormData) => {
     setFormError(null);
-    const activeTenantSlug = tenant?.slug || useTenantStore.getState().tenantSlug || undefined;
+    const activeTenantSlug = routes.isPlatformRoot
+      ? undefined
+      : (tenant?.slug || useTenantStore.getState().tenantSlug || undefined);
 
     const result = await resetPasswordAction({
       email: data.email,

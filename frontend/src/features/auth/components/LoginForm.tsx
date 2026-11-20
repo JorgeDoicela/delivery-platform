@@ -32,9 +32,11 @@ export function LoginForm({
   const login = useAuthStore((s) => s.login);
   const { data: tenant } = useCurrentTenantQuery();
   const routes = useTenantRoutes(tenant?.slug);
-  const brandName = tenant?.name || "La Granjita";
-  const brandTagline = tenant?.tagline || "Asadero";
-  const brandLogo = tenant?.logoUrl || "/images/shared/placeholders/logo-default.png";
+  const brandName = routes.isPlatformRoot ? "Mesafy" : (tenant?.name || "Mesafy");
+  const brandTagline = routes.isPlatformRoot ? "Plataforma Gastronómica" : (tenant?.tagline || "Pedidos en línea");
+  const brandLogo = routes.isPlatformRoot
+    ? "/images/shared/placeholders/logo-default.png"
+    : (tenant?.logoUrl || "/images/shared/placeholders/logo-default.png");
   const [formError, setFormError] = useState<string | null>(null);
   const [showPassword, setShowPassword] = useState(false);
 
@@ -64,7 +66,7 @@ export function LoginForm({
       }
 
       const tenantSlug =
-        loggedUser?.tenantSlug || useTenantStore.getState().tenantSlug || "la-granjita";
+        loggedUser?.tenantSlug || (routes.isPlatformRoot ? undefined : useTenantStore.getState().tenantSlug) || undefined;
 
       const routing = resolveTenantRouting({
         explicitSlug: tenantSlug,

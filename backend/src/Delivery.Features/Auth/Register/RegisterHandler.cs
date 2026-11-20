@@ -47,34 +47,36 @@ public class RegisterHandler : IHandler<RegisterCommand, Result<RegisterResponse
             tenant = await _context.Tenants
                 .IgnoreQueryFilters()
                 .FirstOrDefaultAsync(t => t.Slug == requestedSlug, cancellationToken);
+
+            if (tenant == null)
+            {
+                return Result.Failure<RegisterResponse>(AuthErrors.TenantNotFound);
+            }
+
+            if (!tenant.IsActive)
+            {
+                return Result.Failure<RegisterResponse>(AuthErrors.TenantInactive);
+            }
         }
         else if (_tenantContext.TenantId.HasValue)
         {
             tenant = await _context.Tenants
                 .IgnoreQueryFilters()
                 .FirstOrDefaultAsync(t => t.Id == _tenantContext.TenantId.Value, cancellationToken);
-        }
-        else
-        {
-            tenant = await _context.Tenants
-                .IgnoreQueryFilters()
-                .FirstOrDefaultAsync(t => t.Slug == "la-granjita", cancellationToken)
-                ?? await _context.Tenants
-                    .IgnoreQueryFilters()
-                    .Where(t => t.IsActive)
-                    .OrderBy(t => t.Id)
-                    .FirstOrDefaultAsync(cancellationToken);
-        }
 
-        if (tenant == null)
-        {
-            return Result.Failure<RegisterResponse>(AuthErrors.TenantNotFound);
-        }
+            if (tenant == null)
+            {
+                return Result.Failure<RegisterResponse>(AuthErrors.TenantNotFound);
+            }
 
-        if (!tenant.IsActive)
-        {
-            return Result.Failure<RegisterResponse>(AuthErrors.TenantInactive);
+            if (!tenant.IsActive)
+            {
+                return Result.Failure<RegisterResponse>(AuthErrors.TenantInactive);
+            }
         }
+        // Si no se proporcionó TenantSlug ni existe TenantId en el contexto,
+        // el registro se efectúa en la Plataforma Global (mesafy.doicela.dev).
+        // tenant permanece en null para crear un comensal global.
 
         // 2. Comprobación de unicidad de correo electrónico
         var emailLower = request.Email.Trim().ToLower(CultureInfo.InvariantCulture);
@@ -82,7 +84,7 @@ public class RegisterHandler : IHandler<RegisterCommand, Result<RegisterResponse
 #pragma warning disable CA1862, CA1304, CA1311
         var emailExists = await _context.Users
             .IgnoreQueryFilters()
-            .AnyAsync(u => (u.TenantId == tenant.Id || u.TenantId == null) && u.Email.ToLower() == emailLower, cancellationToken);
+            .AnyAsync(u => (tenant == null ? true : (u.TenantId == tenant.Id || u.TenantId == null)) && u.Email.ToLower() == emailLower, cancellationToken);
 #pragma warning restore CA1862, CA1304, CA1311
 
         if (emailExists)
@@ -103,7 +105,7 @@ public class RegisterHandler : IHandler<RegisterCommand, Result<RegisterResponse
         var newUser = new User
         {
             Id = Guid.NewGuid(),
-            TenantId = tenant.Id,
+            TenantId = tenant?.Id,
             Email = emailLower,
             FullName = resolvedFullName,
             Phone = resolvedPhone,
@@ -127,8 +129,8 @@ public class RegisterHandler : IHandler<RegisterCommand, Result<RegisterResponse
 
         await _context.UserRoles.AddAsync(userRole, cancellationToken);
 
-        // 5. Directorio de Clientes SRI para autocompletado en compras
-        if (!string.IsNullOrWhiteSpace(newUser.Phone))
+        // 5. Directorio de Clientes SRI para autocompletado en compras (solo cuando se registra en un comercio específico)
+        if (tenant != null && !string.IsNullOrWhiteSpace(newUser.Phone))
         {
             var customer = await _context.Customers
                 .IgnoreQueryFilters()
@@ -165,7 +167,7 @@ public class RegisterHandler : IHandler<RegisterCommand, Result<RegisterResponse
             rolesList.Add(new Role { Id = Role.Customer, Name = "Customer", Description = "Cliente Comensal" });
         }
 
-        var (accessToken, accessExpiresAt) = _tokenProvider.GenerateAccessToken(newUser, rolesList, tenant.Id, null);
+        var (accessToken, accessExpiresAt) = _tokenProvider.GenerateAccessToken(newUser, rolesList, tenant?.Id, null);
         var (rawRefreshToken, tokenHash, refreshExpiresAt) = _tokenProvider.GenerateRefreshToken();
 
         // 7. Persistencia del Refresh Token
@@ -201,18 +203,21 @@ public class RegisterHandler : IHandler<RegisterCommand, Result<RegisterResponse
         // 9. Despacho asíncrono del correo de verificación vía SMTP
         if (_emailQueue != null)
         {
-            var brand = new BrandEmailContext
-            {
-                BrandName = tenant.Name,
-                BrandTagline = tenant.Tagline,
-                PrimaryColor = tenant.BrandPrimaryColor ?? "#E4002B",
-                LogoUrl = tenant.LogoUrl,
-                SupportEmail = tenant.ContactEmail,
-                SupportPhone = tenant.ContactPhone
-            };
+            var brand = tenant != null
+                ? new BrandEmailContext
+                {
+                    BrandName = tenant.Name,
+                    BrandTagline = tenant.Tagline,
+                    PrimaryColor = tenant.BrandPrimaryColor ?? "#E4002B",
+                    LogoUrl = tenant.LogoUrl,
+                    SupportEmail = tenant.ContactEmail,
+                    SupportPhone = tenant.ContactPhone
+                }
+                : BrandEmailContext.DefaultPlatform;
 
-            var targetSlug = tenant.Slug;
-            var verificationUrl = $"https://mesafy.doicela.dev/{targetSlug}/login?tab=verify-email&token={rawVerificationToken}&email={Uri.EscapeDataString(newUser.Email)}";
+            var verificationUrl = tenant != null
+                ? $"https://mesafy.doicela.dev/{tenant.Slug}/login?tab=verify-email&token={rawVerificationToken}&email={Uri.EscapeDataString(newUser.Email)}"
+                : $"https://mesafy.doicela.dev/login?tab=verify-email&token={rawVerificationToken}&email={Uri.EscapeDataString(newUser.Email)}";
 
             var emailModel = new EmailVerificationEmailModel
             {
@@ -230,7 +235,7 @@ public class RegisterHandler : IHandler<RegisterCommand, Result<RegisterResponse
                 $"Verifica tu correo electrónico - {brand.BrandName}",
                 EmailTemplateType.EmailVerification,
                 emailModel,
-                tenant.Id
+                tenant?.Id
             );
         }
 
@@ -240,8 +245,8 @@ public class RegisterHandler : IHandler<RegisterCommand, Result<RegisterResponse
             newUser.FullName,
             newUser.Phone,
             "Customer",
-            tenant.Id,
-            tenant.Slug,
+            tenant?.Id,
+            tenant?.Slug,
             null,
             true,
             new List<string> { "Customer" },

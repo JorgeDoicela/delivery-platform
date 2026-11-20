@@ -75,9 +75,15 @@ function DashboardLayoutContent({
           Number(user.role) === 3)
     );
 
-  const brandName = tenant?.name || "La Granjita";
-  const brandLogo = tenant?.logoUrl || "/images/shared/placeholders/logo-default.png";
-  const storefrontHref = `/${tenant?.slug || activeTenantSlug || "la-granjita"}`;
+  const brandName = isSuperAdmin
+    ? "Mesafy Platform"
+    : (tenant?.name || user?.tenantName || "Restaurante");
+  const brandLogo = isSuperAdmin
+    ? "/images/shared/placeholders/logo-default.png"
+    : (tenant?.logoUrl || "/images/shared/placeholders/logo-default.png");
+  const storefrontHref = tenant?.slug || activeTenantSlug
+    ? `/${tenant?.slug || activeTenantSlug}`
+    : "/";
 
   return (
     <AuthGuard

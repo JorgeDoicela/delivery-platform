@@ -30,7 +30,7 @@ public class LoginHandler : IHandler<LoginCommand, Result<LoginResponse>>
 
     public async Task<Result<LoginResponse>> Handle(LoginCommand request, CancellationToken cancellationToken = default)
     {
-        // 1. Resolucion segura del Tenant (priorizando el TenantSlug explícito de la petición)
+        // 1. Resolucion segura del Tenant (priorizando el TenantSlug explícito de la petición o el contexto del host)
         Tenant? tenant = null;
 
         if (!string.IsNullOrWhiteSpace(request.TenantSlug))
@@ -38,41 +38,43 @@ public class LoginHandler : IHandler<LoginCommand, Result<LoginResponse>>
             var requestedSlug = request.TenantSlug.Trim().ToLowerInvariant();
             tenant = await _context.Tenants.IgnoreQueryFilters()
                 .FirstOrDefaultAsync(t => t.Slug == requestedSlug, cancellationToken);
+
+            if (tenant == null)
+            {
+                return Result.Failure<LoginResponse>(AuthErrors.TenantNotFound);
+            }
         }
         else if (_tenantContext.TenantId.HasValue)
         {
             tenant = await _context.Tenants.IgnoreQueryFilters()
                 .FirstOrDefaultAsync(t => t.Id == _tenantContext.TenantId.Value, cancellationToken);
+
+            if (tenant == null)
+            {
+                return Result.Failure<LoginResponse>(AuthErrors.TenantNotFound);
+            }
+        }
+
+        // 2. Busqueda del usuario dentro del tenant o global (SuperAdmin o Customer en Plataforma)
+#pragma warning disable CA1862, CA1304, CA1311
+        var emailLower = request.Email.Trim().ToLower(System.Globalization.CultureInfo.InvariantCulture);
+        User? user;
+
+        if (tenant != null)
+        {
+            // Contexto de un restaurante específico (dominio propio, subdominio o /[slug]/login):
+            // Solo se permite acceso a usuarios que pertenezcan a este restaurante (u.TenantId == tenant.Id)
+            // o a cuentas globales de plataforma (u.TenantId == null). Cero cruce con otros comercios.
+            user = await _context.Users.IgnoreQueryFilters()
+                .Include(u => u.Tenant)
+                .Include(u => u.UserRoles)
+                    .ThenInclude(ur => ur.Role)
+                .FirstOrDefaultAsync(u => (u.TenantId == tenant.Id || u.TenantId == null) && u.Email.ToLower() == emailLower, cancellationToken);
         }
         else
         {
-            // Tenant predeterminado de la plataforma con fallback al primer comercio activo
-            tenant = await _context.Tenants.IgnoreQueryFilters()
-                .FirstOrDefaultAsync(t => t.Slug == "la-granjita", cancellationToken)
-                ?? await _context.Tenants.IgnoreQueryFilters()
-                    .Where(t => t.IsActive)
-                    .OrderBy(t => t.Id)
-                    .FirstOrDefaultAsync(cancellationToken);
-        }
-
-        if (tenant == null)
-        {
-            return Result.Failure<LoginResponse>(AuthErrors.TenantNotFound);
-        }
-
-        // 2. Busqueda del usuario dentro del tenant o global (SuperAdmin)
-#pragma warning disable CA1862, CA1304, CA1311
-        var emailLower = request.Email.Trim().ToLower(System.Globalization.CultureInfo.InvariantCulture);
-
-        var user = await _context.Users.IgnoreQueryFilters()
-            .Include(u => u.Tenant)
-            .Include(u => u.UserRoles)
-                .ThenInclude(ur => ur.Role)
-            .FirstOrDefaultAsync(u => (u.TenantId == tenant.Id || u.TenantId == null) && u.Email.ToLower() == emailLower, cancellationToken);
-
-        // Si no se especificó un TenantSlug forzado en el request y el usuario pertenece a otro comercio, resolver su propio Tenant
-        if (user == null && string.IsNullOrWhiteSpace(request.TenantSlug))
-        {
+            // Contexto de Plataforma Global (mesafy.doicela.dev):
+            // Busqueda global por email para permitir login de administradores, comensales globales o miembros de restaurantes.
             user = await _context.Users.IgnoreQueryFilters()
                 .Include(u => u.Tenant)
                 .Include(u => u.UserRoles)
@@ -81,6 +83,10 @@ public class LoginHandler : IHandler<LoginCommand, Result<LoginResponse>>
 
             if (user?.Tenant != null)
             {
+                if (!user.Tenant.IsActive)
+                {
+                    return Result.Failure<LoginResponse>(AuthErrors.TenantInactive);
+                }
                 tenant = user.Tenant;
             }
         }
@@ -91,8 +97,8 @@ public class LoginHandler : IHandler<LoginCommand, Result<LoginResponse>>
             return Result.Failure<LoginResponse>(AuthErrors.InvalidCredentials);
         }
 
-        // Si el usuario pertenece a un comercio específico (no es SuperAdmin global con TenantId == null), exigir que el comercio esté activo
-        if (user.TenantId.HasValue && !tenant.IsActive)
+        // Si el usuario pertenece a un comercio específico, verificar que esté activo
+        if (user.TenantId.HasValue && tenant != null && !tenant.IsActive)
         {
             return Result.Failure<LoginResponse>(AuthErrors.TenantInactive);
         }
@@ -113,7 +119,7 @@ public class LoginHandler : IHandler<LoginCommand, Result<LoginResponse>>
         var roles = user.UserRoles.Select(ur => ur.Role).ToList();
         var primaryBranchId = user.UserRoles.FirstOrDefault(ur => ur.BranchId.HasValue)?.BranchId;
 
-        // 6. Generacion criptografica de tokens (respetando TenantId nulo para SuperAdmin global)
+        // 6. Generacion criptografica de tokens (respetando TenantId nulo para SuperAdmin o Customer global)
         var effectiveTenantId = user.TenantId;
         var (accessToken, accessExpiresAt) = _tokenProvider.GenerateAccessToken(user, roles, effectiveTenantId, primaryBranchId);
         var (rawRefreshToken, tokenHash, refreshExpiresAt) = _tokenProvider.GenerateRefreshToken();
@@ -141,7 +147,7 @@ public class LoginHandler : IHandler<LoginCommand, Result<LoginResponse>>
             user.Phone,
             primaryRoleName,
             user.TenantId,
-            user.Tenant?.Slug ?? (user.TenantId.HasValue ? tenant.Slug : null),
+            user.Tenant?.Slug ?? tenant?.Slug,
             primaryBranchId,
             user.IsActive,
             roleNames,

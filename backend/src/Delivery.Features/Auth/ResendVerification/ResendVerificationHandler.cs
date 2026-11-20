@@ -60,7 +60,7 @@ public sealed class ResendVerificationHandler : IHandler<ResendVerificationReque
 
         var emailLower = request.Email.Trim().ToLowerInvariant();
 
-        // 1. Resolución del Tenant
+        // 1. Resolución del Tenant (priorizando TenantSlug explícito o contexto del host)
         Tenant? tenant = null;
         if (!string.IsNullOrWhiteSpace(request.TenantSlug))
         {
@@ -75,22 +75,12 @@ public sealed class ResendVerificationHandler : IHandler<ResendVerificationReque
                 .IgnoreQueryFilters()
                 .FirstOrDefaultAsync(t => t.Id == _tenantContext.TenantId.Value, cancellationToken);
         }
-        else
-        {
-            tenant = await _context.Tenants
-                .IgnoreQueryFilters()
-                .FirstOrDefaultAsync(t => t.Slug == "la-granjita", cancellationToken)
-                ?? await _context.Tenants
-                    .IgnoreQueryFilters()
-                    .Where(t => t.IsActive)
-                    .OrderBy(t => t.Id)
-                    .FirstOrDefaultAsync(cancellationToken);
-        }
 
         // 2. Búsqueda de usuario con protección anti-enumeración
 #pragma warning disable CA1862, CA1304, CA1311
         var user = await _context.Users
             .IgnoreQueryFilters()
+            .Include(u => u.Tenant)
             .FirstOrDefaultAsync(u =>
                 (tenant == null || u.TenantId == tenant.Id || u.TenantId == null) &&
                 u.Email.ToLower() == emailLower,
@@ -137,20 +127,22 @@ public sealed class ResendVerificationHandler : IHandler<ResendVerificationReque
         await _context.SaveChangesAsync(cancellationToken);
 
         // 5. Preparar contexto de marca y despachar correo
-        var brand = tenant != null
+        var targetTenant = tenant ?? user.Tenant;
+        var brand = targetTenant != null
             ? new BrandEmailContext
             {
-                BrandName = tenant.Name,
-                BrandTagline = tenant.Tagline,
-                PrimaryColor = tenant.BrandPrimaryColor ?? "#E4002B",
-                LogoUrl = tenant.LogoUrl,
-                SupportEmail = tenant.ContactEmail,
-                SupportPhone = tenant.ContactPhone
+                BrandName = targetTenant.Name,
+                BrandTagline = targetTenant.Tagline,
+                PrimaryColor = targetTenant.BrandPrimaryColor ?? "#E4002B",
+                LogoUrl = targetTenant.LogoUrl,
+                SupportEmail = targetTenant.ContactEmail,
+                SupportPhone = targetTenant.ContactPhone
             }
             : BrandEmailContext.DefaultPlatform;
 
-        var targetSlug = tenant?.Slug ?? "la-granjita";
-        var verificationUrl = $"https://mesafy.doicela.dev/{targetSlug}/login?tab=verify-email&token={rawToken}&email={Uri.EscapeDataString(user.Email)}";
+        var verificationUrl = targetTenant != null
+            ? $"https://mesafy.doicela.dev/{targetTenant.Slug}/login?tab=verify-email&token={rawToken}&email={Uri.EscapeDataString(user.Email)}"
+            : $"https://mesafy.doicela.dev/login?tab=verify-email&token={rawToken}&email={Uri.EscapeDataString(user.Email)}";
 
         var emailModel = new EmailVerificationEmailModel
         {

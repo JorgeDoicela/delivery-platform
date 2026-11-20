@@ -11,6 +11,7 @@ export const PLATFORM_HOSTS = new Set([
   "www.mesafy.app",
   "mesafy.dev",
   "mesafy.doicela.dev",
+  "www.mesafy.doicela.dev",
   "platform.mesafy.com",
 ]);
 
@@ -209,12 +210,28 @@ export function getApiClientTenantSlug(): string | null {
         return pathSlug;
       }
 
-      // 4. Si la ruta es "/" en un host de plataforma, representa el directorio multimarca global
-      if (pathname === "/" && isPlatformHost(hostname)) {
+      // 4. Si estamos en un host de plataforma (mesafy.doicela.dev, localhost):
+      // Si la ruta corresponde a la gobernanza global o cuenta del usuario (/, /login, /registro, /cuenta, /superadmin):
+      // Retornar null para que la sesión y peticiones pertenezcan al contexto global y no secuestren la plataforma.
+      const firstSegment = pathSegments[0] || "";
+      const isPlatformGlobalRoute =
+        !firstSegment ||
+        firstSegment === "login" ||
+        firstSegment === "registro" ||
+        firstSegment === "register" ||
+        firstSegment === "cuenta" ||
+        firstSegment === "superadmin" ||
+        firstSegment === "terminos" ||
+        firstSegment === "privacidad" ||
+        firstSegment === "terms" ||
+        firstSegment === "privacy";
+
+      if (isPlatformHost(hostname) && isPlatformGlobalRoute) {
         return null;
       }
 
-      // 5. En dominio personalizado (ej: pedidos.lagranjita.com) o rutas reservadas (/repartidor, /cocina)
+      // 5. En dominio personalizado (ej: asaderolagranjita.doicela.dev, pedidos.lagranjita.com)
+      // o rutas operativas de franquicia sin prefijo (/admin, /cocina, /repartidor):
       // consultar persistencia de sesión previa
       const stored = window.localStorage.getItem(ACTIVE_TENANT_STORAGE_KEY)?.trim().toLowerCase();
       if (stored && !RESERVED_TENANT_SLUGS.has(stored)) {

@@ -4,7 +4,7 @@ using StackExchange.Redis;
 
 namespace Delivery.Features.Common.Security;
 
-public class RedisWebAuthnChallengeStore : IWebAuthnChallengeStore
+public partial class RedisWebAuthnChallengeStore : IWebAuthnChallengeStore
 {
     private readonly IConnectionMultiplexer? _redis;
     private readonly ILogger<RedisWebAuthnChallengeStore> _logger;
@@ -36,7 +36,7 @@ public class RedisWebAuthnChallengeStore : IWebAuthnChallengeStore
             }
             catch (Exception ex)
             {
-                _logger.LogWarning(ex, "Fallo al almacenar challenge de WebAuthn en Redis. Usando fallback en memoria para clave {Key}", key);
+                LogStoreFailed(_logger, ex, key);
             }
         }
 
@@ -61,7 +61,7 @@ public class RedisWebAuthnChallengeStore : IWebAuthnChallengeStore
             }
             catch (Exception ex)
             {
-                _logger.LogWarning(ex, "Fallo al recuperar challenge de WebAuthn en Redis. Revisando fallback en memoria para clave {Key}", key);
+                LogRetrieveFailed(_logger, ex, key);
             }
         }
 
@@ -94,7 +94,7 @@ public class RedisWebAuthnChallengeStore : IWebAuthnChallengeStore
             }
             catch (Exception ex)
             {
-                _logger.LogWarning(ex, "Fallo al consultar challenge de WebAuthn en Redis. Revisando fallback en memoria para clave {Key}", key);
+                LogGetFailed(_logger, ex, key);
             }
         }
 
@@ -109,4 +109,13 @@ public class RedisWebAuthnChallengeStore : IWebAuthnChallengeStore
 
         return null;
     }
+
+    [LoggerMessage(EventId = 1, Level = LogLevel.Warning, Message = "Fallo al almacenar challenge de WebAuthn en Redis. Usando fallback en memoria para clave {Key}")]
+    private static partial void LogStoreFailed(ILogger logger, Exception ex, string key);
+
+    [LoggerMessage(EventId = 2, Level = LogLevel.Warning, Message = "Fallo al recuperar challenge de WebAuthn en Redis. Revisando fallback en memoria para clave {Key}")]
+    private static partial void LogRetrieveFailed(ILogger logger, Exception ex, string key);
+
+    [LoggerMessage(EventId = 3, Level = LogLevel.Warning, Message = "Fallo al consultar challenge de WebAuthn en Redis. Revisando fallback en memoria para clave {Key}")]
+    private static partial void LogGetFailed(ILogger logger, Exception ex, string key);
 }

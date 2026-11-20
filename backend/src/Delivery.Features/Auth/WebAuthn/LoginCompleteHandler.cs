@@ -67,7 +67,7 @@ public class LoginCompleteHandler : IHandler<LoginCompleteCommand, Result<WebAut
         if (!string.IsNullOrWhiteSpace(command.TenantSlug))
         {
             var slugLower = command.TenantSlug.Trim().ToLowerInvariant();
-            var requestedTenant = await _context.Tenants.FirstOrDefaultAsync(t => t.Slug.ToLower() == slugLower, cancellationToken);
+            var requestedTenant = await _context.Tenants.FirstOrDefaultAsync(t => string.Equals(t.Slug, slugLower, StringComparison.OrdinalIgnoreCase), cancellationToken);
 
             if (requestedTenant != null)
             {

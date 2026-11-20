@@ -263,5 +263,55 @@ public class AuthHandlerTests
         superAdminResult.Value.User.Role.Should().Be("SuperAdmin");
         superAdminResult.Value.User.TenantId.Should().BeNull();
     }
+
+    [Fact]
+    public async Task Login_WhenUserBelongsToDifferentTenant_ShouldDenyAccessAndPreventCrossTenantLeak()
+    {
+        var dbName = Guid.NewGuid().ToString();
+        var passwordHasher = new BCryptPasswordHasher();
+        var tokenProvider = new JwtTokenProvider(Options.Create(CreateJwtOptions()));
+
+        await using (var seedCtx = new AppDbContext(CreateInMemoryOptions(dbName)))
+        {
+            await DatabaseSeeder.SeedAsync(seedCtx);
+        }
+
+        await using var context = new AppDbContext(CreateInMemoryOptions(dbName));
+        var handler = new LoginHandler(context, new FakeTenantContext(), passwordHasher, tokenProvider);
+
+        // Usuario esmeralda@brasasdelvalle.com pertenece a brasas-del-valle
+        // Intentar loguearse en la-granjita debe ser rechazado sin cruce de tenant
+        var crossTenantResult = await handler.Handle(
+            new LoginCommand("esmeralda@brasasdelvalle.com", "Admin123!", "la-granjita", "127.0.0.1"));
+
+        crossTenantResult.IsFailure.Should().BeTrue();
+        crossTenantResult.Error.Code.Should().Be("Auth.InvalidCredentials");
+    }
+
+    [Fact]
+    public async Task Login_GlobalPlatformRoot_WithGlobalSuperAdmin_ShouldSucceedWithNullTenant()
+    {
+        var dbName = Guid.NewGuid().ToString();
+        var passwordHasher = new BCryptPasswordHasher();
+        var tokenProvider = new JwtTokenProvider(Options.Create(CreateJwtOptions()));
+
+        await using (var seedCtx = new AppDbContext(CreateInMemoryOptions(dbName)))
+        {
+            await DatabaseSeeder.SeedAsync(seedCtx);
+        }
+
+        await using var context = new AppDbContext(CreateInMemoryOptions(dbName));
+        // En mesafy.doicela.dev (plataforma global), FakeTenantContext tiene TenantId = null
+        var handler = new LoginHandler(context, new FakeTenantContext(), passwordHasher, tokenProvider);
+
+        var globalResult = await handler.Handle(
+            new LoginCommand("jorge@admin.com", "Admin123!", null, "127.0.0.1"));
+
+        globalResult.IsSuccess.Should().BeTrue();
+        globalResult.Value.User.Email.Should().Be("jorge@admin.com");
+        globalResult.Value.User.Role.Should().Be("SuperAdmin");
+        globalResult.Value.User.TenantId.Should().BeNull();
+        globalResult.Value.User.TenantSlug.Should().BeNull();
+    }
 }
 

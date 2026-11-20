@@ -17,13 +17,12 @@ public class TenantResolutionMiddleware
 
     public async Task InvokeAsync(HttpContext context, TenantContext tenantContext, AppDbContext dbContext)
     {
-        // Bypass para endpoints de sistema, autenticación o gobernanza global de plataforma
+        // Bypass para endpoints de sistema, telemetría o gobernanza global de plataforma
         var path = context.Request.Path.Value ?? string.Empty;
         if (path.Equals("/health", StringComparison.OrdinalIgnoreCase) ||
             path.StartsWith("/swagger", StringComparison.OrdinalIgnoreCase) ||
             path.StartsWith("/hangfire", StringComparison.OrdinalIgnoreCase) ||
             path.StartsWith("/hubs", StringComparison.OrdinalIgnoreCase) ||
-            path.StartsWith("/api/v1/auth", StringComparison.OrdinalIgnoreCase) ||
             path.Equals("/api/tenants", StringComparison.OrdinalIgnoreCase) ||
             path.Equals("/api/tenants/platform", StringComparison.OrdinalIgnoreCase) ||
             (path.StartsWith("/api/tenants/", StringComparison.OrdinalIgnoreCase) &&
@@ -55,9 +54,16 @@ public class TenantResolutionMiddleware
                 path.Equals("/api/geofencing/resolve", StringComparison.OrdinalIgnoreCase) ||
                 path.Equals("/api/orders", StringComparison.OrdinalIgnoreCase)));
 
-        // 1. Aislamiento estricto por JWT para operadores de franquicia (no SuperAdmin) en endpoints administrativos/operativos:
-        // Imposibilita que un TenantAdmin u operador autenticado falsifique el header X-Tenant-Slug de otra marca en paneles internos.
-        if (isAuthenticated && !isSuperAdmin && !isPublicStorefrontRequest)
+        // 1. Aislamiento estricto por JWT para operadores de franquicia (no SuperAdmin ni clientes comensales) en endpoints operativos:
+        // Imposibilita que un TenantAdmin u operador falsifique el header X-Tenant-Slug de otra marca en paneles internos.
+        var isFranchiseStaff = isAuthenticated && !isSuperAdmin && (
+            context.User.IsInRole("TenantAdmin") ||
+            context.User.IsInRole("BranchManager") ||
+            context.User.IsInRole("Cashier") ||
+            context.User.IsInRole("KitchenStaff") ||
+            context.User.IsInRole("Driver"));
+
+        if (isFranchiseStaff && !isPublicStorefrontRequest)
         {
             var tenantIdClaim = context.User.FindFirst("tenant_id")?.Value;
             if (!string.IsNullOrWhiteSpace(tenantIdClaim) && Guid.TryParse(tenantIdClaim, out var claimTenantId))
@@ -129,7 +135,7 @@ public class TenantResolutionMiddleware
                 var hasCustomDomainMatch = await dbContext.TenantSettings
                     .IgnoreQueryFilters()
                     .AsNoTracking()
-                    .AnyAsync(ts => ts.CustomDomain != null && ts.CustomDomain.ToLower() == host && ts.Tenant.IsActive);
+                    .AnyAsync(ts => ts.CustomDomain != null && string.Equals(ts.CustomDomain, host, StringComparison.OrdinalIgnoreCase) && ts.Tenant.IsActive);
 
                 if (!hasCustomDomainMatch)
                 {
@@ -148,20 +154,16 @@ public class TenantResolutionMiddleware
             }
         }
 
-        string? tenantSlug = null;
-
-        // 4. Detección por Dominio Personalizado (CustomDomain en TenantSettings)
-        if (host != "localhost" && host != "127.0.0.1")
+        // 3. Detección por Dominio Personalizado (CustomDomain en TenantSettings)
+        if (host != "localhost" && host != "127.0.0.1" && host != "::1")
         {
-#pragma warning disable CA1862, CA1304, CA1311
             var customDomainTenant = await dbContext.TenantSettings
                 .IgnoreQueryFilters()
                 .AsNoTracking()
                 .Include(ts => ts.Tenant)
-                .Where(ts => ts.CustomDomain != null && ts.CustomDomain.ToLower() == host && ts.Tenant.IsActive)
+                .Where(ts => ts.CustomDomain != null && string.Equals(ts.CustomDomain, host, StringComparison.OrdinalIgnoreCase) && ts.Tenant.IsActive)
                 .Select(ts => ts.Tenant)
                 .FirstOrDefaultAsync();
-#pragma warning restore CA1862, CA1304, CA1311
 
             if (customDomainTenant != null)
             {
@@ -169,49 +171,47 @@ public class TenantResolutionMiddleware
                 await _next(context);
                 return;
             }
+        }
 
-            // 5. Detección por Subdominio ({slug}.mesafy.com / {slug}.mesafy.doicela.dev)
-            var parts = host.Split('.');
-            var reservedSubdomains = new HashSet<string>(StringComparer.OrdinalIgnoreCase)
+        // 4. Detección por Subdominio ({slug}.mesafy.com / {slug}.mesafy.doicela.dev)
+        var parts = host.Split('.');
+        var reservedSubdomains = new HashSet<string>(StringComparer.OrdinalIgnoreCase)
+        {
+            "www", "api", "mesafy", "platform", "app", "admin", "mail", "cdn", "assets", "static"
+        };
+
+        var platformDomain = Environment.GetEnvironmentVariable("NEXT_PUBLIC_PLATFORM_DOMAIN")
+            ?? Environment.GetEnvironmentVariable("PLATFORM_DOMAIN")
+            ?? "mesafy.doicela.dev";
+
+        var isPlatformDomain = host.Equals(platformDomain, StringComparison.OrdinalIgnoreCase) ||
+                               host.EndsWith("." + platformDomain, StringComparison.OrdinalIgnoreCase) ||
+                               host.EndsWith(".mesafy.com", StringComparison.OrdinalIgnoreCase) ||
+                               host.EndsWith(".mesafy.dev", StringComparison.OrdinalIgnoreCase);
+
+        if (isPlatformDomain && parts.Length > 2 && !reservedSubdomains.Contains(parts[0]))
+        {
+            var subdomainSlug = parts[0];
+            var subdomainTenant = await dbContext.Tenants
+                .IgnoreQueryFilters()
+                .AsNoTracking()
+                .FirstOrDefaultAsync(t => t.Slug == subdomainSlug && t.IsActive);
+
+            if (subdomainTenant != null)
             {
-                "www", "api", "mesafy", "platform", "app", "admin", "mail", "cdn", "assets", "static"
-            };
-
-            var platformDomain = Environment.GetEnvironmentVariable("NEXT_PUBLIC_PLATFORM_DOMAIN")
-                ?? Environment.GetEnvironmentVariable("PLATFORM_DOMAIN")
-                ?? "mesafy.doicela.dev";
-
-            var isPlatformDomain = host.Equals(platformDomain, StringComparison.OrdinalIgnoreCase) ||
-                                   host.EndsWith("." + platformDomain, StringComparison.OrdinalIgnoreCase) ||
-                                   host.EndsWith(".mesafy.com", StringComparison.OrdinalIgnoreCase) ||
-                                   host.EndsWith(".mesafy.dev", StringComparison.OrdinalIgnoreCase);
-
-            if (isPlatformDomain && parts.Length > 2 && !reservedSubdomains.Contains(parts[0]))
-            {
-                tenantSlug = parts[0];
+                tenantContext.SetTenant(subdomainTenant.Id, subdomainTenant.Slug);
+                await _next(context);
+                return;
             }
         }
 
-        // 6. Fallback al tenant predeterminado configurado
-        if (string.IsNullOrWhiteSpace(tenantSlug))
+        // 5. Plataforma Global Raíz (mesafy.doicela.dev, www.mesafy.doicela.dev) o desarrollo local en localhost sin slug:
+        // No se asigna ningún tenant; tenantContext permanece con TenantId = null (Contexto Global Mesafy).
+        // Se evita terminantemente el secuestro de la plataforma global mediante fallbacks estáticos a tenants particulares.
+        if (isPlatformDomain || host == "localhost" || host == "127.0.0.1" || host == "::1")
         {
-            tenantSlug = _configuration["Multitenancy:DefaultTenantSlug"] ?? "la-granjita";
-        }
-
-        var defaultTenant = await dbContext.Tenants
-            .IgnoreQueryFilters()
-            .AsNoTracking()
-            .FirstOrDefaultAsync(t => t.Slug == tenantSlug && t.IsActive)
-            ?? await dbContext.Tenants
-                .IgnoreQueryFilters()
-                .AsNoTracking()
-                .Where(t => t.IsActive)
-                .OrderBy(t => t.Id)
-                .FirstOrDefaultAsync();
-
-        if (defaultTenant != null)
-        {
-            tenantContext.SetTenant(defaultTenant.Id, defaultTenant.Slug);
+            await _next(context);
+            return;
         }
 
         await _next(context);
