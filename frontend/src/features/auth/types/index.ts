@@ -28,6 +28,7 @@ export interface AuthUser {
   roles?: UserRoleName[];
   tenantId: string | null;
   tenantSlug?: string | null;
+  tenantName?: string | null;
   branchId: string | number | null;
   isActive: boolean;
   isEmailVerified?: boolean;

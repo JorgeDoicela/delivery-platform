@@ -72,7 +72,7 @@ function buildAuthHeaders(
 let inFlightRefreshPromise: Promise<RefreshTokenResponse> | null = null;
 
 export const authApi = {
-  async login(credentials: LoginFormData): Promise<LoginResponse> {
+  async login(credentials: LoginFormData & { tenantSlug?: string }): Promise<LoginResponse> {
     const tenantSlug = credentials.tenantSlug || getApiClientTenantSlug() || undefined;
     const res = await fetch(`${getApiBaseUrl()}/api/v1/auth/login`, {
       method: "POST",
