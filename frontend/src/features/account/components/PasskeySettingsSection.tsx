@@ -10,12 +10,11 @@ import {
   Check,
   X,
   Loader2,
-  AlertCircle,
-  ShieldCheck,
 } from "lucide-react";
 import { webauthnApi, type WebAuthnCredentialItem } from "@/features/auth/api/webauthnApi";
 import { usePasskeyAuth } from "@/features/auth/lib/usePasskeyAuth";
 import { useCurrentTenantQuery } from "@/features/tenant";
+import { AlertBanner } from "@/shared/components";
 
 export function PasskeySettingsSection() {
   const { data: tenant } = useCurrentTenantQuery();
@@ -167,26 +166,29 @@ export function PasskeySettingsSection() {
       </div>
 
       {!isSupported && (
-        <div className="p-4 bg-amber-50 dark:bg-amber-950/30 border border-amber-200 dark:border-amber-800/60 rounded-2xl text-xs text-amber-800 dark:text-amber-300">
-          <p className="font-semibold">Función no disponible en este navegador</p>
-          <p className="text-[11px] mt-0.5 opacity-90">
-            Tu navegador actual no permite entrar con huella o rostro. Puedes usar esta función abriendo la página desde Safari, Google Chrome o Microsoft Edge.
-          </p>
-        </div>
+        <AlertBanner variant="warning" title="Función no disponible en este navegador">
+          Tu navegador actual no permite entrar con huella o rostro. Puedes usar esta función abriendo la página desde Safari, Google Chrome o Microsoft Edge.
+        </AlertBanner>
       )}
 
       {successMessage && (
-        <div className="flex items-start gap-2.5 p-3.5 bg-emerald-950/40 border border-emerald-800 text-emerald-200 rounded-2xl text-xs">
-          <ShieldCheck className="w-4 h-4 text-emerald-400 shrink-0 mt-0.5" />
-          <p className="font-medium text-[11px]">{successMessage}</p>
-        </div>
+        <AlertBanner
+          variant="success"
+          onClose={() => setSuccessMessage(null)}
+        >
+          {successMessage}
+        </AlertBanner>
       )}
 
       {activeError && (
-        <div className="flex items-start gap-2.5 p-3.5 bg-red-50 dark:bg-red-950/40 border border-red-200 dark:border-red-800/60 text-red-800 dark:text-red-300 rounded-2xl text-xs">
-          <AlertCircle className="w-4 h-4 text-brand-primary shrink-0 mt-0.5" />
-          <p className="font-medium text-[11px]">{activeError}</p>
-        </div>
+        <AlertBanner
+          variant="error"
+          onClose={() => {
+            setErrorMessage(null);
+          }}
+        >
+          {activeError}
+        </AlertBanner>
       )}
 
       {isLoading ? (

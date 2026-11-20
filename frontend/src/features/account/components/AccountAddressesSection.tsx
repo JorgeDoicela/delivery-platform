@@ -8,14 +8,13 @@ import {
   Plus,
   Trash2,
   Edit2,
-  Check,
   Loader2,
-  AlertCircle,
   X,
   Star,
 } from "lucide-react";
 import { addressSchema, type AddressFormData } from "../schemas/accountSchemas";
 import { useAccountStore } from "../store/useAccountStore";
+import { AlertBanner } from "@/shared/components";
 import type { AccountAddress } from "../types";
 
 export function AccountAddressesSection() {
@@ -136,17 +135,15 @@ export function AccountAddressesSection() {
       </div>
 
       {actionSuccessMessage && (
-        <div className="flex items-start gap-3 p-4 bg-emerald-950/40 border border-emerald-800 text-emerald-200 rounded-2xl text-xs">
-          <Check className="w-4 h-4 text-emerald-400 shrink-0 mt-0.5" />
-          <p className="font-medium">{actionSuccessMessage}</p>
-        </div>
+        <AlertBanner variant="success">
+          {actionSuccessMessage}
+        </AlertBanner>
       )}
 
       {addressesError && (
-        <div className="flex items-start gap-3 p-4 bg-red-50 dark:bg-red-950/40 border border-red-200 dark:border-red-800/60 text-red-800 dark:text-red-300 rounded-2xl text-xs">
-          <AlertCircle className="w-4 h-4 text-brand-primary shrink-0 mt-0.5" />
-          <p className="font-medium">{addressesError}</p>
-        </div>
+        <AlertBanner variant="error">
+          {addressesError}
+        </AlertBanner>
       )}
 
       {/* Formulario de Alta / Edición */}

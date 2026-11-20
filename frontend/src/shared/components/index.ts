@@ -22,6 +22,12 @@ export {
 export { ThemeToggle } from "./ThemeToggle";
 
 export {
+  AlertBanner,
+  type AlertBannerProps,
+  type AlertBannerVariant,
+} from "./AlertBanner";
+
+export {
   AppHeader,
   AppHeaderBrand,
   AppHeaderLeading,

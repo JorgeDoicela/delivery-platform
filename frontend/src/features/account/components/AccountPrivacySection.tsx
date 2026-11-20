@@ -1,8 +1,9 @@
 "use client";
 
 import { useState } from "react";
-import { MessageSquare, ShieldCheck, AlertCircle, Check } from "lucide-react";
+import { MessageSquare, ShieldCheck } from "lucide-react";
 import { useAccountStore } from "../store/useAccountStore";
+import { AlertBanner } from "@/shared/components";
 
 export function AccountPrivacySection() {
   const profile = useAccountStore((s) => s.profile);
@@ -36,17 +37,15 @@ export function AccountPrivacySection() {
       </div>
 
       {actionSuccessMessage && (
-        <div className="flex items-start gap-3 p-4 bg-emerald-950/40 border border-emerald-800 text-emerald-200 rounded-2xl text-xs">
-          <Check className="w-4 h-4 text-emerald-400 shrink-0 mt-0.5" />
-          <p className="font-medium">{actionSuccessMessage}</p>
-        </div>
+        <AlertBanner variant="success">
+          {actionSuccessMessage}
+        </AlertBanner>
       )}
 
       {profileError && (
-        <div className="flex items-start gap-3 p-4 bg-red-50 dark:bg-red-950/40 border border-red-200 dark:border-red-800/60 text-red-800 dark:text-red-300 rounded-2xl text-xs">
-          <AlertCircle className="w-4 h-4 text-brand-primary shrink-0 mt-0.5" />
-          <p className="font-medium">{profileError}</p>
-        </div>
+        <AlertBanner variant="error">
+          {profileError}
+        </AlertBanner>
       )}
 
       {/* Control de WhatsApp */}

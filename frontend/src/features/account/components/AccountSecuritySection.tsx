@@ -2,13 +2,14 @@
 
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Lock, Loader2, Check, AlertCircle } from "lucide-react";
+import { Lock, Loader2 } from "lucide-react";
 import {
   changePasswordSchema,
   type ChangePasswordFormData,
 } from "../schemas/accountSchemas";
 import { useAccountStore } from "../store/useAccountStore";
 import { PasskeySettingsSection } from "./PasskeySettingsSection";
+import { AlertBanner } from "@/shared/components";
 
 export function AccountSecuritySection() {
   const isSaving = useAccountStore((s) => s.isSaving);
@@ -54,17 +55,15 @@ export function AccountSecuritySection() {
       </div>
 
       {actionSuccessMessage && (
-        <div className="flex items-start gap-3 p-4 bg-emerald-950/40 border border-emerald-800 text-emerald-200 rounded-2xl text-xs">
-          <Check className="w-4 h-4 text-emerald-400 shrink-0 mt-0.5" />
-          <p className="font-medium">{actionSuccessMessage}</p>
-        </div>
+        <AlertBanner variant="success">
+          {actionSuccessMessage}
+        </AlertBanner>
       )}
 
       {profileError && (
-        <div className="flex items-start gap-3 p-4 bg-red-50 dark:bg-red-950/40 border border-red-200 dark:border-red-800/60 text-red-800 dark:text-red-300 rounded-2xl text-xs">
-          <AlertCircle className="w-4 h-4 text-brand-primary shrink-0 mt-0.5" />
-          <p className="font-medium">{profileError}</p>
-        </div>
+        <AlertBanner variant="error">
+          {profileError}
+        </AlertBanner>
       )}
 
       <form onSubmit={handleSubmit(onSubmit)} className="space-y-4 max-w-lg">

@@ -2,8 +2,9 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { Fingerprint, Loader2, AlertCircle } from "lucide-react";
+import { Fingerprint, Loader2 } from "lucide-react";
 import { usePasskeyAuth } from "../lib/usePasskeyAuth";
+import { AlertBanner } from "@/shared/components";
 import { useAuthStore } from "../store/useAuthStore";
 import { useCurrentTenantQuery, useTenantStore } from "@/features/tenant";
 import { resolveTenantRouting, useTenantRoutes } from "@/shared/lib/tenant-routing";
@@ -98,13 +99,9 @@ export function PasskeySignInButton({
       </button>
 
       {displayError && (
-        <div
-          role="alert"
-          className="flex items-center gap-2 p-2.5 rounded-lg bg-red-50 dark:bg-red-950/40 border border-red-200 dark:border-red-900/60 text-red-700 dark:text-red-300 text-xs"
-        >
-          <AlertCircle className="w-3.5 h-3.5 shrink-0 text-red-600 dark:text-red-400" />
-          <span className="font-medium text-[11px] leading-tight">{displayError}</span>
-        </div>
+        <AlertBanner variant="error">
+          {displayError}
+        </AlertBanner>
       )}
     </div>
   );

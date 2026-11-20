@@ -148,4 +148,32 @@ describe("usePasskeyAuth", () => {
     expect(success).toBe(false);
     expect(currentHook!.error).toBe("Sesión no encontrada");
   });
+
+  it("registerPasskey debe traducir mensajes técnicos en inglés como authenticator previously registered", async () => {
+    vi.mocked(simpleWebAuthn.browserSupportsWebAuthn).mockReturnValue(true);
+    vi.mocked(webauthnApi.getRegistrationOptions).mockResolvedValueOnce({} as any); // eslint-disable-line @typescript-eslint/no-explicit-any
+    vi.mocked(simpleWebAuthn.startRegistration).mockResolvedValueOnce({} as any); // eslint-disable-line @typescript-eslint/no-explicit-any
+    vi.mocked(webauthnApi.completeRegistration).mockRejectedValueOnce(
+      new Error("The authenticator was previously registered")
+    );
+
+    let currentHook: ReturnType<typeof usePasskeyAuth> | null = null;
+    await act(async () => {
+      root.render(
+        <HookTester
+          onHookReady={(h) => {
+            currentHook = h;
+          }}
+        />
+      );
+    });
+
+    let cred = null;
+    await act(async () => {
+      cred = await currentHook!.registerPasskey("Mi equipo");
+    });
+
+    expect(cred).toBeNull();
+    expect(currentHook!.error).toBe("Este dispositivo o huella ya se encuentra registrado en tu cuenta.");
+  });
 });

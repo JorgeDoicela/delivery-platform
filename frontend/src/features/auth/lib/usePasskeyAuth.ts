@@ -20,6 +20,55 @@ interface UsePasskeyAuthReturn {
   registerPasskey: (friendlyName?: string, tenantSlug?: string) => Promise<WebAuthnCredentialItem | null>;
 }
 
+export function translateWebAuthnError(rawError: string | Error | unknown): string {
+  let msg = "";
+  if (typeof rawError === "string") {
+    msg = rawError;
+  } else if (rawError instanceof Error) {
+    msg = rawError.message;
+  } else if (rawError && typeof rawError === "object" && "message" in rawError) {
+    msg = String((rawError as { message: unknown }).message);
+  }
+
+  const lower = msg.toLowerCase();
+
+  if (
+    lower.includes("previously registered") ||
+    lower.includes("already registered") ||
+    lower.includes("invalidstateerror") ||
+    lower.includes("passkeyalreadyregistered")
+  ) {
+    return "Este dispositivo o huella ya se encuentra registrado en tu cuenta.";
+  }
+
+  if (
+    lower.includes("notallowederror") ||
+    lower.includes("cancelled") ||
+    lower.includes("cancelado") ||
+    lower.includes("the operation either timed out or was not allowed")
+  ) {
+    return "Activación cancelada en tu dispositivo o tiempo de espera agotado.";
+  }
+
+  if (lower.includes("aborterror") || lower.includes("timed out") || lower.includes("timeout")) {
+    return "La solicitud expiró o fue interrumpida. Por favor, intenta de nuevo.";
+  }
+
+  if (lower.includes("notsupportederror") || lower.includes("not supported")) {
+    return "Tu dispositivo o navegador no soporta autenticación biométrica.";
+  }
+
+  if (lower.includes("securityerror")) {
+    return "Operación no autorizada por las políticas de seguridad del navegador.";
+  }
+
+  if (lower.includes("challenge") || lower.includes("expir")) {
+    return "El desafío de seguridad expiró. Por favor, intenta activar el dispositivo nuevamente.";
+  }
+
+  return msg || "No se pudo activar el acceso en este equipo.";
+}
+
 export function usePasskeyAuth(): UsePasskeyAuthReturn {
   const [isSupported] = useState<boolean>(() => {
     if (typeof window === "undefined") return false;
@@ -77,11 +126,9 @@ export function usePasskeyAuth(): UsePasskeyAuthReturn {
               return false;
             }
           }
-          setError(err.message || "No se pudo verificar tu huella o rostro.");
-        } else if (err instanceof Error) {
-          setError(err.message);
+          setError(translateWebAuthnError(err));
         } else {
-          setError("No pudimos iniciar sesión en este momento.");
+          setError(translateWebAuthnError(err));
         }
         return false;
       } finally {
@@ -121,11 +168,9 @@ export function usePasskeyAuth(): UsePasskeyAuthReturn {
               return null;
             }
           }
-          setError(err.message || "No se pudo activar el acceso en este equipo.");
-        } else if (err instanceof Error) {
-          setError(err.message);
+          setError(translateWebAuthnError(err));
         } else {
-          setError("No se pudo completar la activación en este equipo.");
+          setError(translateWebAuthnError(err));
         }
         return null;
       } finally {

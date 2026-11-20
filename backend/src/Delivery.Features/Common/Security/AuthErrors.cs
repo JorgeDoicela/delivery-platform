@@ -66,7 +66,7 @@ public static class AuthErrors
 
     public static readonly Error PasskeyAlreadyRegistered = new(
         "Auth.PasskeyAlreadyRegistered",
-        "Esta llave de acceso ya se encuentra registrada en la cuenta.");
+        "Este dispositivo o autenticador ya se encuentra registrado en tu cuenta.");
 
     public static readonly Error PasskeyCloneDetected = new(
         "Auth.PasskeyCloneDetected",
@@ -82,8 +82,36 @@ public static class AuthErrors
         "Auth.UnauthorizedTenant",
         "El usuario no tiene autorización para operar en el establecimiento seleccionado.");
 
-    public static Error WebAuthnVerificationFailed(string detail) => new(
-        "Auth.WebAuthnVerificationFailed",
-        $"La verificación criptográfica de la llave de acceso falló: {detail}");
+    public static Error WebAuthnVerificationFailed(string detail)
+    {
+        if (string.IsNullOrWhiteSpace(detail))
+        {
+            return PasskeyVerificationFailed;
+        }
+
+        if (detail.Contains("previously registered", StringComparison.OrdinalIgnoreCase) ||
+            detail.Contains("already registered", StringComparison.OrdinalIgnoreCase))
+        {
+            return PasskeyAlreadyRegistered;
+        }
+
+        if (detail.Contains("challenge", StringComparison.OrdinalIgnoreCase) ||
+            detail.Contains("expir", StringComparison.OrdinalIgnoreCase))
+        {
+            return PasskeyChallengeExpired;
+        }
+
+        if (detail.Contains("user verification", StringComparison.OrdinalIgnoreCase))
+        {
+            return new Error("Auth.WebAuthnUserVerificationFailed", "La verificación biométrica no se completó en tu dispositivo.");
+        }
+
+        if (detail.Contains("origin", StringComparison.OrdinalIgnoreCase))
+        {
+            return new Error("Auth.WebAuthnOriginMismatch", "El origen de la solicitud no coincide con el dominio autorizado de la plataforma.");
+        }
+
+        return new Error("Auth.WebAuthnVerificationFailed", "No se pudo verificar la huella o rostro en este dispositivo. Por favor, intenta de nuevo.");
+    }
 }
 
