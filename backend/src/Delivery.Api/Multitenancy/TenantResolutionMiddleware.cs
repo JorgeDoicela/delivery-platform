@@ -135,7 +135,7 @@ public class TenantResolutionMiddleware
                 var hasCustomDomainMatch = await dbContext.TenantSettings
                     .IgnoreQueryFilters()
                     .AsNoTracking()
-                    .AnyAsync(ts => ts.CustomDomain != null && string.Equals(ts.CustomDomain, host, StringComparison.OrdinalIgnoreCase) && ts.Tenant.IsActive);
+                    .AnyAsync(ts => ts.CustomDomain != null && EF.Functions.ILike(ts.CustomDomain, host) && ts.Tenant.IsActive);
 
                 if (!hasCustomDomainMatch)
                 {
@@ -161,7 +161,7 @@ public class TenantResolutionMiddleware
                 .IgnoreQueryFilters()
                 .AsNoTracking()
                 .Include(ts => ts.Tenant)
-                .Where(ts => ts.CustomDomain != null && string.Equals(ts.CustomDomain, host, StringComparison.OrdinalIgnoreCase) && ts.Tenant.IsActive)
+                .Where(ts => ts.CustomDomain != null && EF.Functions.ILike(ts.CustomDomain, host) && ts.Tenant.IsActive)
                 .Select(ts => ts.Tenant)
                 .FirstOrDefaultAsync();
 

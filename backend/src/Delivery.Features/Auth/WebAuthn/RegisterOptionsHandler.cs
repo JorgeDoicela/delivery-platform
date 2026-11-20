@@ -44,7 +44,7 @@ public class RegisterOptionsHandler : IHandler<RegisterOptionsCommand, Result<Cr
         if (tenant == null && !string.IsNullOrWhiteSpace(command.TenantSlug))
         {
             var slugLower = command.TenantSlug.Trim().ToLowerInvariant();
-            tenant = await _context.Tenants.FirstOrDefaultAsync(t => string.Equals(t.Slug, slugLower, StringComparison.OrdinalIgnoreCase), cancellationToken);
+            tenant = await _context.Tenants.FirstOrDefaultAsync(t => EF.Functions.ILike(t.Slug, slugLower), cancellationToken);
         }
 
         var existingCredentialIds = user.WebAuthnCredentials
