@@ -157,6 +157,8 @@ flowchart LR
 | **Ofertas** | `PromotionalBannersJson`| `text` | Array JSON con banners intermedios de promocion en vitrina. |
 | **Logistica** | `BaseDeliveryFee` | `numeric(10,2)`| Costo base de despacho a domicilio en la zona de cobertura. |
 | **Modalidades**| `EnableDelivery` / `Takeout` / `DineIn` | `boolean` | Habilita o deshabilita canales de despacho de forma independiente. |
+| **Operacion KDS** | `EnableKitchenWorkflow` | `boolean` | Habilita el flujo y rol de Cocina (KDS) por defecto (`true`) o modo directo Solo Mostrador (`false`). Sobrescribible por sucursal mediante `Branch.EnableKitchenWorkflowOverride`. |
+| **Retiro Directo** | `AllowDirectCounterTakeoutDelivery` | `boolean` | En modo Solo Mostrador, permite entregar pedidos `Takeout` directamente desde `Confirmed` o exigir el paso previo `ReadyForDelivery`. Sobrescribible por sucursal mediante `Branch.AllowDirectCounterTakeoutDeliveryOverride`. |
 | **Pagos** | `AcceptsCash` / `Transfer` / `Card` | `boolean` | Pasarelas y metodos de cobro autorizados por el comercio. |
 | **Banco** | `BankName`, `BankAccountNumber`... | `varchar` | Datos de la cuenta bancaria donde el cliente transfiere fondos. |
 | **Legal** | `TermsAndConditionsMarkdown` | `text` | Contenido en Markdown renderizado en `/terminos`. |

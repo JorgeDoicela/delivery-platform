@@ -4,6 +4,8 @@ import type { NextRequest } from "next/server";
 const OPERATIONAL_KEYWORDS = new Set([
   "cocina",
   "kitchen",
+  "mostrador",
+  "despacho",
   "admin",
   "superadmin",
   "driver",

@@ -11,7 +11,10 @@ public sealed record UpdateBranchOperatingHoursRequest(
     string ClosingTime,
     bool? IsActive = null,
     double? DeliveryRadiusKm = null,
-    bool? IsCoverageStrict = null
+    bool? IsCoverageStrict = null,
+    bool? EnableKitchenWorkflowOverride = null,
+    bool? AllowDirectCounterTakeoutDeliveryOverride = null,
+    bool ApplyWorkflowOverrides = false
 );
 
 public sealed class UpdateBranchOperatingHoursEndpoint : IEndpoint
@@ -30,7 +33,10 @@ public sealed class UpdateBranchOperatingHoursEndpoint : IEndpoint
                 request.ClosingTime,
                 request.IsActive,
                 request.DeliveryRadiusKm,
-                request.IsCoverageStrict
+                request.IsCoverageStrict,
+                request.EnableKitchenWorkflowOverride,
+                request.AllowDirectCounterTakeoutDeliveryOverride,
+                request.ApplyWorkflowOverrides
             );
 
             var result = await handler.Handle(command, ct);

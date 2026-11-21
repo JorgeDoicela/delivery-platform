@@ -21,7 +21,11 @@ public sealed record BranchDetailDto(
     double Longitude,
     bool IsActive,
     double? DeliveryRadiusKm = null,
-    bool IsCoverageStrict = true
+    bool IsCoverageStrict = true,
+    bool? EnableKitchenWorkflowOverride = null,
+    bool UseKitchenWorkflow = true,
+    bool? AllowDirectCounterTakeoutDeliveryOverride = null,
+    bool AllowDirectCounterTakeoutDelivery = true
 );
 
 public sealed class GetBranchesHandler : IHandler<GetBranchesQuery, Result<List<BranchDetailDto>>>
@@ -53,7 +57,11 @@ public sealed class GetBranchesHandler : IHandler<GetBranchesQuery, Result<List<
                 b.LocationPoint.X,
                 b.IsActive,
                 b.DeliveryRadiusKm,
-                b.IsCoverageStrict
+                b.IsCoverageStrict,
+                b.EnableKitchenWorkflowOverride,
+                b.EnableKitchenWorkflowOverride ?? (b.Tenant.Settings != null ? b.Tenant.Settings.EnableKitchenWorkflow : true),
+                b.AllowDirectCounterTakeoutDeliveryOverride,
+                b.AllowDirectCounterTakeoutDeliveryOverride ?? (b.Tenant.Settings != null ? b.Tenant.Settings.AllowDirectCounterTakeoutDelivery : true)
             ))
             .ToListAsync(cancellationToken);
 

@@ -27,6 +27,20 @@ function BranchScheduleForm({ branch, onClose }: BranchScheduleFormProps) {
   const [isCoverageStrict, setIsCoverageStrict] = useState(
     branch.isCoverageStrict ?? true
   );
+  const [kitchenWorkflowMode, setKitchenWorkflowMode] = useState<"inherit" | "enabled" | "disabled">(
+    branch.enableKitchenWorkflowOverride === true
+      ? "enabled"
+      : branch.enableKitchenWorkflowOverride === false
+      ? "disabled"
+      : "inherit"
+  );
+  const [directTakeoutMode, setDirectTakeoutMode] = useState<"inherit" | "enabled" | "disabled">(
+    branch.allowDirectCounterTakeoutDeliveryOverride === true
+      ? "enabled"
+      : branch.allowDirectCounterTakeoutDeliveryOverride === false
+      ? "disabled"
+      : "inherit"
+  );
   const [validationError, setValidationError] = useState<string | null>(null);
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
 
@@ -56,6 +70,19 @@ function BranchScheduleForm({ branch, onClose }: BranchScheduleFormProps) {
     }
 
     try {
+      const enableKitchenWorkflowOverride =
+        kitchenWorkflowMode === "enabled"
+          ? true
+          : kitchenWorkflowMode === "disabled"
+          ? false
+          : null;
+      const allowDirectCounterTakeoutDeliveryOverride =
+        directTakeoutMode === "enabled"
+          ? true
+          : directTakeoutMode === "disabled"
+          ? false
+          : null;
+
       await mutation.mutateAsync({
         branchId: branch.id,
         data: {
@@ -64,6 +91,9 @@ function BranchScheduleForm({ branch, onClose }: BranchScheduleFormProps) {
           isActive,
           deliveryRadiusKm,
           isCoverageStrict,
+          enableKitchenWorkflowOverride,
+          allowDirectCounterTakeoutDeliveryOverride,
+          applyWorkflowOverrides: true,
         },
       });
 
@@ -255,6 +285,55 @@ function BranchScheduleForm({ branch, onClose }: BranchScheduleFormProps) {
                   </span>
                 </div>
               </label>
+            </div>
+          </div>
+        </div>
+
+        {/* Modo Operativo: Cocina KDS vs Solo Mostrador */}
+        <div className="pt-2 border-t border-surface-border space-y-3">
+          <div>
+            <span className="text-xs font-bold text-text-strong block font-display uppercase tracking-wider">
+              Flujo Operativo (Cocina KDS vs Mostrador)
+            </span>
+            <span className="text-[11px] text-text-muted block">
+              Define si esta sucursal utiliza pantalla de cocina o despacha directamente desde mostrador.
+            </span>
+          </div>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            <div>
+              <label className="block text-[11px] font-bold text-text-muted mb-1 uppercase tracking-wider">
+                Rol y Pantalla de Cocina
+              </label>
+              <select
+                value={kitchenWorkflowMode}
+                onChange={(e) =>
+                  setKitchenWorkflowMode(e.target.value as "inherit" | "enabled" | "disabled")
+                }
+                className="w-full px-3 py-2.5 bg-surface-canvas border border-surface-border rounded-xl text-xs font-semibold text-text-strong focus:outline-none focus:ring-2 focus:ring-brand-primary"
+              >
+                <option value="inherit">Heredar de la marca</option>
+                <option value="enabled">Usar Cocina (KDS)</option>
+                <option value="disabled">Solo Mostrador (sin Cocina)</option>
+              </select>
+            </div>
+
+            <div>
+              <label className="block text-[11px] font-bold text-text-muted mb-1 uppercase tracking-wider">
+                Retiros en Mostrador (Takeout)
+              </label>
+              <select
+                value={directTakeoutMode}
+                onChange={(e) =>
+                  setDirectTakeoutMode(e.target.value as "inherit" | "enabled" | "disabled")
+                }
+                disabled={kitchenWorkflowMode === "enabled"}
+                className="w-full px-3 py-2.5 bg-surface-canvas border border-surface-border rounded-xl text-xs font-semibold text-text-strong focus:outline-none focus:ring-2 focus:ring-brand-primary disabled:opacity-50"
+              >
+                <option value="inherit">Heredar de la marca</option>
+                <option value="enabled">Entrega directa o en 2 pasos</option>
+                <option value="disabled">Exigir marcar Listo antes</option>
+              </select>
             </div>
           </div>
         </div>

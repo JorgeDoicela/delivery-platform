@@ -8,9 +8,17 @@ interface KitchenTicketCardProps {
   order: KitchenOrderTicketDto;
   onAdvance: (orderId: string, nextStatus: OrderStatus) => Promise<void>;
   onApproveTransfer?: (orderId: string, isApproved: boolean, rejectionReason?: string) => Promise<void>;
+  useKitchenWorkflow?: boolean;
+  allowDirectCounterTakeoutDelivery?: boolean;
 }
 
-export function KitchenTicketCard({ order, onAdvance, onApproveTransfer }: KitchenTicketCardProps) {
+export function KitchenTicketCard({
+  order,
+  onAdvance,
+  onApproveTransfer,
+  useKitchenWorkflow = true,
+  allowDirectCounterTakeoutDelivery = true,
+}: KitchenTicketCardProps) {
   const [elapsedMinutes, setElapsedMinutes] = useState(0);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
@@ -189,14 +197,44 @@ export function KitchenTicketCard({ order, onAdvance, onApproveTransfer }: Kitch
         )}
 
         {order.status === OrderStatus.Confirmed && (
-          <button
-            onClick={() => handleAdvance(OrderStatus.InKitchen)}
-            disabled={isSubmitting}
-            className="w-full flex items-center justify-center gap-2 py-2.5 px-4 bg-brand-primary hover:bg-brand-primary-hover text-white text-xs font-bold uppercase tracking-wider rounded-full shadow-md transition-all active:scale-95 disabled:opacity-50 cursor-pointer"
-          >
-            <ChefHat className="h-4 w-4" />
-            {isSubmitting ? 'Iniciando...' : 'Iniciar en Cocina'}
-          </button>
+          useKitchenWorkflow ? (
+            <button
+              onClick={() => handleAdvance(OrderStatus.InKitchen)}
+              disabled={isSubmitting}
+              className="w-full flex items-center justify-center gap-2 py-2.5 px-4 bg-brand-primary hover:bg-brand-primary-hover text-white text-xs font-bold uppercase tracking-wider rounded-full shadow-md transition-all active:scale-95 disabled:opacity-50 cursor-pointer"
+            >
+              <ChefHat className="h-4 w-4" />
+              {isSubmitting ? 'Iniciando...' : 'Iniciar en Cocina'}
+            </button>
+          ) : isTakeout && allowDirectCounterTakeoutDelivery ? (
+            <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2">
+              <button
+                onClick={() => handleAdvance(OrderStatus.ReadyForDelivery)}
+                disabled={isSubmitting}
+                className="flex-1 flex items-center justify-center gap-1.5 py-2.5 px-3 bg-surface-card hover:bg-status-info/10 text-status-info border border-status-info/30 text-xs font-bold uppercase tracking-wider rounded-full transition-all active:scale-95 disabled:opacity-50 cursor-pointer"
+              >
+                <CheckCircle2 className="h-3.5 w-3.5" />
+                {isSubmitting ? 'Guardando...' : 'Marcar Listo'}
+              </button>
+              <button
+                onClick={() => handleAdvance(OrderStatus.Delivered)}
+                disabled={isSubmitting}
+                className="flex-1 flex items-center justify-center gap-1.5 py-2.5 px-3 bg-status-success hover:bg-status-success/85 text-white text-xs font-bold uppercase tracking-wider rounded-full shadow-md transition-all active:scale-95 disabled:opacity-50 cursor-pointer"
+              >
+                <Store className="h-3.5 w-3.5" />
+                {isSubmitting ? 'Entregando...' : 'Entregar'}
+              </button>
+            </div>
+          ) : (
+            <button
+              onClick={() => handleAdvance(OrderStatus.ReadyForDelivery)}
+              disabled={isSubmitting}
+              className="w-full flex items-center justify-center gap-2 py-2.5 px-4 bg-status-info hover:bg-status-info/85 text-white text-xs font-bold uppercase tracking-wider rounded-full shadow-md transition-all active:scale-95 disabled:opacity-50 cursor-pointer"
+            >
+              <CheckCircle2 className="h-4 w-4" />
+              {isSubmitting ? 'Guardando...' : isTakeout ? 'Listo en Mostrador' : 'Listo para Reparto'}
+            </button>
+          )
         )}
 
         {order.status === OrderStatus.InKitchen && (

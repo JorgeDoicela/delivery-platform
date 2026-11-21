@@ -48,6 +48,8 @@ public partial class AppDbContext
             ts.Property(x => x.HeroSlidesJson).HasColumnType("text");
             ts.Property(x => x.PromotionalBannersJson).HasColumnType("text");
             ts.Property(x => x.CustomPrivacyPolicyUrl).HasMaxLength(500);
+            ts.Property(x => x.EnableKitchenWorkflow).HasDefaultValue(true);
+            ts.Property(x => x.AllowDirectCounterTakeoutDelivery).HasDefaultValue(true);
 
             ts.HasOne(x => x.Tenant)
                 .WithOne(x => x.Settings)

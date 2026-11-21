@@ -2,6 +2,7 @@ using System.Text.Json;
 using Delivery.Core.Common;
 using Delivery.Core.Domain.Common;
 using Delivery.Core.Domain.Entities;
+using Delivery.Core.Domain.Policies;
 using Delivery.Core.Domain.ValueObjects;
 using Delivery.Core.Infrastructure.Persistence;
 using Delivery.Features.Common.Handlers;
@@ -30,7 +31,11 @@ public sealed record UpdatedTenantBranchSummaryDto(
     double Longitude,
     bool IsActive,
     double? DeliveryRadiusKm = null,
-    bool IsCoverageStrict = true
+    bool IsCoverageStrict = true,
+    bool? EnableKitchenWorkflowOverride = null,
+    bool UseKitchenWorkflow = true,
+    bool? AllowDirectCounterTakeoutDeliveryOverride = null,
+    bool AllowDirectCounterTakeoutDelivery = true
 );
 
 public sealed record UpdatedTenantStorefrontDto(
@@ -65,7 +70,9 @@ public sealed record UpdatedTenantStorefrontDto(
     List<TenantHeroSlide> HeroSlides,
     List<TenantPromoBanner> PromotionalBanners,
     List<UpdatedTenantBranchSummaryDto> Branches,
-    bool RequireCoverageValidation = true
+    bool RequireCoverageValidation = true,
+    bool EnableKitchenWorkflow = true,
+    bool AllowDirectCounterTakeoutDelivery = true
 );
 
 public sealed record UpdateTenantStorefrontCommand(
@@ -96,7 +103,9 @@ public sealed record UpdateTenantStorefrontCommand(
     UpdateTenantBankDetailsDto BankDetails,
     List<TenantHeroSlide> HeroSlides,
     List<TenantPromoBanner> PromotionalBanners,
-    bool? RequireCoverageValidation = null
+    bool? RequireCoverageValidation = null,
+    bool? EnableKitchenWorkflow = null,
+    bool? AllowDirectCounterTakeoutDelivery = null
 );
 
 public sealed class UpdateTenantStorefrontHandler : IHandler<UpdateTenantStorefrontCommand, Result<UpdatedTenantStorefrontDto>>
@@ -210,6 +219,16 @@ public sealed class UpdateTenantStorefrontHandler : IHandler<UpdateTenantStorefr
             settings.RequireCoverageValidation = command.RequireCoverageValidation.Value;
         }
 
+        if (command.EnableKitchenWorkflow.HasValue)
+        {
+            settings.EnableKitchenWorkflow = command.EnableKitchenWorkflow.Value;
+        }
+
+        if (command.AllowDirectCounterTakeoutDelivery.HasValue)
+        {
+            settings.AllowDirectCounterTakeoutDelivery = command.AllowDirectCounterTakeoutDelivery.Value;
+        }
+
         if (!string.IsNullOrWhiteSpace(command.LandingLayoutTemplate))
         {
             settings.LandingLayoutTemplate = command.LandingLayoutTemplate.Trim();
@@ -244,7 +263,11 @@ public sealed class UpdateTenantStorefrontHandler : IHandler<UpdateTenantStorefr
                 b.LocationPoint.X,
                 b.IsActive,
                 b.DeliveryRadiusKm,
-                b.IsCoverageStrict
+                b.IsCoverageStrict,
+                b.EnableKitchenWorkflowOverride,
+                KitchenWorkflowPolicy.ResolveKitchenWorkflow(settings.EnableKitchenWorkflow, b.EnableKitchenWorkflowOverride),
+                b.AllowDirectCounterTakeoutDeliveryOverride,
+                KitchenWorkflowPolicy.ResolveDirectCounterTakeoutDelivery(settings.AllowDirectCounterTakeoutDelivery, b.AllowDirectCounterTakeoutDeliveryOverride)
             ))
             .ToList();
 
@@ -286,7 +309,9 @@ public sealed class UpdateTenantStorefrontHandler : IHandler<UpdateTenantStorefr
             heroSlides.Where(s => s.IsActive).OrderBy(s => s.DisplayOrder).ToList(),
             promos.Where(p => p.IsActive).OrderBy(p => p.DisplayOrder).ToList(),
             branches,
-            settings.RequireCoverageValidation
+            settings.RequireCoverageValidation,
+            settings.EnableKitchenWorkflow,
+            settings.AllowDirectCounterTakeoutDelivery
         );
 
         return Result.Success(dto);

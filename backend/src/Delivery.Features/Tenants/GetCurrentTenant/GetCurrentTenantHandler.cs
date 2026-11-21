@@ -1,6 +1,7 @@
 using System.Text.Json;
 using Delivery.Core.Common;
 using Delivery.Core.Domain.Common;
+using Delivery.Core.Domain.Policies;
 using Delivery.Core.Domain.ValueObjects;
 using Delivery.Core.Infrastructure.Persistence;
 using Delivery.Features.Common.Handlers;
@@ -30,7 +31,11 @@ public sealed record TenantBranchSummaryDto(
     double Longitude,
     bool IsActive,
     double? DeliveryRadiusKm = null,
-    bool IsCoverageStrict = true
+    bool IsCoverageStrict = true,
+    bool? EnableKitchenWorkflowOverride = null,
+    bool UseKitchenWorkflow = true,
+    bool? AllowDirectCounterTakeoutDeliveryOverride = null,
+    bool AllowDirectCounterTakeoutDelivery = true
 );
 
 public sealed record TenantStorefrontConfigDto(
@@ -65,7 +70,9 @@ public sealed record TenantStorefrontConfigDto(
     List<TenantHeroSlide> HeroSlides,
     List<TenantPromoBanner> PromotionalBanners,
     List<TenantBranchSummaryDto> Branches,
-    bool RequireCoverageValidation = true
+    bool RequireCoverageValidation = true,
+    bool EnableKitchenWorkflow = true,
+    bool AllowDirectCounterTakeoutDelivery = true
 );
 
 public sealed class GetCurrentTenantHandler : IHandler<GetCurrentTenantQuery, Result<TenantStorefrontConfigDto>>
@@ -115,6 +122,9 @@ public sealed class GetCurrentTenantHandler : IHandler<GetCurrentTenantQuery, Re
             .OrderBy(p => p.DisplayOrder)
             .ToList();
 
+        var tenantEnableKitchen = settings?.EnableKitchenWorkflow ?? true;
+        var tenantAllowDirectTakeout = settings?.AllowDirectCounterTakeoutDelivery ?? true;
+
         var branches = tenant.Branches
             .Where(b => b.IsActive)
             .OrderBy(b => b.Id)
@@ -130,7 +140,11 @@ public sealed class GetCurrentTenantHandler : IHandler<GetCurrentTenantQuery, Re
                 b.LocationPoint.X,
                 b.IsActive,
                 b.DeliveryRadiusKm,
-                b.IsCoverageStrict
+                b.IsCoverageStrict,
+                b.EnableKitchenWorkflowOverride,
+                KitchenWorkflowPolicy.ResolveKitchenWorkflow(tenantEnableKitchen, b.EnableKitchenWorkflowOverride),
+                b.AllowDirectCounterTakeoutDeliveryOverride,
+                KitchenWorkflowPolicy.ResolveDirectCounterTakeoutDelivery(tenantAllowDirectTakeout, b.AllowDirectCounterTakeoutDeliveryOverride)
             ))
             .ToList();
 
@@ -174,7 +188,9 @@ public sealed class GetCurrentTenantHandler : IHandler<GetCurrentTenantQuery, Re
             heroSlides,
             promos,
             branches,
-            settings?.RequireCoverageValidation ?? true
+            settings?.RequireCoverageValidation ?? true,
+            tenantEnableKitchen,
+            tenantAllowDirectTakeout
         );
 
         return Result.Success(dto);

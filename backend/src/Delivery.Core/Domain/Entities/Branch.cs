@@ -38,6 +38,19 @@ public class Branch : IMustHaveTenant
     public bool IsCoverageStrict { get; set; } = true;
 
     /// <summary>
+    /// Override por sucursal para el flujo de Cocina (KDS).
+    /// null = heredar configuración de la marca (TenantSetting.EnableKitchenWorkflow);
+    /// true = usar Cocina KDS; false = operar solo desde Mostrador.
+    /// </summary>
+    public bool? EnableKitchenWorkflowOverride { get; set; }
+
+    /// <summary>
+    /// Override por sucursal para entrega directa de pedidos Takeout en modo Solo Mostrador.
+    /// null = heredar configuración de la marca (TenantSetting.AllowDirectCounterTakeoutDelivery).
+    /// </summary>
+    public bool? AllowDirectCounterTakeoutDeliveryOverride { get; set; }
+
+    /// <summary>
     /// Capacidad operativa máxima de pedidos admitidos por ventana de 20 minutos (throttling).
     /// </summary>
     public int MaxOrdersPerSlot { get; set; } = 15;

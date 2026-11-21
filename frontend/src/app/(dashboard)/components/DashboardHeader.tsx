@@ -25,6 +25,7 @@ interface DashboardHeaderProps {
   canManageFranchise: boolean;
   isTenantAdmin?: boolean;
   isSuperAdmin: boolean;
+  useKitchenWorkflow?: boolean;
   onOpenMobileMenu: () => void;
   isHeaderVisible?: boolean;
   isScrolled?: boolean;
@@ -38,12 +39,19 @@ export function DashboardHeader({
   canManageFranchise,
   isTenantAdmin = false,
   isSuperAdmin,
+  useKitchenWorkflow = true,
   onOpenMobileMenu,
   isHeaderVisible = true,
   isScrolled = false,
 }: DashboardHeaderProps) {
-  const isKitchenActive =
-    pathname.endsWith("/cocina") || pathname.endsWith("/kitchen");
+  const operationsHref = useKitchenWorkflow
+    ? routes.getKitchenHref()
+    : routes.getMostradorHref();
+  const isOperationsActive =
+    pathname.endsWith("/cocina") ||
+    pathname.endsWith("/kitchen") ||
+    pathname.endsWith("/mostrador") ||
+    pathname.endsWith("/despacho");
   const isInventoryActive =
     pathname.includes("/admin/inventario") ||
     pathname.includes("/admin/inventory");
@@ -62,21 +70,21 @@ export function DashboardHeader({
       brand={{
         name: brandName,
         logo: brandLogo,
-        href: routes.getKitchenHref(),
-        subtitle: "Operaciones & Cocina",
+        href: operationsHref,
+        subtitle: useKitchenWorkflow ? "Operaciones & Cocina" : "Operaciones & Mostrador",
       }}
       navigation={
         <>
           <Link
-            href={routes.getKitchenHref()}
+            href={operationsHref}
             className={`px-3.5 py-1.5 rounded-full transition-colors flex items-center gap-1.5 ${
-              isKitchenActive
+              isOperationsActive
                 ? "bg-brand-primary text-white shadow-xs"
                 : "text-text-muted hover:text-text-strong hover:bg-surface-card-hover"
             }`}
           >
             <Utensils className="w-3.5 h-3.5 text-brand-primary group-hover:text-white" />
-            <span>Cocina KDS</span>
+            <span>{useKitchenWorkflow ? "Cocina KDS" : "Mostrador"}</span>
           </Link>
 
           {canManageFranchise && (

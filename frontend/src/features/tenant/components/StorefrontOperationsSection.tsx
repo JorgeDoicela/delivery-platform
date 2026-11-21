@@ -104,6 +104,55 @@ export function StorefrontOperationsSection({
             </div>
           </label>
         </div>
+
+        <div className="pt-3 border-t border-surface-border space-y-3">
+          <span className="block text-[11px] font-bold uppercase tracking-wider text-text-muted">
+            Flujo Operativo de Cocina (KDS) y Mostrador
+          </span>
+
+          <label className="flex items-start gap-2.5 cursor-pointer text-text-strong">
+            <input
+              type="checkbox"
+              checked={formState.enableKitchenWorkflow ?? true}
+              onChange={(e) =>
+                onFieldChange("enableKitchenWorkflow", e.target.checked)
+              }
+              className="rounded border-surface-border mt-0.5"
+            />
+            <div className="space-y-0.5">
+              <span className="font-semibold block">
+                Usar pantalla y rol de Cocina (KDS)
+              </span>
+              <p className="text-[11px] text-text-muted leading-tight">
+                Activado: los pedidos pasan por Confirmado &rarr; En Cocina &rarr; Listo. Desactivado: flujo directo en Mostrador sin etapa intermedia de cocina (cada sucursal puede sobrescribir esta regla en /admin/sucursales).
+              </p>
+            </div>
+          </label>
+
+          {!(formState.enableKitchenWorkflow ?? true) && (
+            <label className="flex items-start gap-2.5 cursor-pointer text-text-strong pl-4 border-l-2 border-brand-primary/30">
+              <input
+                type="checkbox"
+                checked={formState.allowDirectCounterTakeoutDelivery ?? true}
+                onChange={(e) =>
+                  onFieldChange(
+                    "allowDirectCounterTakeoutDelivery",
+                    e.target.checked
+                  )
+                }
+                className="rounded border-surface-border mt-0.5"
+              />
+              <div className="space-y-0.5">
+                <span className="font-semibold block">
+                  Permitir entrega directa en mostrador (Takeout)
+                </span>
+                <p className="text-[11px] text-text-muted leading-tight">
+                  Si está activo, el cajero puede entregar pedidos para llevar en un clic o marcarlos como listos. Si se desactiva, siempre deberá marcar Listo en Mostrador antes de entregar.
+                </p>
+              </div>
+            </label>
+          )}
+        </div>
       </div>
 
       <div className="bg-surface-card border border-surface-border rounded-3xl p-6 space-y-4 shadow-xs transition-colors duration-200">

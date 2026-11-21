@@ -34,7 +34,7 @@ function normalizeAuthUser(user: AuthUser): AuthUser {
   if (user.tenantSlug && typeof window !== "undefined") {
     const isPlatform = isPlatformHost(window.location.hostname);
     const isOperationalPath =
-      /^\/([a-z0-9_-]+\/)?(cocina|kitchen|admin|repartidor|active-delivery)(\/|$)/i.test(
+      /^\/([a-z0-9_-]+\/)?(cocina|kitchen|mostrador|despacho|admin|repartidor|active-delivery)(\/|$)/i.test(
         window.location.pathname
       );
 

@@ -78,6 +78,7 @@ export function LoginForm({
         user: loggedUser,
         redirectUrl,
         routing,
+        useKitchenWorkflow: tenant?.enableKitchenWorkflow,
       });
 
       if (

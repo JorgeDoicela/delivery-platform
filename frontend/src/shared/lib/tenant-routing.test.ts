@@ -27,6 +27,9 @@ describe("resolveTenantRouting", () => {
       expect(routes.getSucursalesHref()).toBe("/la-granjita/sucursales");
       expect(routes.getSucursalesHref(2)).toBe("/la-granjita/sucursal/2");
       expect(routes.getKitchenHref()).toBe("/la-granjita/cocina");
+      expect(routes.getMostradorHref()).toBe("/la-granjita/mostrador");
+      expect(routes.getOperationsHref(true)).toBe("/la-granjita/cocina");
+      expect(routes.getOperationsHref(false)).toBe("/la-granjita/mostrador");
       expect(routes.getDriverHref()).toBe("/la-granjita/repartidor");
       expect(routes.getAdminHref("personalizacion")).toBe("/la-granjita/admin/personalizacion");
       expect(routes.getAdminHref("inventario")).toBe("/la-granjita/admin/inventario");
@@ -100,6 +103,9 @@ describe("resolveTenantRouting", () => {
       expect(routes.getSucursalesHref()).toBe("/sucursales");
       expect(routes.getSucursalesHref(1)).toBe("/sucursal/1");
       expect(routes.getKitchenHref()).toBe("/cocina");
+      expect(routes.getMostradorHref()).toBe("/mostrador");
+      expect(routes.getOperationsHref(true)).toBe("/cocina");
+      expect(routes.getOperationsHref(false)).toBe("/mostrador");
       expect(routes.getDriverHref()).toBe("/repartidor");
       expect(routes.getAdminHref("personalizacion")).toBe("/admin/personalizacion");
     });

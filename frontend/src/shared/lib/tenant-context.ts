@@ -102,6 +102,8 @@ export const RESERVED_TENANT_SLUGS = new Set([
   "finalizar-pedido",
   "cocina",
   "kitchen",
+  "mostrador",
+  "despacho",
   "repartidor",
   "active-delivery",
   "pedidos",

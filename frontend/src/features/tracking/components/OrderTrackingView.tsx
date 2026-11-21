@@ -197,7 +197,11 @@ export function OrderTrackingView({ orderId }: OrderTrackingViewProps) {
             </div>
 
             {/* Stepper de Progreso */}
-            <StatusTimeline status={order.status as OrderStatus} />
+            <StatusTimeline
+              status={order.status as OrderStatus}
+              useKitchenWorkflow={order.useKitchenWorkflow ?? true}
+              deliveryType={order.deliveryType}
+            />
 
             {/* Banner Descriptivo en Vivo según la Etapa del Despacho */}
             {statusDescriptions[order.status as OrderStatus] && (

@@ -20,6 +20,8 @@ export function isOperationalPath(pathname: string): boolean {
     "admin",
     "cocina",
     "kitchen",
+    "mostrador",
+    "despacho",
     "repartidor",
     "superadmin",
     "active-delivery",
@@ -79,8 +81,9 @@ export function resolvePostLoginRedirect(params: {
   user: AuthenticatedUserLike | null | undefined;
   redirectUrl?: string | null;
   routing: TenantRoutingResolution;
+  useKitchenWorkflow?: boolean;
 }): string {
-  const { user, redirectUrl, routing } = params;
+  const { user, redirectUrl, routing, useKitchenWorkflow } = params;
 
   const isSuperAdmin = isUserInRole(user, UserRole.SuperAdmin);
   const isTenantAdmin = isUserInRole(user, UserRole.TenantAdmin);
@@ -122,8 +125,8 @@ export function resolvePostLoginRedirect(params: {
     return routing.getAdminHref("inventario");
   }
 
-  // 4. KitchenStaff / Cashier
-  if (isKitchenStaff || isCashier) {
+  // 4. KitchenStaff
+  if (isKitchenStaff) {
     if (
       redirectUrl &&
       (redirectUrl.includes("/cocina") || redirectUrl.includes("/kitchen"))
@@ -131,6 +134,26 @@ export function resolvePostLoginRedirect(params: {
       return redirectUrl;
     }
     return routing.getKitchenHref();
+  }
+
+  // 4b. Cashier (se adapta si la marca opera con Cocina KDS o Solo Mostrador)
+  if (isCashier) {
+    const isKitchenActive = useKitchenWorkflow ?? true;
+    if (redirectUrl) {
+      if (
+        isKitchenActive &&
+        (redirectUrl.includes("/cocina") || redirectUrl.includes("/kitchen"))
+      ) {
+        return redirectUrl;
+      }
+      if (
+        !isKitchenActive &&
+        (redirectUrl.includes("/mostrador") || redirectUrl.includes("/despacho"))
+      ) {
+        return redirectUrl;
+      }
+    }
+    return isKitchenActive ? routing.getKitchenHref() : routing.getMostradorHref();
   }
 
   // 5. Driver

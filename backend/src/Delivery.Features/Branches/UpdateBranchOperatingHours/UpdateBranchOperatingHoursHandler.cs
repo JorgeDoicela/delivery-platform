@@ -1,4 +1,5 @@
 using Delivery.Core.Common;
+using Delivery.Core.Domain.Policies;
 using Delivery.Core.Infrastructure.Persistence;
 using Delivery.Features.Common.Handlers;
 using FluentValidation;
@@ -67,7 +68,42 @@ public sealed class UpdateBranchOperatingHoursHandler : IHandler<UpdateBranchOpe
             branch.IsCoverageStrict = command.IsCoverageStrict.Value;
         }
 
+        if (command.ApplyWorkflowOverrides)
+        {
+            branch.EnableKitchenWorkflowOverride = command.EnableKitchenWorkflowOverride;
+            branch.AllowDirectCounterTakeoutDeliveryOverride = command.AllowDirectCounterTakeoutDeliveryOverride;
+        }
+        else
+        {
+            if (command.EnableKitchenWorkflowOverride.HasValue)
+            {
+                branch.EnableKitchenWorkflowOverride = command.EnableKitchenWorkflowOverride;
+            }
+            if (command.AllowDirectCounterTakeoutDeliveryOverride.HasValue)
+            {
+                branch.AllowDirectCounterTakeoutDeliveryOverride = command.AllowDirectCounterTakeoutDeliveryOverride;
+            }
+        }
+
         await _context.SaveChangesAsync(cancellationToken);
+
+        var tenantWorkflow = branch.TenantId != Guid.Empty
+            ? await _context.TenantSettings
+                .IgnoreQueryFilters()
+                .AsNoTracking()
+                .Where(ts => ts.TenantId == branch.TenantId)
+                .Select(ts => new { ts.EnableKitchenWorkflow, ts.AllowDirectCounterTakeoutDelivery })
+                .FirstOrDefaultAsync(cancellationToken)
+            : null;
+
+        var useKitchenWorkflow = KitchenWorkflowPolicy.ResolveKitchenWorkflow(
+            tenantWorkflow?.EnableKitchenWorkflow ?? true,
+            branch.EnableKitchenWorkflowOverride
+        );
+        var allowDirectTakeout = KitchenWorkflowPolicy.ResolveDirectCounterTakeoutDelivery(
+            tenantWorkflow?.AllowDirectCounterTakeoutDelivery ?? true,
+            branch.AllowDirectCounterTakeoutDeliveryOverride
+        );
 
         return Result.Success(new UpdateBranchOperatingHoursResponse(
             branch.Id,
@@ -76,7 +112,11 @@ public sealed class UpdateBranchOperatingHoursHandler : IHandler<UpdateBranchOpe
             branch.ClosingTime,
             branch.IsActive,
             branch.DeliveryRadiusKm,
-            branch.IsCoverageStrict
+            branch.IsCoverageStrict,
+            branch.EnableKitchenWorkflowOverride,
+            useKitchenWorkflow,
+            branch.AllowDirectCounterTakeoutDeliveryOverride,
+            allowDirectTakeout
         ));
     }
 }

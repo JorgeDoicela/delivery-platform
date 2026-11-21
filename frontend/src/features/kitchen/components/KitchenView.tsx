@@ -1,6 +1,7 @@
 "use client";
 
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
+import { usePathname, useRouter } from "next/navigation";
 import { useKitchenOrders } from "../hooks/useKitchenOrders";
 import { KitchenTicketCard } from "./KitchenTicketCard";
 import { OrderStatus } from "@/shared/types/api";
@@ -9,9 +10,13 @@ import { kitchenAlertSound } from "../lib/sound";
 import { Select, type SelectOption } from "@/shared/components/Select";
 import { useBranchesQuery, useCurrentTenantQuery } from "@/features/tenant";
 import { useAuthStore, UserRole } from "@/features/auth";
+import { useTenantRoutes } from "@/shared/lib/tenant-routing";
 
 export function KitchenView() {
+  const pathname = usePathname();
+  const router = useRouter();
   const { data: tenant } = useCurrentTenantQuery();
+  const routes = useTenantRoutes(tenant?.slug);
   const { data: branchesData } = useBranchesQuery();
   const rawBranchId = useAuthStore((s) => s.user?.branchId);
   const userBranchId = useMemo(() => {
@@ -55,6 +60,16 @@ export function KitchenView() {
         : selectedBranchId;
 
   const activeBranch = branches.find((b) => b.id === branchId);
+  const useKitchenWorkflow =
+    activeBranch?.useKitchenWorkflow ?? tenant?.enableKitchenWorkflow ?? true;
+  const allowDirectCounterTakeoutDelivery =
+    activeBranch?.allowDirectCounterTakeoutDelivery ??
+    tenant?.allowDirectCounterTakeoutDelivery ??
+    true;
+  const isKitchenOnlyRole =
+    user?.role === "KitchenStaff" ||
+    user?.role === UserRole.KitchenStaff ||
+    Number(user?.role) === 5;
 
   const { orders, error, connectionStatus, advanceOrderStatus, approveTransfer } =
     useKitchenOrders(branchId);
@@ -63,8 +78,26 @@ export function KitchenView() {
   const confirmedOrders = orders.filter((o) => o.status === OrderStatus.Confirmed);
   const inKitchenOrders = orders.filter((o) => o.status === OrderStatus.InKitchen);
   const readyOrders = orders.filter((o) => o.status === OrderStatus.ReadyForDelivery);
+  const showInKitchenColumn = useKitchenWorkflow || inKitchenOrders.length > 0;
 
   const [mobileColumn, setMobileColumn] = useState<"pending" | "confirmed" | "inkitchen" | "ready">("confirmed");
+  const effectiveMobileColumn =
+    !showInKitchenColumn && mobileColumn === "inkitchen" ? "confirmed" : mobileColumn;
+
+  // Sincronización semántica de la URL:
+  // Si la sucursal opera en modo Solo Mostrador y la URL contiene /cocina, redirige a /mostrador.
+  // Si la sucursal opera con Cocina (KDS) y la URL contiene /mostrador, redirige a /cocina.
+  useEffect(() => {
+    if (!pathname || !tenant) return;
+    const isCocinaRoute = pathname.endsWith("/cocina") || pathname.endsWith("/kitchen");
+    const isMostradorRoute = pathname.endsWith("/mostrador") || pathname.endsWith("/despacho");
+
+    if (!useKitchenWorkflow && isCocinaRoute) {
+      router.replace(routes.getMostradorHref());
+    } else if (useKitchenWorkflow && isMostradorRoute) {
+      router.replace(routes.getKitchenHref());
+    }
+  }, [useKitchenWorkflow, pathname, router, routes, tenant]);
 
   return (
     <div className="space-y-4">
@@ -72,10 +105,12 @@ export function KitchenView() {
         <div className="flex items-center gap-3">
           <div>
             <h1 className="text-2xl sm:text-3xl font-black uppercase tracking-wide text-text-strong font-display">
-              Pantalla de Cocina (KDS) • {tenant?.name}
+              {useKitchenWorkflow ? "Pantalla de Cocina (KDS)" : "Despacho de Mostrador"} • {tenant?.name}
             </h1>
             <p className="text-xs text-text-muted mt-0.5">
-              Despacho en secuencia FIFO y actualización en tiempo real por sucursal
+              {useKitchenWorkflow
+                ? "Despacho en secuencia FIFO y actualización en tiempo real por sucursal"
+                : "Flujo directo de mostrador sin pantalla intermedia de cocina (FIFO en tiempo real)"}
             </p>
           </div>
         </div>
@@ -133,7 +168,9 @@ export function KitchenView() {
             />
             <span>
               {connectionStatus === "connected"
-                ? "En Vivo • KDS"
+                ? useKitchenWorkflow
+                  ? "En Vivo • KDS"
+                  : "En Vivo • Mostrador"
                 : connectionStatus === "connecting"
                 ? "Reconectando..."
                 : "Sin Conexión"}
@@ -141,6 +178,15 @@ export function KitchenView() {
           </div>
         </div>
       </div>
+
+      {!useKitchenWorkflow && isKitchenOnlyRole && (
+        <div className="p-4 rounded-2xl bg-status-info/10 border border-status-info/30 text-text-strong text-xs leading-relaxed">
+          <strong className="font-bold uppercase tracking-wider font-display text-status-info block mb-0.5">
+            Modo Solo Mostrador Activo
+          </strong>
+          Esta sucursal opera actualmente sin etapa intermedia de cocina. Los pedidos pasan directamente de Confirmado a Listo/Entrega desde mostrador.
+        </div>
+      )}
 
       {error && (
         <div className="p-4 rounded-2xl bg-status-danger/15 border border-status-danger/30 text-status-danger text-xs font-semibold">
@@ -181,37 +227,39 @@ export function KitchenView() {
           type="button"
           onClick={() => setMobileColumn("confirmed")}
           className={`flex-1 py-2 px-2 rounded-xl text-[11px] font-black uppercase font-display tracking-wide transition-all flex items-center justify-center gap-1.5 ${
-            mobileColumn === "confirmed"
+            effectiveMobileColumn === "confirmed"
               ? "bg-status-warning text-neutral-950 shadow-sm"
               : "text-text-muted hover:text-text-strong"
           }`}
         >
-          <span>Espera</span>
+          <span>{useKitchenWorkflow ? "Espera" : "Recibidos"}</span>
           <span className="font-mono text-[10px] font-bold bg-black/15 px-1.5 py-0.2 rounded-full">
             {confirmedOrders.length}
           </span>
         </button>
 
-        <button
-          type="button"
-          onClick={() => setMobileColumn("inkitchen")}
-          className={`flex-1 py-2 px-2 rounded-xl text-[11px] font-black uppercase font-display tracking-wide transition-all flex items-center justify-center gap-1.5 ${
-            mobileColumn === "inkitchen"
-              ? "bg-status-info text-white shadow-sm"
-              : "text-text-muted hover:text-text-strong"
-          }`}
-        >
-          <span>Horno</span>
-          <span className="font-mono text-[10px] font-bold bg-white/20 px-1.5 py-0.2 rounded-full">
-            {inKitchenOrders.length}
-          </span>
-        </button>
+        {showInKitchenColumn && (
+          <button
+            type="button"
+            onClick={() => setMobileColumn("inkitchen")}
+            className={`flex-1 py-2 px-2 rounded-xl text-[11px] font-black uppercase font-display tracking-wide transition-all flex items-center justify-center gap-1.5 ${
+              effectiveMobileColumn === "inkitchen"
+                ? "bg-status-info text-white shadow-sm"
+                : "text-text-muted hover:text-text-strong"
+            }`}
+          >
+            <span>Horno</span>
+            <span className="font-mono text-[10px] font-bold bg-white/20 px-1.5 py-0.2 rounded-full">
+              {inKitchenOrders.length}
+            </span>
+          </button>
+        )}
 
         <button
           type="button"
           onClick={() => setMobileColumn("ready")}
           className={`flex-1 py-2 px-2 rounded-xl text-[11px] font-black uppercase font-display tracking-wide transition-all flex items-center justify-center gap-1.5 ${
-            mobileColumn === "ready"
+            effectiveMobileColumn === "ready"
               ? "bg-status-success text-white shadow-sm"
               : "text-text-muted hover:text-text-strong"
           }`}
@@ -223,15 +271,21 @@ export function KitchenView() {
         </button>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4 min-h-[calc(100vh-180px)]">
-        {/* Columna 1: En Espera */}
+      <div
+        className={`grid grid-cols-1 ${
+          showInKitchenColumn ? "md:grid-cols-3" : "md:grid-cols-2"
+        } gap-4 min-h-[calc(100vh-180px)]`}
+      >
+        {/* Columna 1: En Espera / Recibidos */}
         <div
           className={`bg-surface-card rounded-2xl border border-surface-border p-4 flex flex-col shadow-xs transition-colors duration-200 ${
-            mobileColumn === "confirmed" ? "flex" : "hidden md:flex"
+            effectiveMobileColumn === "confirmed" ? "flex" : "hidden md:flex"
           }`}
         >
           <div className="flex items-center justify-between pb-3 border-b border-surface-border text-xs font-black uppercase tracking-wider font-display text-status-warning">
-            <span>EN ESPERA (CONFIRMADOS)</span>
+            <span>
+              {useKitchenWorkflow ? "EN ESPERA (CONFIRMADOS)" : "PEDIDOS RECIBIDOS (MOSTRADOR)"}
+            </span>
             <span className="bg-status-warning/20 text-status-warning px-2.5 py-0.5 rounded-full border border-status-warning/40 font-mono font-bold">
               {confirmedOrders.length}
             </span>
@@ -249,47 +303,53 @@ export function KitchenView() {
                   order={order}
                   onAdvance={advanceOrderStatus}
                   onApproveTransfer={approveTransfer}
+                  useKitchenWorkflow={useKitchenWorkflow}
+                  allowDirectCounterTakeoutDelivery={allowDirectCounterTakeoutDelivery}
                 />
               ))
             )}
           </div>
         </div>
 
-        {/* Columna 2: En Preparación */}
-        <div
-          className={`bg-surface-card rounded-2xl border border-surface-border p-4 flex flex-col shadow-xs transition-colors duration-200 ${
-            mobileColumn === "inkitchen" ? "flex" : "hidden md:flex"
-          }`}
-        >
-          <div className="flex items-center justify-between pb-3 border-b border-surface-border text-xs font-black uppercase tracking-wider font-display text-status-info">
-            <span>EN PREPARACIÓN (HORNO)</span>
-            <span className="bg-status-info/20 text-status-info px-2.5 py-0.5 rounded-full border border-status-info/40 font-mono font-bold">
-              {inKitchenOrders.length}
-            </span>
-          </div>
+        {/* Columna 2: En Preparación (Solo si Cocina KDS activa o hay comandas en curso) */}
+        {showInKitchenColumn && (
+          <div
+            className={`bg-surface-card rounded-2xl border border-surface-border p-4 flex flex-col shadow-xs transition-colors duration-200 ${
+              effectiveMobileColumn === "inkitchen" ? "flex" : "hidden md:flex"
+            }`}
+          >
+            <div className="flex items-center justify-between pb-3 border-b border-surface-border text-xs font-black uppercase tracking-wider font-display text-status-info">
+              <span>EN PREPARACIÓN (HORNO)</span>
+              <span className="bg-status-info/20 text-status-info px-2.5 py-0.5 rounded-full border border-status-info/40 font-mono font-bold">
+                {inKitchenOrders.length}
+              </span>
+            </div>
 
-          <div className="flex-1 mt-3 space-y-3 overflow-y-auto max-h-[calc(100vh-250px)] md:max-h-[calc(100vh-220px)] pr-1">
-            {inKitchenOrders.length === 0 ? (
-              <div className="h-40 flex items-center justify-center text-xs text-text-muted font-medium border border-dashed border-surface-border rounded-xl bg-surface-canvas">
-                Sin pedidos en preparación
-              </div>
-            ) : (
-              inKitchenOrders.map((order) => (
-                <KitchenTicketCard
-                  key={order.orderId}
-                  order={order}
-                  onAdvance={advanceOrderStatus}
-                  onApproveTransfer={approveTransfer}
-                />
-              ))
-            )}
+            <div className="flex-1 mt-3 space-y-3 overflow-y-auto max-h-[calc(100vh-250px)] md:max-h-[calc(100vh-220px)] pr-1">
+              {inKitchenOrders.length === 0 ? (
+                <div className="h-40 flex items-center justify-center text-xs text-text-muted font-medium border border-dashed border-surface-border rounded-xl bg-surface-canvas">
+                  Sin pedidos en preparación
+                </div>
+              ) : (
+                inKitchenOrders.map((order) => (
+                  <KitchenTicketCard
+                    key={order.orderId}
+                    order={order}
+                    onAdvance={advanceOrderStatus}
+                    onApproveTransfer={approveTransfer}
+                    useKitchenWorkflow={useKitchenWorkflow}
+                    allowDirectCounterTakeoutDelivery={allowDirectCounterTakeoutDelivery}
+                  />
+                ))
+              )}
+            </div>
           </div>
-        </div>
+        )}
 
         {/* Columna 3: Listos para Despacho */}
         <div
           className={`bg-surface-card rounded-2xl border border-surface-border p-4 flex flex-col shadow-xs transition-colors duration-200 ${
-            mobileColumn === "ready" ? "flex" : "hidden md:flex"
+            effectiveMobileColumn === "ready" ? "flex" : "hidden md:flex"
           }`}
         >
           <div className="flex items-center justify-between pb-3 border-b border-surface-border text-xs font-black uppercase tracking-wider font-display text-status-success">
@@ -311,6 +371,8 @@ export function KitchenView() {
                   order={order}
                   onAdvance={advanceOrderStatus}
                   onApproveTransfer={approveTransfer}
+                  useKitchenWorkflow={useKitchenWorkflow}
+                  allowDirectCounterTakeoutDelivery={allowDirectCounterTakeoutDelivery}
                 />
               ))
             )}

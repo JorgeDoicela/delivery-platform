@@ -140,6 +140,7 @@ export interface OrderDetailResponse {
   createdAt: string;
   updatedAt?: string;
   items: OrderDetailItemDto[];
+  useKitchenWorkflow?: boolean;
 }
 
 export enum OrderStatus {

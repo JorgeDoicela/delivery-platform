@@ -3,6 +3,7 @@ using Delivery.Core.Contracts.Emails;
 using Delivery.Core.Contracts.Emails.Models;
 using Delivery.Core.Contracts.Realtime;
 using Delivery.Core.Domain.Enums;
+using Delivery.Core.Domain.Policies;
 using Delivery.Core.Infrastructure.Persistence;
 using Delivery.Features.Common.Handlers;
 using FluentValidation;
@@ -96,7 +97,32 @@ public sealed class UpdateOrderStatusHandler : IHandler<UpdateOrderStatusCommand
 
         var previousStatus = order.Status;
 
-        // Validación estricta de la máquina de estados según README Sección 3
+        var branchWorkflow = await _context.Branches
+            .IgnoreQueryFilters()
+            .AsNoTracking()
+            .Where(b => b.Id == order.BranchId)
+            .Select(b => new { b.EnableKitchenWorkflowOverride, b.AllowDirectCounterTakeoutDeliveryOverride })
+            .FirstOrDefaultAsync(cancellationToken);
+
+        var tenantWorkflow = order.TenantId != Guid.Empty
+            ? await _context.TenantSettings
+                .IgnoreQueryFilters()
+                .AsNoTracking()
+                .Where(ts => ts.TenantId == order.TenantId)
+                .Select(ts => new { ts.EnableKitchenWorkflow, ts.AllowDirectCounterTakeoutDelivery })
+                .FirstOrDefaultAsync(cancellationToken)
+            : null;
+
+        var useKitchenWorkflow = KitchenWorkflowPolicy.ResolveKitchenWorkflow(
+            tenantWorkflow?.EnableKitchenWorkflow ?? true,
+            branchWorkflow?.EnableKitchenWorkflowOverride
+        );
+        var allowDirectCounterTakeout = KitchenWorkflowPolicy.ResolveDirectCounterTakeoutDelivery(
+            tenantWorkflow?.AllowDirectCounterTakeoutDelivery ?? true,
+            branchWorkflow?.AllowDirectCounterTakeoutDeliveryOverride
+        );
+
+        // Validación estricta de la máquina de estados adaptada al modo operativo (KDS vs Solo Mostrador)
         var isValid = (previousStatus, command.NewStatus) switch
         {
             (OrderStatus.Created, OrderStatus.Confirmed) => true,
@@ -106,7 +132,9 @@ public sealed class UpdateOrderStatusHandler : IHandler<UpdateOrderStatusCommand
             (OrderStatus.PendingValidation, OrderStatus.Confirmed) => true,
             (OrderStatus.PendingValidation, OrderStatus.Cancelled) => true,
 
-            (OrderStatus.Confirmed, OrderStatus.InKitchen) => true,
+            (OrderStatus.Confirmed, OrderStatus.InKitchen) => useKitchenWorkflow,
+            (OrderStatus.Confirmed, OrderStatus.ReadyForDelivery) => !useKitchenWorkflow,
+            (OrderStatus.Confirmed, OrderStatus.Delivered) => !useKitchenWorkflow && allowDirectCounterTakeout && order.DeliveryType == DeliveryType.Takeout,
             (OrderStatus.Confirmed, OrderStatus.Cancelled) => true,
 
             (OrderStatus.InKitchen, OrderStatus.ReadyForDelivery) => true,

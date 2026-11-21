@@ -1,5 +1,6 @@
 using Delivery.Core.Common;
 using Delivery.Core.Domain.Enums;
+using Delivery.Core.Domain.Policies;
 using Delivery.Core.Infrastructure.Persistence;
 using Delivery.Features.Common.Handlers;
 using FluentValidation;
@@ -68,7 +69,8 @@ public sealed record OrderDetailResponse(
     string? TransferReceiptUrl,
     DateTime CreatedAt,
     DateTime? UpdatedAt,
-    List<OrderDetailItemDto> Items
+    List<OrderDetailItemDto> Items,
+    bool UseKitchenWorkflow = true
 );
 
 public static class GetOrderByIdErrors
@@ -113,6 +115,7 @@ public sealed class GetOrderByIdHandler : IHandler<GetOrderByIdQuery, Result<Ord
             .IgnoreQueryFilters()
             .AsNoTracking()
             .Include(o => o.Tenant)
+                .ThenInclude(t => t.Settings)
             .Include(o => o.Branch)
             .Include(o => o.Items)
                 .ThenInclude(i => i.Modifiers)
@@ -200,6 +203,11 @@ public sealed class GetOrderByIdHandler : IHandler<GetOrderByIdQuery, Result<Ord
             );
         }).ToList();
 
+        var useKitchenWorkflow = KitchenWorkflowPolicy.ResolveKitchenWorkflow(
+            order.Tenant?.Settings?.EnableKitchenWorkflow ?? true,
+            order.Branch?.EnableKitchenWorkflowOverride
+        );
+
         var response = new OrderDetailResponse(
             order.Id,
             order.OrderNumber,
@@ -229,7 +237,8 @@ public sealed class GetOrderByIdHandler : IHandler<GetOrderByIdQuery, Result<Ord
             order.TransferReceiptUrl,
             order.CreatedAt,
             order.UpdatedAt,
-            itemDtos
+            itemDtos,
+            useKitchenWorkflow
         );
 
         return Result.Success(response);

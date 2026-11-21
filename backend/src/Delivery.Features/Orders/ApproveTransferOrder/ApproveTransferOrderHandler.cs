@@ -1,6 +1,7 @@
 using Delivery.Core.Common;
 using Delivery.Core.Contracts.Realtime;
 using Delivery.Core.Domain.Enums;
+using Delivery.Core.Domain.Policies;
 using Delivery.Core.Infrastructure.Persistence;
 using Delivery.Features.Common.Handlers;
 using FluentValidation;
@@ -81,13 +82,34 @@ public sealed class ApproveTransferOrderHandler : IHandler<ApproveTransferComman
             return Result.Failure<ApproveTransferResponse>(ApproveTransferErrors.NotPendingValidation);
         }
 
+        var branchOverride = await _context.Branches
+            .IgnoreQueryFilters()
+            .AsNoTracking()
+            .Where(b => b.Id == order.BranchId)
+            .Select(b => b.EnableKitchenWorkflowOverride)
+            .FirstOrDefaultAsync(cancellationToken);
+
+        var tenantDefault = order.TenantId != Guid.Empty
+            ? await _context.TenantSettings
+                .IgnoreQueryFilters()
+                .AsNoTracking()
+                .Where(ts => ts.TenantId == order.TenantId)
+                .Select(ts => (bool?)ts.EnableKitchenWorkflow)
+                .FirstOrDefaultAsync(cancellationToken)
+            : null;
+
+        var useKitchenWorkflow = KitchenWorkflowPolicy.ResolveKitchenWorkflow(
+            tenantDefault ?? true,
+            branchOverride
+        );
+
         if (command.IsApproved)
         {
             order.Status = OrderStatus.Confirmed;
             order.UpdatedAt = DateTime.UtcNow;
             await _context.SaveChangesAsync(cancellationToken);
 
-            // Notificar a las pantallas KDS de cocina que la orden fue confirmada
+            // Notificar a las pantallas operativas (KDS o Mostrador) que la orden fue confirmada
             await _kitchenNotifier.NotifyOrderStatusChangedAsync(order.Id, OrderStatus.Confirmed, cancellationToken);
             if (_trackingNotifier != null)
             {
@@ -101,7 +123,9 @@ public sealed class ApproveTransferOrderHandler : IHandler<ApproveTransferComman
             return Result.Success(new ApproveTransferResponse(
                 order.Id,
                 order.Status,
-                "Comprobante de transferencia aprobado. Orden enviada a cocina."
+                useKitchenWorkflow
+                    ? "Comprobante de transferencia aprobado. Orden enviada a cocina."
+                    : "Comprobante de transferencia aprobado. Orden confirmada en mostrador."
             ));
         }
         else

@@ -31,6 +31,8 @@ export interface TenantRoutingResolution {
   getRastreoHref: (orderId?: string) => string;
   getSucursalesHref: (branchId?: number | string | null) => string;
   getKitchenHref: () => string;
+  getMostradorHref: () => string;
+  getOperationsHref: (useKitchen?: boolean) => string;
   getDriverHref: () => string;
   getAdminHref: (section?: "personalizacion" | "inventario" | "sucursales" | "tenants" | "inventory" | "branches") => string;
   getSuperAdminHref: () => string;
@@ -183,6 +185,14 @@ export function resolveTenantRouting(
     return basePath ? `${basePath}/cocina` : "/cocina";
   };
 
+  const getMostradorHref = (): string => {
+    return basePath ? `${basePath}/mostrador` : "/mostrador";
+  };
+
+  const getOperationsHref = (useKitchen?: boolean): string => {
+    return useKitchen === false ? getMostradorHref() : getKitchenHref();
+  };
+
   const getDriverHref = (): string => {
     return basePath ? `${basePath}/repartidor` : "/repartidor";
   };
@@ -226,6 +236,8 @@ export function resolveTenantRouting(
     getRastreoHref,
     getSucursalesHref,
     getKitchenHref,
+    getMostradorHref,
+    getOperationsHref,
     getDriverHref,
     getAdminHref,
     getSuperAdminHref,

@@ -17,6 +17,10 @@ describe("redirectByRole", () => {
     it("identifies operational paths correctly", () => {
       expect(isOperationalPath("/cocina")).toBe(true);
       expect(isOperationalPath("/la-granjita/cocina")).toBe(true);
+      expect(isOperationalPath("/mostrador")).toBe(true);
+      expect(isOperationalPath("/la-granjita/mostrador")).toBe(true);
+      expect(isOperationalPath("/despacho")).toBe(true);
+      expect(isOperationalPath("/la-granjita/despacho")).toBe(true);
       expect(isOperationalPath("/admin/inventario")).toBe(true);
       expect(isOperationalPath("/la-granjita/admin/personalizacion")).toBe(true);
       expect(isOperationalPath("/repartidor")).toBe(true);
@@ -75,7 +79,7 @@ describe("redirectByRole", () => {
       ).toBe("/la-granjita/checkout");
     });
 
-    it("redirects KitchenStaff and Cashier to kitchen", () => {
+    it("redirects KitchenStaff and Cashier to kitchen when kitchen workflow is enabled", () => {
       const kitchenStaff = { role: UserRole.KitchenStaff };
       const cashier = { role: UserRole.Cashier };
 
@@ -85,6 +89,25 @@ describe("redirectByRole", () => {
       expect(resolvePostLoginRedirect({ user: cashier, routing })).toBe(
         routing.getKitchenHref()
       );
+      expect(
+        resolvePostLoginRedirect({
+          user: cashier,
+          routing,
+          useKitchenWorkflow: true,
+        })
+      ).toBe(routing.getKitchenHref());
+    });
+
+    it("redirects Cashier to mostrador when kitchen workflow is disabled", () => {
+      const cashier = { role: UserRole.Cashier };
+
+      expect(
+        resolvePostLoginRedirect({
+          user: cashier,
+          routing,
+          useKitchenWorkflow: false,
+        })
+      ).toBe(routing.getMostradorHref());
     });
 
     it("redirects Driver to driver console", () => {

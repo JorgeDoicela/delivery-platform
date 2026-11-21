@@ -152,6 +152,16 @@ public static partial class DatabaseSeeder
                     secondarySettings.RequireDataProtectionConsent = true;
                     needsSave = true;
                 }
+                if (secondarySettings.EnableKitchenWorkflow)
+                {
+                    secondarySettings.EnableKitchenWorkflow = false;
+                    needsSave = true;
+                }
+                if (!secondarySettings.AllowDirectCounterTakeoutDelivery)
+                {
+                    secondarySettings.AllowDirectCounterTakeoutDelivery = true;
+                    needsSave = true;
+                }
             }
 
             var secondaryBranches = await context.Branches
@@ -205,6 +215,8 @@ public static partial class DatabaseSeeder
             EnableDelivery = true,
             EnableTakeout = true,
             EnableDineIn = true,
+            EnableKitchenWorkflow = false,
+            AllowDirectCounterTakeoutDelivery = true,
             AcceptsCash = true,
             AcceptsBankTransfer = true,
             AcceptsCard = true,
@@ -254,7 +266,7 @@ public static partial class DatabaseSeeder
         await context.Branches.AddAsync(branch);
         await context.SaveChangesAsync();
 
-        await SeedOperationalUsersAsync(context, tenant.Id, branch.Id, emailDomain);
+        await SeedOperationalUsersAsync(context, tenant.Id, branch.Id, emailDomain, includeKitchenStaff: settings.EnableKitchenWorkflow);
 
         // 1. Mesas de salón para el tenant secundario (idempotente)
         var secondaryTableNames = Enumerable.Range(1, 6).Select(i => $"Mesa {i}").ToList();

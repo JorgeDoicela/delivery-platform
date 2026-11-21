@@ -6,7 +6,10 @@ public sealed record UpdateBranchOperatingHoursCommand(
     string ClosingTime,
     bool? IsActive = null,
     double? DeliveryRadiusKm = null,
-    bool? IsCoverageStrict = null
+    bool? IsCoverageStrict = null,
+    bool? EnableKitchenWorkflowOverride = null,
+    bool? AllowDirectCounterTakeoutDeliveryOverride = null,
+    bool ApplyWorkflowOverrides = false
 );
 
 public sealed record UpdateBranchOperatingHoursResponse(
@@ -16,5 +19,9 @@ public sealed record UpdateBranchOperatingHoursResponse(
     string ClosingTime,
     bool IsActive,
     double? DeliveryRadiusKm = null,
-    bool IsCoverageStrict = true
+    bool IsCoverageStrict = true,
+    bool? EnableKitchenWorkflowOverride = null,
+    bool UseKitchenWorkflow = true,
+    bool? AllowDirectCounterTakeoutDeliveryOverride = null,
+    bool AllowDirectCounterTakeoutDelivery = true
 );

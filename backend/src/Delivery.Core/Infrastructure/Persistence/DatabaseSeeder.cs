@@ -202,6 +202,8 @@ public static partial class DatabaseSeeder
                 EnableDelivery = true,
                 EnableTakeout = true,
                 EnableDineIn = true,
+                EnableKitchenWorkflow = false,
+                AllowDirectCounterTakeoutDelivery = true,
                 AcceptsCash = true,
                 AcceptsBankTransfer = true,
                 AcceptsCard = false,
@@ -243,6 +245,18 @@ public static partial class DatabaseSeeder
             if (!settings.RequireDataProtectionConsent)
             {
                 settings.RequireDataProtectionConsent = true;
+                needsSave = true;
+            }
+
+            if (settings.EnableKitchenWorkflow)
+            {
+                settings.EnableKitchenWorkflow = false;
+                needsSave = true;
+            }
+
+            if (!settings.AllowDirectCounterTakeoutDelivery)
+            {
+                settings.AllowDirectCounterTakeoutDelivery = true;
                 needsSave = true;
             }
 
@@ -364,7 +378,7 @@ public static partial class DatabaseSeeder
 
         var primaryBranch = branches[0];
 
-        await SeedOperationalUsersAsync(context, tenant.Id, primaryBranch.Id, "lagranjita.com");
+        await SeedOperationalUsersAsync(context, tenant.Id, primaryBranch.Id, "lagranjita.com", includeKitchenStaff: settings.EnableKitchenWorkflow);
 
         var defaultTableNames = Enumerable.Range(1, 8).Select(i => $"Mesa {i}").ToArray();
 
@@ -417,15 +431,36 @@ public static partial class DatabaseSeeder
         }
     }
 
-    private static async Task SeedOperationalUsersAsync(AppDbContext context, Guid tenantId, int primaryBranchId, string emailDomain)
+    private static async Task SeedOperationalUsersAsync(
+        AppDbContext context,
+        Guid tenantId,
+        int primaryBranchId,
+        string emailDomain,
+        bool includeKitchenStaff = false)
     {
-        var staffSpecs = new[]
+        var staffSpecs = new List<(string Email, string Name, string Phone, int RoleId, bool BranchScoped)>
         {
             (Email: $"esmeralda@{emailDomain}", Name: "Esmeralda - Administradora", Phone: "0987654321", RoleId: Role.TenantAdmin, BranchScoped: false),
             (Email: $"cajero@{emailDomain}", Name: "Cajero Principal", Phone: "0987654323", RoleId: Role.Cashier, BranchScoped: true),
-            (Email: $"cocina@{emailDomain}", Name: "Maestro Hornero KDS", Phone: "0987654324", RoleId: Role.KitchenStaff, BranchScoped: true),
             (Email: $"repartidor@{emailDomain}", Name: "Carlos Motorizado #1", Phone: "0987654325", RoleId: Role.Driver, BranchScoped: true)
         };
+
+        if (includeKitchenStaff)
+        {
+            staffSpecs.Add((Email: $"cocina@{emailDomain}", Name: "Maestro Hornero KDS", Phone: "0987654324", RoleId: Role.KitchenStaff, BranchScoped: true));
+        }
+        else
+        {
+            var obsoleteKitchenUser = await context.Users.IgnoreQueryFilters()
+                .FirstOrDefaultAsync(u => u.Email == $"cocina@{emailDomain}" && u.TenantId == tenantId);
+            if (obsoleteKitchenUser != null)
+            {
+                var userRoles = await context.UserRoles.Where(ur => ur.UserId == obsoleteKitchenUser.Id).ToListAsync();
+                context.UserRoles.RemoveRange(userRoles);
+                context.Users.Remove(obsoleteKitchenUser);
+                await context.SaveChangesAsync();
+            }
+        }
 
         foreach (var spec in staffSpecs)
         {

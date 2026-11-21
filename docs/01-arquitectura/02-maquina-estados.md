@@ -38,7 +38,9 @@ stateDiagram-v2
 | `Created` (1) | `Confirmed` (3) | Sistema / Operador | Emite evento `ReceiveNewOrder` al grupo SignalR `KitchenHub:{branchId}` |
 | `PendingValidation` (2) | `Confirmed` (3) | Operador administrativo | Valida comprobante y emite evento a `KitchenHub:{branchId}` |
 | `PendingValidation` (2) | `Cancelled` (8) | Operador administrativo | Notifica cancelacion al cliente |
-| `Confirmed` (3) | `InKitchen` (4) | Cocinero en KDS | Cambia comanda a columna de preparacion en KDS; notifica a `TrackingHub` |
+| `Confirmed` (3) | `InKitchen` (4) | Cocinero en KDS | Solo cuando `UseKitchenWorkflow = true`. Cambia comanda a preparacion en KDS; notifica a `TrackingHub`. |
+| `Confirmed` (3) | `ReadyForDelivery` (5) | Cajero en Mostrador | Solo cuando `UseKitchenWorkflow = false` (Modo Solo Mostrador). Habilita alerta inmediata a repartidores o retiro en local. |
+| `Confirmed` (3) | `Delivered` (7) | Cajero en Mostrador | Solo cuando `UseKitchenWorkflow = false`, `AllowDirectCounterTakeoutDelivery = true` y `DeliveryType = Takeout`. |
 | `InKitchen` (4) | `ReadyForDelivery` (5) | Cocinero en KDS | Alerta a repartidores disponibles; notifica al cliente que el pedido esta empacado |
 | `ReadyForDelivery` (5) | `OnTheWay` (6) | Repartidor en app movil | Inicia ingesta de telemetria GPS en Redis; emite ubicacion al cliente via `TrackingHub` |
 | `ReadyForDelivery` (5) | `Delivered` (7) | Operador en mostrador | Aplica a pedidos con modalidad `Takeout` (Retiro en local) |

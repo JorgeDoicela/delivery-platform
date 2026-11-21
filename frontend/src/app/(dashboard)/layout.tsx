@@ -85,6 +85,12 @@ function DashboardLayoutContent({
     ? `/${tenant?.slug || activeTenantSlug}`
     : "/";
 
+  const userBranch = user?.branchId
+    ? tenant?.branches?.find((b) => b.id === Number(user.branchId))
+    : undefined;
+  const useKitchenWorkflow =
+    userBranch?.useKitchenWorkflow ?? tenant?.enableKitchenWorkflow ?? true;
+
   return (
     <AuthGuard
       allowedRoles={[
@@ -104,6 +110,7 @@ function DashboardLayoutContent({
           canManageFranchise={canManageFranchise}
           isTenantAdmin={isTenantAdmin}
           isSuperAdmin={isSuperAdmin}
+          useKitchenWorkflow={useKitchenWorkflow}
           isHeaderVisible={isVisible}
           isScrolled={isScrolled}
           onOpenMobileMenu={() => setIsMobileMenuOpen(true)}
@@ -128,6 +135,7 @@ function DashboardLayoutContent({
           canManageFranchise={canManageFranchise}
           isTenantAdmin={isTenantAdmin}
           isSuperAdmin={isSuperAdmin}
+          useKitchenWorkflow={useKitchenWorkflow}
           isBottomNavVisible={isVisible}
         />
       </div>

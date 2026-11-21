@@ -66,17 +66,23 @@ export function StorefrontHeader() {
   const isCashier = isUserInRole(user, UserRole.Cashier);
   const isDriver = isUserInRole(user, UserRole.Driver);
 
+  const useKitchenWorkflow = tenant?.enableKitchenWorkflow ?? true;
+
   const operationalHref = isSuperAdmin
     ? routes.getSuperAdminHref()
     : isTenantAdmin
       ? routes.getAdminHref("personalizacion")
       : isBranchManager
         ? routes.getAdminHref("inventario")
-        : isKitchenStaff || isCashier
+        : isKitchenStaff
           ? routes.getKitchenHref()
-          : isDriver
-            ? routes.getDriverHref()
-            : null;
+          : isCashier
+            ? useKitchenWorkflow
+              ? routes.getKitchenHref()
+              : routes.getMostradorHref()
+            : isDriver
+              ? routes.getDriverHref()
+              : null;
 
   const operationalLabel = isSuperAdmin
     ? "SuperAdmin"
@@ -84,11 +90,15 @@ export function StorefrontHeader() {
       ? "Administración"
       : isBranchManager
         ? "Gestión Local"
-        : isKitchenStaff || isCashier
+        : isKitchenStaff
           ? "Cocina KDS"
-          : isDriver
-            ? "Repartidor"
-            : null;
+          : isCashier
+            ? useKitchenWorkflow
+              ? "Cocina KDS"
+              : "Mostrador"
+            : isDriver
+              ? "Repartidor"
+              : null;
 
   const isHomeActive =
     pathname === brandHomeHref || (routes.basePath ? pathname === routes.basePath : pathname === "/");

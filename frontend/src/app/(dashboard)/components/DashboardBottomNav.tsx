@@ -18,6 +18,7 @@ interface DashboardBottomNavProps {
   canManageFranchise: boolean;
   isTenantAdmin?: boolean;
   isSuperAdmin: boolean;
+  useKitchenWorkflow?: boolean;
   isBottomNavVisible: boolean;
 }
 
@@ -27,10 +28,17 @@ export function DashboardBottomNav({
   canManageFranchise,
   isTenantAdmin = false,
   isSuperAdmin,
+  useKitchenWorkflow = true,
   isBottomNavVisible,
 }: DashboardBottomNavProps) {
-  const isKitchenActive =
-    pathname.endsWith("/cocina") || pathname.endsWith("/kitchen");
+  const operationsHref = useKitchenWorkflow
+    ? routes.getKitchenHref()
+    : routes.getMostradorHref();
+  const isOperationsActive =
+    pathname.endsWith("/cocina") ||
+    pathname.endsWith("/kitchen") ||
+    pathname.endsWith("/mostrador") ||
+    pathname.endsWith("/despacho");
   const isInventoryActive =
     pathname.includes("/admin/inventario") ||
     pathname.includes("/admin/inventory");
@@ -52,15 +60,15 @@ export function DashboardBottomNav({
       style={{ paddingBottom: "max(0.4rem, env(safe-area-inset-bottom))" }}
     >
       <Link
-        href={routes.getKitchenHref()}
+        href={operationsHref}
         className={`flex flex-col items-center justify-center py-1 px-2 rounded-xl text-[10px] font-bold font-display uppercase tracking-wider transition-colors min-w-[50px] min-h-[44px] ${
-          isKitchenActive
+          isOperationsActive
             ? "text-brand-primary"
             : "text-text-muted hover:text-text-strong"
         }`}
       >
         <Utensils className="w-5 h-5 mb-0.5" />
-        <span>KDS</span>
+        <span>{useKitchenWorkflow ? "KDS" : "Mostrador"}</span>
       </Link>
 
       {canManageFranchise && (

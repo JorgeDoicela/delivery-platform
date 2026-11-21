@@ -21,6 +21,18 @@ public class TenantSetting : IMustHaveTenant
     public bool EnableDineIn { get; set; }
 
     /// <summary>
+    /// Habilita o deshabilita el flujo y rol de Cocina (KDS) por defecto para las sucursales de la marca.
+    /// Si es falso, los pedidos operan en modo directo de Mostrador (sin etapa intermedia InKitchen).
+    /// </summary>
+    public bool EnableKitchenWorkflow { get; set; } = true;
+
+    /// <summary>
+    /// En modo Solo Mostrador, permite entregar pedidos Takeout directamente desde Confirmado (Confirmed -> Delivered)
+    /// además de marcarlos como Listos. Si es falso, exige el paso previo Listo en Mostrador (Confirmed -> ReadyForDelivery -> Delivered).
+    /// </summary>
+    public bool AllowDirectCounterTakeoutDelivery { get; set; } = true;
+
+    /// <summary>
     /// Habilita o deshabilita la validación estricta de cobertura geográfica (geocerca/radio).
     /// Si es falso, los clientes pueden pedir desde cualquier ubicación y se asigna la sucursal más cercana por Haversine.
     /// </summary>

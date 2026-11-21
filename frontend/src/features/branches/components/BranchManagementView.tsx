@@ -115,6 +115,17 @@ export function BranchManagementView() {
                                             >
                                                 {!branch.isActive ? "Pausada" : opStatus.statusLabel}
                                             </span>
+                                            <span
+                                                className={`text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full font-mono ${
+                                                    (branch.useKitchenWorkflow ?? tenant?.enableKitchenWorkflow ?? true)
+                                                        ? "bg-status-info/15 text-status-info border border-status-info/30"
+                                                        : "bg-brand-accent/15 text-brand-accent border border-brand-accent/30"
+                                                }`}
+                                            >
+                                                {(branch.useKitchenWorkflow ?? tenant?.enableKitchenWorkflow ?? true)
+                                                    ? "Cocina KDS"
+                                                    : "Solo Mostrador"}
+                                            </span>
                                         </div>
                                         <h3 className="text-lg sm:text-xl font-black uppercase tracking-tight text-text-strong font-display mt-2 truncate">
                                             {branch.name}

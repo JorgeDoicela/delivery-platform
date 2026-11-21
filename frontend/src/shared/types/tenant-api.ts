@@ -45,6 +45,10 @@ export interface TenantBranchSummaryDto {
   isActive: boolean;
   deliveryRadiusKm?: number | null;
   isCoverageStrict?: boolean;
+  enableKitchenWorkflowOverride?: boolean | null;
+  useKitchenWorkflow?: boolean;
+  allowDirectCounterTakeoutDeliveryOverride?: boolean | null;
+  allowDirectCounterTakeoutDelivery?: boolean;
 }
 
 export interface BranchDetailDto {
@@ -62,6 +66,10 @@ export interface BranchDetailDto {
   isActive: boolean;
   deliveryRadiusKm?: number | null;
   isCoverageStrict?: boolean;
+  enableKitchenWorkflowOverride?: boolean | null;
+  useKitchenWorkflow?: boolean;
+  allowDirectCounterTakeoutDeliveryOverride?: boolean | null;
+  allowDirectCounterTakeoutDelivery?: boolean;
 }
 
 export interface UpdateBranchHoursRequest {
@@ -70,6 +78,9 @@ export interface UpdateBranchHoursRequest {
   isActive?: boolean;
   deliveryRadiusKm?: number | null;
   isCoverageStrict?: boolean;
+  enableKitchenWorkflowOverride?: boolean | null;
+  allowDirectCounterTakeoutDeliveryOverride?: boolean | null;
+  applyWorkflowOverrides?: boolean;
 }
 
 export interface UpdateBranchHoursResponse {
@@ -80,6 +91,10 @@ export interface UpdateBranchHoursResponse {
   isActive: boolean;
   deliveryRadiusKm?: number | null;
   isCoverageStrict?: boolean;
+  enableKitchenWorkflowOverride?: boolean | null;
+  useKitchenWorkflow?: boolean;
+  allowDirectCounterTakeoutDeliveryOverride?: boolean | null;
+  allowDirectCounterTakeoutDelivery?: boolean;
 }
 
 export interface PublicTenantSummaryDto {
@@ -135,6 +150,8 @@ export interface TenantStorefrontConfigDto {
   promotionalBanners: TenantPromoBanner[];
   branches: TenantBranchSummaryDto[];
   requireCoverageValidation?: boolean;
+  enableKitchenWorkflow?: boolean;
+  allowDirectCounterTakeoutDelivery?: boolean;
 }
 
 export interface UpdateTenantStorefrontCommand {
@@ -166,6 +183,8 @@ export interface UpdateTenantStorefrontCommand {
   heroSlides: TenantHeroSlide[];
   promotionalBanners: TenantPromoBanner[];
   requireCoverageValidation?: boolean;
+  enableKitchenWorkflow?: boolean;
+  allowDirectCounterTakeoutDelivery?: boolean;
 }
 
 export interface PlatformTenantItemDto {
