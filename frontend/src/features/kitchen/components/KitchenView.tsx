@@ -5,8 +5,7 @@ import { usePathname, useRouter } from "next/navigation";
 import { useKitchenOrders } from "../hooks/useKitchenOrders";
 import { KitchenTicketCard } from "./KitchenTicketCard";
 import { OrderStatus } from "@/shared/types/api";
-import { Volume2, Building2 } from "lucide-react";
-import { kitchenAlertSound } from "../lib/sound";
+import { Building2 } from "lucide-react";
 import { Select, type SelectOption } from "@/shared/components/Select";
 import { useBranchesQuery, useCurrentTenantQuery } from "@/features/tenant";
 import { useAuthStore, UserRole } from "@/features/auth";
@@ -138,15 +137,6 @@ export function KitchenView() {
               triggerClassName="!rounded-full !py-1.5 !px-3.5 shadow-xs font-bold uppercase tracking-wider text-xs"
             />
           )}
-
-          <button
-            onClick={() => kitchenAlertSound.playNewOrderChime()}
-            title="Probar sonido de comanda"
-            className="flex items-center gap-1.5 px-3.5 py-1.5 bg-surface-card hover:bg-surface-card-hover border border-surface-border rounded-full text-xs font-bold uppercase tracking-wider text-text-strong transition-colors cursor-pointer shadow-xs"
-          >
-            <Volume2 className="h-4 w-4 text-brand-accent" />
-            <span className="hidden sm:inline">Probar Sonido</span>
-          </button>
 
           <div
             className={`flex items-center gap-1.5 px-3.5 py-1.5 rounded-full text-xs font-bold uppercase tracking-wider border shadow-xs ${
