@@ -9,6 +9,7 @@ import {
   type UpdateProfileFormData,
 } from "../schemas/accountSchemas";
 import { useAccountStore } from "../store/useAccountStore";
+import { useAuthStore, UserRole, isUserInRole } from "@/features/auth";
 import { AlertBanner } from "@/shared/components";
 import type { IdentificationType } from "../types";
 
@@ -20,6 +21,15 @@ const IDENTIFICATION_OPTIONS: SelectOption[] = [
 ];
 
 export function AccountProfileSection() {
+  const user = useAuthStore((s) => s.user);
+  const isStaffOrAdmin =
+    isUserInRole(user, UserRole.SuperAdmin) ||
+    isUserInRole(user, UserRole.TenantAdmin) ||
+    isUserInRole(user, UserRole.BranchManager) ||
+    isUserInRole(user, UserRole.KitchenStaff) ||
+    isUserInRole(user, UserRole.Cashier) ||
+    isUserInRole(user, UserRole.Driver);
+
   const profile = useAccountStore((s) => s.profile);
   const isSaving = useAccountStore((s) => s.isSaving);
   const profileError = useAccountStore((s) => s.profileError);
@@ -66,10 +76,12 @@ export function AccountProfileSection() {
     <div className="bg-surface-card border border-surface-border rounded-3xl p-6 md:p-8 space-y-6">
       <div className="border-b border-surface-border pb-4">
         <h2 className="text-lg font-black text-text-strong font-display uppercase tracking-tight">
-          Datos Personales y de Facturación
+          {isStaffOrAdmin ? "Datos Personales" : "Datos Personales y de Facturación"}
         </h2>
         <p className="text-xs text-text-muted mt-0.5">
-          Configura tus datos para agilizar el despacho y la emisión de comprobantes fiscales electrónicos (SRI).
+          {isStaffOrAdmin
+            ? "Actualiza tu nombre y teléfono de contacto asociados a tu cuenta operativa."
+            : "Configura tus datos para agilizar el despacho y la emisión de comprobantes fiscales electrónicos (SRI)."}
         </p>
       </div>
 
@@ -123,39 +135,43 @@ export function AccountProfileSection() {
             )}
           </div>
 
-          {/* Tipo de Documento */}
-          <div>
-            <Select
-              label="Tipo de Identificación"
-              placeholder="Seleccionar tipo..."
-              options={IDENTIFICATION_OPTIONS}
-              value={identificationTypeValue || ""}
-              onChange={(val) =>
-                setValue("identificationType", (val || null) as IdentificationType, {
-                  shouldValidate: true,
-                })
-              }
-              error={errors.identificationType?.message}
-            />
-          </div>
+          {!isStaffOrAdmin && (
+            <>
+              {/* Tipo de Documento */}
+              <div>
+                <Select
+                  label="Tipo de Identificación"
+                  placeholder="Seleccionar tipo..."
+                  options={IDENTIFICATION_OPTIONS}
+                  value={identificationTypeValue || ""}
+                  onChange={(val) =>
+                    setValue("identificationType", (val || null) as IdentificationType, {
+                      shouldValidate: true,
+                    })
+                  }
+                  error={errors.identificationType?.message}
+                />
+              </div>
 
-          {/* Número de documento */}
-          <div className="space-y-1.5">
-            <label className="block text-xs font-bold text-text-base uppercase tracking-wider">
-              Número de Identificación
-            </label>
-            <input
-              type="text"
-              {...register("identificationNumber")}
-              placeholder="Ej: 1712345678"
-              className="w-full px-4 py-3 rounded-2xl border border-surface-border bg-surface-canvas text-text-strong placeholder:text-text-subtle focus:outline-none focus:border-brand-primary text-xs transition-colors"
-            />
-            {errors.identificationNumber && (
-              <p className="text-xs text-brand-primary font-semibold">
-                {errors.identificationNumber.message}
-              </p>
-            )}
-          </div>
+              {/* Número de documento */}
+              <div className="space-y-1.5">
+                <label className="block text-xs font-bold text-text-base uppercase tracking-wider">
+                  Número de Identificación
+                </label>
+                <input
+                  type="text"
+                  {...register("identificationNumber")}
+                  placeholder="Ej: 1712345678"
+                  className="w-full px-4 py-3 rounded-2xl border border-surface-border bg-surface-canvas text-text-strong placeholder:text-text-subtle focus:outline-none focus:border-brand-primary text-xs transition-colors"
+                />
+                {errors.identificationNumber && (
+                  <p className="text-xs text-brand-primary font-semibold">
+                    {errors.identificationNumber.message}
+                  </p>
+                )}
+              </div>
+            </>
+          )}
         </div>
 
         {/* Correo (de solo lectura por motivos de auditoría y verificación) */}

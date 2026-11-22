@@ -13,7 +13,7 @@ import {
 } from "lucide-react";
 import { Select, type SelectOption } from "@/shared/components/Select";
 import { useAccountStore, type AccountTab } from "../store/useAccountStore";
-import { useAuthStore } from "@/features/auth/store/useAuthStore";
+import { useAuthStore, UserRole, isUserInRole } from "@/features/auth";
 import { AccountHeader } from "./AccountHeader";
 import { AccountProfileSection } from "./AccountProfileSection";
 import { AccountOrdersSection } from "./AccountOrdersSection";
@@ -25,19 +25,18 @@ interface AccountDashboardViewProps {
   tenantSlug?: string;
 }
 
-const TABS: Array<{ id: AccountTab; label: string; icon: typeof User }> = [
+const ALL_TABS: Array<{
+  id: AccountTab;
+  label: string;
+  icon: typeof User;
+  customerOnly?: boolean;
+}> = [
   { id: "perfil", label: "Datos Personales", icon: User },
-  { id: "pedidos", label: "Historial de Pedidos", icon: Package },
-  { id: "direcciones", label: "Direcciones Guardadas", icon: MapPin },
+  { id: "pedidos", label: "Historial de Pedidos", icon: Package, customerOnly: true },
+  { id: "direcciones", label: "Direcciones Guardadas", icon: MapPin, customerOnly: true },
   { id: "privacidad", label: "Privacidad (LOPDP)", icon: Shield },
   { id: "seguridad", label: "Seguridad y Clave", icon: Lock },
 ];
-
-const TAB_OPTIONS: SelectOption<AccountTab>[] = TABS.map((tab) => ({
-  value: tab.id,
-  label: tab.label,
-  icon: tab.icon,
-}));
 
 export function AccountDashboardView({ tenantSlug }: AccountDashboardViewProps) {
   const router = useRouter();
@@ -50,21 +49,41 @@ export function AccountDashboardView({ tenantSlug }: AccountDashboardViewProps) 
   const setActiveTab = useAccountStore((s) => s.setActiveTab);
   const fetchProfile = useAccountStore((s) => s.fetchProfile);
 
+  const user = useAuthStore((s) => s.user);
   const isAuthenticated = useAuthStore((s) => s.isAuthenticated);
   const logout = useAuthStore((s) => s.logout);
+
+  const isStaffOrAdmin =
+    isUserInRole(user, UserRole.SuperAdmin) ||
+    isUserInRole(user, UserRole.TenantAdmin) ||
+    isUserInRole(user, UserRole.BranchManager) ||
+    isUserInRole(user, UserRole.KitchenStaff) ||
+    isUserInRole(user, UserRole.Cashier) ||
+    isUserInRole(user, UserRole.Driver);
+
+  const visibleTabs = isStaffOrAdmin
+    ? ALL_TABS.filter((tab) => !tab.customerOnly)
+    : ALL_TABS;
+
+  const tabOptions: SelectOption<AccountTab>[] = visibleTabs.map((tab) => ({
+    value: tab.id,
+    label: tab.label,
+    icon: tab.icon,
+  }));
 
   useEffect(() => {
     if (
       tabParam &&
-      (tabParam === "perfil" ||
-        tabParam === "pedidos" ||
-        tabParam === "direcciones" ||
-        tabParam === "privacidad" ||
-        tabParam === "seguridad")
+      visibleTabs.some((t) => t.id === tabParam)
     ) {
       setActiveTab(tabParam);
+    } else if (
+      isStaffOrAdmin &&
+      (activeTab === "pedidos" || activeTab === "direcciones")
+    ) {
+      setActiveTab("perfil");
     }
-  }, [tabParam, setActiveTab]);
+  }, [tabParam, isStaffOrAdmin, activeTab, visibleTabs, setActiveTab]);
 
   useEffect(() => {
     if (isAuthenticated) {
@@ -93,7 +112,7 @@ export function AccountDashboardView({ tenantSlug }: AccountDashboardViewProps) 
           {/* Versión Móvil (< 640px): Selector de secciones a ancho completo */}
           <div className="sm:hidden w-full">
             <Select<AccountTab>
-              options={TAB_OPTIONS}
+              options={tabOptions}
               value={activeTab}
               onChange={(val) => setActiveTab(val)}
               size="md"
@@ -107,7 +126,7 @@ export function AccountDashboardView({ tenantSlug }: AccountDashboardViewProps) 
           {/* Versión Tablet (640px a 1024px): Píldoras con wrap automático y botón Cerrar Sesión */}
           <nav className="hidden sm:flex lg:hidden flex-wrap items-center justify-between gap-2">
             <div className="flex flex-wrap gap-2 flex-1">
-              {TABS.map((tab) => {
+              {visibleTabs.map((tab) => {
                 const Icon = tab.icon;
                 const isActive = activeTab === tab.id;
 
@@ -141,7 +160,7 @@ export function AccountDashboardView({ tenantSlug }: AccountDashboardViewProps) 
 
           {/* Versión Desktop (>= 1024px): Menú lateral estructurado */}
           <nav className="hidden lg:block bg-surface-card border border-surface-border rounded-3xl p-3 space-y-1 shadow-xs sticky top-24">
-            {TABS.map((tab) => {
+            {visibleTabs.map((tab) => {
               const Icon = tab.icon;
               const isActive = activeTab === tab.id;
 

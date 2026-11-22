@@ -1,10 +1,28 @@
 "use client";
 
 import React from "react";
+import { useAuthStore, UserRole, isUserInRole } from "@/features/auth";
+import { useIsMounted } from "@/shared/hooks/useIsMounted";
 import { FloatingPwaInstallButton } from "./FloatingPwaInstallButton";
 import { FloatingWhatsAppButton } from "./FloatingWhatsAppButton";
 
 export function FloatingStorefrontActions() {
+  const isMounted = useIsMounted();
+  const user = useAuthStore((s) => s.user);
+
+  const isStaffOrAdmin =
+    isMounted &&
+    (isUserInRole(user, UserRole.SuperAdmin) ||
+      isUserInRole(user, UserRole.TenantAdmin) ||
+      isUserInRole(user, UserRole.BranchManager) ||
+      isUserInRole(user, UserRole.KitchenStaff) ||
+      isUserInRole(user, UserRole.Cashier) ||
+      isUserInRole(user, UserRole.Driver));
+
+  if (isStaffOrAdmin) {
+    return null;
+  }
+
   return (
     <aside
       aria-label="Acciones rápidas flotantes"

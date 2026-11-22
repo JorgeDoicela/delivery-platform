@@ -1,10 +1,10 @@
 "use client";
 
 import React, { useEffect, Suspense } from "react";
-import { useRouter, usePathname } from "next/navigation";
-import { LogOut } from "lucide-react";
+import Link from "next/link";
+import { usePathname } from "next/navigation";
 import { useCurrentTenantQuery, useTenantStore, RESERVED_TENANT_SLUGS } from "@/features/tenant";
-import { AuthGuard, UserRole, useAuthStore } from "@/features/auth";
+import { AuthGuard, UserRole, useAuthStore, UserNav } from "@/features/auth";
 import { ThemeToggle, AppHeader } from "@/shared/components";
 import { useTenantRoutes } from "@/shared/lib/tenant-routing";
 import { useSmartScrollHeader } from "@/shared/hooks/useSmartScrollHeader";
@@ -15,7 +15,6 @@ function DriverLayoutContent({
 }: {
   children: React.ReactNode;
 }) {
-  const router = useRouter();
   const pathname = usePathname();
   const rawSlug = pathname?.split("/").filter(Boolean)[0];
   const urlSlug =
@@ -26,15 +25,9 @@ function DriverLayoutContent({
   const tenantSlug = useTenantStore((s) => s.tenantSlug);
   const setTenantSlug = useTenantStore((s) => s.setTenantSlug);
   const user = useAuthStore((s) => s.user);
-  const logout = useAuthStore((s) => s.logout);
 
   const activeTenantSlug = urlSlug || tenantSlug || user?.tenantSlug || "la-granjita";
   const routes = useTenantRoutes(activeTenantSlug);
-
-  const handleLogout = async () => {
-    await logout();
-    router.push(routes.getLoginHref());
-  };
 
   useEffect(() => {
     if (activeTenantSlug && activeTenantSlug !== tenantSlug) {
@@ -49,8 +42,10 @@ function DriverLayoutContent({
 
   const { data: tenant } = useCurrentTenantQuery(activeTenantSlug);
   const brandName = tenant?.name || user?.tenantName || "Restaurante";
+  const brandTagline = tenant?.tagline || "Restaurante & Delivery";
   const brandLogo = tenant?.logoUrl || "/images/shared/placeholders/logo-default.png";
-  const brandHomeHref = routes.getHomeHref();
+  const driverHref = routes.getDriverHref();
+  const isDriverActive = pathname?.includes("/repartidor");
 
   return (
     <AuthGuard allowedRoles={[UserRole.SuperAdmin, UserRole.Driver]}>
@@ -58,26 +53,30 @@ function DriverLayoutContent({
         <AppHeader
           isVisible={isVisible}
           isScrolled={isScrolled}
-          pinOnDesktop={false}
+          pinOnDesktop={true}
           brand={{
             name: brandName,
             logo: brandLogo,
-            href: brandHomeHref,
-            subtitle: `Reparto Móvil • ${activeTenantSlug}`,
+            href: driverHref,
+            tagline: brandTagline,
+            variant: "primary",
           }}
+          navigation={
+            <div className="flex items-center gap-5 lg:gap-6 text-xs sm:text-sm font-display font-bold uppercase tracking-wider">
+              <Link
+                href={driverHref}
+                className={`transition-colors hover:text-brand-primary ${
+                  isDriverActive ? "text-brand-primary" : "text-text-strong"
+                }`}
+              >
+                Reparto
+              </Link>
+            </div>
+          }
           actions={
             <>
               <ThemeToggle />
-              <button
-                type="button"
-                onClick={handleLogout}
-                title="Cerrar sesión"
-                aria-label="Cerrar sesión"
-                className="p-2 sm:px-3 sm:py-1.5 rounded-full text-text-muted hover:text-red-500 hover:bg-surface-card-hover border border-surface-border transition-colors cursor-pointer flex items-center gap-1.5"
-              >
-                <LogOut className="w-3.5 h-3.5" />
-                <span className="hidden sm:inline text-[11px] font-bold uppercase tracking-wider">Salir</span>
-              </button>
+              <UserNav tenantSlug={activeTenantSlug} showGuestLogin={false} />
             </>
           }
         />

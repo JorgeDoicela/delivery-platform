@@ -9,10 +9,15 @@ import {
   RESERVED_TENANT_SLUGS,
   useCurrentTenantQuery,
 } from "@/features/tenant";
+import { useAuthStore, UserRole, isUserInRole } from "@/features/auth";
+import { useIsMounted } from "@/shared/hooks/useIsMounted";
 import { useTenantRoutes } from "@/shared/lib/tenant-routing";
 
 export function StorefrontFooter() {
   const pathname = usePathname();
+  const isMounted = useIsMounted();
+  const user = useAuthStore((s) => s.user);
+
   const rawSlug = pathname?.split("/").filter(Boolean)[0];
   const activeSlug =
     rawSlug && !RESERVED_TENANT_SLUGS.has(rawSlug.toLowerCase())
@@ -20,6 +25,19 @@ export function StorefrontFooter() {
       : undefined;
   const { data: tenant } = useCurrentTenantQuery(activeSlug);
   const routes = useTenantRoutes(activeSlug || tenant?.slug);
+
+  const isStaffOrAdmin =
+    isMounted &&
+    (isUserInRole(user, UserRole.SuperAdmin) ||
+      isUserInRole(user, UserRole.TenantAdmin) ||
+      isUserInRole(user, UserRole.BranchManager) ||
+      isUserInRole(user, UserRole.KitchenStaff) ||
+      isUserInRole(user, UserRole.Cashier) ||
+      isUserInRole(user, UserRole.Driver));
+
+  if (isStaffOrAdmin && pathname?.includes("/cuenta")) {
+    return null;
+  }
 
   const isPlatformRoot = routes.isPlatformRoot;
   const brandName = isPlatformRoot

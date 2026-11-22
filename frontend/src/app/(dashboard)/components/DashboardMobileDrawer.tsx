@@ -19,6 +19,7 @@ interface DashboardMobileDrawerProps {
   onClose: () => void;
   brandName: string;
   brandLogo: string;
+  canManageFranchise?: boolean;
   isSuperAdmin: boolean;
   storefrontHref: string;
 }
@@ -28,6 +29,7 @@ export function DashboardMobileDrawer({
   onClose,
   brandName,
   brandLogo,
+  canManageFranchise = false,
   isSuperAdmin,
   storefrontHref,
 }: DashboardMobileDrawerProps) {
@@ -118,7 +120,7 @@ export function DashboardMobileDrawer({
                   <span className="text-[10px] text-text-muted block">Aviso automático de comandas</span>
                 </div>
               </div>
-              <span className="text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full bg-status-success/15 text-status-success border border-status-success/30 font-mono">
+              <span className="text-[10px] font-bold uppercase tracking-wider text-status-success font-mono">
                 Activa
               </span>
             </div>
@@ -139,17 +141,19 @@ export function DashboardMobileDrawer({
         </div>
 
         <div className="pt-6 border-t border-surface-border space-y-3">
-          <Link
-            href={storefrontHref}
-            onClick={onClose}
-            className="flex items-center justify-between px-4 py-3 rounded-2xl bg-surface-canvas hover:bg-surface-card-hover border border-surface-border text-text-strong text-xs font-bold uppercase tracking-wider font-display transition-colors min-h-[44px]"
-          >
-            <div className="flex items-center gap-2.5">
-              <Store className="w-4 h-4 text-brand-primary" />
-              <span>Ver Tienda Pública</span>
-            </div>
-            <ExternalLink className="w-3.5 h-3.5 text-text-muted" />
-          </Link>
+          {canManageFranchise && (
+            <Link
+              href={storefrontHref}
+              onClick={onClose}
+              className="flex items-center justify-between px-4 py-3 rounded-2xl bg-surface-canvas hover:bg-surface-card-hover border border-surface-border text-text-strong text-xs font-bold uppercase tracking-wider font-display transition-colors min-h-[44px]"
+            >
+              <div className="flex items-center gap-2.5">
+                <Store className="w-4 h-4 text-brand-primary" />
+                <span>Ver Tienda Pública</span>
+              </div>
+              <ExternalLink className="w-3.5 h-3.5 text-text-muted" />
+            </Link>
+          )}
 
           <div className="flex items-center justify-between px-2 pt-1">
             <span className="text-[11px] text-text-muted font-medium">Tema:</span>

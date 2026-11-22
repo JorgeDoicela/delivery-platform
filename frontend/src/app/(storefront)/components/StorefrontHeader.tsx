@@ -3,11 +3,7 @@
 import React, { useState, useEffect } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import {
-  User,
-  Menu,
-  LayoutDashboard,
-} from "lucide-react";
+import { Menu } from "lucide-react";
 import { CartButtonBadge } from "@/features/cart";
 import {
   RESERVED_TENANT_SLUGS,
@@ -15,7 +11,7 @@ import {
   TenantSwitcher,
   useCurrentTenantQuery,
 } from "@/features/tenant";
-import { useAuthStore, UserRole, isUserInRole } from "@/features/auth";
+import { useAuthStore, UserRole, isUserInRole, UserNav } from "@/features/auth";
 import { ThemeToggle, AppHeader } from "@/shared/components";
 import { useIsMounted } from "@/shared/hooks/useIsMounted";
 import { StorefrontMobileDrawer } from "./StorefrontMobileDrawer";
@@ -39,7 +35,7 @@ export function StorefrontHeader() {
   const routes = useTenantRoutes(activeSlug || tenant?.slug);
 
   const isPlatformRoot = routes.isPlatformRoot;
-  const brandHomeHref = routes.getHomeHref();
+  const storefrontHomeHref = routes.getHomeHref();
   const catalogHref = routes.getCatalogHref();
   const brandName = isPlatformRoot
     ? "MESAFY"
@@ -66,7 +62,21 @@ export function StorefrontHeader() {
   const isCashier = isUserInRole(user, UserRole.Cashier);
   const isDriver = isUserInRole(user, UserRole.Driver);
 
-  const useKitchenWorkflow = tenant?.enableKitchenWorkflow ?? true;
+  const canManageFranchise = isSuperAdmin || isTenantAdmin || isBranchManager;
+  const isStaffOrAdmin =
+    canManageFranchise || isKitchenStaff || isCashier || isDriver;
+  const isCustomerOrGuest = !isStaffOrAdmin;
+
+  const userBranch = user?.branchId
+    ? tenant?.branches?.find((b) => b.id === Number(user.branchId))
+    : undefined;
+  const useKitchenWorkflow =
+    userBranch?.useKitchenWorkflow ?? tenant?.enableKitchenWorkflow ?? true;
+
+  const operationsHref = useKitchenWorkflow
+    ? routes.getKitchenHref()
+    : routes.getMostradorHref();
+  const operationsLabel = useKitchenWorkflow ? "Cocina KDS" : "Mostrador";
 
   const operationalHref = isSuperAdmin
     ? routes.getSuperAdminHref()
@@ -74,47 +84,63 @@ export function StorefrontHeader() {
       ? routes.getAdminHref("personalizacion")
       : isBranchManager
         ? routes.getAdminHref("inventario")
-        : isKitchenStaff
-          ? routes.getKitchenHref()
-          : isCashier
-            ? useKitchenWorkflow
-              ? routes.getKitchenHref()
-              : routes.getMostradorHref()
-            : isDriver
-              ? routes.getDriverHref()
-              : null;
+        : isKitchenStaff || isCashier
+          ? operationsHref
+          : isDriver
+            ? routes.getDriverHref()
+            : null;
 
   const operationalLabel = isSuperAdmin
-    ? "SuperAdmin"
+    ? "Marcas"
     : isTenantAdmin
-      ? "Administración"
+      ? "Marca"
       : isBranchManager
-        ? "Gestión Local"
-        : isKitchenStaff
-          ? "Cocina KDS"
-          : isCashier
-            ? useKitchenWorkflow
-              ? "Cocina KDS"
-              : "Mostrador"
-            : isDriver
-              ? "Repartidor"
-              : null;
+        ? "Inventario"
+        : isKitchenStaff || isCashier
+          ? operationsLabel
+          : isDriver
+            ? "Reparto"
+            : null;
+
+  const brandPrimaryHref =
+    isCashier || isKitchenStaff || canManageFranchise
+      ? operationsHref
+      : isDriver
+        ? routes.getDriverHref()
+        : storefrontHomeHref;
 
   const isHomeActive =
-    pathname === brandHomeHref || (routes.basePath ? pathname === routes.basePath : pathname === "/");
+    pathname === storefrontHomeHref ||
+    (routes.basePath ? pathname === routes.basePath : pathname === "/");
   const isCatalogActive =
     pathname.includes("menu") || pathname.includes("catalogo");
   const isPedidosActive =
-    pathname.includes("pedidos") || pathname.includes("rastreo") || pathname.includes("track");
+    pathname.includes("pedidos") ||
+    pathname.includes("rastreo") ||
+    pathname.includes("track");
 
-  // Cerrar menú móvil al navegar
+  const isOperationsActive =
+    pathname.endsWith("/cocina") ||
+    pathname.endsWith("/kitchen") ||
+    pathname.endsWith("/mostrador") ||
+    pathname.endsWith("/despacho");
+  const isInventoryActive =
+    pathname.includes("/admin/inventario") ||
+    pathname.includes("/admin/inventory");
+  const isBranchesActive =
+    pathname.includes("/admin/sucursales") ||
+    pathname.includes("/admin/branches");
+  const isBrandingActive = pathname.includes("/admin/personalizacion");
+  const isSuperAdminActive =
+    pathname.startsWith("/superadmin") || pathname.includes("/admin/tenants");
+  const isDriverActive = pathname.includes("/repartidor");
+
   const [prevPathname, setPrevPathname] = useState(pathname);
   if (prevPathname !== pathname) {
     setPrevPathname(pathname);
     setIsMobileMenuOpen(false);
   }
 
-  // Bloquear scroll cuando el drawer móvil esté abierto
   useEffect(() => {
     if (isMobileMenuOpen) {
       document.body.style.overflow = "hidden";
@@ -132,7 +158,7 @@ export function StorefrontHeader() {
         onFocus={() => setIsVisible(true)}
         isVisible={isVisible}
         isScrolled={isScrolled}
-        pinOnDesktop={false}
+        pinOnDesktop={isStaffOrAdmin}
         leadingAction={
           <button
             type="button"
@@ -146,83 +172,159 @@ export function StorefrontHeader() {
         brand={{
           name: brandName,
           logo: brandLogo,
-          href: brandHomeHref,
+          href: brandPrimaryHref,
           tagline: brandTagline,
           variant: "primary",
         }}
         navigation={
-          <nav className="hidden xl:flex items-center gap-6 text-[13px] sm:text-sm font-semibold text-text-strong">
-            <Link
-              href={brandHomeHref}
-              className={`transition-colors hover:text-brand-primary ${
-                isHomeActive ? "text-brand-primary font-bold" : ""
-              }`}
-            >
-              Inicio
-            </Link>
-            <Link
-              href={catalogHref}
-              className={`transition-colors hover:text-brand-primary ${
-                isCatalogActive ? "text-brand-primary font-bold" : ""
-              }`}
-            >
-              {isPlatformRoot ? "Restaurantes" : "Menú & Combos"}
-            </Link>
-            {isAuthenticated && (
+          <div className="flex items-center gap-5 lg:gap-6 text-xs sm:text-sm font-display font-bold uppercase tracking-wider">
+            {isCustomerOrGuest && (
+              <>
+                <Link
+                  href={storefrontHomeHref}
+                  className={`transition-colors hover:text-brand-primary ${
+                    isHomeActive ? "text-brand-primary" : "text-text-strong"
+                  }`}
+                >
+                  Inicio
+                </Link>
+                <Link
+                  href={catalogHref}
+                  className={`transition-colors hover:text-brand-primary ${
+                    isCatalogActive ? "text-brand-primary" : "text-text-strong"
+                  }`}
+                >
+                  {isPlatformRoot ? "Restaurantes" : "Menú & Combos"}
+                </Link>
+                {isAuthenticated && (
+                  <Link
+                    href={routes.getPedidosHref()}
+                    className={`transition-colors hover:text-brand-primary ${
+                      isPedidosActive ? "text-brand-primary" : "text-text-strong"
+                    }`}
+                  >
+                    Mis Pedidos
+                  </Link>
+                )}
+              </>
+            )}
+
+            {(isCashier || isKitchenStaff) && (
               <Link
-                href={routes.getPedidosHref()}
+                href={operationsHref}
                 className={`transition-colors hover:text-brand-primary ${
-                  isPedidosActive ? "text-brand-primary font-bold" : ""
+                  isOperationsActive ? "text-brand-primary" : "text-text-strong"
                 }`}
               >
-                Mis Pedidos
+                {operationsLabel}
               </Link>
             )}
-          </nav>
+
+            {isDriver && (
+              <Link
+                href={routes.getDriverHref()}
+                className={`transition-colors hover:text-brand-primary ${
+                  isDriverActive ? "text-brand-primary" : "text-text-strong"
+                }`}
+              >
+                Reparto
+              </Link>
+            )}
+
+            {canManageFranchise && (
+              <>
+                {isSuperAdmin && (
+                  <Link
+                    href={routes.getSuperAdminHref()}
+                    className={`transition-colors hover:text-brand-primary ${
+                      isSuperAdminActive
+                        ? "text-brand-primary"
+                        : "text-text-strong"
+                    }`}
+                  >
+                    Marcas
+                  </Link>
+                )}
+                <Link
+                  href={operationsHref}
+                  className={`transition-colors hover:text-brand-primary ${
+                    isOperationsActive
+                      ? "text-brand-primary"
+                      : "text-text-strong"
+                  }`}
+                >
+                  {operationsLabel}
+                </Link>
+                <Link
+                  href={routes.getAdminHref("inventario")}
+                  className={`transition-colors hover:text-brand-primary ${
+                    isInventoryActive
+                      ? "text-brand-primary"
+                      : "text-text-strong"
+                  }`}
+                >
+                  Inventario
+                </Link>
+                <Link
+                  href={routes.getAdminHref("sucursales")}
+                  className={`transition-colors hover:text-brand-primary ${
+                    isBranchesActive ? "text-brand-primary" : "text-text-strong"
+                  }`}
+                >
+                  Sucursales
+                </Link>
+                {(isTenantAdmin || isSuperAdmin) && (
+                  <Link
+                    href={routes.getAdminHref("personalizacion")}
+                    className={`transition-colors hover:text-brand-primary ${
+                      isBrandingActive
+                        ? "text-brand-primary"
+                        : "text-text-strong"
+                    }`}
+                  >
+                    Marca
+                  </Link>
+                )}
+                <Link
+                  href={storefrontHomeHref}
+                  className={`transition-colors hover:text-brand-primary ${
+                    isHomeActive ? "text-brand-primary" : "text-text-strong"
+                  }`}
+                >
+                  Tienda
+                </Link>
+              </>
+            )}
+          </div>
         }
         actions={
           <>
-            <div className="hidden sm:block">
-              {isPlatformRoot ? (
+            {isSuperAdmin ? (
+              <div className="hidden sm:block">
                 <TenantSwitcher variant="auto" />
-              ) : (
-                <TenantBranchSelector tenant={tenant} />
-              )}
-            </div>
+              </div>
+            ) : isCustomerOrGuest ? (
+              <div className="hidden sm:block">
+                {isPlatformRoot ? (
+                  <TenantSwitcher variant="auto" />
+                ) : (
+                  <TenantBranchSelector tenant={tenant} />
+                )}
+              </div>
+            ) : null}
 
             <ThemeToggle />
 
-            {operationalHref && (
-              <Link
-                href={operationalHref}
-                className="hidden md:inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-neutral-900 hover:bg-neutral-800 text-white text-[11px] font-bold uppercase tracking-wider font-display transition-colors shadow-xs"
-                title={`Acceder a ${operationalLabel}`}
-              >
-                <LayoutDashboard className="w-3.5 h-3.5 text-brand-primary" />
-                <span>{operationalLabel}</span>
-              </Link>
-            )}
+            <UserNav
+              tenantSlug={activeSlug || tenant?.slug}
+              showGuestLogin
+            />
 
-            <Link
-              href={isAuthenticated ? routes.getAccountHref() : routes.getLoginHref()}
-              className="hidden sm:flex flex-col items-center justify-center text-text-strong hover:text-brand-primary transition-colors px-1 shrink-0 relative"
-              title={isAuthenticated ? `Mi Cuenta (${user?.fullName})` : "Mi Perfil / Iniciar Sesión"}
-            >
-              <User className="w-5 h-5 text-text-strong stroke-[1.8]" />
-              <span
-                suppressHydrationWarning
-                className="text-[10px] font-semibold text-text-muted leading-none mt-1"
-              >
-                {isAuthenticated ? "Mi Cuenta" : "Perfil"}
-              </span>
-            </Link>
-
-            <CartButtonBadge />
+            {isCustomerOrGuest && <CartButtonBadge />}
           </>
         }
       />
 
-      {/* Drawer Deslizante Móvil Modularizado */}
       <StorefrontMobileDrawer
         isOpen={isMobileMenuOpen}
         onClose={() => setIsMobileMenuOpen(false)}

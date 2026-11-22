@@ -5,7 +5,7 @@ import { usePathname, useRouter } from "next/navigation";
 import { useKitchenOrders } from "../hooks/useKitchenOrders";
 import { KitchenTicketCard } from "./KitchenTicketCard";
 import { OrderStatus } from "@/shared/types/api";
-import { Building2 } from "lucide-react";
+import { Building2, Receipt } from "lucide-react";
 import { Select, type SelectOption } from "@/shared/components/Select";
 import { useBranchesQuery, useCurrentTenantQuery } from "@/features/tenant";
 import { useAuthStore, UserRole } from "@/features/auth";
@@ -28,6 +28,7 @@ export function KitchenView() {
     () => branchesData ?? tenant?.branches ?? [],
     [branchesData, tenant?.branches]
   );
+  const hasMultipleBranches = branches.length > 1;
 
   const branchOptions = useMemo<SelectOption<number>[]>(
     () =>
@@ -70,7 +71,7 @@ export function KitchenView() {
     user?.role === UserRole.KitchenStaff ||
     Number(user?.role) === 5;
 
-  const { orders, error, connectionStatus, advanceOrderStatus, approveTransfer } =
+  const { orders, error, advanceOrderStatus, approveTransfer } =
     useKitchenOrders(branchId);
 
   const pendingValidationOrders = orders.filter((o) => o.status === OrderStatus.PendingValidation);
@@ -100,13 +101,21 @@ export function KitchenView() {
 
   return (
     <div className="space-y-4">
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between pb-4 border-b border-surface-border gap-4">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between pb-2 gap-4">
         <div className="flex items-center gap-3">
           <div>
-            <h1 className="text-2xl sm:text-3xl font-black uppercase tracking-wide text-text-strong font-display">
-              {useKitchenWorkflow ? "Pantalla de Cocina (KDS)" : "Despacho de Mostrador"} • {tenant?.name}
+            <h1 className="text-2xl sm:text-3xl font-black uppercase tracking-tight font-display">
+              <span className="text-text-strong">
+                {useKitchenWorkflow ? "Pantalla de Cocina (KDS)" : "Despacho de Mostrador"}
+              </span>
+              {tenant?.name && (
+                <>
+                  <span className="text-text-muted mx-2 font-normal">•</span>
+                  <span className="text-brand-primary">{tenant.name}</span>
+                </>
+              )}
             </h1>
-            <p className="text-xs text-text-muted mt-0.5">
+            <p className="text-xs text-text-muted mt-0.5 font-medium">
               {useKitchenWorkflow
                 ? "Despacho en secuencia FIFO y actualización en tiempo real por sucursal"
                 : "Flujo directo de mostrador sin pantalla intermedia de cocina (FIFO en tiempo real)"}
@@ -114,59 +123,32 @@ export function KitchenView() {
           </div>
         </div>
 
-        <div className="flex flex-wrap items-center gap-2">
-          {isBranchScopedStaff ? (
-            <div className="flex items-center gap-2 bg-surface-card border border-surface-border rounded-full px-3.5 py-1.5 shadow-xs">
-              <Building2 className="h-4 w-4 text-brand-primary" />
-              <span className="text-xs text-text-strong font-bold uppercase tracking-wider">
-                {activeBranch?.name || `Sucursal #${branchId}`}
-              </span>
-              <span className="text-[9px] bg-brand-primary/10 text-brand-primary font-bold uppercase px-2 py-0.5 rounded-full font-mono">
-                Sede Asignada
-              </span>
-            </div>
-          ) : (
-            <Select<number>
-              options={branchOptions}
-              value={branchId}
-              onChange={(val) => setSelectedBranchId(Number(val))}
-              size="sm"
-              leftIcon={Building2}
-              variant="surface"
-              className="w-auto min-w-[170px]"
-              triggerClassName="!rounded-full !py-1.5 !px-3.5 shadow-xs font-bold uppercase tracking-wider text-xs"
-            />
-          )}
-
-          <div
-            className={`flex items-center gap-1.5 px-3.5 py-1.5 rounded-full text-xs font-bold uppercase tracking-wider border shadow-xs ${
-              connectionStatus === "connected"
-                ? "bg-status-success/15 text-status-success border-status-success/30"
-                : connectionStatus === "connecting"
-                ? "bg-status-warning/15 text-status-warning border-status-warning/30"
-                : "bg-status-danger/15 text-status-danger border-status-danger/30"
-            }`}
-          >
-            <span
-              className={`w-2 h-2 rounded-full ${
-                connectionStatus === "connected"
-                  ? "bg-status-success animate-pulse"
-                  : connectionStatus === "connecting"
-                  ? "bg-status-warning animate-ping"
-                  : "bg-status-danger"
-              }`}
-            />
-            <span>
-              {connectionStatus === "connected"
-                ? useKitchenWorkflow
-                  ? "En Vivo • KDS"
-                  : "En Vivo • Mostrador"
-                : connectionStatus === "connecting"
-                ? "Reconectando..."
-                : "Sin Conexión"}
-            </span>
+        {hasMultipleBranches && (
+          <div className="flex flex-wrap items-center gap-2">
+            {isBranchScopedStaff ? (
+              <div className="flex items-center gap-2 bg-surface-card border border-surface-border rounded-full px-3.5 py-1.5 shadow-xs">
+                <Building2 className="h-4 w-4 text-brand-primary" />
+                <span className="text-xs text-text-strong font-bold uppercase tracking-wider">
+                  {activeBranch?.name || `Sucursal #${branchId}`}
+                </span>
+                <span className="text-[9px] bg-brand-primary/10 text-brand-primary font-bold uppercase px-2 py-0.5 rounded-full font-mono">
+                  Sede Asignada
+                </span>
+              </div>
+            ) : (
+              <Select<number>
+                options={branchOptions}
+                value={branchId}
+                onChange={(val) => setSelectedBranchId(Number(val))}
+                size="sm"
+                leftIcon={Building2}
+                variant="surface"
+                className="w-auto min-w-[170px]"
+                triggerClassName="!rounded-full !py-1.5 !px-3.5 shadow-xs font-bold uppercase tracking-wider text-xs"
+              />
+            )}
           </div>
-        </div>
+        )}
       </div>
 
       {!useKitchenWorkflow && isKitchenOnlyRole && (
@@ -186,15 +168,15 @@ export function KitchenView() {
 
       {/* Alerta / Sección destacada de transferencias pendientes de validación para cajeros */}
       {pendingValidationOrders.length > 0 && (
-        <div className="bg-status-warning/10 border border-status-warning/30 rounded-2xl p-4 shadow-xs">
-          <div className="flex items-center justify-between pb-3 border-b border-status-warning/20">
+        <div className="bg-surface-card rounded-2xl p-4 shadow-xs">
+          <div className="flex items-center justify-between pb-2">
             <div className="flex items-center gap-2">
-              <span className="w-2.5 h-2.5 rounded-full bg-status-warning animate-ping" />
+              <Receipt className="w-4 h-4 text-brand-accent" />
               <h2 className="text-xs sm:text-sm font-black uppercase tracking-wider text-text-strong font-display">
                 Comprobantes de Transferencia por Validar
               </h2>
             </div>
-            <span className="bg-status-warning/20 text-status-warning px-2.5 py-0.5 rounded-full border border-status-warning/40 font-mono text-xs font-bold">
+            <span className="font-mono text-xs font-black tabular-nums text-brand-accent">
               {pendingValidationOrders.length} {pendingValidationOrders.length === 1 ? 'pendiente' : 'pendientes'}
             </span>
           </div>
@@ -268,22 +250,22 @@ export function KitchenView() {
       >
         {/* Columna 1: En Espera / Recibidos */}
         <div
-          className={`bg-surface-card rounded-2xl border border-surface-border p-4 flex flex-col shadow-xs transition-colors duration-200 ${
+          className={`bg-surface-card rounded-2xl p-4 flex flex-col shadow-xs transition-colors duration-200 ${
             effectiveMobileColumn === "confirmed" ? "flex" : "hidden md:flex"
           }`}
         >
-          <div className="flex items-center justify-between pb-3 border-b border-surface-border text-xs font-black uppercase tracking-wider font-display text-status-warning">
-            <span>
+          <div className="flex items-center justify-between pb-2 text-xs font-black uppercase tracking-wider font-display">
+            <span className="text-brand-accent">
               {useKitchenWorkflow ? "EN ESPERA (CONFIRMADOS)" : "PEDIDOS RECIBIDOS (MOSTRADOR)"}
             </span>
-            <span className="bg-status-warning/20 text-status-warning px-2.5 py-0.5 rounded-full border border-status-warning/40 font-mono font-bold">
+            <span className="font-mono text-sm font-black tabular-nums text-text-strong">
               {confirmedOrders.length}
             </span>
           </div>
 
           <div className="flex-1 mt-3 space-y-3 overflow-y-auto max-h-[calc(100vh-250px)] md:max-h-[calc(100vh-220px)] pr-1">
             {confirmedOrders.length === 0 ? (
-              <div className="h-40 flex items-center justify-center text-xs text-text-muted font-medium border border-dashed border-surface-border rounded-xl bg-surface-canvas">
+              <div className="h-40 flex items-center justify-center text-xs text-text-muted font-medium rounded-xl bg-surface-canvas">
                 Sin pedidos en espera
               </div>
             ) : (
@@ -304,20 +286,20 @@ export function KitchenView() {
         {/* Columna 2: En Preparación (Solo si Cocina KDS activa o hay comandas en curso) */}
         {showInKitchenColumn && (
           <div
-            className={`bg-surface-card rounded-2xl border border-surface-border p-4 flex flex-col shadow-xs transition-colors duration-200 ${
+            className={`bg-surface-card rounded-2xl p-4 flex flex-col shadow-xs transition-colors duration-200 ${
               effectiveMobileColumn === "inkitchen" ? "flex" : "hidden md:flex"
             }`}
           >
-            <div className="flex items-center justify-between pb-3 border-b border-surface-border text-xs font-black uppercase tracking-wider font-display text-status-info">
-              <span>EN PREPARACIÓN (HORNO)</span>
-              <span className="bg-status-info/20 text-status-info px-2.5 py-0.5 rounded-full border border-status-info/40 font-mono font-bold">
+            <div className="flex items-center justify-between pb-2 text-xs font-black uppercase tracking-wider font-display">
+              <span className="text-status-info">EN PREPARACIÓN (HORNO)</span>
+              <span className="font-mono text-sm font-black tabular-nums text-text-strong">
                 {inKitchenOrders.length}
               </span>
             </div>
 
             <div className="flex-1 mt-3 space-y-3 overflow-y-auto max-h-[calc(100vh-250px)] md:max-h-[calc(100vh-220px)] pr-1">
               {inKitchenOrders.length === 0 ? (
-                <div className="h-40 flex items-center justify-center text-xs text-text-muted font-medium border border-dashed border-surface-border rounded-xl bg-surface-canvas">
+                <div className="h-40 flex items-center justify-center text-xs text-text-muted font-medium rounded-xl bg-surface-canvas">
                   Sin pedidos en preparación
                 </div>
               ) : (
@@ -338,20 +320,20 @@ export function KitchenView() {
 
         {/* Columna 3: Listos para Despacho */}
         <div
-          className={`bg-surface-card rounded-2xl border border-surface-border p-4 flex flex-col shadow-xs transition-colors duration-200 ${
+          className={`bg-surface-card rounded-2xl p-4 flex flex-col shadow-xs transition-colors duration-200 ${
             effectiveMobileColumn === "ready" ? "flex" : "hidden md:flex"
           }`}
         >
-          <div className="flex items-center justify-between pb-3 border-b border-surface-border text-xs font-black uppercase tracking-wider font-display text-status-success">
-            <span>LISTOS PARA DESPACHO</span>
-            <span className="bg-status-success/20 text-status-success px-2.5 py-0.5 rounded-full border border-status-success/40 font-mono font-bold">
+          <div className="flex items-center justify-between pb-2 text-xs font-black uppercase tracking-wider font-display">
+            <span className="text-status-success">LISTOS PARA DESPACHO</span>
+            <span className="font-mono text-sm font-black tabular-nums text-text-strong">
               {readyOrders.length}
             </span>
           </div>
 
           <div className="flex-1 mt-3 space-y-3 overflow-y-auto max-h-[calc(100vh-250px)] md:max-h-[calc(100vh-220px)] pr-1">
             {readyOrders.length === 0 ? (
-              <div className="h-40 flex items-center justify-center text-xs text-text-muted font-medium border border-dashed border-surface-border rounded-xl bg-surface-canvas">
+              <div className="h-40 flex items-center justify-center text-xs text-text-muted font-medium rounded-xl bg-surface-canvas">
                 Sin pedidos listos para entrega
               </div>
             ) : (

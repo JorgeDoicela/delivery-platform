@@ -17,7 +17,7 @@ import {
 } from "@/features/tenant";
 import { useSmartScrollHeader } from "@/shared/hooks/useSmartScrollHeader";
 import { useTenantRoutes } from "@/shared/lib/tenant-routing";
-import { useAuthStore } from "@/features/auth/store/useAuthStore";
+import { useAuthStore, UserRole, isUserInRole } from "@/features/auth";
 import { useIsMounted } from "@/shared/hooks/useIsMounted";
 
 export function MobileBottomNav() {
@@ -37,7 +37,17 @@ export function MobileBottomNav() {
   const routes = useTenantRoutes(activeSlug || tenant?.slug);
   const isMounted = useIsMounted();
   const rawIsAuthenticated = useAuthStore((s) => s.isAuthenticated);
+  const rawUser = useAuthStore((s) => s.user);
   const isAuthenticated = isMounted && rawIsAuthenticated;
+  const user = isMounted ? rawUser : null;
+
+  const isStaffOrAdmin =
+    isUserInRole(user, UserRole.SuperAdmin) ||
+    isUserInRole(user, UserRole.TenantAdmin) ||
+    isUserInRole(user, UserRole.BranchManager) ||
+    isUserInRole(user, UserRole.KitchenStaff) ||
+    isUserInRole(user, UserRole.Cashier) ||
+    isUserInRole(user, UserRole.Driver);
 
   const homeHref = routes.getHomeHref();
   const catalogHref = routes.getCatalogHref();
@@ -48,7 +58,7 @@ export function MobileBottomNav() {
   const isCheckout =
     pathname.includes("checkout") || pathname.includes("finalizar-pedido");
 
-  if (isCheckout) {
+  if (isCheckout || isStaffOrAdmin) {
     return null;
   }
 

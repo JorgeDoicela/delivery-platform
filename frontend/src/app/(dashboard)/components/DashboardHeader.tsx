@@ -2,16 +2,7 @@
 
 import React from "react";
 import Link from "next/link";
-import {
-  Utensils,
-  Volume2,
-  Package,
-  Building2,
-  Palette,
-  ShieldCheck,
-  Menu,
-  Store,
-} from "lucide-react";
+import { Menu } from "lucide-react";
 import { UserNav } from "@/features/auth";
 import { TenantSwitcher } from "@/features/tenant";
 import { ThemeToggle, AppHeader } from "@/shared/components";
@@ -20,6 +11,7 @@ import type { TenantRoutingResolution } from "@/shared/lib/tenant-routing";
 interface DashboardHeaderProps {
   brandName: string;
   brandLogo: string;
+  brandTagline?: string;
   routes: TenantRoutingResolution;
   pathname: string;
   canManageFranchise: boolean;
@@ -34,6 +26,7 @@ interface DashboardHeaderProps {
 export function DashboardHeader({
   brandName,
   brandLogo,
+  brandTagline,
   routes,
   pathname,
   canManageFranchise,
@@ -47,6 +40,8 @@ export function DashboardHeader({
   const operationsHref = useKitchenWorkflow
     ? routes.getKitchenHref()
     : routes.getMostradorHref();
+  const operationsLabel = useKitchenWorkflow ? "Cocina KDS" : "Mostrador";
+
   const isOperationsActive =
     pathname.endsWith("/cocina") ||
     pathname.endsWith("/kitchen") ||
@@ -62,6 +57,8 @@ export function DashboardHeader({
   const isSuperAdminActive =
     pathname.startsWith("/superadmin") || pathname.includes("/admin/tenants");
 
+  const hasMultipleTabs = canManageFranchise || isTenantAdmin || isSuperAdmin;
+
   return (
     <AppHeader
       isVisible={isHeaderVisible}
@@ -71,46 +68,49 @@ export function DashboardHeader({
         name: brandName,
         logo: brandLogo,
         href: operationsHref,
-        subtitle: useKitchenWorkflow ? "Operaciones & Cocina" : "Operaciones & Mostrador",
+        tagline: brandTagline || (useKitchenWorkflow ? "Cocina KDS" : "Mostrador"),
+        variant: isSuperAdmin ? "strong" : "primary",
       }}
       navigation={
-        <>
+        <div className="flex items-center gap-5 lg:gap-6 text-xs sm:text-sm font-display font-bold uppercase tracking-wider">
+          {isSuperAdmin && (
+            <Link
+              href={routes.getSuperAdminHref()}
+              className={`transition-colors hover:text-brand-primary ${
+                isSuperAdminActive ? "text-brand-primary" : "text-text-strong"
+              }`}
+            >
+              Marcas
+            </Link>
+          )}
+
           <Link
             href={operationsHref}
-            className={`px-3.5 py-1.5 rounded-full transition-colors flex items-center gap-1.5 ${
-              isOperationsActive
-                ? "bg-brand-primary text-white shadow-xs"
-                : "text-text-muted hover:text-text-strong hover:bg-surface-card-hover"
+            className={`transition-colors hover:text-brand-primary ${
+              isOperationsActive ? "text-brand-primary" : "text-text-strong"
             }`}
           >
-            <Utensils className="w-3.5 h-3.5 text-brand-primary group-hover:text-white" />
-            <span>{useKitchenWorkflow ? "Cocina KDS" : "Mostrador"}</span>
+            {operationsLabel}
           </Link>
 
           {canManageFranchise && (
             <>
               <Link
                 href={routes.getAdminHref("inventario")}
-                className={`px-3.5 py-1.5 rounded-full transition-colors flex items-center gap-1.5 ${
-                  isInventoryActive
-                    ? "bg-brand-primary text-white shadow-xs"
-                    : "text-text-muted hover:text-text-strong hover:bg-surface-card-hover"
+                className={`transition-colors hover:text-brand-primary ${
+                  isInventoryActive ? "text-brand-primary" : "text-text-strong"
                 }`}
               >
-                <Package className="w-3.5 h-3.5 text-brand-accent" />
-                <span>Inventario</span>
+                Inventario
               </Link>
 
               <Link
                 href={routes.getAdminHref("sucursales")}
-                className={`px-3.5 py-1.5 rounded-full transition-colors flex items-center gap-1.5 ${
-                  isBranchesActive
-                    ? "bg-brand-primary text-white shadow-xs"
-                    : "text-text-muted hover:text-text-strong hover:bg-surface-card-hover"
+                className={`transition-colors hover:text-brand-primary ${
+                  isBranchesActive ? "text-brand-primary" : "text-text-strong"
                 }`}
               >
-                <Building2 className="w-3.5 h-3.5 text-status-info" />
-                <span>Sucursales</span>
+                Sucursales
               </Link>
             </>
           )}
@@ -118,31 +118,23 @@ export function DashboardHeader({
           {(isTenantAdmin || isSuperAdmin) && (
             <Link
               href={routes.getAdminHref("personalizacion")}
-              className={`px-3.5 py-1.5 rounded-full transition-colors flex items-center gap-1.5 ${
-                isBrandingActive
-                  ? "bg-brand-primary text-white shadow-xs"
-                  : "text-text-muted hover:text-text-strong hover:bg-surface-card-hover"
+              className={`transition-colors hover:text-brand-primary ${
+                isBrandingActive ? "text-brand-primary" : "text-text-strong"
               }`}
             >
-              <Palette className="w-3.5 h-3.5 text-brand-primary" />
-              <span>Marca & Landing</span>
+              Marca
             </Link>
           )}
 
-          {isSuperAdmin && (
+          {hasMultipleTabs && (
             <Link
-              href={routes.getSuperAdminHref()}
-              className={`px-3.5 py-1.5 rounded-full transition-colors flex items-center gap-1.5 ${
-                isSuperAdminActive
-                  ? "bg-brand-primary text-white shadow-xs"
-                  : "text-text-muted hover:text-text-strong hover:bg-surface-card-hover"
-              }`}
+              href={routes.getHomeHref()}
+              className="transition-colors text-text-strong hover:text-brand-primary"
             >
-              <ShieldCheck className="w-3.5 h-3.5 text-emerald-600" />
-              <span>Gobernanza de Marcas</span>
+              Tienda
             </Link>
           )}
-        </>
+        </div>
       }
       actions={
         <>
@@ -152,25 +144,10 @@ export function DashboardHeader({
             </div>
           )}
 
-          <div className="hidden lg:flex items-center gap-1.5 text-text-muted bg-surface-canvas px-3 py-1 rounded-full border border-surface-border text-[11px] font-bold uppercase tracking-wider">
-            <Volume2 className="w-3.5 h-3.5 text-brand-accent" />
-            <span>Alarma</span>
-          </div>
-
-          <Link
-            href={routes.getHomeHref()}
-            className="text-xs font-bold uppercase tracking-wider text-text-strong hover:text-brand-primary transition-colors px-2.5 sm:px-3 py-1.5 rounded-full bg-surface-canvas hover:bg-surface-card-hover border border-surface-border font-display hidden sm:inline-flex items-center gap-1.5"
-            title="Ver Tienda Pública en Vivo"
-          >
-            <Store className="w-3.5 h-3.5 text-brand-primary" />
-            <span>Ver Tienda</span>
-          </Link>
-
           <ThemeToggle />
 
-          <UserNav />
+          <UserNav tenantSlug={routes.activeTenantSlug} showGuestLogin={false} />
 
-          {/* Botón de Menú Móvil en pantallas < md */}
           <button
             type="button"
             onClick={onOpenMobileMenu}

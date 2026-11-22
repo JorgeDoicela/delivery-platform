@@ -49,6 +49,9 @@ export function DashboardBottomNav({
   const isSuperAdminActive =
     pathname.startsWith("/superadmin") || pathname.includes("/admin/tenants");
 
+  const hasMultipleTabs = canManageFranchise || isTenantAdmin || isSuperAdmin;
+  if (!hasMultipleTabs) return null;
+
   return (
     <nav
       aria-label="Navegación móvil de operaciones"

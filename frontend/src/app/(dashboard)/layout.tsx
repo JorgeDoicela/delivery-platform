@@ -78,6 +78,9 @@ function DashboardLayoutContent({
   const brandName = isSuperAdmin
     ? "Mesafy Platform"
     : (tenant?.name || user?.tenantName || "Restaurante");
+  const brandTagline = isSuperAdmin
+    ? "Gobernanza Multi-Tenant"
+    : (tenant?.tagline || "Restaurante & Delivery");
   const brandLogo = isSuperAdmin
     ? "/images/shared/placeholders/logo-default.png"
     : (tenant?.logoUrl || "/images/shared/placeholders/logo-default.png");
@@ -105,6 +108,7 @@ function DashboardLayoutContent({
         <DashboardHeader
           brandName={brandName}
           brandLogo={brandLogo}
+          brandTagline={brandTagline}
           routes={routes}
           pathname={pathname}
           canManageFranchise={canManageFranchise}
@@ -121,11 +125,16 @@ function DashboardLayoutContent({
           onClose={() => setIsMobileMenuOpen(false)}
           brandName={brandName}
           brandLogo={brandLogo}
+          canManageFranchise={canManageFranchise}
           isSuperAdmin={isSuperAdmin}
           storefrontHref={storefrontHref}
         />
 
-        <main className="flex-1 w-full p-3.5 sm:p-6 flex flex-col bg-surface-canvas transition-colors duration-200 pb-24 md:pb-6">
+        <main
+          className={`flex-1 w-full p-3.5 sm:p-6 flex flex-col bg-surface-canvas transition-colors duration-200 ${
+            canManageFranchise ? "pb-24 md:pb-6" : "pb-6"
+          }`}
+        >
           {children}
         </main>
 

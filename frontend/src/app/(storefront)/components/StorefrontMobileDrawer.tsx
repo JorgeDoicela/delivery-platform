@@ -17,14 +17,20 @@ import {
 } from "lucide-react";
 import { TenantBranchSelector, TenantSwitcher } from "@/features/tenant";
 import { useAccountStore, type AccountTab } from "@/features/account";
+import { UserRole, isUserInRole } from "@/features/auth";
 import type { TenantStorefrontConfigDto } from "@/shared/types/api";
 import type { AuthenticatedUserLike } from "@/features/auth/lib/redirectByRole";
 import type { TenantRoutingResolution } from "@/shared/lib/tenant-routing";
 
-const ACCOUNT_NAV_ITEMS: Array<{ id: AccountTab; label: string; icon: typeof UserIcon }> = [
+const ACCOUNT_NAV_ITEMS: Array<{
+  id: AccountTab;
+  label: string;
+  icon: typeof UserIcon;
+  customerOnly?: boolean;
+}> = [
   { id: "perfil", label: "Datos Personales", icon: UserIcon },
-  { id: "pedidos", label: "Historial de Pedidos", icon: Package },
-  { id: "direcciones", label: "Direcciones Guardadas", icon: MapPin },
+  { id: "pedidos", label: "Historial de Pedidos", icon: Package, customerOnly: true },
+  { id: "direcciones", label: "Direcciones Guardadas", icon: MapPin, customerOnly: true },
   { id: "privacidad", label: "Privacidad (LOPDP)", icon: Shield },
   { id: "seguridad", label: "Seguridad y Clave", icon: Lock },
 ];
@@ -55,10 +61,23 @@ export function StorefrontMobileDrawer({
   routes,
   tenant,
   isAuthenticated,
+  user,
   operationalHref,
   operationalLabel,
   onLogout,
 }: StorefrontMobileDrawerProps) {
+  const isStaffOrAdmin =
+    isUserInRole(user, UserRole.SuperAdmin) ||
+    isUserInRole(user, UserRole.TenantAdmin) ||
+    isUserInRole(user, UserRole.BranchManager) ||
+    isUserInRole(user, UserRole.KitchenStaff) ||
+    isUserInRole(user, UserRole.Cashier) ||
+    isUserInRole(user, UserRole.Driver);
+
+  const visibleAccountItems = isStaffOrAdmin
+    ? ACCOUNT_NAV_ITEMS.filter((item) => !item.customerOnly)
+    : ACCOUNT_NAV_ITEMS;
+
   React.useEffect(() => {
     if (!isOpen) return;
 
@@ -167,7 +186,7 @@ export function StorefrontMobileDrawer({
               <span className="text-[10px] font-bold uppercase tracking-wider text-text-muted block px-3 py-1">
                 Mi Cuenta
               </span>
-              {ACCOUNT_NAV_ITEMS.map((item) => {
+              {visibleAccountItems.map((item) => {
                 const Icon = item.icon;
                 return (
                   <Link
@@ -193,10 +212,10 @@ export function StorefrontMobileDrawer({
               <Link
                 href={operationalHref}
                 onClick={onClose}
-                className="flex items-center justify-between px-3.5 py-2.5 rounded-2xl bg-neutral-900 text-white text-xs font-bold uppercase tracking-wider font-display hover:bg-neutral-800 transition-colors"
+                className="flex items-center justify-between px-4 py-2.5 rounded-full bg-brand-primary text-white text-xs font-black uppercase tracking-wider font-display hover:bg-brand-primary-hover transition-colors shadow-xs"
               >
                 <span>Ir a {operationalLabel}</span>
-                <span className="text-[10px] text-brand-primary">&rarr;</span>
+                <span className="text-xs">&rarr;</span>
               </Link>
             </div>
           )}

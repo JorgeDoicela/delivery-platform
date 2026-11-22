@@ -54,12 +54,12 @@ export function KitchenTicketCard({
     }
   };
 
-  // Semáforo de tiempos
-  let timerBadgeColor = 'bg-status-success/15 text-status-success border-status-success/30';
+  // Semáforo de tiempos limpio y de alto contraste (sin fondos deslavados)
+  let timerBadgeColor = 'bg-surface-card text-status-success border-surface-border';
   if (elapsedMinutes >= 25) {
-    timerBadgeColor = 'bg-status-danger/15 text-status-danger border-status-danger/30 animate-pulse';
+    timerBadgeColor = 'bg-surface-card text-status-danger border-status-danger/40';
   } else if (elapsedMinutes >= 15) {
-    timerBadgeColor = 'bg-status-warning/15 text-status-warning border-status-warning/30';
+    timerBadgeColor = 'bg-surface-card text-brand-accent border-brand-accent/40';
   }
 
   const isTakeout = order.deliveryType === DeliveryType.Takeout;
@@ -74,19 +74,19 @@ export function KitchenTicketCard({
             #{order.orderId.slice(0, 8)}
           </span>
           <span
-            className={`inline-flex items-center gap-1 text-[10px] font-bold px-2.5 py-0.5 rounded-full uppercase tracking-wider ${
+            className={`inline-flex items-center gap-1 text-[10px] font-black uppercase tracking-wider px-2.5 py-0.5 rounded-full border ${
               isTakeout
-                ? 'bg-status-info/15 text-status-info border border-status-info/30'
-                : 'bg-surface-card border border-surface-border text-text-strong'
+                ? 'bg-surface-card border-surface-border text-brand-primary'
+                : 'bg-surface-card border-surface-border text-text-strong'
             }`}
           >
             {isTakeout ? (
               <>
-                <Store className="h-3 w-3" /> Mostrador
+                <Store className="h-3 w-3 text-brand-primary" /> Mostrador
               </>
             ) : (
               <>
-                <Bike className="h-3 w-3" /> Delivery
+                <Bike className="h-3 w-3 text-text-muted" /> Delivery
               </>
             )}
           </span>
@@ -94,7 +94,7 @@ export function KitchenTicketCard({
 
         {/* Cronómetro Semáforo */}
         <div
-          className={`flex items-center gap-1.5 px-2.5 py-0.5 rounded-full border text-xs font-mono font-bold ${timerBadgeColor}`}
+          className={`flex items-center gap-1.5 px-2.5 py-0.5 rounded-full border text-xs font-mono font-black tabular-nums shadow-xs ${timerBadgeColor}`}
         >
           <Clock className="h-3.5 w-3.5" />
           <span>{elapsedMinutes}m</span>
@@ -107,7 +107,7 @@ export function KitchenTicketCard({
         <div className="flex items-center justify-between">
           <p className="font-bold text-text-strong truncate">{order.customerName}</p>
           {order.total !== undefined && order.total > 0 && (
-            <span className="font-mono font-black text-brand-primary text-xs">
+            <span className="font-mono font-black text-brand-primary text-sm tabular-nums">
               ${order.total.toFixed(2)}
             </span>
           )}
@@ -118,17 +118,17 @@ export function KitchenTicketCard({
           </p>
         )}
         {order.paymentMethod === PaymentMethod.Cash && order.changeDue !== undefined && order.changeDue !== null && order.changeDue > 0 && (
-          <p className="text-[11px] text-status-warning font-semibold">
-            Cambio a entregar: ${order.changeDue.toFixed(2)}
+          <p className="text-[11px] text-brand-accent font-semibold font-sans">
+            Cambio a entregar: <strong className="font-mono font-black tabular-nums">${order.changeDue.toFixed(2)}</strong>
           </p>
         )}
       </div>
 
       {/* Bloque especial de Transferencia Bancaria por Validar */}
       {isPendingValidation && (
-        <div className="px-3.5 py-2.5 bg-status-warning/10 border-b border-status-warning/20 text-xs">
+        <div className="px-3.5 py-2 bg-surface-canvas border-b border-surface-border text-xs">
           <div className="flex items-center justify-between">
-            <span className="text-[11px] font-bold text-status-warning uppercase tracking-wider flex items-center gap-1">
+            <span className="text-[11px] font-bold text-brand-accent uppercase tracking-wider flex items-center gap-1 font-display">
               <Receipt className="h-3.5 w-3.5" /> Transferencia por validar
             </span>
             {order.transferReceiptUrl && (
@@ -136,7 +136,7 @@ export function KitchenTicketCard({
                 href={order.transferReceiptUrl}
                 target="_blank"
                 rel="noreferrer"
-                className="inline-flex items-center gap-1 text-[11px] font-bold text-brand-primary hover:underline"
+                className="inline-flex items-center gap-1 text-[11px] font-bold text-brand-primary hover:underline font-display uppercase tracking-wide"
               >
                 Ver Comprobante <ExternalLink className="h-3 w-3" />
               </a>
@@ -150,7 +150,7 @@ export function KitchenTicketCard({
         {order.items.map((item, idx) => (
           <div key={idx} className="pt-2 first:pt-0">
             <div className="flex items-start gap-2">
-              <span className="font-mono font-black text-brand-accent text-sm w-5 text-right">
+              <span className="font-mono font-black text-brand-accent text-sm w-5 text-right tabular-nums">
                 {item.quantity}x
               </span>
               <div className="flex-1">
@@ -160,7 +160,7 @@ export function KitchenTicketCard({
                     {item.modifiers.map((m, mIdx) => (
                       <li
                         key={mIdx}
-                        className="text-[10px] font-bold uppercase tracking-wider text-brand-accent bg-surface-canvas px-2 py-0.5 rounded-full border border-surface-border inline-block mr-1 mb-1"
+                        className="text-[10px] font-bold uppercase tracking-wider text-brand-accent bg-surface-canvas px-2 py-0.5 rounded-full border border-surface-border inline-block mr-1 mb-1 font-display"
                       >
                         + {m.modifierName}
                       </li>
@@ -180,7 +180,7 @@ export function KitchenTicketCard({
             <button
               onClick={() => handleApprove(false)}
               disabled={isSubmitting}
-              className="flex-1 flex items-center justify-center gap-1 py-2 px-3 bg-surface-card hover:bg-status-danger/10 text-status-danger border border-status-danger/30 text-xs font-bold uppercase tracking-wider rounded-full transition-all active:scale-95 disabled:opacity-50 cursor-pointer"
+              className="flex-1 flex items-center justify-center gap-1 py-2 px-3 bg-surface-card hover:bg-surface-card-hover text-status-danger border border-status-danger/40 text-xs font-black uppercase tracking-wider font-display rounded-full transition-all active:scale-95 disabled:opacity-50 cursor-pointer shadow-xs"
             >
               <X className="h-3.5 w-3.5" />
               Rechazar
@@ -188,7 +188,7 @@ export function KitchenTicketCard({
             <button
               onClick={() => handleApprove(true)}
               disabled={isSubmitting}
-              className="flex-1 flex items-center justify-center gap-1 py-2 px-3 bg-status-success hover:bg-status-success/90 text-white text-xs font-bold uppercase tracking-wider rounded-full shadow-md transition-all active:scale-95 disabled:opacity-50 cursor-pointer"
+              className="flex-1 flex items-center justify-center gap-1 py-2 px-3 bg-brand-primary hover:bg-brand-primary-hover text-white text-xs font-black uppercase tracking-wider font-display rounded-full shadow-md transition-all active:scale-95 disabled:opacity-50 cursor-pointer"
             >
               <Check className="h-3.5 w-3.5" />
               Aprobar
@@ -201,7 +201,7 @@ export function KitchenTicketCard({
             <button
               onClick={() => handleAdvance(OrderStatus.InKitchen)}
               disabled={isSubmitting}
-              className="w-full flex items-center justify-center gap-2 py-2.5 px-4 bg-brand-primary hover:bg-brand-primary-hover text-white text-xs font-bold uppercase tracking-wider rounded-full shadow-md transition-all active:scale-95 disabled:opacity-50 cursor-pointer"
+              className="w-full flex items-center justify-center gap-2 py-2.5 px-4 bg-brand-primary hover:bg-brand-primary-hover text-white text-xs font-black uppercase tracking-wider font-display rounded-full shadow-md transition-all active:scale-95 disabled:opacity-50 cursor-pointer"
             >
               <ChefHat className="h-4 w-4" />
               {isSubmitting ? 'Iniciando...' : 'Iniciar en Cocina'}
@@ -211,15 +211,15 @@ export function KitchenTicketCard({
               <button
                 onClick={() => handleAdvance(OrderStatus.ReadyForDelivery)}
                 disabled={isSubmitting}
-                className="flex-1 flex items-center justify-center gap-1.5 py-2.5 px-3 bg-surface-card hover:bg-status-info/10 text-status-info border border-status-info/30 text-xs font-bold uppercase tracking-wider rounded-full transition-all active:scale-95 disabled:opacity-50 cursor-pointer"
+                className="flex-1 flex items-center justify-center gap-1.5 py-2.5 px-3 bg-surface-card hover:bg-surface-card-hover text-text-strong border border-surface-border text-xs font-black uppercase tracking-wider font-display rounded-full transition-all active:scale-95 disabled:opacity-50 cursor-pointer shadow-xs"
               >
-                <CheckCircle2 className="h-3.5 w-3.5" />
+                <CheckCircle2 className="h-3.5 w-3.5 text-brand-accent" />
                 {isSubmitting ? 'Guardando...' : 'Marcar Listo'}
               </button>
               <button
                 onClick={() => handleAdvance(OrderStatus.Delivered)}
                 disabled={isSubmitting}
-                className="flex-1 flex items-center justify-center gap-1.5 py-2.5 px-3 bg-status-success hover:bg-status-success/85 text-white text-xs font-bold uppercase tracking-wider rounded-full shadow-md transition-all active:scale-95 disabled:opacity-50 cursor-pointer"
+                className="flex-1 flex items-center justify-center gap-1.5 py-2.5 px-3 bg-brand-primary hover:bg-brand-primary-hover text-white text-xs font-black uppercase tracking-wider font-display rounded-full shadow-md transition-all active:scale-95 disabled:opacity-50 cursor-pointer"
               >
                 <Store className="h-3.5 w-3.5" />
                 {isSubmitting ? 'Entregando...' : 'Entregar'}
@@ -229,7 +229,7 @@ export function KitchenTicketCard({
             <button
               onClick={() => handleAdvance(OrderStatus.ReadyForDelivery)}
               disabled={isSubmitting}
-              className="w-full flex items-center justify-center gap-2 py-2.5 px-4 bg-status-info hover:bg-status-info/85 text-white text-xs font-bold uppercase tracking-wider rounded-full shadow-md transition-all active:scale-95 disabled:opacity-50 cursor-pointer"
+              className="w-full flex items-center justify-center gap-2 py-2.5 px-4 bg-brand-primary hover:bg-brand-primary-hover text-white text-xs font-black uppercase tracking-wider font-display rounded-full shadow-md transition-all active:scale-95 disabled:opacity-50 cursor-pointer"
             >
               <CheckCircle2 className="h-4 w-4" />
               {isSubmitting ? 'Guardando...' : isTakeout ? 'Listo en Mostrador' : 'Listo para Reparto'}
@@ -241,7 +241,7 @@ export function KitchenTicketCard({
           <button
             onClick={() => handleAdvance(OrderStatus.ReadyForDelivery)}
             disabled={isSubmitting}
-            className="w-full flex items-center justify-center gap-2 py-2.5 px-4 bg-status-info hover:bg-status-info/80 text-white text-xs font-bold uppercase tracking-wider rounded-full shadow-md transition-all active:scale-95 disabled:opacity-50 cursor-pointer"
+            className="w-full flex items-center justify-center gap-2 py-2.5 px-4 bg-brand-primary hover:bg-brand-primary-hover text-white text-xs font-black uppercase tracking-wider font-display rounded-full shadow-md transition-all active:scale-95 disabled:opacity-50 cursor-pointer"
           >
             <CheckCircle2 className="h-4 w-4" />
             {isSubmitting ? 'Guardando...' : isTakeout ? 'Listo en Mostrador' : 'Listo para Reparto'}
@@ -253,7 +253,7 @@ export function KitchenTicketCard({
             <button
               onClick={() => handleAdvance(OrderStatus.Delivered)}
               disabled={isSubmitting}
-              className="w-full flex items-center justify-center gap-2 py-2.5 px-4 bg-status-success hover:bg-status-success/80 text-white text-xs font-bold uppercase tracking-wider rounded-full shadow-md transition-all active:scale-95 disabled:opacity-50 cursor-pointer"
+              className="w-full flex items-center justify-center gap-2 py-2.5 px-4 bg-status-success hover:bg-status-success/85 text-white text-xs font-black uppercase tracking-wider font-display rounded-full shadow-md transition-all active:scale-95 disabled:opacity-50 cursor-pointer"
             >
               <Store className="h-4 w-4" />
               {isSubmitting ? 'Entregando...' : 'Entregar en Mostrador'}
@@ -262,7 +262,7 @@ export function KitchenTicketCard({
             <button
               onClick={() => handleAdvance(OrderStatus.OnTheWay)}
               disabled={isSubmitting}
-              className="w-full flex items-center justify-center gap-2 py-2.5 px-4 bg-status-success hover:bg-status-success/80 text-white text-xs font-bold uppercase tracking-wider rounded-full shadow-md transition-all active:scale-95 disabled:opacity-50 cursor-pointer"
+              className="w-full flex items-center justify-center gap-2 py-2.5 px-4 bg-status-success hover:bg-status-success/85 text-white text-xs font-black uppercase tracking-wider font-display rounded-full shadow-md transition-all active:scale-95 disabled:opacity-50 cursor-pointer"
             >
               <Bike className="h-4 w-4" />
               {isSubmitting ? 'Despachando...' : 'Despachar / En Camino'}
