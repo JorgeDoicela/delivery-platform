@@ -89,8 +89,8 @@ export function WhatsAppSignInButton({
     }
   };
 
-  const handleVerifyOtp = async (e: React.FormEvent) => {
-    e.preventDefault();
+  const handleVerifyOtp = async (e?: React.FormEvent) => {
+    if (e) e.preventDefault();
     setError(null);
 
     const cleanCode = code.trim();
