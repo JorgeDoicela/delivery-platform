@@ -7,7 +7,7 @@ import {
   PLATFORM_BASE_DOMAINS,
 } from "./tenant-context";
 import { useTenantHost } from "./tenant-host-context";
-import { useTenantStore } from "@/features/tenant/store/useTenantStore";
+import { useTenantStore, getFallbackTenantConfigByDomain } from "@/features/tenant/store/useTenantStore";
 
 export { PLATFORM_BASE_DOMAINS };
 
@@ -77,24 +77,34 @@ export function resolveTenantRouting(
   const subdomain = isPlatformSub ? rawSubdomain : null;
   const isCustomDomain = !hostIsPlatform && !isPlatformSub;
 
-  // Segmento inicial de ruta para identificar tenant en hosts de plataforma
+  // Segmento inicial de ruta para identificar tenant ÚNICAMENTE en hosts de plataforma
   const segments = pathname.split("/").filter(Boolean);
   const firstSegment = segments[0]?.toLowerCase();
   const pathSlug =
-    firstSegment && !RESERVED_TENANT_SLUGS.has(firstSegment) && !firstSegment.includes(".")
+    hostIsPlatform &&
+    firstSegment &&
+    !RESERVED_TENANT_SLUGS.has(firstSegment) &&
+    !firstSegment.includes(".")
       ? firstSegment
       : undefined;
 
+  // En dominio personalizado (ej: asaderolagranjita.doicela.dev), resolver el slug del tenant
+  const customDomainSlug = isCustomDomain
+    ? getFallbackTenantConfigByDomain(cleanHost).slug
+    : undefined;
+
   // Prioridad de resolución del slug activo:
   // 1. Slug explícito pasado como parámetro
-  // 2. Slug detectado en la ruta /[slug]/...
+  // 2. Slug detectado en la ruta /[slug]/... (solo en host de plataforma)
   // 3. Subdominio (la-granjita.mesafy.com)
-  // 4. Slug almacenado en el store Zustand
-  // 5. Fallback por defecto
+  // 4. Dominio personalizado (asaderolagranjita.doicela.dev)
+  // 5. Slug almacenado en el store Zustand
+  // 6. Fallback por defecto
   const resolvedSlug =
     explicitSlug ||
     pathSlug ||
     subdomain ||
+    customDomainSlug ||
     storeSlug ||
     DEFAULT_TENANT_SLUG;
 

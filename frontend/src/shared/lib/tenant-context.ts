@@ -97,6 +97,14 @@ export const RESERVED_TENANT_SLUGS = new Set([
   "superadmin",
   "api",
   "login",
+  "registro",
+  "register",
+  "cuenta",
+  "account",
+  "perfil",
+  "profile",
+  "menu",
+  "carta",
   "checkout",
   "catalogo",
   "finalizar-pedido",
@@ -108,14 +116,23 @@ export const RESERVED_TENANT_SLUGS = new Set([
   "active-delivery",
   "pedidos",
   "mis-pedidos",
+  "orders",
   "rastreo",
   "track",
+  "tracking",
   "sucursales",
   "sucursal",
+  "locales",
   "terminos",
   "privacidad",
   "terms",
   "privacy",
+  "recuperar-clave",
+  "restablecer-clave",
+  "forgot-password",
+  "reset-password",
+  "verificar-correo",
+  "verify-email",
   "static",
   "assets",
   "health",
@@ -123,7 +140,6 @@ export const RESERVED_TENANT_SLUGS = new Set([
   "hubs",
   "ws",
   "auth",
-  "register",
   "cart",
   "favicon",
   "robots",
@@ -195,13 +211,14 @@ export function getApiClientTenantSlug(): string | null {
         return queryTenant;
       }
 
-      // 3. Segmento de ruta /[slug]/... (solo cuando no es una palabra reservada del sistema)
+      // 3. Segmento de ruta /[slug]/... (solo cuando estamos en host de plataforma y no es una palabra reservada)
       const pathSegments = pathname
         .split("/")
         .map((s) => s.trim().toLowerCase())
         .filter(Boolean);
 
       if (
+        isPlatformHost(hostname) &&
         pathSegments.length >= 1 &&
         !RESERVED_TENANT_SLUGS.has(pathSegments[0]) &&
         !pathSegments[0].includes(".")
@@ -226,6 +243,8 @@ export function getApiClientTenantSlug(): string | null {
         firstSegment === "registro" ||
         firstSegment === "register" ||
         firstSegment === "cuenta" ||
+        firstSegment === "account" ||
+        firstSegment === "perfil" ||
         firstSegment === "superadmin" ||
         firstSegment === "terminos" ||
         firstSegment === "privacidad" ||
@@ -237,12 +256,30 @@ export function getApiClientTenantSlug(): string | null {
       }
 
       // 5. En dominio personalizado (ej: asaderolagranjita.doicela.dev, pedidos.lagranjita.com)
-      // o rutas operativas de franquicia sin prefijo (/admin, /cocina, /repartidor):
-      // consultar persistencia de sesión previa
+      if (!isPlatformHost(hostname)) {
+        if (hostname.includes("lagranjita") || hostname.includes("granjita") || hostname.includes("asadero")) {
+          currentTenantSlugMemory = "la-granjita";
+          return "la-granjita";
+        }
+        if (hostname.includes("brasas") || hostname.includes("valle")) {
+          currentTenantSlugMemory = "brasas-del-valle";
+          return "brasas-del-valle";
+        }
+      }
+
+      // 6. Consultar persistencia de sesión previa (limpiando slugs corruptos/reservados)
       const stored = window.localStorage.getItem(ACTIVE_TENANT_STORAGE_KEY)?.trim().toLowerCase();
-      if (stored && !RESERVED_TENANT_SLUGS.has(stored)) {
-        currentTenantSlugMemory = stored;
-        return stored;
+      if (stored) {
+        if (RESERVED_TENANT_SLUGS.has(stored)) {
+          try {
+            window.localStorage.removeItem(ACTIVE_TENANT_STORAGE_KEY);
+          } catch {
+            // Ignorar
+          }
+        } else {
+          currentTenantSlugMemory = stored;
+          return stored;
+        }
       }
     } catch {
       // Usar fallback en memoria

@@ -110,6 +110,18 @@ describe("resolveTenantRouting", () => {
       expect(routes.getAdminHref("personalizacion")).toBe("/admin/personalizacion");
     });
 
+    it("resuelve /cuenta en dominio propio sin confundir 'cuenta' con el slug del tenant", () => {
+      const routes = resolveTenantRouting({
+        pathname: "/cuenta",
+        hostname: "asaderolagranjita.doicela.dev",
+      });
+
+      expect(routes.isCustomDomain).toBe(true);
+      expect(routes.activeTenantSlug).toBe("la-granjita");
+      expect(routes.basePath).toBe("");
+      expect(routes.getCatalogHref()).toBe("/menu");
+    });
+
     it("soporta dominios de segundo nivel directos como pollos.ec", () => {
       const routes = resolveTenantRouting({
         pathname: "/login",
