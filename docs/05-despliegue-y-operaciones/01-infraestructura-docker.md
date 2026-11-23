@@ -61,12 +61,20 @@ flowchart TD
 * **Variables de Entorno:**
   - `ASPNETCORE_ENVIRONMENT=${ASPNETCORE_ENVIRONMENT:-Production}`
   - `ASPNETCORE_URLS=http://+:5005`
+  - `RESET_DATABASE_ON_STARTUP=${RESET_DATABASE_ON_STARTUP:-false}`
   - `ConnectionStrings__DefaultConnection=Host=postgres;Port=5432;Database=${POSTGRES_DB:-delivery};Username=${POSTGRES_USER:-postgres};Password=${POSTGRES_PASSWORD:?Definir POSTGRES_PASSWORD en .env}`
   - `ConnectionStrings__Redis=redis:6379,password=${REDIS_PASSWORD:?Definir REDIS_PASSWORD en .env}`
   - `Jwt__SecretKey=${JWT_SECRET:?Definir JWT_SECRET en .env}`
   - `INITIAL_ADMIN_PASSWORD=${INITIAL_ADMIN_PASSWORD:?Definir INITIAL_ADMIN_PASSWORD en .env}`
   - `GOOGLE_CLIENT_ID=${GOOGLE_CLIENT_ID:-}`
   - `WHATSAPP_*`, `DEEPSEEK_API_KEY`, `GEMINI_API_KEY`
+  - `SMTP_HOST=${SMTP_HOST:-smtp.resend.com}`
+  - `SMTP_PORT=${SMTP_PORT:-587}`
+  - `SMTP_USER=${SMTP_USER:-resend}`
+  - `SMTP_PASSWORD=${SMTP_PASSWORD:-}`
+  - `SMTP_SECURE=${SMTP_SECURE:-true}`
+  - `SMTP_FROM_EMAIL=${SMTP_FROM_EMAIL:-no-reply@mesafy.doicela.dev}`
+  - `SMTP_FROM_NAME=${SMTP_FROM_NAME:-Mesafy Gastronomía}`
 * **Volumen Persistente:** `delivery_uploads_data:/app/uploads` (propiedad de `$APP_UID` en `backend/Dockerfile` para almacenamiento multi-tenant de avatares WebP).
 * **Dependencias:** `postgres` y `redis` en estado saludable (`service_healthy`).
 * **Healthcheck:**

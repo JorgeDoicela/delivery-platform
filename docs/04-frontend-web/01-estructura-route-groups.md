@@ -79,9 +79,13 @@ La plataforma implementa un panel de accesos directos en [`src/app/(storefront)/
 
 ### 4.1. Canal Storefront (`src/app/(storefront)/`)
 * **URL Publica:** `/`, `/[slug]`, `/cuenta`, `/[slug]/cuenta`, `/checkout`, `/finalizar-pedido`, `/track/[orderId]`, `/login`, `/terminos`, `/privacidad`
-* **Diseno Visual:** Paleta sobria asadero (fondos neutros oscuros `bg-neutral-950` y acentos ambar/rojo asadero dinamicamente inyectados segun la marca). Cero emojis y cero insignias infladas de garantia.
+* **Diseno Visual:** Paleta sobria asadero (fondos neutros claros `bg-surface-canvas` y acentos rojo asadero inyectados por comercio). Cero emojis y cero insignias infladas de garantia.
 * **Ergonomia Comercial:** Tarjetas de producto con botones de accion directa `+ PEDIR` e insignias de oferta sobrias.
-* **Header Interactivo:** Indicador de carrito reactivo en vivo mediante `CartButtonBadge.tsx`.
+* **Header Interactivo y Mobile Drawer:**
+  - `StorefrontHeader.tsx`: Sincronizacion activa en rojo (`text-brand-primary`) con exclusion mutua entre `Inicio`, `Menú & Combos` y `Mis Pedidos`, contemplando anclajes hash (`#catalogo`, `#restaurantes`).
+  - `UserNav.tsx`: Boton de usuario sin fondo gris residual, resaltando en rojo el trazo del icono en vistas de acceso (`/login`, `/cuenta`).
+  - `CartButtonBadge.tsx`: Indicador de carrito reactivo que conmuta su icono a rojo (`text-brand-primary`) al abrir el drawer o ingresar a `/checkout`.
+  - `StorefrontMobileDrawer.tsx`: Menu lateral sin divisores forzados (`border-t`), con enlaces integrados en fondo transparente y activacion de color de marca para navegacion secundaria.
 
 ### 4.2. Canal Dashboard / KDS y Administracion (`src/app/(dashboard)/`)
 * **URL Publica:** `/kitchen`, `/cocina`, `/admin/inventario`, `/admin/sucursales`, `/admin/personalizacion`, `/admin/tenants`, `/superadmin`
@@ -157,6 +161,22 @@ Interpreta las peticiones entrantes antes de renderizar paginas protegidas (`/co
 ### 6.3. Almacenamiento Seguro sin XSS
 * El `accessToken` vive exclusivamente en la memoria volatil del store Zustand (`useAuthStore.ts`), nunca en `localStorage`.
 * Las llamadas a `/api/v1/auth/*` utilizan `credentials: "include"` para permitir la transmision automatica y segura de cookies `HttpOnly`.
+
+---
+
+## 7. Arquitectura PWA Multi-Tenant y Richer Install UI
+
+La plataforma opera como una Progressive Web App (PWA) instalable de forma aislada por establecimiento, sucursal o portal global de plataforma mediante un endpoint de generacion de manifiesto dinamico:
+
+### 7.1. Resolucion Dinamica del Manifiesto (`/manifest.json`)
+* **Por Tenant:** Solicitudes con `?slug={tenantSlug}` o cabecera `Referer` resuelven el ID, nombre comercial, colores de marca (`theme_color`, `background_color`) e iconos aislados (`/images/tenants/{slug}/identidad/logo.png`).
+* **Por Sucursal:** Si la URL incluye `?slug={slug}&branch={branchId}`, el manifiesto se califica con el nombre y alcance de dicha sucursal (`id: "/{slug}?branch={branchId}"`).
+* **Sincronizacion en Cliente (`DynamicPwaManifest.tsx`):** Un componente de cliente montado en el layout sincroniza dinamicamente la etiqueta `<link rel="manifest">` en el `<head>` del documento al cambiar de ruta entre tiendas sin recarga completa.
+
+### 7.2. Interfaz Enriquecida de Instalacion (Richer Install UI)
+Para activar la experiencia nativa de instalacion en Android (Bottom Sheet modal con arte destacado) y en navegadores de escritorio (sustituyendo la ilustracion generica del navegador por la portada real del restaurante):
+* **Screenshots Narrow (Movil):** Imagen vertical en proporcion 9:16 (`1080x1920`, `form_factor: "narrow"`) generada para cada tenant (`/images/tenants/{slug}/identidad/pwa-preview-mobile.png`) que presenta el logotipo oficial centrado sobre el fondo de identidad de marca.
+* **Screenshots Wide (Escritorio):** Banner horizontal en proporcion 16:9 (`1376x768`, `form_factor: "wide"`) correspondiente al slide o portada principal de la tienda (`hero-pollo-brasa.jpg` o banners promocionales activos).
 
 ---
 

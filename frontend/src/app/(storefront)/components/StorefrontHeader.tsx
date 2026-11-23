@@ -109,11 +109,41 @@ export function StorefrontHeader() {
         ? routes.getDriverHref()
         : storefrontHomeHref;
 
-  const isHomeActive =
-    pathname === storefrontHomeHref ||
-    (routes.basePath ? pathname === routes.basePath : pathname === "/");
+  const [currentHash, setCurrentHash] = useState("");
+
+  useEffect(() => {
+    const handleHash = () => {
+      if (typeof window !== "undefined") {
+        setCurrentHash(window.location.hash);
+      }
+    };
+    handleHash();
+    window.addEventListener("hashchange", handleHash);
+    return () => {
+      window.removeEventListener("hashchange", handleHash);
+    };
+  }, []);
+
   const isCatalogActive =
-    pathname.includes("menu") || pathname.includes("catalogo");
+    pathname.includes("menu") ||
+    pathname.includes("catalogo") ||
+    (isPlatformRoot && currentHash === "#restaurantes") ||
+    (!isPlatformRoot && currentHash === "#catalogo");
+
+  const isHomeActive =
+    (pathname === storefrontHomeHref ||
+      (routes.basePath ? pathname === routes.basePath : pathname === "/") ||
+      pathname.includes("/sucursal/")) &&
+    !pathname.includes("menu") &&
+    !pathname.includes("catalogo") &&
+    !pathname.includes("pedidos") &&
+    !pathname.includes("rastreo") &&
+    !pathname.includes("track") &&
+    !pathname.includes("login") &&
+    !pathname.includes("cuenta") &&
+    !pathname.includes("checkout") &&
+    !pathname.includes("finalizar-pedido") &&
+    !isCatalogActive;
   const isPedidosActive =
     pathname.includes("pedidos") ||
     pathname.includes("rastreo") ||

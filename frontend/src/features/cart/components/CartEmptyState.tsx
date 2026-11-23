@@ -15,8 +15,8 @@ export function CartEmptyState({ tenantSlug }: CartEmptyStateProps) {
 
   return (
     <div className="flex-1 flex flex-col items-center justify-center p-8 text-center space-y-4">
-      <div className="w-16 h-16 rounded-full bg-surface-canvas border border-surface-border flex items-center justify-center text-text-muted">
-        <ShoppingBag className="w-8 h-8 stroke-[1.5]" />
+      <div className="flex items-center justify-center text-text-muted">
+        <ShoppingBag className="w-12 h-12 stroke-[1.5]" />
       </div>
 
       <div className="space-y-1 max-w-xs">

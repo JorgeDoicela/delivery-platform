@@ -6,7 +6,7 @@ Plataforma integral multitenant de venta directa, gestion de cocina (KDS), despa
 
 ## 1. Indice Maestro de Documentacion Tecnica (Docs-as-Code)
 
-La documentacion tecnica detallada del sistema se encuentra organizada bajo taxonomia jerarquica numerica dentro del directorio [`docs/`](docs/):
+La documentacion tecnica detallada del sistema se encuentra organizada bajo taxonomia jerarquica numerica encabezada por el catalogo maestro [`docs/00-indice-general.md`](docs/00-indice-general.md):
 
 * **01. Arquitectura y Diseno:**
   - [`01-vision-general.md`](docs/01-arquitectura/01-vision-general.md): Topologia de red, multitenancy seguro con filtros globales, Vertical Slices en backend, Feature-Driven en frontend e inventario automatizado por recetas.

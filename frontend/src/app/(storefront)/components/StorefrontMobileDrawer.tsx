@@ -3,6 +3,7 @@
 import React from "react";
 import Link from "next/link";
 import Image from "next/image";
+import { usePathname } from "next/navigation";
 import {
   User as UserIcon,
   Package,
@@ -94,6 +95,18 @@ export function StorefrontMobileDrawer({
       window.removeEventListener("keydown", handleKeyDown);
     };
   }, [isOpen, onClose]);
+
+  const pathname = usePathname();
+  const isLoginActive =
+    Boolean(pathname?.includes("/login")) ||
+    Boolean(pathname?.includes("/registro")) ||
+    Boolean(pathname?.includes("/recuperar")) ||
+    Boolean(pathname?.includes("/cuenta"));
+  const isSucursalesActive =
+    Boolean(pathname?.includes("/sucursal")) ||
+    Boolean(pathname?.includes("/sucursales"));
+  const isTermsActive = Boolean(pathname?.includes("/terminos"));
+  const isPrivacyActive = Boolean(pathname?.includes("/privacidad"));
 
   const hasMultipleBranches =
     isPlatformRoot || Boolean(tenant?.branches && tenant.branches.length > 1);
@@ -230,7 +243,11 @@ export function StorefrontMobileDrawer({
               <Link
                 href={routes.getSucursalesHref()}
                 onClick={onClose}
-                className="flex items-center gap-3 px-3.5 py-3 rounded-2xl hover:bg-surface-canvas text-text-strong hover:text-brand-primary font-display font-black text-sm uppercase tracking-wide transition-colors"
+                className={`flex items-center gap-3 px-3.5 py-3 rounded-2xl hover:bg-surface-canvas font-display font-black text-sm uppercase tracking-wide transition-colors ${
+                  isSucursalesActive
+                    ? "text-brand-primary"
+                    : "text-text-strong hover:text-brand-primary"
+                }`}
               >
                 <Building2 className="w-4 h-4 text-brand-primary shrink-0" />
                 <span>Sucursales & Cobertura</span>
@@ -240,7 +257,11 @@ export function StorefrontMobileDrawer({
             <Link
               href={routes.getTermsHref()}
               onClick={onClose}
-              className="flex items-center gap-3 px-3.5 py-3 rounded-2xl hover:bg-surface-canvas text-text-strong hover:text-brand-primary font-display font-black text-sm uppercase tracking-wide transition-colors"
+              className={`flex items-center gap-3 px-3.5 py-3 rounded-2xl hover:bg-surface-canvas font-display font-black text-sm uppercase tracking-wide transition-colors ${
+                isTermsActive
+                  ? "text-brand-primary"
+                  : "text-text-strong hover:text-brand-primary"
+              }`}
             >
               <FileText className="w-4 h-4 text-brand-primary shrink-0" />
               <span>Términos y Condiciones</span>
@@ -249,7 +270,11 @@ export function StorefrontMobileDrawer({
             <Link
               href={routes.getPrivacyHref()}
               onClick={onClose}
-              className="flex items-center gap-3 px-3.5 py-3 rounded-2xl hover:bg-surface-canvas text-text-strong hover:text-brand-primary font-display font-black text-sm uppercase tracking-wide transition-colors"
+              className={`flex items-center gap-3 px-3.5 py-3 rounded-2xl hover:bg-surface-canvas font-display font-black text-sm uppercase tracking-wide transition-colors ${
+                isPrivacyActive
+                  ? "text-brand-primary"
+                  : "text-text-strong hover:text-brand-primary"
+              }`}
             >
               <ShieldCheck className="w-4 h-4 text-brand-primary shrink-0" />
               <span>Aviso de Privacidad</span>
@@ -258,7 +283,7 @@ export function StorefrontMobileDrawer({
         </div>
 
         {/* Pie del Drawer */}
-        <div className="p-4 sm:p-6 pt-3 sm:pt-4 border-t border-surface-border space-y-2 shrink-0">
+        <div className="px-4 sm:px-6 pb-4 sm:pb-6 pt-1 space-y-1 shrink-0">
           {isAuthenticated ? (
             <button
               type="button"
@@ -266,7 +291,7 @@ export function StorefrontMobileDrawer({
                 await onLogout();
                 onClose();
               }}
-              className="w-full flex items-center justify-center gap-2 px-4 py-3 rounded-2xl bg-surface-canvas hover:bg-surface-card-hover border border-surface-border text-text-strong hover:text-brand-primary text-xs font-bold uppercase tracking-wider font-display transition-colors cursor-pointer"
+              className="w-full flex items-center gap-3 px-3.5 py-3 rounded-2xl hover:bg-surface-canvas text-text-strong hover:text-brand-primary font-display font-black text-sm uppercase tracking-wide transition-colors cursor-pointer"
             >
               <LogOut className="w-4 h-4 text-brand-primary shrink-0" />
               <span>Cerrar Sesión</span>
@@ -275,13 +300,14 @@ export function StorefrontMobileDrawer({
             <Link
               href={routes.getLoginHref()}
               onClick={onClose}
-              className="flex items-center justify-between px-4 py-3 rounded-2xl bg-surface-canvas hover:bg-surface-card-hover border border-surface-border text-text-strong text-xs font-bold uppercase tracking-wider font-display transition-colors"
+              className={`flex items-center gap-3 px-3.5 py-3 rounded-2xl hover:bg-surface-canvas font-display font-black text-sm uppercase tracking-wide transition-colors ${
+                isLoginActive
+                  ? "text-brand-primary"
+                  : "text-text-strong hover:text-brand-primary"
+              }`}
             >
-              <div className="flex items-center gap-2.5">
-                <UserIcon className="w-4 h-4 text-brand-primary" />
-                <span>Mi Perfil / Iniciar Sesión</span>
-              </div>
-              <span className="text-[10px] text-text-muted">&rarr;</span>
+              <UserIcon className="w-4 h-4 text-brand-primary shrink-0" />
+              <span>Mi Perfil / Iniciar Sesión</span>
             </Link>
           )}
         </div>

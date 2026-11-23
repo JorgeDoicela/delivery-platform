@@ -79,21 +79,19 @@ export function PasskeySignInButton({
         onClick={handlePasskeyLogin}
         disabled={isLoading}
         aria-label="Entrar con huella o reconocimiento facial"
-        className="w-full min-h-[48px] bg-surface-card hover:bg-surface-card-hover active:scale-[0.99] text-text-strong font-bold text-xs uppercase tracking-wider font-display rounded-xl border border-surface-border hover:border-brand-primary/50 shadow-2xs transition-all flex items-center justify-center gap-2.5 disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer px-4"
+        className="w-full min-h-[48px] px-4 py-2.5 bg-surface-card hover:bg-surface-card-hover active:scale-95 border border-surface-border hover:border-surface-border/80 rounded-full text-sm font-bold tracking-wide font-display text-text-strong shadow-xs transition-all flex items-center justify-center gap-2.5 disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
       >
         {isLoading ? (
           <>
             <Loader2 className="w-4 h-4 animate-spin text-brand-primary" />
-            <span className="font-sans normal-case text-xs text-text-muted">
-              Verifica tu huella o rostro en tu equipo...
+            <span className="text-sm font-semibold text-text-muted">
+              Verificando huella o rostro...
             </span>
           </>
         ) : (
           <>
             <Fingerprint className="w-4 h-4 text-brand-primary shrink-0" />
-            <span className="font-sans normal-case text-xs font-semibold">
-              Entrar con Huella o Rostro
-            </span>
+            <span>Entrar con Huella o Rostro</span>
           </>
         )}
       </button>

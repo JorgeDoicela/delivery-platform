@@ -80,8 +80,17 @@ export function FloatingPwaInstallButton() {
         >
           <div className="bg-surface-card rounded-3xl border border-surface-border text-text-strong shadow-2xl max-w-sm w-full p-5 sm:p-6 space-y-4 animate-slideUp">
             <div className="flex items-center justify-between pb-2 border-b border-surface-border/60">
-              <div className="flex items-center gap-2">
-                <Smartphone className="w-5 h-5 text-brand-primary" />
+              <div className="flex items-center gap-2.5">
+                {tenant?.logoUrl ? (
+                  // eslint-disable-next-line @next/next/no-img-element
+                  <img
+                    src={tenant.logoUrl}
+                    alt={brandName}
+                    className="w-7 h-7 rounded-full object-contain shrink-0 border border-surface-border bg-surface-canvas p-0.5"
+                  />
+                ) : (
+                  <Smartphone className="w-5 h-5 text-brand-primary" />
+                )}
                 <h3 className="font-display font-black text-base uppercase tracking-tight text-text-strong">
                   Instalar Aplicación
                 </h3>

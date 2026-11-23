@@ -9,22 +9,43 @@ El backend de la plataforma incorpora un mecanismo de inicializacion y siembra a
 
 ---
 
-## 2. Flujo de Inicializacion en Arranque
+## 2. Flujo de Inicializacion en Arranque y Switch de Reinicio (DatabaseResetManager)
+
+Para facilitar el desarrollo activo tanto en entorno local como en despliegues tempranos en VPS/staging sin acumular esquemas o semillas obsoletas, la plataforma incorpora un switch de control:
+
+* **Variable de Entorno (`.env` / Docker Compose):** `RESET_DATABASE_ON_STARTUP=true` (o `false`)
+* **Configuración JSON (`appsettings.json`):** `Database:ResetOnStartup` (booleano)
+* **Gestor Central:** `DatabaseResetManager` en `backend/src/Delivery.Core/Infrastructure/Persistence/DatabaseResetManager.cs`
+
+### Comportamiento del Switch
+
+1. **Cuando está Activo (`true` / `1` / `yes`):**
+   - Ejecuta un script PL/pgSQL que elimina todas las vistas, tablas y secuencias del esquema `public` en cascada, **preservando intacta la tabla `spatial_ref_sys` de PostGIS**.
+   - Ejecuta un hook asíncrono para vaciar la base de datos de Redis (`FlushDatabaseAsync`), eliminando ranuras de cocina desactualizadas, llaves de idempotencia y coordenadas GPS previas.
+   - Aplica todas las migraciones de Entity Framework Core desde el inicio (`MigrateAsync`).
+   - Ejecuta el sembrado de datos completo e idempotente (`DatabaseSeeder.SeedAsync`).
+2. **Cuando está Inactivo (`false` / `0` / ausente - Valor por Defecto):**
+   - Preserva todas las tablas, usuarios, órdenes y datos reales.
+   - Aplica únicamente migraciones incrementales pendientes.
+   - Verifica que los datos semilla esenciales (roles y SuperAdmin) existan sin sobrescribir ni reiniciar pedidos.
 
 ```mermaid
 flowchart TD
-    AppStart[Arranque de Delivery.Api Program.cs] --> CheckEnv{Es Entorno Development?}
-    CheckEnv -- Si --> RunMigrations[context.Database.MigrateAsync]
+    AppStart[Arranque de Delivery.Api Program.cs] --> CheckSwitch{Switch RESET_DATABASE_ON_STARTUP activo?}
+    CheckSwitch -- Si (true) --> PurgeSchema[1. Purgar vistas, tablas y secuencias en public]
+    PurgeSchema --> PreservePostgis[2. Preservar spatial_ref_sys PostGIS intacto]
+    PreservePostgis --> FlushRedis[3. Vaciar cache y slots de cocina en Redis]
+    FlushRedis --> RunMigrations[4. Aplicar migraciones EF Core MigrateAsync]
+    CheckSwitch -- No (false / default) --> RunMigrations
     RunMigrations --> SeedAsync[DatabaseSeeder.SeedAsync]
     SeedAsync --> SeedRoles[1. Sembrar Roles Globales 1 a 7]
     SeedRoles --> SeedSuperAdmin[2. Sembrar SuperAdmin jorge@admin.com]
     SeedSuperAdmin --> SeedGranjita[3. Sembrar Tenant La Granjita Asadero]
-    SeedGranjita --> SeedBranches[3.1. Sucursales Norte y Sur con Poligonos GiST]
+    SeedGranjita --> SeedBranches[3.1. Sucursales con Poligonos GiST]
     SeedBranches --> SeedInventory[3.2. Proveedores, Insumos Crudos y Kardex Inicial]
     SeedBranches --> SeedCatalog[3.3. Categorias, Platos, Modificadores y Recetas]
     SeedGranjita --> SeedSecondary[4. Sembrar Tenants Secundarios: Brasas del Valle]
-    SeedSecondary --> Ready[Base de Datos Lista para Pruebas Locales]
-    CheckEnv -- No (Produccion) --> Standby[Migraciones aplicadas mediante scripts CI/CD]
+    SeedSecondary --> Ready[Base de Datos Lista y Operativa]
 ```
 
 ---

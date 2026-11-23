@@ -21,6 +21,7 @@ describe("Dynamic Multi-Tenant PWA Manifest Handler", () => {
     expect(manifest.name).toBe("Mesafy | Plataforma Gastronómica");
     expect(manifest.short_name).toBe("Mesafy");
     expect(manifest.display).toBe("standalone");
+    expect(manifest.screenshots).toHaveLength(2);
   });
 
   it("genera el manifest aislado para un tenant especifico (la-granjita)", async () => {
@@ -38,6 +39,9 @@ describe("Dynamic Multi-Tenant PWA Manifest Handler", () => {
     expect(manifest.theme_color).toBe("#E4002B");
     expect(manifest.icons).toHaveLength(2);
     expect(manifest.icons[0].src).toBe("/images/tenants/la-granjita/identidad/logo.png");
+    expect(manifest.screenshots).toHaveLength(2);
+    expect(manifest.screenshots[0].form_factor).toBe("narrow");
+    expect(manifest.screenshots[1].form_factor).toBe("wide");
     expect(manifest.shortcuts[0].url).toBe("/la-granjita/menu");
     expect(manifest.shortcuts[1].url).toBe("/la-granjita/pedidos");
   });
@@ -73,6 +77,9 @@ describe("Dynamic Multi-Tenant PWA Manifest Handler", () => {
     expect(manifest.name).toBe("Brasas del Valle - Parrilla & Cortes Madurados");
     expect(manifest.short_name).toBe("Brasas del Valle");
     expect(manifest.theme_color).toBe("#047857");
+    expect(manifest.screenshots).toHaveLength(2);
+    expect(manifest.screenshots[0].src).toBe("/images/tenants/brasas-del-valle/identidad/pwa-preview-mobile.png");
+    expect(manifest.screenshots[1].src).toBe("/images/tenants/brasas-del-valle/banners/hero-combo-familiar.jpg");
   });
 
   it("soporta subdominios multi-tenant ajustando scope y start_url a la raiz", async () => {

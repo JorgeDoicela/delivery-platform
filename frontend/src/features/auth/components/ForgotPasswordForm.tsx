@@ -100,7 +100,6 @@ export function ForgotPasswordForm({
               Ingresa tu correo para recibir un enlace seguro de restablecimiento.
             </p>
           </div>
-          <div className="border-t border-surface-border/60" />
         </>
       )}
 
@@ -197,7 +196,7 @@ export function ForgotPasswordForm({
           </button>
 
           {/* Enlace para volver */}
-          <div className="pt-2 text-center border-t border-surface-border/60">
+          <div className="pt-2 text-center">
             {onSwitchToLogin ? (
               <button
                 type="button"

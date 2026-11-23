@@ -164,7 +164,6 @@ export function ResetPasswordForm({
               Define tu nueva contraseña para recuperar el acceso a tu cuenta.
             </p>
           </div>
-          <div className="border-t border-surface-border/60" />
         </>
       )}
 
@@ -339,7 +338,7 @@ export function ResetPasswordForm({
           </button>
 
           {/* Enlace de regreso */}
-          <div className="pt-2 text-center border-t border-surface-border/60">
+          <div className="pt-2 text-center">
             {onSwitchToLogin ? (
               <button
                 type="button"

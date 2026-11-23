@@ -167,6 +167,15 @@ export async function GET(request: NextRequest) {
 
     const logoUrl = tenantConfig.logoUrl || `/images/tenants/${slug}/identidad/logo.png`;
 
+    // Capturas enriquecidas para el modal de instalación PWA (Richer Install UI)
+    const mobilePreviewUrl = `/images/tenants/${slug}/identidad/pwa-preview-mobile.png`;
+    const desktopBannerUrl =
+      tenantConfig.heroSlides?.find((s) => s.isActive && s.imageUrl)?.imageUrl ||
+      tenantConfig.heroSlides?.[0]?.imageUrl ||
+      tenantConfig.promotionalBanners?.find((b) => b.isActive && b.imageUrl)?.imageUrl ||
+      tenantConfig.promotionalBanners?.[0]?.imageUrl ||
+      logoUrl;
+
     const tenantManifest = {
       id: appId,
       name: appName,
@@ -193,6 +202,22 @@ export async function GET(request: NextRequest) {
           sizes: "512x512",
           type: "image/png",
           purpose: "any maskable",
+        },
+      ],
+      screenshots: [
+        {
+          src: mobilePreviewUrl,
+          sizes: "1080x1920",
+          type: "image/png",
+          form_factor: "narrow",
+          label: `${tenantConfig.name} - Menú y Pedidos en Línea`,
+        },
+        {
+          src: desktopBannerUrl,
+          sizes: "1376x768",
+          type: "image/jpeg",
+          form_factor: "wide",
+          label: `${appName} - Especialidades y Delivery`,
         },
       ],
       shortcuts: [
@@ -248,6 +273,22 @@ export async function GET(request: NextRequest) {
         sizes: "512x512",
         type: "image/png",
         purpose: "any maskable",
+      },
+    ],
+    screenshots: [
+      {
+        src: "/images/platform/pwa-preview-mobile.png",
+        sizes: "1080x1920",
+        type: "image/png",
+        form_factor: "narrow",
+        label: "Mesafy - Plataforma Gastronómica Multi-Restaurante",
+      },
+      {
+        src: "/images/platform/hero-platform.jpg",
+        sizes: "1376x768",
+        type: "image/jpeg",
+        form_factor: "wide",
+        label: "Mesafy - Directorio y Pedidos en Tiempo Real",
       },
     ],
     shortcuts: [

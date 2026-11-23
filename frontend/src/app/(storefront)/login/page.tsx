@@ -118,7 +118,7 @@ function LoginContent({ initialSlug }: LoginPageProps) {
                 ) : (
                     /* Formulario de Login / Registro / Recuperación */
                     <div className="w-full max-w-md mx-auto py-2">
-                        <div className="mb-6 pb-3 border-b border-surface-border/60">
+                        <div className="mb-6 pb-1">
                             <h2 className="text-2xl font-black uppercase tracking-tight text-text-strong font-display">
                                 {authMode === "login"
                                     ? "Iniciar Sesión"
@@ -130,17 +130,15 @@ function LoginContent({ initialSlug }: LoginPageProps) {
                                                 ? "Restablecer Contraseña"
                                                 : "Verificar Correo Electrónico"}
                             </h2>
-                            <p className="text-xs text-text-muted mt-1">
-                                {authMode === "login"
-                                    ? "Accede a tu cuenta para gestionar pedidos, cocina o administración."
-                                    : authMode === "register"
-                                        ? `Regístrate en ${brandName} para disfrutar pedidos en línea y seguimiento satelital.`
-                                        : authMode === "forgot-password"
-                                            ? "Ingresa tu correo electrónico registrado y te enviaremos un enlace seguro con instrucciones."
-                                            : authMode === "reset-password"
-                                                ? "Ingresa tu nueva contraseña para recuperar el acceso a tu cuenta."
-                                                : `Confirma tu cuenta registrada en ${brandName} para habilitar pedidos y notificaciones.`}
-                            </p>
+                            {authMode !== "login" && authMode !== "register" && (
+                                <p className="text-xs text-text-muted mt-1">
+                                    {authMode === "forgot-password"
+                                        ? "Ingresa tu correo electrónico registrado y te enviaremos un enlace seguro con instrucciones."
+                                        : authMode === "reset-password"
+                                            ? "Ingresa tu nueva contraseña para recuperar el acceso a tu cuenta."
+                                            : `Confirma tu cuenta registrada en ${brandName} para habilitar pedidos y notificaciones.`}
+                                </p>
+                            )}
                         </div>
 
                         {authMode === "login" && (

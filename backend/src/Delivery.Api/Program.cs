@@ -59,7 +59,7 @@ if (string.IsNullOrWhiteSpace(redisConnectionString))
     var redisPass = Environment.GetEnvironmentVariable("REDIS_PASSWORD")
         ?? throw new InvalidOperationException("La variable 'REDIS_PASSWORD' no está configurada en el archivo .env.");
 
-    redisConnectionString = $"{redisHost}:{redisPort},password={redisPass},abortConnect=false";
+    redisConnectionString = $"{redisHost}:{redisPort},password={redisPass},abortConnect=false,allowAdmin=true";
 }
 builder.Services.AddSingleton<IConnectionMultiplexer>(_ => ConnectionMultiplexer.Connect(redisConnectionString));
 
@@ -246,12 +246,32 @@ builder.Services.AddSwaggerGen(c =>
 
 var app = builder.Build();
 
-// Inicialización de base de datos y seeding
+// Inicialización de base de datos y seeding (con soporte para switch de reinicio en desarrollo)
 using (var scope = app.Services.CreateScope())
 {
     var context = scope.ServiceProvider.GetRequiredService<AppDbContext>();
-    await context.Database.MigrateAsync();
-    await DatabaseSeeder.SeedAsync(context);
+    var logger = scope.ServiceProvider.GetRequiredService<ILogger<Program>>();
+    var redis = scope.ServiceProvider.GetService<IConnectionMultiplexer>();
+
+    await DatabaseResetManager.InitializeDatabaseAsync(
+        context,
+        builder.Configuration,
+        logger,
+        onDatabasePurged: async () =>
+        {
+            if (redis != null && redis.IsConnected)
+            {
+                var endpoints = redis.GetEndPoints();
+                foreach (var endpoint in endpoints)
+                {
+                    var server = redis.GetServer(endpoint);
+                    if (!server.IsReplica)
+                    {
+                        await server.FlushDatabaseAsync();
+                    }
+                }
+            }
+        });
 }
 
 // Pipeline HTTP

@@ -235,7 +235,7 @@ export function LoginForm({
       <button
         type="submit"
         disabled={isSubmitting}
-        className="w-full min-h-[50px] bg-brand-primary hover:bg-brand-primary-hover active:scale-95 text-white font-black text-sm uppercase tracking-wider font-display rounded-full shadow-md shadow-brand-primary/20 transition-all flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer pt-0.5"
+        className="w-full min-h-[48px] px-4 py-2.5 bg-brand-primary hover:bg-brand-primary-hover active:scale-95 text-white font-bold text-sm tracking-wide font-display rounded-full shadow-md shadow-brand-primary/20 transition-all flex items-center justify-center gap-2.5 disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
       >
         {isSubmitting ? (
           <>
@@ -252,7 +252,7 @@ export function LoginForm({
       <PasskeySignInButton redirectUrl={redirectUrl} emailHint={watchedEmail} />
 
       {/* Enlace alternativo para crear cuenta */}
-      <div className="pt-2 text-center border-t border-surface-border/60">
+      <div className="pt-2 text-center">
         <p className="text-xs text-text-muted font-sans">
           ¿No tienes una cuenta aún?{" "}
           {onSwitchToRegister ? (

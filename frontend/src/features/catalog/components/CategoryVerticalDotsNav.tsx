@@ -248,13 +248,13 @@ export function CategoryVerticalDotsNav({
                   )}%`
                 : `${((activeIndex + 0.5) / validCategories.length) * 100}%`,
           }}
-          className="absolute right-10 -translate-y-1/2 z-40 px-3 py-1.5 rounded-full bg-white/95 dark:bg-neutral-900/95 text-neutral-900 dark:text-white shadow-xl shadow-black/10 dark:shadow-black/40 backdrop-blur-md border border-neutral-200/90 dark:border-white/10 flex items-center justify-center transition-[top] duration-75 ease-out pointer-events-none whitespace-nowrap animate-in fade-in zoom-in-95"
+          className="absolute right-11 -translate-y-1/2 z-40 px-4 py-2 rounded-full bg-white/95 dark:bg-neutral-900/95 text-neutral-900 dark:text-white shadow-xl shadow-black/15 dark:shadow-black/50 backdrop-blur-md border border-neutral-200/90 dark:border-white/10 flex items-center justify-center transition-[top] duration-75 ease-out pointer-events-none whitespace-nowrap animate-in fade-in zoom-in-95"
         >
-          <span className="text-[11px] font-black font-display uppercase tracking-wider">
+          <span className="text-[13px] font-black font-display uppercase tracking-wide leading-none">
             {displayCategoryName}
           </span>
           {/* Triángulo apuntador hacia los puntos */}
-          <span className="absolute -right-1 top-1/2 -translate-y-1/2 w-2 h-2 rotate-45 bg-white/95 dark:bg-neutral-900/95 border-r border-t border-neutral-200/90 dark:border-white/10" />
+          <span className="absolute -right-1.5 top-1/2 -translate-y-1/2 w-2.5 h-2.5 rotate-45 bg-white/95 dark:bg-neutral-900/95 border-r border-t border-neutral-200/90 dark:border-white/10" />
         </div>
       )}
 

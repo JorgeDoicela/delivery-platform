@@ -112,15 +112,30 @@ NEXT_PUBLIC_API_URL=https://api.mesafy.doicela.dev
 NEXT_PUBLIC_WS_URL=https://api.mesafy.doicela.dev/hubs
 INTERNAL_API_URL=http://127.0.0.1:5005
 
-# 7. Correo Electronico SMTP Transaccional (Google Gmail / SendGrid / Amazon SES)
-SMTP_HOST=smtp.gmail.com
+# 7. Correo Electronico SMTP Transaccional (Resend / SMTP)
+SMTP_HOST=smtp.resend.com
 SMTP_PORT=587
-SMTP_USER=notificaciones@doicela.dev
-SMTP_PASSWORD=clave_de_aplicacion_google_16_caracteres
+SMTP_USER=resend
+SMTP_PASSWORD=re_tu_api_key_aqui
 SMTP_SECURE=true
-SMTP_FROM_EMAIL=notificaciones@doicela.dev
-SMTP_FROM_NAME=Mesafy Platform
+SMTP_FROM_EMAIL=no-reply@mesafy.doicela.dev
+SMTP_FROM_NAME=Mesafy Gastronomia
 ```
+
+### 3.1. Infraestructura de Correo Transaccional con Resend y Cloudflare DNS
+
+La plataforma despacha correos transaccionales (confirmaciones de pedido, activacion de cuentas, pines de seguridad de caja y restablecimiento de claves) a traves de **Resend** mediante protocolo SMTP seguro (`MailKitSmtpEmailService`):
+
+1. **Parametros SMTP:**
+   - Host: `smtp.resend.com`
+   - Puerto: `587` (con negociacion `STARTTLS` mediante `SecureSocketOptions.StartTls`).
+   - Usuario: `resend` (constante oficial requerida por el servidor SMTP de Resend).
+   - Password: API Key generada en el panel de Resend con permisos de envio (`re_...`).
+2. **Autenticacion Criptografica de Dominio (DNS Cloudflare):**
+   - Dominio oficial verificado: `mesafy.doicela.dev`.
+   - **DKIM:** Registro `TXT` en `resend._domainkey.mesafy` firmado con llave RSA para garantizar la integridad del remitente y evitar caida en carpetas de spam.
+   - **SPF y Retorno:** Registros `CNAME` en `send.mesafy` y `rsend.mesafy` delegados a `send.forge.rmta.net` con estado *DNS Only* (sin proxy Cloudflare).
+   - Validacion y diagnostico operativo disponible en el endpoint: `POST /api/emails/test`.
 
 ---
 

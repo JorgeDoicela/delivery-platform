@@ -74,16 +74,32 @@ export function UserNav({ tenantSlug, showGuestLogin = true }: UserNavProps = {}
     return null;
   }
 
+  const isAuthActive =
+    Boolean(pathname?.includes("/login")) ||
+    Boolean(pathname?.includes("/registro")) ||
+    Boolean(pathname?.includes("/recuperar")) ||
+    Boolean(pathname?.includes("/reset")) ||
+    Boolean(pathname?.includes("/verificar")) ||
+    Boolean(pathname?.includes("/cuenta"));
+
   if (!isAuthenticated || !user) {
     if (!showGuestLogin) return null;
     return (
       <Link
         href={routes.getLoginHref()}
-        className="hidden sm:inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-bold uppercase tracking-wider font-display text-text-strong hover:text-brand-primary hover:bg-surface-card-hover transition-colors shrink-0"
+        className={`hidden sm:flex p-1.5 sm:p-2 rounded-full transition-colors items-center justify-center shrink-0 active:scale-95 ${
+          isAuthActive
+            ? "text-brand-primary"
+            : "text-text-strong hover:text-brand-primary"
+        }`}
         title="Iniciar Sesión"
+        aria-label="Iniciar Sesión"
       >
-        <UserIcon className="w-4 h-4 text-text-strong stroke-[1.8]" />
-        <span>Ingresar</span>
+        <UserIcon
+          className={`w-5 h-5 transition-colors stroke-[1.8] ${
+            isAuthActive ? "text-brand-primary" : "text-text-strong hover:text-brand-primary"
+          }`}
+        />
       </Link>
     );
   }
@@ -122,9 +138,11 @@ export function UserNav({ tenantSlug, showGuestLogin = true }: UserNavProps = {}
         aria-haspopup="menu"
         title={`Cuenta (${user.fullName})`}
         className={`flex items-center gap-2 px-2.5 py-1.5 rounded-full text-xs transition-colors cursor-pointer ${
-          isAccountActive || isOpen
+          isOpen
             ? "bg-surface-card-hover text-brand-primary"
-            : "text-text-base hover:text-text-strong hover:bg-surface-card-hover"
+            : isAccountActive
+              ? "text-brand-primary"
+              : "text-text-base hover:text-text-strong hover:bg-surface-card-hover"
         }`}
       >
         <div className="w-6 h-6 rounded-full bg-neutral-900 text-white flex items-center justify-center font-bold text-[10px] overflow-hidden shrink-0">

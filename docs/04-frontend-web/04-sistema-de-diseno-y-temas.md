@@ -108,7 +108,11 @@ export function TenantThemeProvider({ children }: { children: React.ReactNode })
 La interfaz comercial del cliente esta normalizada bajo cuatro composiciones visuales primarias:
 
 ### 6.1. Cabecera Comercial y Hero Panoramico
-* **Cabecera (`StorefrontLayout`):** Altura `h-[70px] sm:h-[76px]`, logotipo dual en `font-display` (`LA GRANJITA ASADERO / ASADERO & LEÑA`), enlaces centrales (`Ordenar`, `Sucursales`, `Rastrear Pedido`, `Personalizar`), conmutador de franquicia con punto pulsante (`TenantSwitcher`), buscador píldora `#f8f7f5` con lupa y bolsa de compras roja con contador reactivo.
+* **Cabecera (`StorefrontHeader` / `AppHeader`):** Altura `h-[70px] sm:h-[76px]`, logotipo dual en `font-display`, selector de sucursales multi-tenant y navegacion activa con exclusion mutua:
+  - **Enlaces de Seccion (`Inicio`, `Menú & Combos`, `Mis Pedidos`):** El elemento activo se resalta en rojo de marca (`text-brand-primary`) asegurando que `Inicio` solo este activo cuando no se navegue en catalogos o subsecciones. Soporte nativo para hashes de anclaje (`#catalogo`, `#restaurantes`).
+  - **Acceso a Perfil (`UserNav`):** Diseno minimalista de icono accesible (`w-5 h-5`), fondo transparente (sin fondos o circulos grises residuales), que conmuta a rojo (`text-brand-primary`) en rutas de autenticacion (`/login`, `/registro`) o cuenta (`/cuenta`).
+  - **Bolsa de Compras (`CartButtonBadge`):** Icono reactivo que conmuta a rojo (`text-brand-primary`) al desplegar el drawer lateral del carrito o al ingresar al flujo de checkout (`/checkout`, `/finalizar-pedido`).
+  - **Drawer Movil (`StorefrontMobileDrawer`):** Menu lateral sin divisores inferiores forzados (`border-t`), con enlaces planos integrados en fondo transparente y resaltado activo en rojo de marca para sucursales, terminos, privacidad y login.
 * **Carrusel Hero (`CatalogHero`):** Ancho completo (`w-full`), badge rojo superior (`AHORRO FAMILIAR`), titular gigante condensado (`SUPER COMBO ASADOR / 12 PRESAS`), botones píldora (`ORDENA AQUÍ ->` y `VERIFICAR COBERTURA` con icono de mapa), flechas circulares y paginación con dot activo alargado.
 
 ### 6.2. Selector de Modalidad Operativa ("¿Como te gustaria ordenar hoy?")
@@ -126,7 +130,18 @@ La interfaz comercial del cliente esta normalizada bajo cuatro composiciones vis
 * **Miga de Pan y Titular:** `Inicio > Perfil` y encabezado `HOLA, BIENVENIDO/A A {BRAND}` en Barlow Condensed.
 * **Estructura Asimetrica de 2 Columnas:**
   - **Columna Izquierda:** Tarjeta roja de fidelizacion `PROGRAMA DE CLIENTES / ÚNETE A BENEFICIOS {BRAND}` y menu lateral blanco con iconos limpios (`PEDIDOS & RASTREO`, `CONTACTOS & LOCALES`, `TÉRMINOS Y CONDICIONES`).
-  - **Columna Derecha:** Tarjeta blanca flotante de `INICIAR SESIÓN` con boton `VOLVER`, campos de entrada grises `bg-neutral-50` para correo y contrasena, y boton pildora rojo ancho `ACCEDER AL SISTEMA`.
+  - **Columna Derecha:** Tarjeta blanca flotante de `INICIAR SESIÓN` con boton `VOLVER`, campos de entrada grises `bg-neutral-50` para correo y contrasena, y la terna armonizada de botones pildora de autenticacion.
+
+### 6.5. Terna Armonizada de Botones Pildora de Autenticacion
+Para garantizar una experiencia visual simetrica y coherente, los tres metodos de autenticacion en [`LoginForm.tsx`](../../frontend/src/features/auth/components/LoginForm.tsx), [`GoogleSignInButton.tsx`](../../frontend/src/features/auth/components/GoogleSignInButton.tsx) y [`PasskeySignInButton.tsx`](../../frontend/src/features/auth/components/PasskeySignInButton.tsx) comparten exactamente la misma geometria:
+
+| Accion | Componente | Formato Visual | Altura y Radio | Tipografia |
+| :--- | :--- | :--- | :--- | :--- |
+| **Acceso Primario (Password)** | `LoginForm.tsx` | Solido rojo (`bg-brand-primary text-white shadow-md active:scale-95`) | `min-h-[48px] rounded-full px-4` | `text-sm font-bold tracking-wide font-display` |
+| **Acceso Google (OAuth)** | `GoogleSignInButton.tsx` | Borde sutil (`bg-surface-card border border-surface-border shadow-xs active:scale-95`) | `min-h-[48px] rounded-full px-4` | `text-sm font-bold tracking-wide font-display` |
+| **Acceso Biometrico (Passkey)** | `PasskeySignInButton.tsx` | Borde sutil (`bg-surface-card border border-surface-border shadow-xs active:scale-95`) | `min-h-[48px] rounded-full px-4` | `text-sm font-bold tracking-wide font-display` |
+
+* **Regla de Diseno:** Queda prohibido el uso de esquinas rectangulares (`rounded-xl` o `rounded-2xl`) en botones de autenticacion. Todos los botones de acceso se alinean a `rounded-full` y escala de 14px (`text-sm`).
 
 ---
 

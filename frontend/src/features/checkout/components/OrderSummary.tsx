@@ -24,8 +24,8 @@ export function OrderSummary() {
   if (items.length === 0) {
     return (
       <div className="bg-surface-card rounded-3xl border border-surface-border p-8 text-center space-y-4 shadow-sm">
-        <div className="w-12 h-12 rounded-full bg-surface-canvas text-text-subtle flex items-center justify-center mx-auto">
-          <ShoppingBag className="w-6 h-6" />
+        <div className="flex items-center justify-center text-text-subtle mx-auto">
+          <ShoppingBag className="w-12 h-12 stroke-[1.5]" />
         </div>
         <div>
           <h3 className="font-bold text-text-strong text-base font-display uppercase tracking-wide">Tu pedido está vacío</h3>

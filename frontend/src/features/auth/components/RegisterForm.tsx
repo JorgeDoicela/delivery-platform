@@ -133,11 +133,7 @@ export function RegisterForm({
             <span className="text-[11px] font-bold text-text-subtle uppercase tracking-widest block mt-1 font-mono">
               {brandTagline} • Registro de Cuenta
             </span>
-            <p className="text-xs text-text-muted mt-2 leading-relaxed">
-              Crea tu cuenta de cliente para realizar pedidos y dar seguimiento satelital.
-            </p>
           </div>
-          <div className="border-t border-surface-border/60" />
         </>
       )}
 
@@ -278,7 +274,7 @@ export function RegisterForm({
       <GoogleSignInButton redirectUrl={redirectUrl} />
 
       {/* Enlace alternativo para iniciar sesión */}
-      <div className="pt-2 text-center border-t border-surface-border/60">
+      <div className="pt-2 text-center">
         <p className="text-xs text-text-muted font-sans">
           ¿Ya tienes una cuenta registrada?{" "}
           {onSwitchToLogin ? (
