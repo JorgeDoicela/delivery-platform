@@ -169,18 +169,18 @@ export function AccountDashboardView({ tenantSlug }: AccountDashboardViewProps) 
                   key={tab.id}
                   type="button"
                   onClick={() => setActiveTab(tab.id)}
-                  className={`w-full flex items-center justify-between px-4 py-3 rounded-2xl text-xs font-bold transition-all min-h-[44px] cursor-pointer ${
+                  className={`w-full flex items-center justify-between px-4 py-3 rounded-2xl text-xs font-bold transition-all min-h-[44px] cursor-pointer text-left ${
                     isActive
-                      ? "bg-brand-primary text-white shadow-xs font-display uppercase tracking-wider"
+                      ? "bg-brand-primary text-white shadow-xs font-display tracking-wider"
                       : "text-text-muted hover:text-text-strong hover:bg-surface-canvas"
                   }`}
                 >
-                  <div className="flex items-center gap-3">
+                  <div className="flex items-center gap-3 min-w-0">
                     <Icon className="w-4 h-4 shrink-0" />
-                    <span>{tab.label}</span>
+                    <span className="truncate">{tab.label}</span>
                   </div>
                   <ChevronRight
-                    className={`w-3.5 h-3.5 transition-transform ${
+                    className={`w-3.5 h-3.5 shrink-0 transition-transform ${
                       isActive ? "text-white" : "text-text-subtle"
                     }`}
                   />
@@ -192,7 +192,7 @@ export function AccountDashboardView({ tenantSlug }: AccountDashboardViewProps) 
               <button
                 type="button"
                 onClick={handleLogout}
-                className="w-full flex items-center gap-3 px-4 py-3 rounded-2xl text-xs font-bold text-text-muted hover:text-brand-primary hover:bg-surface-canvas transition-colors min-h-[44px] cursor-pointer"
+                className="w-full flex items-center gap-3 px-4 py-3 rounded-2xl text-xs font-bold text-text-muted hover:text-brand-primary hover:bg-surface-canvas transition-colors min-h-[44px] cursor-pointer text-left"
               >
                 <LogOut className="w-4 h-4 shrink-0" />
                 <span>Cerrar Sesión</span>

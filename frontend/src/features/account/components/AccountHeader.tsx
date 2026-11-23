@@ -1,8 +1,9 @@
 "use client";
 
 import { useRef, useState } from "react";
-import { ShieldCheck, Mail, Phone, Camera, Trash2, Loader2, AlertCircle } from "lucide-react";
+import { Mail, Phone, Camera, Trash2, Loader2, AlertCircle, CheckCircle2 } from "lucide-react";
 import { getApiBaseUrl } from "@/shared/lib/api-client";
+import { useAuthStore } from "@/features/auth";
 import { useAccountStore } from "../store/useAccountStore";
 import type { AccountProfile } from "../types";
 
@@ -25,8 +26,32 @@ export function AccountHeader({ profile, isLoading }: AccountHeaderProps) {
   const deleteAvatar = useAccountStore((s) => s.deleteAvatar);
   const isUploadingAvatar = useAccountStore((s) => s.isUploadingAvatar);
   const avatarError = useAccountStore((s) => s.avatarError);
+  const resendVerification = useAuthStore((s) => s.resendVerification);
 
   const [previewError, setPreviewError] = useState<string | null>(null);
+  const [isResending, setIsResending] = useState(false);
+  const [resendStatus, setResendStatus] = useState<{ success: boolean; message: string } | null>(null);
+
+  const handleResendEmail = async () => {
+    if (!profile?.email || isResending) return;
+    setIsResending(true);
+    setResendStatus(null);
+    try {
+      const response = await resendVerification({ email: profile.email });
+      setResendStatus({
+        success: true,
+        message: response.message || "Enlace de verificación enviado a tu correo.",
+      });
+    } catch (err: unknown) {
+      const msg = err instanceof Error ? err.message : "No fue posible reenviar el enlace. Intenta nuevamente.";
+      setResendStatus({
+        success: false,
+        message: msg,
+      });
+    } finally {
+      setIsResending(false);
+    }
+  };
 
   const handleTriggerUpload = () => {
     setPreviewError(null);
@@ -145,14 +170,38 @@ export function AccountHeader({ profile, isLoading }: AccountHeaderProps) {
             <h1 className="text-xl sm:text-2xl font-black text-text-strong font-display uppercase tracking-tight break-words">
               {profile.fullName || "Cliente de la Plataforma"}
             </h1>
-            {profile.isEmailVerified && (
+            {profile.isEmailVerified ? (
               <span
                 title="Cuenta de correo verificada"
-                className="inline-flex items-center gap-1 text-[11px] font-bold uppercase tracking-wider text-text-strong bg-surface-canvas border border-surface-border px-2 py-0.5 rounded-full shrink-0"
+                className="text-[11px] font-bold uppercase tracking-wider text-emerald-600 dark:text-emerald-400 shrink-0"
               >
-                <ShieldCheck className="w-3.5 h-3.5 text-brand-primary" />
-                <span>Verificada</span>
+                Verificada
               </span>
+            ) : (
+              <div className="inline-flex items-center gap-2">
+                <span
+                  title="Cuenta de correo pendiente de confirmación"
+                  className="text-[11px] font-bold uppercase tracking-wider text-amber-600 dark:text-amber-400 shrink-0"
+                >
+                  No verificada
+                </span>
+                <span className="text-text-subtle text-xs">•</span>
+                <button
+                  type="button"
+                  onClick={handleResendEmail}
+                  disabled={isResending}
+                  className="inline-flex items-center gap-1 text-[11px] font-bold text-brand-primary hover:underline disabled:opacity-50 transition-opacity cursor-pointer"
+                >
+                  {isResending ? (
+                    <>
+                      <Loader2 className="w-3 h-3 animate-spin" />
+                      <span>Enviando enlace...</span>
+                    </>
+                  ) : (
+                    <span>Reenviar correo</span>
+                  )}
+                </button>
+              </div>
             )}
           </div>
           <div className="flex flex-wrap items-center gap-x-3 gap-y-1 mt-1 text-xs text-text-muted break-all sm:break-normal">
@@ -167,11 +216,35 @@ export function AccountHeader({ profile, isLoading }: AccountHeaderProps) {
               </span>
             )}
           </div>
-          <p className="text-[11px] text-text-subtle mt-1">
-            Haz clic en la cámara para actualizar tu foto de perfil.
-          </p>
         </div>
       </div>
+
+      {/* Mensaje de estado al reenviar correo de verificación */}
+      {resendStatus && (
+        <div
+          className={`p-3 rounded-2xl text-xs flex items-center justify-between gap-2 border ${
+            resendStatus.success
+              ? "bg-emerald-50 dark:bg-emerald-950/40 border-emerald-200 dark:border-emerald-800/60 text-emerald-800 dark:text-emerald-300"
+              : "bg-red-50 dark:bg-red-950/40 border-red-200 dark:border-red-800/60 text-red-800 dark:text-red-300"
+          }`}
+        >
+          <div className="flex items-center gap-2">
+            {resendStatus.success ? (
+              <CheckCircle2 className="w-4 h-4 text-emerald-600 dark:text-emerald-400 shrink-0" />
+            ) : (
+              <AlertCircle className="w-4 h-4 text-red-600 dark:text-red-400 shrink-0" />
+            )}
+            <span>{resendStatus.message}</span>
+          </div>
+          <button
+            type="button"
+            onClick={() => setResendStatus(null)}
+            className="text-[11px] font-bold underline hover:opacity-80 cursor-pointer shrink-0"
+          >
+            Cerrar
+          </button>
+        </div>
+      )}
 
       {/* Alertas de error de subida si ocurren */}
       {(previewError || avatarError) && (
