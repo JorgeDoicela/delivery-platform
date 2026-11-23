@@ -255,16 +255,11 @@ export function getApiClientTenantSlug(): string | null {
         return null;
       }
 
-      // 5. En dominio personalizado (ej: asaderolagranjita.doicela.dev, pedidos.lagranjita.com)
-      if (!isPlatformHost(hostname)) {
-        if (hostname.includes("lagranjita") || hostname.includes("granjita") || hostname.includes("asadero")) {
-          currentTenantSlugMemory = "la-granjita";
-          return "la-granjita";
-        }
-        if (hostname.includes("brasas") || hostname.includes("valle")) {
-          currentTenantSlugMemory = "brasas-del-valle";
-          return "brasas-del-valle";
-        }
+      // 5. En dominio personalizado (ej: asaderolagranjita.doicela.dev, pedidos.cualquierrestaurante.com)
+      // La identidad del tenant se resuelve dinámicamente en el backend vía X-Tenant-Domain (PostgreSQL).
+      // Si ya fue resuelto previamente en memoria durante la sesión, reutilizarlo:
+      if (!isPlatformHost(hostname) && currentTenantSlugMemory) {
+        return currentTenantSlugMemory;
       }
 
       // 6. Consultar persistencia de sesión previa (limpiando slugs corruptos/reservados)
