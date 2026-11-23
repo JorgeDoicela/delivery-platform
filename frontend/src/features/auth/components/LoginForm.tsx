@@ -154,7 +154,7 @@ export function LoginForm({
           htmlFor="email"
           className="block text-[11px] font-bold text-text-base uppercase tracking-wider"
         >
-          Correo Electrónico
+          Correo Electrónico <span className="text-brand-primary">*</span>
         </label>
         <input
           id="email"
@@ -181,7 +181,7 @@ export function LoginForm({
             htmlFor="password"
             className="block text-[11px] font-bold text-text-base uppercase tracking-wider"
           >
-            Contraseña
+            Contraseña <span className="text-brand-primary">*</span>
           </label>
           {onSwitchToForgotPassword ? (
             <button
@@ -248,7 +248,16 @@ export function LoginForm({
         )}
       </button>
 
-      <WhatsAppSignInButton redirectUrl={redirectUrl} />
+      {/* Separador Visual de Métodos Rápidos */}
+      <div className="relative flex items-center justify-center my-1">
+        <div className="border-t border-surface-border w-full" />
+        <span className="bg-surface-card px-3 text-[11px] font-bold text-text-subtle uppercase tracking-wider shrink-0">
+          O continúa con
+        </span>
+        <div className="border-t border-surface-border w-full" />
+      </div>
+
+      <WhatsAppSignInButton redirectUrl={redirectUrl} mode="login" />
 
       <GoogleSignInButton redirectUrl={redirectUrl} />
 

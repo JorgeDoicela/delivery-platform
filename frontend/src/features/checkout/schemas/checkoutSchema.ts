@@ -7,8 +7,10 @@ export const checkoutSchema = z.object({
     .max(100),
   customerPhone: z
     .string()
-    .min(9, "El número de teléfono debe tener al menos 9 dígitos.")
-    .max(15, "Número de teléfono no válido."),
+    .trim()
+    .min(7, "El número de teléfono debe tener al menos 7 dígitos.")
+    .max(20, "Número de teléfono no válido.")
+    .regex(/^[0-9+\s-]{7,20}$/, "Formato de teléfono no válido."),
   customerEmail: z.string().email("Correo electrónico no válido.").optional().or(z.literal("")),
   identificationType: z.enum(["CONSUMIDOR_FINAL", "CEDULA", "RUC"]),
   identificationNumber: z.string().min(10, "Mínimo 10 dígitos para identificación.").max(13),

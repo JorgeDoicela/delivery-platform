@@ -216,6 +216,7 @@ export function CheckoutForm() {
             register={register}
             setValue={setValue}
             watch={watch}
+            control={control}
             errors={errors}
             coords={coords}
             onLocationResolved={handleLocationResolved}

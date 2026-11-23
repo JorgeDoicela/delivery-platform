@@ -26,8 +26,8 @@ export const registerSchema = z
       .trim()
       .min(1, "El número de teléfono es obligatorio.")
       .min(7, "El número de teléfono debe tener al menos 7 dígitos.")
-      .max(15, "El número de teléfono no puede exceder 15 caracteres.")
-      .regex(/^[0-9+ ]{7,15}$/, "Ingresa un número de teléfono válido (ej: 0987654321 o +593987654321)."),
+      .max(20, "El número de teléfono no puede exceder 20 caracteres.")
+      .regex(/^[0-9+\s-]{7,20}$/, "Ingresa un número de teléfono válido (ej: +593987654321 o 0987654321)."),
   })
   .refine((data) => data.password === data.confirmPassword, {
     message: "Las contraseñas no coinciden.",

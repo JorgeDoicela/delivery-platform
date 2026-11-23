@@ -25,7 +25,7 @@ public class RegisterValidator : AbstractValidator<RegisterCommand>
 
         RuleFor(x => x.Phone)
             .NotEmpty().WithMessage("El número de teléfono es obligatorio.")
-            .Matches(@"^[0-9+ ]{7,15}$").WithMessage("El número de teléfono no es válido.");
+            .Matches(@"^[0-9+\s-]{7,20}$").WithMessage("El número de teléfono no es válido.");
     }
 }
 

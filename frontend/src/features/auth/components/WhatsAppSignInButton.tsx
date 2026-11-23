@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { Loader2, X, AlertCircle, ArrowLeft } from "lucide-react";
 import { WhatsAppIcon } from "@/shared/components/WhatsAppIcon";
+import { PhoneNumberInput } from "@/shared/components";
 import { useAuthStore } from "../store/useAuthStore";
 import { useCurrentTenantQuery, useTenantStore } from "@/features/tenant";
 import { resolveTenantRouting, useTenantRoutes } from "@/shared/lib/tenant-routing";
@@ -13,12 +14,14 @@ interface WhatsAppSignInButtonProps {
   redirectUrl?: string;
   onSuccess?: () => void;
   onError?: (error: string) => void;
+  mode?: "login" | "register";
 }
 
 export function WhatsAppSignInButton({
   redirectUrl,
   onSuccess,
   onError,
+  mode = "login",
 }: WhatsAppSignInButtonProps) {
   const router = useRouter();
   const { data: tenant } = useCurrentTenantQuery();
@@ -157,7 +160,7 @@ export function WhatsAppSignInButton({
         className="w-full min-h-[46px] px-4 py-2.5 bg-[#25D366] hover:bg-[#20BD5A] active:scale-95 text-white font-bold text-sm tracking-wide font-display rounded-full shadow-md shadow-[#25D366]/20 transition-all flex items-center justify-center gap-2.5 cursor-pointer"
       >
         <WhatsAppIcon className="w-5 h-5 fill-current shrink-0" />
-        <span>Ingresar con mi WhatsApp</span>
+        <span>Continuar con WhatsApp</span>
       </button>
 
       {/* Modal Interactivo de Verificación OTP */}
@@ -176,10 +179,14 @@ export function WhatsAppSignInButton({
                 </div>
                 <div>
                   <h3 className="font-display font-black text-lg uppercase tracking-tight text-text-strong leading-tight">
-                    {step === "phone" ? "Acceso con WhatsApp" : "Verifica tu Código"}
+                    {step === "phone"
+                      ? mode === "register"
+                        ? "Registro con WhatsApp"
+                        : "Acceso con WhatsApp"
+                      : "Verifica tu Código"}
                   </h3>
                   <span className="text-[11px] text-text-subtle font-mono">
-                    {step === "phone" ? "Sin contraseña" : "Código de 6 dígitos"}
+                    {step === "phone" ? "Entra o regístrate sin contraseña" : "Código de 6 dígitos"}
                   </span>
                 </div>
               </div>
@@ -204,24 +211,23 @@ export function WhatsAppSignInButton({
 
             {/* Paso 1: Ingreso de Teléfono Celular */}
             {step === "phone" ? (
-              <form onSubmit={handleRequestOtp} className="space-y-4">
+              <div
+                className="space-y-4"
+                onKeyDown={(e) => {
+                  if (e.key === "Enter" && !isLoading) {
+                    e.preventDefault();
+                    handleRequestOtp();
+                  }
+                }}
+              >
                 <div className="space-y-1.5">
-                  <label
-                    htmlFor="wa-phone"
-                    className="block text-[11px] font-bold text-text-base uppercase tracking-wider"
-                  >
-                    Número Celular de WhatsApp
-                  </label>
-                  <input
+                  <PhoneNumberInput
                     id="wa-phone"
-                    type="tel"
-                    autoFocus
+                    label="Número Celular de WhatsApp"
                     required
                     disabled={isLoading}
                     value={phone}
-                    onChange={(e) => setPhone(e.target.value)}
-                    placeholder="Ej: 0987654321 o +593987654321"
-                    className="w-full min-h-[46px] px-4 py-2 bg-surface-canvas border border-surface-border hover:border-surface-border/80 focus:bg-surface-card focus:border-[#25D366] focus:ring-1 focus:ring-[#25D366] rounded-xl text-sm text-text-strong placeholder:text-text-subtle transition-all outline-none"
+                    onChange={(val) => setPhone(val)}
                   />
                   <p className="text-[11px] text-text-muted leading-relaxed">
                     Te enviaremos un mensaje de WhatsApp con un código de seguridad para ingresar a tu cuenta.
@@ -229,7 +235,8 @@ export function WhatsAppSignInButton({
                 </div>
 
                 <button
-                  type="submit"
+                  type="button"
+                  onClick={handleRequestOtp}
                   disabled={isLoading}
                   className="w-full min-h-[46px] px-4 py-2.5 bg-[#25D366] hover:bg-[#20BD5A] active:scale-95 text-white font-bold text-sm tracking-wide font-display rounded-full shadow-md shadow-[#25D366]/20 transition-all flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50"
                 >
@@ -242,10 +249,18 @@ export function WhatsAppSignInButton({
                     <span>Enviar Código por WhatsApp</span>
                   )}
                 </button>
-              </form>
+              </div>
             ) : (
               /* Paso 2: Ingreso del Código OTP */
-              <form onSubmit={handleVerifyOtp} className="space-y-4">
+              <div
+                className="space-y-4"
+                onKeyDown={(e) => {
+                  if (e.key === "Enter" && !isLoading && code.length >= 4) {
+                    e.preventDefault();
+                    handleVerifyOtp();
+                  }
+                }}
+              >
                 <div className="space-y-1.5">
                   <div className="flex items-center justify-between">
                     <label
@@ -283,7 +298,8 @@ export function WhatsAppSignInButton({
                 </div>
 
                 <button
-                  type="submit"
+                  type="button"
+                  onClick={handleVerifyOtp}
                   disabled={isLoading || code.length < 4}
                   className="w-full min-h-[46px] px-4 py-2.5 bg-[#25D366] hover:bg-[#20BD5A] active:scale-95 text-white font-bold text-sm tracking-wide font-display rounded-full shadow-md shadow-[#25D366]/20 transition-all flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50"
                 >
@@ -314,7 +330,7 @@ export function WhatsAppSignInButton({
                     </button>
                   )}
                 </div>
-              </form>
+              </div>
             )}
           </div>
         </div>

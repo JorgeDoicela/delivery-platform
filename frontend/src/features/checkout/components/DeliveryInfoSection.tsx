@@ -1,7 +1,9 @@
 "use client";
 
 import { useEffect, useState, useCallback, useMemo } from "react";
-import type { UseFormRegister, UseFormSetValue, UseFormWatch, FieldErrors } from "react-hook-form";
+import type { UseFormRegister, UseFormSetValue, UseFormWatch, FieldErrors, Control } from "react-hook-form";
+import { Controller } from "react-hook-form";
+import { PhoneNumberInput } from "@/shared/components";
 import type { CheckoutFormData } from "../schemas/checkoutSchema";
 import { useAccountStore } from "@/features/account";
 import { useAuthStore } from "@/features/auth";
@@ -27,6 +29,7 @@ interface DeliveryInfoSectionProps {
   register: UseFormRegister<CheckoutFormData>;
   setValue: UseFormSetValue<CheckoutFormData>;
   watch: UseFormWatch<CheckoutFormData>;
+  control?: Control<CheckoutFormData>;
   errors: FieldErrors<CheckoutFormData>;
   coords: { lat: number; lng: number } | null;
   onLocationResolved: (lat: number, lng: number) => void;
@@ -36,6 +39,7 @@ export function DeliveryInfoSection({
   register,
   setValue,
   watch,
+  control,
   errors,
   coords,
   onLocationResolved,
@@ -433,18 +437,37 @@ export function DeliveryInfoSection({
           </div>
 
           <div>
-            <label className="block text-xs font-bold text-text-base mb-1">
-              Teléfono Celular *
-            </label>
-            <input
-              {...register("customerPhone")}
-              placeholder="Ej. 0987654321"
-              className="w-full text-xs px-3.5 py-2.5 rounded-xl border border-surface-border focus:outline-none focus:ring-1 focus:ring-brand-primary focus:border-brand-primary bg-surface-card text-text-strong"
-            />
-            {errors.customerPhone && (
-              <p className="text-[11px] text-status-danger mt-1 font-medium">
-                {errors.customerPhone.message}
-              </p>
+            {control ? (
+              <Controller
+                name="customerPhone"
+                control={control}
+                render={({ field }) => (
+                  <PhoneNumberInput
+                    label="Teléfono Celular"
+                    required
+                    value={field.value}
+                    onChange={field.onChange}
+                    onBlur={field.onBlur}
+                    error={errors.customerPhone?.message}
+                  />
+                )}
+              />
+            ) : (
+              <>
+                <label className="block text-xs font-bold text-text-base mb-1">
+                  Teléfono Celular <span className="text-brand-primary">*</span>
+                </label>
+                <input
+                  {...register("customerPhone")}
+                  placeholder="Ej. 0987654321"
+                  className="w-full text-xs px-3.5 py-2.5 rounded-xl border border-surface-border focus:outline-none focus:ring-1 focus:ring-brand-primary focus:border-brand-primary bg-surface-card text-text-strong"
+                />
+                {errors.customerPhone && (
+                  <p className="text-[11px] text-status-danger mt-1 font-medium">
+                    {errors.customerPhone.message}
+                  </p>
+                )}
+              </>
             )}
           </div>
         </div>

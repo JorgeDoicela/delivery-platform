@@ -1,9 +1,9 @@
 "use client";
 
-import { useForm, useWatch } from "react-hook-form";
+import { useForm, useWatch, Controller } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Loader2 } from "lucide-react";
-import { Select, type SelectOption } from "@/shared/components";
+import { Select, type SelectOption, PhoneNumberInput } from "@/shared/components";
 import {
   updateProfileSchema,
   type UpdateProfileFormData,
@@ -118,22 +118,20 @@ export function AccountProfileSection() {
           </div>
 
           {/* Teléfono */}
-          <div className="space-y-1.5">
-            <label className="block text-xs font-bold text-text-base uppercase tracking-wider">
-              Teléfono de Contacto *
-            </label>
-            <input
-              type="tel"
-              {...register("phone")}
-              placeholder="Ej: +593987654321"
-              className="w-full px-4 py-3 rounded-2xl border border-surface-border bg-surface-canvas text-text-strong placeholder:text-text-subtle focus:outline-none focus:border-brand-primary text-xs transition-colors"
-            />
-            {errors.phone && (
-              <p className="text-xs text-brand-primary font-semibold">
-                {errors.phone.message}
-              </p>
+          <Controller
+            name="phone"
+            control={control}
+            render={({ field }) => (
+              <PhoneNumberInput
+                label="Teléfono de Contacto"
+                required
+                value={field.value}
+                onChange={field.onChange}
+                onBlur={field.onBlur}
+                error={errors.phone?.message}
+              />
             )}
-          </div>
+          />
 
           {!isStaffOrAdmin && (
             <>

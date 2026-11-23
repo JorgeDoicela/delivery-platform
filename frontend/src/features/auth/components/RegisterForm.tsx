@@ -4,7 +4,7 @@ import { useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useForm } from "react-hook-form";
+import { useForm, Controller } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Loader2, AlertCircle, Eye, EyeOff } from "lucide-react";
 import { registerSchema, type RegisterFormData } from "../schemas/registerSchema";
@@ -13,6 +13,7 @@ import { useCurrentTenantQuery, useTenantStore } from "@/features/tenant";
 import { resolvePostLoginRedirect } from "../lib/redirectByRole";
 import { GoogleSignInButton } from "./GoogleSignInButton";
 import { WhatsAppSignInButton } from "./WhatsAppSignInButton";
+import { PhoneNumberInput } from "@/shared/components";
 import { useTenantRoutes, resolveTenantRouting } from "@/shared/lib/tenant-routing";
 
 interface RegisterFormProps {
@@ -44,6 +45,7 @@ export function RegisterForm({
 
   const {
     register,
+    control,
     handleSubmit,
     formState: { errors, isSubmitting },
   } = useForm<RegisterFormData>({
@@ -157,7 +159,7 @@ export function RegisterForm({
           htmlFor="reg-email"
           className="block text-[11px] font-bold text-text-base uppercase tracking-wider"
         >
-          Correo Electrónico
+          Correo Electrónico <span className="text-brand-primary">*</span>
         </label>
         <input
           id="reg-email"
@@ -178,30 +180,23 @@ export function RegisterForm({
       </div>
 
       {/* Teléfono de Contacto */}
-      <div className="space-y-1.5">
-        <label
-          htmlFor="reg-phone"
-          className="block text-[11px] font-bold text-text-base uppercase tracking-wider"
-        >
-          Teléfono Celular *
-        </label>
-        <input
-          id="reg-phone"
-          type="tel"
-          autoComplete="tel"
-          disabled={isSubmitting}
-          aria-invalid={Boolean(errors.phone)}
-          aria-describedby={errors.phone ? "reg-phone-error" : undefined}
-          {...register("phone")}
-          placeholder="Ej: 0987654321 o +593987654321"
-          className="w-full min-h-[46px] px-4 py-2 bg-surface-canvas border border-surface-border hover:border-surface-border/80 focus:bg-surface-card focus:border-brand-primary focus:ring-1 focus:ring-brand-primary focus:outline-none rounded-xl text-sm text-text-strong placeholder:text-text-subtle transition-all disabled:opacity-50 shadow-2xs outline-none"
-        />
-        {errors.phone && (
-          <p id="reg-phone-error" className="text-xs text-red-600 font-medium">
-            {errors.phone.message}
-          </p>
+      <Controller
+        name="phone"
+        control={control}
+        render={({ field }) => (
+          <PhoneNumberInput
+            id="reg-phone"
+            name={field.name}
+            label="Teléfono Celular"
+            required
+            disabled={isSubmitting}
+            value={field.value}
+            onChange={field.onChange}
+            onBlur={field.onBlur}
+            error={errors.phone?.message}
+          />
         )}
-      </div>
+      />
 
       {/* Contraseña */}
       <div className="space-y-1.5">
@@ -209,7 +204,7 @@ export function RegisterForm({
           htmlFor="reg-password"
           className="block text-[11px] font-bold text-text-base uppercase tracking-wider"
         >
-          Contraseña
+          Contraseña <span className="text-brand-primary">*</span>
         </label>
         <div className="relative">
           <input
@@ -249,7 +244,7 @@ export function RegisterForm({
           htmlFor="reg-confirmPassword"
           className="block text-[11px] font-bold text-text-base uppercase tracking-wider"
         >
-          Confirmar Contraseña
+          Confirmar Contraseña <span className="text-brand-primary">*</span>
         </label>
         <div className="relative">
           <input
@@ -299,9 +294,18 @@ export function RegisterForm({
         )}
       </button>
 
-      <GoogleSignInButton redirectUrl={redirectUrl} />
+      {/* Separador Visual de Métodos Rápidos */}
+      <div className="relative flex items-center justify-center my-1">
+        <div className="border-t border-surface-border w-full" />
+        <span className="bg-surface-card px-3 text-[11px] font-bold text-text-subtle uppercase tracking-wider shrink-0">
+          O regístrate con
+        </span>
+        <div className="border-t border-surface-border w-full" />
+      </div>
 
-      <WhatsAppSignInButton redirectUrl={redirectUrl} />
+      <WhatsAppSignInButton redirectUrl={redirectUrl} mode="register" />
+
+      <GoogleSignInButton redirectUrl={redirectUrl} />
 
       {/* Enlace alternativo para iniciar sesión */}
       <div className="pt-2 text-center">
