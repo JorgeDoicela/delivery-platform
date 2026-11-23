@@ -70,6 +70,7 @@ public static class DependencyInjection
         services.AddScoped<Delivery.Features.Chatbot.WhatsAppWebhook.GeminiAiEngine>();
         services.AddScoped<Delivery.Features.Chatbot.WhatsAppWebhook.IChatbotAiEngine, Delivery.Features.Chatbot.WhatsAppWebhook.ResilientChatbotAiEngine>();
         services.AddScoped<Delivery.Features.Chatbot.WhatsAppWebhook.IWhatsAppClient, Delivery.Features.Chatbot.WhatsAppWebhook.WhatsAppClient>();
+        services.AddScoped<Delivery.Core.Contracts.WhatsApp.IWhatsAppClient>(sp => sp.GetRequiredService<Delivery.Features.Chatbot.WhatsAppWebhook.IWhatsAppClient>());
         services.AddScoped<Delivery.Features.Chatbot.WhatsAppWebhook.IWhatsAppOrderLocationProcessor, Delivery.Features.Chatbot.WhatsAppWebhook.WhatsAppOrderLocationProcessor>();
         services.AddScoped<Delivery.Features.Chatbot.WhatsAppWebhook.IWhatsAppWebhookProcessor, Delivery.Features.Chatbot.WhatsAppWebhook.WhatsAppWebhookProcessor>();
 

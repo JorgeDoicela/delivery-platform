@@ -23,11 +23,9 @@ public class RegisterValidator : AbstractValidator<RegisterCommand>
                 .MaximumLength(100).WithMessage("El nombre no puede exceder 100 caracteres.");
         });
 
-        When(x => !string.IsNullOrWhiteSpace(x.Phone), () =>
-        {
-            RuleFor(x => x.Phone!)
-                .Matches(@"^[0-9+ ]{7,15}$").WithMessage("El número de teléfono no es válido.");
-        });
+        RuleFor(x => x.Phone)
+            .NotEmpty().WithMessage("El número de teléfono es obligatorio.")
+            .Matches(@"^[0-9+ ]{7,15}$").WithMessage("El número de teléfono no es válido.");
     }
 }
 

@@ -19,6 +19,9 @@ import type {
   VerifyEmailResponse,
   ResendVerificationRequest,
   ResendVerificationResponse,
+  RequestWhatsAppOtpRequest,
+  RequestWhatsAppOtpResponse,
+  VerifyWhatsAppOtpRequest,
 } from "../types";
 import type { LoginFormData } from "../schemas/loginSchema";
 
@@ -60,6 +63,8 @@ interface AuthActions {
   resetPassword: (data: ResetPasswordRequest) => Promise<{ success: boolean; message: string }>;
   verifyEmail: (data: VerifyEmailRequest) => Promise<VerifyEmailResponse>;
   resendVerification: (data: ResendVerificationRequest) => Promise<ResendVerificationResponse>;
+  requestWhatsAppOtp: (data: RequestWhatsAppOtpRequest) => Promise<RequestWhatsAppOtpResponse>;
+  verifyWhatsAppOtp: (data: VerifyWhatsAppOtpRequest) => Promise<boolean>;
   logout: () => Promise<void>;
   checkAuth: () => Promise<boolean>;
   setAccessToken: (token: string | null) => void;
@@ -280,6 +285,48 @@ export const useAuthStore = create<AuthStore>()(
             err instanceof Error ? err.message : "Error al reenviar el correo de verificación.";
           set({ status: "error", error: message });
           throw err;
+        }
+      },
+
+      requestWhatsAppOtp: async (data) => {
+        set({ status: "loading", error: null });
+        try {
+          const response = await authApi.requestWhatsAppOtp(data);
+          set({ status: "idle", error: null });
+          return response;
+        } catch (err: unknown) {
+          const message =
+            err instanceof Error ? err.message : "Error al solicitar código por WhatsApp.";
+          set({ status: "error", error: message });
+          throw err;
+        }
+      },
+
+      verifyWhatsAppOtp: async (data) => {
+        set({ status: "loading", error: null });
+        try {
+          const response = await authApi.verifyWhatsAppOtp(data);
+          const normalizedUser = normalizeAuthUser(response.user);
+          setApiClientAccessToken(response.accessToken);
+
+          if (typeof window !== "undefined") {
+            localStorage.setItem(SESSION_STORAGE_KEY, "1");
+          }
+
+          set({
+            user: normalizedUser,
+            accessToken: response.accessToken,
+            isAuthenticated: true,
+            status: "success",
+            error: null,
+          });
+
+          return true;
+        } catch (err: unknown) {
+          const message =
+            err instanceof Error ? err.message : "Código de verificación inválido o expirado.";
+          set({ status: "error", error: message });
+          return false;
         }
       },
 

@@ -135,4 +135,27 @@ public class FeatureValidatorsTests
             result.Errors.Should().Contain(e => e.PropertyName == "Slug");
         }
     }
+
+    [Theory]
+    [InlineData("usuario@example.com", "Password123", "0998877665", true)]
+    [InlineData("usuario@example.com", "Password123", "+593998877665", true)]
+    [InlineData("usuario@example.com", "Password123", "", false)]
+    [InlineData("usuario@example.com", "Password123", null, false)]
+    [InlineData("usuario@example.com", "Password123", "123", false)]
+    public void RegisterValidator_ValidatesRequiredPhone(string email, string password, string? phone, bool expectedValid)
+    {
+        var validator = new Delivery.Features.Auth.Register.RegisterValidator();
+        var command = new Delivery.Features.Auth.Register.RegisterCommand(
+            Email: email,
+            Password: password,
+            Phone: phone
+        );
+
+        var result = validator.Validate(command);
+        result.IsValid.Should().Be(expectedValid);
+        if (!expectedValid)
+        {
+            result.Errors.Should().Contain(e => e.PropertyName == "Phone");
+        }
+    }
 }

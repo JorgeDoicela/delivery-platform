@@ -221,6 +221,12 @@ public sealed class CreateOrderHandler : IHandler<CreateOrderCommand, Result<Cre
             ? command.CustomerPhone.Trim()
             : user.Phone;
 
+        // Progressive Profiling: si el usuario no tenía teléfono (ej: registro con Google OAuth), se persiste en su cuenta
+        if (string.IsNullOrWhiteSpace(user.Phone) && !string.IsNullOrWhiteSpace(contactPhone))
+        {
+            user.Phone = contactPhone;
+        }
+
         if (!string.IsNullOrWhiteSpace(contactPhone) || !string.IsNullOrWhiteSpace(user.Email))
         {
             customer = await _context.Customers

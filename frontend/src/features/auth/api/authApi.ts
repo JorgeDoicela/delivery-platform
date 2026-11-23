@@ -20,6 +20,10 @@ import type {
   VerifyEmailResponse,
   ResendVerificationRequest,
   ResendVerificationResponse,
+  RequestWhatsAppOtpRequest,
+  RequestWhatsAppOtpResponse,
+  VerifyWhatsAppOtpRequest,
+  VerifyWhatsAppOtpResponse,
 } from "../types";
 import type { LoginFormData } from "../schemas/loginSchema";
 
@@ -182,6 +186,27 @@ export const authApi = {
       body: JSON.stringify({ ...data, ...(tenantSlug ? { tenantSlug } : {}) }),
     });
     return handleAuthResponse<ResendVerificationResponse>(res);
+  },
+
+  async requestWhatsAppOtp(data: RequestWhatsAppOtpRequest): Promise<RequestWhatsAppOtpResponse> {
+    const tenantSlug = data.tenantSlug || getApiClientTenantSlug() || undefined;
+    const res = await fetch(`${getApiBaseUrl()}/api/v1/auth/whatsapp/otp/request`, {
+      method: "POST",
+      headers: buildAuthHeaders(undefined, tenantSlug),
+      body: JSON.stringify({ ...data, ...(tenantSlug ? { tenantSlug } : {}) }),
+    });
+    return handleAuthResponse<RequestWhatsAppOtpResponse>(res);
+  },
+
+  async verifyWhatsAppOtp(data: VerifyWhatsAppOtpRequest): Promise<VerifyWhatsAppOtpResponse> {
+    const tenantSlug = data.tenantSlug || getApiClientTenantSlug() || undefined;
+    const res = await fetch(`${getApiBaseUrl()}/api/v1/auth/whatsapp/otp/verify`, {
+      method: "POST",
+      headers: buildAuthHeaders(undefined, tenantSlug),
+      credentials: "include",
+      body: JSON.stringify({ ...data, ...(tenantSlug ? { tenantSlug } : {}) }),
+    });
+    return handleAuthResponse<VerifyWhatsAppOtpResponse>(res);
   },
 
   async logout(): Promise<void> {

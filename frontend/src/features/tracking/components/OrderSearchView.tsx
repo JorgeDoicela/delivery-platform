@@ -151,19 +151,13 @@ export function OrderSearchView() {
                   Todos tus pedidos anteriores ya fueron entregados. Al realizar una nueva orden en tienda, por aplicación o vía WhatsApp, aparecerá aquí automáticamente.
                 </p>
               </div>
-              <div className="pt-2 flex flex-wrap justify-center gap-3">
+              <div className="pt-2 flex justify-center">
                 <Link
                   href={routes.getCatalogHref()}
                   className="inline-flex items-center gap-1.5 px-6 py-3 bg-brand-primary hover:bg-brand-primary-hover text-white text-xs uppercase tracking-wider rounded-full font-black shadow-md transition-all cursor-pointer font-display"
                 >
                   <span>Ver Menú del Restaurante</span>
                   <ExternalLink className="w-3.5 h-3.5" />
-                </Link>
-                <Link
-                  href={`${routes.getAccountHref()}?tab=pedidos`}
-                  className="inline-flex items-center gap-1.5 px-6 py-3 bg-surface-card hover:bg-surface-card-hover border border-surface-border text-text-strong text-xs uppercase tracking-wider rounded-full font-bold transition-all cursor-pointer font-display shadow-xs"
-                >
-                  <span>Historial de Compras</span>
                 </Link>
               </div>
             </div>

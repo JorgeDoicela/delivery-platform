@@ -12,6 +12,7 @@ import { useAuthStore } from "../store/useAuthStore";
 import { useCurrentTenantQuery, useTenantStore } from "@/features/tenant";
 import { resolvePostLoginRedirect } from "../lib/redirectByRole";
 import { GoogleSignInButton } from "./GoogleSignInButton";
+import { WhatsAppSignInButton } from "./WhatsAppSignInButton";
 import { useTenantRoutes, resolveTenantRouting } from "@/shared/lib/tenant-routing";
 
 interface RegisterFormProps {
@@ -49,6 +50,7 @@ export function RegisterForm({
     resolver: zodResolver(registerSchema),
     defaultValues: {
       email: "",
+      phone: "",
       password: "",
       confirmPassword: "",
     },
@@ -175,6 +177,32 @@ export function RegisterForm({
         )}
       </div>
 
+      {/* Teléfono de Contacto */}
+      <div className="space-y-1.5">
+        <label
+          htmlFor="reg-phone"
+          className="block text-[11px] font-bold text-text-base uppercase tracking-wider"
+        >
+          Teléfono Celular *
+        </label>
+        <input
+          id="reg-phone"
+          type="tel"
+          autoComplete="tel"
+          disabled={isSubmitting}
+          aria-invalid={Boolean(errors.phone)}
+          aria-describedby={errors.phone ? "reg-phone-error" : undefined}
+          {...register("phone")}
+          placeholder="Ej: 0987654321 o +593987654321"
+          className="w-full min-h-[46px] px-4 py-2 bg-surface-canvas border border-surface-border hover:border-surface-border/80 focus:bg-surface-card focus:border-brand-primary focus:ring-1 focus:ring-brand-primary focus:outline-none rounded-xl text-sm text-text-strong placeholder:text-text-subtle transition-all disabled:opacity-50 shadow-2xs outline-none"
+        />
+        {errors.phone && (
+          <p id="reg-phone-error" className="text-xs text-red-600 font-medium">
+            {errors.phone.message}
+          </p>
+        )}
+      </div>
+
       {/* Contraseña */}
       <div className="space-y-1.5">
         <label
@@ -272,6 +300,8 @@ export function RegisterForm({
       </button>
 
       <GoogleSignInButton redirectUrl={redirectUrl} />
+
+      <WhatsAppSignInButton redirectUrl={redirectUrl} />
 
       {/* Enlace alternativo para iniciar sesión */}
       <div className="pt-2 text-center">

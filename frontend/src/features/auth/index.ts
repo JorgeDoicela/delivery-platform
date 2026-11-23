@@ -12,6 +12,7 @@ export * from "./components/ForgotPasswordForm";
 export * from "./components/ResetPasswordForm";
 export * from "./components/VerifyEmailView";
 export * from "./components/GoogleSignInButton";
+export * from "./components/WhatsAppSignInButton";
 export * from "./components/PasskeySignInButton";
 export * from "./components/AuthGuard";
 export * from "./components/UserNav";

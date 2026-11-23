@@ -15,15 +15,37 @@ describe("registerSchema", () => {
     expect(result.success).toBe(true);
   });
 
-  it("validates valid registration with only email, password and confirmPassword", () => {
+  it("validates valid registration with required fields (email, phone, password, confirmPassword)", () => {
     const minimalData = {
       email: "cliente@example.com",
+      phone: "0991234567",
       password: "Password123",
       confirmPassword: "Password123",
     };
 
     const result = registerSchema.safeParse(minimalData);
     expect(result.success).toBe(true);
+  });
+
+  it("fails when phone is missing or invalid", () => {
+    const missingPhone = {
+      email: "cliente@example.com",
+      password: "Password123",
+      confirmPassword: "Password123",
+    };
+
+    const result = registerSchema.safeParse(missingPhone);
+    expect(result.success).toBe(false);
+
+    const invalidPhone = {
+      email: "cliente@example.com",
+      phone: "123",
+      password: "Password123",
+      confirmPassword: "Password123",
+    };
+
+    const resultInvalid = registerSchema.safeParse(invalidPhone);
+    expect(resultInvalid.success).toBe(false);
   });
 
   it("fails when passwords do not match", () => {

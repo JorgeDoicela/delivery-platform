@@ -68,6 +68,8 @@ public class VerticalSliceArchitectureRegistrationTests
         registeredServiceTypes.Should().Contain(typeof(Delivery.Features.Account.UpsertAddress.UpsertAddressHandler));
         registeredServiceTypes.Should().Contain(typeof(Delivery.Features.Account.DeleteAddress.DeleteAddressHandler));
         registeredServiceTypes.Should().Contain(typeof(Delivery.Features.Account.UpdateConsentSettings.UpdateConsentSettingsHandler));
+        registeredServiceTypes.Should().Contain(typeof(Delivery.Features.Auth.WhatsAppOtp.RequestWhatsAppOtpHandler));
+        registeredServiceTypes.Should().Contain(typeof(Delivery.Features.Auth.WhatsAppOtp.VerifyWhatsAppOtpHandler));
 
         // Verificar registro de interfaces IHandler<,>
         registeredServiceTypes.Should().Contain(typeof(Delivery.Features.Common.Handlers.IHandler<CreateOrderCommand, Result<CreateOrderResponse>>));
@@ -84,11 +86,12 @@ public class VerticalSliceArchitectureRegistrationTests
         // Act
         services.AddDeliveryFeatures();
 
-        // Assert: Deben registrarse exactamente 48 endpoints autónomos
+        // Assert: Deben registrarse exactamente 49 endpoints autónomos
         var endpointDescriptors = services.Where(s => s.ServiceType == typeof(IEndpoint)).ToList();
-        endpointDescriptors.Should().HaveCount(48);
+        endpointDescriptors.Should().HaveCount(49);
 
         var endpointImplementationTypes = endpointDescriptors.Select(d => d.ImplementationType).ToHashSet();
+        endpointImplementationTypes.Should().Contain(typeof(Delivery.Features.Auth.WhatsAppOtp.WhatsAppOtpEndpoints));
         endpointImplementationTypes.Should().Contain(typeof(Delivery.Features.Auth.WebAuthn.WebAuthnEndpoints));
         endpointImplementationTypes.Should().Contain(typeof(ResolveBranchEndpoint));
         endpointImplementationTypes.Should().Contain(typeof(GetBranchCapacityEndpoint));

@@ -100,6 +100,24 @@ export interface VerifyEmailResponse {
   fullName?: string;
 }
 
+export interface RequestWhatsAppOtpRequest {
+  phone: string;
+  tenantSlug?: string;
+}
+
+export interface RequestWhatsAppOtpResponse {
+  success: boolean;
+  message: string;
+}
+
+export interface VerifyWhatsAppOtpRequest {
+  phone: string;
+  code: string;
+  tenantSlug?: string;
+}
+
+export type VerifyWhatsAppOtpResponse = LoginResponse;
+
 export interface ResendVerificationRequest {
   email: string;
   tenantSlug?: string;

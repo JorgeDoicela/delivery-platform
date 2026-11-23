@@ -113,5 +113,17 @@ public static class AuthErrors
 
         return new Error("Auth.WebAuthnVerificationFailed", "No se pudo verificar la huella o rostro en este dispositivo. Por favor, intenta de nuevo.");
     }
+
+    public static readonly Error InvalidOtpCode = new(
+        "Auth.InvalidOtpCode",
+        "El código de verificación es inválido o ha expirado.");
+
+    public static readonly Error OtpRateLimitExceeded = new(
+        "Auth.OtpRateLimitExceeded",
+        "Has superado el límite de intentos. Por favor espera unos minutos antes de solicitar un nuevo código.");
+
+    public static readonly Error InvalidPhoneNumber = new(
+        "Auth.InvalidPhoneNumber",
+        "El número de teléfono proporcionado no tiene un formato válido.");
 }
 
