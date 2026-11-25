@@ -158,6 +158,7 @@ export interface TenantStorefrontConfigDto {
   requireCoverageValidation?: boolean;
   enableKitchenWorkflow?: boolean;
   allowDirectCounterTakeoutDelivery?: boolean;
+  allowCustomBilling?: boolean;
 }
 
 export interface UpdateTenantStorefrontCommand {
@@ -191,6 +192,7 @@ export interface UpdateTenantStorefrontCommand {
   requireCoverageValidation?: boolean;
   enableKitchenWorkflow?: boolean;
   allowDirectCounterTakeoutDelivery?: boolean;
+  allowCustomBilling?: boolean;
 }
 
 export interface PlatformTenantItemDto {

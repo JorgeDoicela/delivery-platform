@@ -231,9 +231,21 @@ export const apiClient = {
         return handleResponse<BranchCoverageDto>(res);
     },
 
-    // 1.1 Capacidad y Throttling por franja de 20 min en Redis
-    async getBranchCapacity(branchId: number): Promise<BranchCapacityResponse> {
-        const res = await fetch(`${getApiBaseUrl()}/api/branches/${branchId}/capacity`, {
+    // 1.1 Capacidad y Throttling por franja de 20 min en Redis con estimación de distancia/modalidad
+    async getBranchCapacity(
+        branchId: number,
+        distanceKm?: number,
+        isTakeout = false
+    ): Promise<BranchCapacityResponse> {
+        const queryParams = new URLSearchParams();
+        if (typeof distanceKm === "number" && !Number.isNaN(distanceKm)) {
+            queryParams.append("distanceKm", distanceKm.toString());
+        }
+        if (isTakeout) {
+            queryParams.append("isTakeout", "true");
+        }
+        const queryString = queryParams.toString() ? `?${queryParams.toString()}` : "";
+        const res = await fetch(`${getApiBaseUrl()}/api/branches/${branchId}/capacity${queryString}`, {
             method: "GET",
             headers: buildHeaders(),
             cache: "no-store",

@@ -3,7 +3,7 @@
 import { useState } from "react";
 import type { UseFormSetValue } from "react-hook-form";
 import type { CheckoutFormData } from "../schemas/checkoutSchema";
-import { Copy, Check } from "lucide-react";
+import { Copy, Check, Banknote, ArrowLeftRight } from "lucide-react";
 import { useCurrentTenantQuery } from "@/features/tenant";
 import { useCartStore } from "@/features/cart";
 
@@ -39,81 +39,69 @@ export function PaymentMethodSection({
     }
   };
 
+  const showSelector = acceptsCash && acceptsBankTransfer;
+  const showBankDetails = acceptsBankTransfer && (selectedPaymentMethod === 2 || !acceptsCash);
+
+  // Si el establecimiento solo acepta Efectivo, no mostramos selector redundante
+  if (acceptsCash && !acceptsBankTransfer) {
+    return null;
+  }
+
   return (
     <div className="space-y-4">
       <div>
         <h3 className="text-xs sm:text-sm font-bold uppercase tracking-wider text-text-strong font-display">
-          Método de Pago
+          {showSelector ? "Método de Pago" : "Pago por Transferencia / Deuna"}
         </h3>
         <p className="text-[11px] text-text-muted">
-          Opciones habilitadas por {tenant?.name || "el restaurante"}
+          {showSelector
+            ? `Opciones habilitadas por ${tenant?.name || "el restaurante"}`
+            : `Realiza tu transferencia y valida el comprobante con ${tenant?.name || "el restaurante"}`}
         </p>
       </div>
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
-        {acceptsCash && (
+      {showSelector && (
+        <div className="grid grid-cols-2 rounded-xl overflow-hidden border border-surface-border bg-surface-card">
           <button
             type="button"
             onClick={() => handleSelectPaymentMethod(1)}
-            className={`p-3.5 rounded-xl border text-left text-xs transition-all flex items-start gap-3 cursor-pointer ${
+            className={`py-2 px-2.5 sm:px-4 transition-colors flex flex-col items-center justify-center text-center gap-0.5 cursor-pointer border-r border-surface-border ${
               selectedPaymentMethod === 1
-                ? "border-brand-primary bg-surface-card ring-1 ring-brand-primary shadow-xs"
-                : "border-surface-border hover:border-surface-border-subtle bg-surface-canvas/50"
+                ? "bg-brand-primary text-white"
+                : "bg-surface-card text-text-strong hover:bg-surface-canvas"
             }`}
           >
-            <div
-              className={`w-4 h-4 rounded-full border mt-0.5 flex items-center justify-center shrink-0 ${
-                selectedPaymentMethod === 1
-                  ? "border-brand-primary bg-brand-primary"
-                  : "border-surface-border bg-white"
-              }`}
-            >
-              {selectedPaymentMethod === 1 && <div className="w-1.5 h-1.5 rounded-full bg-white" />}
-            </div>
-            <div className="min-w-0">
-              <p className="font-bold text-text-strong font-display uppercase tracking-wide">
-                Efectivo contra Entrega
-              </p>
-              <p className="text-[11px] text-text-muted mt-0.5 leading-snug">
-                Paga en efectivo al recibir tu pedido o retirar en caja.
-              </p>
-            </div>
+            <span className="flex items-center justify-center gap-1.5 text-[11px] sm:text-xs font-bold font-display uppercase tracking-wide">
+              <Banknote className={`w-3.5 h-3.5 sm:w-4 sm:h-4 shrink-0 ${selectedPaymentMethod === 1 ? "text-white" : "text-text-muted"}`} />
+              <span className="truncate">Efectivo</span>
+            </span>
+            <span className={`text-[10px] leading-tight ${selectedPaymentMethod === 1 ? "text-white/85" : "text-text-muted"}`}>
+              Al recibir o en caja
+            </span>
           </button>
-        )}
 
-        {acceptsBankTransfer && (
           <button
             type="button"
             onClick={() => handleSelectPaymentMethod(2)}
-            className={`p-3.5 rounded-xl border text-left text-xs transition-all flex items-start gap-3 cursor-pointer ${
+            className={`py-2 px-2.5 sm:px-4 transition-colors flex flex-col items-center justify-center text-center gap-0.5 cursor-pointer ${
               selectedPaymentMethod === 2
-                ? "border-brand-primary bg-surface-card ring-1 ring-brand-primary shadow-xs"
-                : "border-surface-border hover:border-surface-border-subtle bg-surface-canvas/50"
+                ? "bg-brand-primary text-white"
+                : "bg-surface-card text-text-strong hover:bg-surface-canvas"
             }`}
           >
-            <div
-              className={`w-4 h-4 rounded-full border mt-0.5 flex items-center justify-center shrink-0 ${
-                selectedPaymentMethod === 2
-                  ? "border-brand-primary bg-brand-primary"
-                  : "border-surface-border bg-white"
-              }`}
-            >
-              {selectedPaymentMethod === 2 && <div className="w-1.5 h-1.5 rounded-full bg-white" />}
-            </div>
-            <div className="min-w-0">
-              <p className="font-bold text-text-strong font-display uppercase tracking-wide">
-                Transferencia / Deuna
-              </p>
-              <p className="text-[11px] text-text-muted mt-0.5 leading-snug">
-                Transfiere y valida el comprobante directamente con caja.
-              </p>
-            </div>
+            <span className="flex items-center justify-center gap-1.5 text-[11px] sm:text-xs font-bold font-display uppercase tracking-wide">
+              <ArrowLeftRight className={`w-3.5 h-3.5 sm:w-4 sm:h-4 shrink-0 ${selectedPaymentMethod === 2 ? "text-white" : "text-text-muted"}`} />
+              <span className="truncate">Transferencia / Deuna</span>
+            </span>
+            <span className={`text-[10px] leading-tight ${selectedPaymentMethod === 2 ? "text-white/85" : "text-text-muted"}`}>
+              Valida tu comprobante
+            </span>
           </button>
-        )}
-      </div>
+        </div>
+      )}
 
       {/* Subsección Informativa: Transferencia Bancaria */}
-      {selectedPaymentMethod === 2 && (
+      {showBankDetails && (
         <div className="p-3.5 bg-surface-canvas border border-surface-border/80 rounded-xl space-y-2 text-xs animate-in fade-in duration-200">
           <div className="flex items-center justify-between">
             <p className="font-bold uppercase tracking-wide font-display text-text-strong">

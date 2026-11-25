@@ -10,9 +10,14 @@ public sealed class GetBranchCapacityEndpoint : IEndpoint
 {
     public void MapEndpoint(IEndpointRouteBuilder app)
     {
-        app.MapGet("/api/branches/{branchId:int}/capacity", async (int branchId, GetBranchCapacityHandler handler, CancellationToken ct) =>
+        app.MapGet("/api/branches/{branchId:int}/capacity", async (
+            int branchId,
+            double? distanceKm,
+            bool? isTakeout,
+            GetBranchCapacityHandler handler,
+            CancellationToken ct) =>
         {
-            var result = await handler.Handle(new GetBranchCapacityQuery(branchId), ct);
+            var result = await handler.Handle(new GetBranchCapacityQuery(branchId, distanceKm, isTakeout ?? false), ct);
             return result.ToHttpResult();
         })
         .WithTags("Branches")

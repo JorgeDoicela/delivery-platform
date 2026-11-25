@@ -85,6 +85,28 @@ export function StorefrontOperationsSection({
 
         <div className="pt-3 border-t border-surface-border space-y-2">
           <span className="block text-[11px] font-bold uppercase tracking-wider text-text-muted">
+            Facturación en Checkout
+          </span>
+          <label className="flex items-start gap-2.5 cursor-pointer text-text-strong">
+            <input
+              type="checkbox"
+              checked={formState.allowCustomBilling ?? true}
+              onChange={(e) =>
+                onFieldChange("allowCustomBilling", e.target.checked)
+              }
+              className="rounded border-surface-border mt-0.5"
+            />
+            <div className="space-y-0.5">
+              <span className="font-semibold block">Permitir factura con datos (Cédula / RUC)</span>
+              <p className="text-[11px] text-text-muted leading-tight">
+                Si se desactiva, todos los pedidos se emiten automáticamente como Consumidor Final y se oculta la sección de facturación en el checkout.
+              </p>
+            </div>
+          </label>
+        </div>
+
+        <div className="pt-3 border-t border-surface-border space-y-2">
+          <span className="block text-[11px] font-bold uppercase tracking-wider text-text-muted">
             Validación de Cobertura Geográfica
           </span>
           <label className="flex items-start gap-2.5 cursor-pointer text-text-strong">

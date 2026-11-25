@@ -7,7 +7,7 @@ using StackExchange.Redis;
 
 namespace Delivery.Features.Branches.GetBranchCapacity;
 
-public sealed record GetBranchCapacityQuery(int BranchId);
+public sealed record GetBranchCapacityQuery(int BranchId, double? DistanceKm = null, bool IsTakeout = false);
 
 public sealed class GetBranchCapacityValidator : AbstractValidator<GetBranchCapacityQuery>
 {
@@ -75,9 +75,11 @@ public sealed class GetBranchCapacityHandler : IHandler<GetBranchCapacityQuery, 
 
         bool isHighDemand = currentCount > maxOrders && currentCount <= hardCap;
         bool isSaturated = currentCount > hardCap;
-        string estimatedTime = isHighDemand ? "60-75 min" : (isSaturated ? "Pausado (Saturación)" : "35-45 min");
+        string estimatedTime = DeliveryTimeEstimator.Estimate(query.DistanceKm, isHighDemand, isSaturated, query.IsTakeout);
         string? notice = isHighDemand
-            ? "Tiempo estimado de entrega extendido a 60-75 min por alta demanda en cocina."
+            ? (query.IsTakeout
+                ? "Tiempo estimado de preparación extendido a 25-35 min por alta demanda en cocina."
+                : $"Tiempo estimado de entrega extendido a {estimatedTime} por alta demanda en cocina.")
             : (isSaturated ? "Cocina saturada temporalmente. Pedidos en pausa." : null);
 
         return Result.Success(new BranchCapacityResponse(

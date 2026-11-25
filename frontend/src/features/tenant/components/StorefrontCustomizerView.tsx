@@ -69,6 +69,7 @@ function StorefrontCustomizerForm({
     requireCoverageValidation: tenant.requireCoverageValidation ?? true,
     enableKitchenWorkflow: tenant.enableKitchenWorkflow ?? true,
     allowDirectCounterTakeoutDelivery: tenant.allowDirectCounterTakeoutDelivery ?? true,
+    allowCustomBilling: tenant.allowCustomBilling ?? true,
     landingLayoutTemplate: tenant.landingLayoutTemplate ?? "asadero-clasico",
     customDomain: tenant.customDomain ?? null,
     bankDetails: { ...tenant.bankDetails },

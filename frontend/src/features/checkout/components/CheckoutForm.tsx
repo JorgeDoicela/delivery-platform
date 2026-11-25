@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useMemo, useSyncExternalStore } from "react";
 import { useRouter } from "next/navigation";
-import { useForm, useWatch } from "react-hook-form";
+import { useForm, useWatch, type SubmitErrorHandler } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { checkoutSchema, type CheckoutFormData } from "../schemas/checkoutSchema";
 import { OrderSummary } from "./OrderSummary";
@@ -15,8 +15,9 @@ import { useAccountStore } from "@/features/account";
 import { useCurrentTenantQuery } from "@/features/tenant";
 import { apiClient } from "@/shared/lib/api-client";
 import { formatCurrency } from "@/shared/lib/utils";
+import { scrollToFormField } from "@/shared/lib/scroll-to-field";
 import { useTenantRoutes } from "@/shared/lib/tenant-routing";
-import { UserCheck, ShieldCheck, LogIn, Loader2 } from "lucide-react";
+import { LogIn, Loader2 } from "lucide-react";
 import { CheckoutAuthGate } from "./CheckoutAuthGate";
 
 const emptySubscribe = () => () => {};
@@ -61,7 +62,6 @@ export function CheckoutForm() {
   const total = getTotal();
   const user = useAuthStore((s) => s.user);
   const isAuthenticated = useAuthStore((s) => s.isAuthenticated);
-  const logout = useAuthStore((s) => s.logout);
   const profile = useAccountStore((s) => s.profile);
   const fetchProfile = useAccountStore((s) => s.fetchProfile);
 
@@ -74,6 +74,7 @@ export function CheckoutForm() {
     formState: { errors },
   } = useForm<CheckoutFormData>({
     resolver: zodResolver(checkoutSchema),
+    shouldFocusError: false,
     defaultValues: {
       customerName: user?.fullName || "",
       customerPhone: "",
@@ -94,6 +95,11 @@ export function CheckoutForm() {
     }
   }, [isAuthenticated, profile, fetchProfile]);
 
+  const allowCustomBilling = tenant?.allowCustomBilling ?? true;
+  const acceptsCash = tenant?.acceptsCash ?? true;
+  const acceptsBankTransfer = tenant?.acceptsBankTransfer ?? true;
+  const showPaymentSection = acceptsBankTransfer;
+
   useEffect(() => {
     if (user?.fullName) {
       setValue("customerName", user.fullName);
@@ -104,14 +110,33 @@ export function CheckoutForm() {
     if (profile) {
       if (profile.fullName) setValue("customerName", profile.fullName);
       if (profile.phone) setValue("customerPhone", profile.phone);
-      if (profile.identificationType === "CEDULA" || profile.identificationType === "RUC") {
+      if (
+        allowCustomBilling &&
+        (profile.identificationType === "CEDULA" || profile.identificationType === "RUC")
+      ) {
         setValue("identificationType", profile.identificationType);
         if (profile.identificationNumber) {
           setValue("identificationNumber", profile.identificationNumber);
         }
       }
     }
-  }, [user, profile, setValue]);
+  }, [user, profile, allowCustomBilling, setValue]);
+
+  useEffect(() => {
+    if (!allowCustomBilling) {
+      setValue("identificationType", "CONSUMIDOR_FINAL");
+      setValue("identificationNumber", "9999999999999");
+    }
+  }, [allowCustomBilling, setValue]);
+
+  useEffect(() => {
+    if (acceptsCash && !acceptsBankTransfer) {
+      setValue("paymentMethod", 1);
+      setValue("cashAmountPaid", undefined);
+    } else if (!acceptsCash && acceptsBankTransfer) {
+      setValue("paymentMethod", 2);
+    }
+  }, [acceptsCash, acceptsBankTransfer, setValue]);
 
   const selectedPaymentMethod = useWatch({ control, name: "paymentMethod" });
 
@@ -189,6 +214,52 @@ export function CheckoutForm() {
     }
   };
 
+  const onInvalid: SubmitErrorHandler<CheckoutFormData> = (formErrors) => {
+    if (typeof document === "undefined") {
+      return;
+    }
+
+    const orderedFields: (keyof CheckoutFormData)[] = [
+      "addressStreet",
+      "customerName",
+      "customerPhone",
+      "customerEmail",
+      "identificationNumber",
+      "cashAmountPaid",
+    ];
+
+    const invalidFields = [
+      ...orderedFields.filter((field) => Boolean(formErrors[field])),
+      ...(Object.keys(formErrors) as (keyof CheckoutFormData)[]).filter(
+        (field) => !orderedFields.includes(field)
+      ),
+    ];
+
+    requestAnimationFrame(() => {
+      let target: HTMLElement | null = null;
+
+      for (const field of invalidFields) {
+        const el = document.querySelector<HTMLElement>(
+          `[data-field="${field}"], [name="${field}"]`
+        );
+        if (el) {
+          target = el;
+          break;
+        }
+      }
+
+      if (!target) {
+        target = document.getElementById("checkout-form-top");
+      }
+
+      if (!target) {
+        return;
+      }
+
+      scrollToFormField(target);
+    });
+  };
+
   if (!isMounted) {
     return (
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start animate-pulse">
@@ -208,7 +279,12 @@ export function CheckoutForm() {
   }
 
   return (
-    <form onSubmit={handleSubmit(onSubmit)} className="pb-28 lg:pb-0">
+    <form
+      id="checkout-form-top"
+      onSubmit={handleSubmit(onSubmit, onInvalid)}
+      noValidate
+      className="pb-28 lg:pb-0"
+    >
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
         {/* Columna Izquierda: Formulario Unificado sin cuadros anidados en móvil */}
         <div className="lg:col-span-7 bg-transparent sm:bg-surface-card rounded-none sm:rounded-3xl border-0 sm:border border-surface-border p-0 sm:p-7 space-y-7 shadow-none sm:shadow-xs">
@@ -222,57 +298,41 @@ export function CheckoutForm() {
             onLocationResolved={handleLocationResolved}
           />
 
-          <div className="border-t border-surface-border/80" />
+          {allowCustomBilling && (
+            <>
+              <div className="border-t border-surface-border/80" />
 
-          <PaymentMethodSection
-            setValue={setValue}
-            selectedPaymentMethod={selectedPaymentMethod}
-          />
+              <BillingInfoSection
+                register={register}
+                setValue={setValue}
+                control={control}
+                errors={errors}
+              />
+            </>
+          )}
 
-          <div className="border-t border-surface-border/80" />
+          {showPaymentSection && (
+            <>
+              <div className="border-t border-surface-border/80" />
 
-          <BillingInfoSection
-            register={register}
-            setValue={setValue}
-            control={control}
-            errors={errors}
-          />
+              <PaymentMethodSection
+                setValue={setValue}
+                selectedPaymentMethod={selectedPaymentMethod}
+              />
+            </>
+          )}
         </div>
 
         {/* Columna Derecha: Resumen de Pedido y Autenticación Sticky */}
         <div className="lg:col-span-5 space-y-4 lg:sticky lg:top-24">
           <OrderSummary />
 
-          {/* Autenticación Requerida o Tarjeta de Cliente Identificado */}
-          <div id="checkout-auth-section">
-            {!isAuthenticated ? (
+          {/* Autenticación Requerida cuando no hay sesión iniciada */}
+          {!isAuthenticated && (
+            <div id="checkout-auth-section">
               <CheckoutAuthGate />
-            ) : (
-              <div className="px-4 py-3 rounded-2xl bg-surface-card border border-surface-border flex items-center justify-between gap-3 text-xs shadow-xs">
-                <div className="flex items-center gap-2.5 min-w-0">
-                  <UserCheck className="w-4 h-4 text-brand-primary shrink-0" />
-                  <div className="min-w-0">
-                    <div className="flex items-center gap-1.5">
-                      <span className="font-bold text-text-strong truncate">
-                        {user?.fullName || profile?.fullName || user?.email}
-                      </span>
-                      <ShieldCheck className="w-3.5 h-3.5 text-status-success shrink-0" />
-                    </div>
-                    <span className="text-text-muted text-[11px] block truncate">
-                      {user?.email} • Cuenta Verificada
-                    </span>
-                  </div>
-                </div>
-                <button
-                  type="button"
-                  onClick={() => logout()}
-                  className="text-xs font-bold text-brand-primary hover:underline shrink-0 cursor-pointer"
-                >
-                  Cambiar
-                </button>
-              </div>
-            )}
-          </div>
+            </div>
+          )}
 
           {submitError && (
             <div className="p-3.5 rounded-2xl bg-status-danger-bg border border-status-danger-border text-xs text-status-danger font-medium leading-relaxed animate-in fade-in">

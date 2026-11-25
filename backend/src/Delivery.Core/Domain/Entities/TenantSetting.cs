@@ -42,6 +42,12 @@ public class TenantSetting : IMustHaveTenant
     public bool AcceptsBankTransfer { get; set; } = true;
     public bool AcceptsCard { get; set; }
 
+    /// <summary>
+    /// Permite emitir facturas electrónicas con datos del cliente (Cédula o RUC) en el checkout.
+    /// Si es falso, el establecimiento opera exclusivamente con Consumidor Final (9999999999999).
+    /// </summary>
+    public bool AllowCustomBilling { get; set; } = true;
+
     public string? BankName { get; set; }
     public string? BankAccountType { get; set; }
     public string? BankAccountNumber { get; set; }

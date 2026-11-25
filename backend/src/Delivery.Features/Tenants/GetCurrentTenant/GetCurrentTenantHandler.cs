@@ -74,7 +74,8 @@ public sealed record TenantStorefrontConfigDto(
     List<TenantBranchSummaryDto> Branches,
     bool RequireCoverageValidation = true,
     bool EnableKitchenWorkflow = true,
-    bool AllowDirectCounterTakeoutDelivery = true
+    bool AllowDirectCounterTakeoutDelivery = true,
+    bool AllowCustomBilling = true
 );
 
 public sealed class GetCurrentTenantHandler : IHandler<GetCurrentTenantQuery, Result<TenantStorefrontConfigDto>>
@@ -195,7 +196,8 @@ public sealed class GetCurrentTenantHandler : IHandler<GetCurrentTenantQuery, Re
             branches,
             settings?.RequireCoverageValidation ?? true,
             tenantEnableKitchen,
-            tenantAllowDirectTakeout
+            tenantAllowDirectTakeout,
+            settings?.AllowCustomBilling ?? true
         );
 
         return Result.Success(dto);

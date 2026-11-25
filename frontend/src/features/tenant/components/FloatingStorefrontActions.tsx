@@ -1,14 +1,18 @@
 "use client";
 
 import React from "react";
+import { usePathname } from "next/navigation";
 import { useAuthStore, UserRole, isUserInRole } from "@/features/auth";
 import { useIsMounted } from "@/shared/hooks/useIsMounted";
 import { FloatingPwaInstallButton } from "./FloatingPwaInstallButton";
 import { FloatingWhatsAppButton } from "./FloatingWhatsAppButton";
 
 export function FloatingStorefrontActions() {
+  const pathname = usePathname() || "";
   const isMounted = useIsMounted();
   const user = useAuthStore((s) => s.user);
+
+  const isCheckoutRoute = /(?:^|\/)checkout(?:\/|$)/i.test(pathname);
 
   const isStaffOrAdmin =
     isMounted &&
@@ -19,7 +23,7 @@ export function FloatingStorefrontActions() {
       isUserInRole(user, UserRole.Cashier) ||
       isUserInRole(user, UserRole.Driver));
 
-  if (isStaffOrAdmin) {
+  if (isStaffOrAdmin || isCheckoutRoute) {
     return null;
   }
 

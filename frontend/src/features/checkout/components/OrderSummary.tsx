@@ -54,7 +54,7 @@ export function OrderSummary() {
             {items.reduce((acc, i) => acc + i.quantity, 0)} {items.reduce((acc, i) => acc + i.quantity, 0) === 1 ? "artículo" : "artículos"}
           </span>
         </div>
-        <span className="inline-flex items-center gap-1.5 text-xs text-text-strong font-bold uppercase tracking-wider bg-surface-canvas px-3 py-1 rounded-full border border-surface-border font-display">
+        <span className="inline-flex items-center gap-1.5 text-xs text-text-strong font-bold uppercase tracking-wider font-display">
           {deliveryType === "delivery" ? (
             <>
               <Truck className="w-3.5 h-3.5 text-brand-primary" />

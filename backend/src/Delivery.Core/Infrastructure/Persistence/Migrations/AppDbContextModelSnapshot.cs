@@ -1387,6 +1387,9 @@ namespace Delivery.Core.Infrastructure.Persistence.Migrations
                     b.Property<bool>("AcceptsCash")
                         .HasColumnType("boolean");
 
+                    b.Property<bool>("AllowCustomBilling")
+                        .HasColumnType("boolean");
+
                     b.Property<bool>("AllowDirectCounterTakeoutDelivery")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("boolean")

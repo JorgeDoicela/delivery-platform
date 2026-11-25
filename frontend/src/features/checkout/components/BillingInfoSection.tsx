@@ -4,6 +4,7 @@ import { useState } from "react";
 import { useWatch, type UseFormRegister, type UseFormSetValue, type Control, type FieldErrors } from "react-hook-form";
 import type { CheckoutFormData } from "../schemas/checkoutSchema";
 import { Select, type SelectOption } from "@/shared/components";
+import { User, FileText } from "lucide-react";
 
 interface BillingInfoSectionProps {
   register: UseFormRegister<CheckoutFormData>;
@@ -56,61 +57,41 @@ export function BillingInfoSection({
       </div>
 
       {/* Selector: Consumidor Final vs Con Datos */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+      <div className="grid grid-cols-2 rounded-xl overflow-hidden border border-surface-border bg-surface-card">
         <button
           type="button"
           onClick={() => handleToggleCustomBilling(false)}
-          className={`p-3 rounded-xl border text-left text-xs transition-all flex items-start gap-2.5 cursor-pointer ${
+          className={`py-2 px-2.5 sm:px-4 transition-colors flex flex-col items-center justify-center text-center gap-0.5 cursor-pointer border-r border-surface-border ${
             !wantsCustomBilling
-              ? "border-brand-primary bg-surface-card ring-1 ring-brand-primary shadow-xs"
-              : "border-surface-border hover:border-surface-border-subtle bg-surface-canvas/50"
+              ? "bg-brand-primary text-white"
+              : "bg-surface-card text-text-strong hover:bg-surface-canvas"
           }`}
         >
-          <div
-            className={`w-4 h-4 rounded-full border mt-0.5 flex items-center justify-center shrink-0 ${
-              !wantsCustomBilling
-                ? "border-brand-primary bg-brand-primary"
-                : "border-surface-border bg-white"
-            }`}
-          >
-            {!wantsCustomBilling && <div className="w-1.5 h-1.5 rounded-full bg-white" />}
-          </div>
-          <div className="min-w-0">
-            <span className="font-bold text-text-strong block font-display uppercase tracking-wide">
-              Consumidor Final
-            </span>
-            <span className="text-[11px] text-text-muted block mt-0.5 leading-snug">
-              Sin datos adicionales
-            </span>
-          </div>
+          <span className="flex items-center justify-center gap-1.5 text-[11px] sm:text-xs font-bold font-display uppercase tracking-wide">
+            <User className={`w-3.5 h-3.5 sm:w-4 sm:h-4 shrink-0 ${!wantsCustomBilling ? "text-white" : "text-text-muted"}`} />
+            <span className="truncate">Consumidor Final</span>
+          </span>
+          <span className={`text-[10px] leading-tight ${!wantsCustomBilling ? "text-white/85" : "text-text-muted"}`}>
+            Sin datos adicionales
+          </span>
         </button>
 
         <button
           type="button"
           onClick={() => handleToggleCustomBilling(true)}
-          className={`p-3 rounded-xl border text-left text-xs transition-all flex items-start gap-2.5 cursor-pointer ${
+          className={`py-2 px-2.5 sm:px-4 transition-colors flex flex-col items-center justify-center text-center gap-0.5 cursor-pointer ${
             wantsCustomBilling
-              ? "border-brand-primary bg-surface-card ring-1 ring-brand-primary shadow-xs"
-              : "border-surface-border hover:border-surface-border-subtle bg-surface-canvas/50"
+              ? "bg-brand-primary text-white"
+              : "bg-surface-card text-text-strong hover:bg-surface-canvas"
           }`}
         >
-          <div
-            className={`w-4 h-4 rounded-full border mt-0.5 flex items-center justify-center shrink-0 ${
-              wantsCustomBilling
-                ? "border-brand-primary bg-brand-primary"
-                : "border-surface-border bg-white"
-            }`}
-          >
-            {wantsCustomBilling && <div className="w-1.5 h-1.5 rounded-full bg-white" />}
-          </div>
-          <div className="min-w-0">
-            <span className="font-bold text-text-strong block font-display uppercase tracking-wide">
-              Con Datos / RUC
-            </span>
-            <span className="text-[11px] text-text-muted block mt-0.5 leading-snug">
-              Para deducir gastos o crédito tributario
-            </span>
-          </div>
+          <span className="flex items-center justify-center gap-1.5 text-[11px] sm:text-xs font-bold font-display uppercase tracking-wide">
+            <FileText className={`w-3.5 h-3.5 sm:w-4 sm:h-4 shrink-0 ${wantsCustomBilling ? "text-white" : "text-text-muted"}`} />
+            <span className="truncate">Con Datos / RUC</span>
+          </span>
+          <span className={`text-[10px] leading-tight ${wantsCustomBilling ? "text-white/85" : "text-text-muted"}`}>
+            Para deducir gastos
+          </span>
         </button>
       </div>
 

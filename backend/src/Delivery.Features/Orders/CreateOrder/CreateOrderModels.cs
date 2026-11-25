@@ -75,6 +75,16 @@ public static class CreateOrderErrors
         "Uno o más productos seleccionados no existen o están agotados."
     );
 
+    public static readonly Error PaymentMethodNotAccepted = new(
+        "Orders.PaymentMethodNotAccepted",
+        "El método de pago seleccionado no está habilitado para este establecimiento."
+    );
+
+    public static readonly Error DeliveryTypeNotAccepted = new(
+        "Orders.DeliveryTypeNotAccepted",
+        "La modalidad de entrega seleccionada no está habilitada para este establecimiento."
+    );
+
     public static readonly Error InsufficientCashPayment = new(
         "Orders.InsufficientCashPayment",
         "El monto en efectivo indicado es inferior al total a pagar."

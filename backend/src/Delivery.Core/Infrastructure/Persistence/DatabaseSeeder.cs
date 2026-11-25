@@ -207,6 +207,7 @@ public static partial class DatabaseSeeder
                 AcceptsCash = true,
                 AcceptsBankTransfer = true,
                 AcceptsCard = false,
+                AllowCustomBilling = false,
                 BankName = "Banco Pichincha",
                 BankAccountType = "Cuenta Corriente",
                 BankAccountNumber = "2100456789",
@@ -257,6 +258,18 @@ public static partial class DatabaseSeeder
             if (!settings.AllowDirectCounterTakeoutDelivery)
             {
                 settings.AllowDirectCounterTakeoutDelivery = true;
+                needsSave = true;
+            }
+
+            if (!settings.AcceptsBankTransfer)
+            {
+                settings.AcceptsBankTransfer = true;
+                needsSave = true;
+            }
+
+            if (settings.AllowCustomBilling)
+            {
+                settings.AllowCustomBilling = false;
                 needsSave = true;
             }
 

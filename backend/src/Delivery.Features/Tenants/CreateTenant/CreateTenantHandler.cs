@@ -207,6 +207,7 @@ public sealed class CreateTenantHandler : IHandler<CreateTenantCommand, Result<C
                 AcceptsCash = true,
                 AcceptsBankTransfer = true,
                 AcceptsCard = true,
+                AllowCustomBilling = true,
                 QuickLinksEnabled = true,
                 CustomDomain = normalizedCustomDomain,
                 LandingLayoutTemplate = string.IsNullOrWhiteSpace(normalizedCommand.LandingLayoutTemplate)

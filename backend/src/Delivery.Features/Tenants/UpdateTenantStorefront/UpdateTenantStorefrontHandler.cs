@@ -72,7 +72,8 @@ public sealed record UpdatedTenantStorefrontDto(
     List<UpdatedTenantBranchSummaryDto> Branches,
     bool RequireCoverageValidation = true,
     bool EnableKitchenWorkflow = true,
-    bool AllowDirectCounterTakeoutDelivery = true
+    bool AllowDirectCounterTakeoutDelivery = true,
+    bool AllowCustomBilling = true
 );
 
 public sealed record UpdateTenantStorefrontCommand(
@@ -105,7 +106,8 @@ public sealed record UpdateTenantStorefrontCommand(
     List<TenantPromoBanner> PromotionalBanners,
     bool? RequireCoverageValidation = null,
     bool? EnableKitchenWorkflow = null,
-    bool? AllowDirectCounterTakeoutDelivery = null
+    bool? AllowDirectCounterTakeoutDelivery = null,
+    bool? AllowCustomBilling = null
 );
 
 public sealed class UpdateTenantStorefrontHandler : IHandler<UpdateTenantStorefrontCommand, Result<UpdatedTenantStorefrontDto>>
@@ -229,6 +231,11 @@ public sealed class UpdateTenantStorefrontHandler : IHandler<UpdateTenantStorefr
             settings.AllowDirectCounterTakeoutDelivery = command.AllowDirectCounterTakeoutDelivery.Value;
         }
 
+        if (command.AllowCustomBilling.HasValue)
+        {
+            settings.AllowCustomBilling = command.AllowCustomBilling.Value;
+        }
+
         if (!string.IsNullOrWhiteSpace(command.LandingLayoutTemplate))
         {
             settings.LandingLayoutTemplate = command.LandingLayoutTemplate.Trim();
@@ -311,7 +318,8 @@ public sealed class UpdateTenantStorefrontHandler : IHandler<UpdateTenantStorefr
             branches,
             settings.RequireCoverageValidation,
             settings.EnableKitchenWorkflow,
-            settings.AllowDirectCounterTakeoutDelivery
+            settings.AllowDirectCounterTakeoutDelivery,
+            settings.AllowCustomBilling
         );
 
         return Result.Success(dto);

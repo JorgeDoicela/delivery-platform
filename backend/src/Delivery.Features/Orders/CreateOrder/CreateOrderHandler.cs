@@ -119,6 +119,44 @@ public sealed class CreateOrderHandler : IHandler<CreateOrderCommand, Result<Cre
             .AsNoTracking()
             .FirstOrDefaultAsync(ts => ts.TenantId == branch.TenantId, cancellationToken);
 
+        // Validar modalidad de entrega y método de pago habilitados por el comercio
+        if (tenantSettings is not null)
+        {
+            var deliveryAllowed = command.DeliveryType switch
+            {
+                DeliveryType.Delivery => tenantSettings.EnableDelivery,
+                DeliveryType.Takeout => tenantSettings.EnableTakeout,
+                _ => true
+            };
+
+            if (!deliveryAllowed)
+            {
+                return Result.Failure<CreateOrderResponse>(CreateOrderErrors.DeliveryTypeNotAccepted);
+            }
+
+            var paymentAllowed = command.PaymentMethod switch
+            {
+                PaymentMethod.CashOnDelivery => tenantSettings.AcceptsCash,
+                PaymentMethod.BankTransfer => tenantSettings.AcceptsBankTransfer,
+                PaymentMethod.CreditDebitCard => tenantSettings.AcceptsCard,
+                _ => true
+            };
+
+            if (!paymentAllowed)
+            {
+                return Result.Failure<CreateOrderResponse>(CreateOrderErrors.PaymentMethodNotAccepted);
+            }
+        }
+
+        // Si el negocio opera solo con Consumidor Final, se normalizan los datos fiscales
+        var allowCustomBilling = tenantSettings?.AllowCustomBilling ?? true;
+        var effectiveIdentificationType = allowCustomBilling && !string.IsNullOrWhiteSpace(command.IdentificationType)
+            ? command.IdentificationType.Trim()
+            : "CONSUMIDOR_FINAL";
+        var effectiveIdentificationNumber = allowCustomBilling && effectiveIdentificationType != "CONSUMIDOR_FINAL" && !string.IsNullOrWhiteSpace(command.IdentificationNumber)
+            ? command.IdentificationNumber.Trim()
+            : "9999999999999";
+
         decimal configuredDeliveryFee = branch.BaseDeliveryFeeOverride
             ?? tenantSettings?.BaseDeliveryFee
             ?? 1.50m;
@@ -143,8 +181,8 @@ public sealed class CreateOrderHandler : IHandler<CreateOrderCommand, Result<Cre
 
             if (customer == null)
             {
-                var idNum = !string.IsNullOrWhiteSpace(command.IdentificationNumber) && command.IdentificationNumber != "9999999999999"
-                    ? command.IdentificationNumber.Trim()
+                var idNum = effectiveIdentificationNumber != "9999999999999"
+                    ? effectiveIdentificationNumber
                     : $"CF-{user.Id:N}"[..18];
 
                 customer = new Customer
@@ -154,7 +192,7 @@ public sealed class CreateOrderHandler : IHandler<CreateOrderCommand, Result<Cre
                     FullName = !string.IsNullOrWhiteSpace(command.CustomerName) ? command.CustomerName.Trim() : user.FullName,
                     Phone = contactPhone,
                     Email = user.Email,
-                    IdentificationType = !string.IsNullOrWhiteSpace(command.IdentificationType) ? command.IdentificationType.Trim() : "CONSUMIDOR_FINAL",
+                    IdentificationType = effectiveIdentificationType,
                     IdentificationNumber = idNum,
                     DefaultAddressStreet = command.AddressStreet.Trim(),
                     DefaultAddressReference = command.AddressReference?.Trim() ?? string.Empty,
@@ -191,8 +229,8 @@ public sealed class CreateOrderHandler : IHandler<CreateOrderCommand, Result<Cre
             CustomerName = !string.IsNullOrWhiteSpace(command.CustomerName) ? command.CustomerName.Trim() : user.FullName,
             CustomerPhone = contactPhone,
             CustomerEmail = user.Email,
-            IdentificationType = command.IdentificationType.Trim(),
-            IdentificationNumber = command.IdentificationNumber.Trim(),
+            IdentificationType = effectiveIdentificationType,
+            IdentificationNumber = effectiveIdentificationNumber,
             AddressStreet = command.AddressStreet.Trim(),
             AddressReference = command.AddressReference?.Trim() ?? string.Empty,
             PaymentMethod = command.PaymentMethod,
@@ -324,14 +362,30 @@ public sealed class CreateOrderHandler : IHandler<CreateOrderCommand, Result<Cre
             return Result.Failure<CreateOrderResponse>(CreateOrderErrors.SlotCapacityExceeded);
         }
 
-        string estimatedTime = "35-45 min";
-        string? demandNotice = null;
-
-        if (currentSlotOrders > maxOrders)
+        double? orderDistanceKm = null;
+        if (command.DeliveryLatitude.HasValue && command.DeliveryLongitude.HasValue)
         {
-            estimatedTime = "60-75 min";
-            demandNotice = "Tiempo estimado de entrega extendido a 60-75 min por alta demanda en cocina.";
+            var branchLat = branch.LocationPoint.Y;
+            var branchLon = branch.LocationPoint.X;
+            orderDistanceKm = Math.Round(
+                Delivery.Core.Common.Spatial.HaversineCalculator.CalculateDistanceKm(
+                    branchLat,
+                    branchLon,
+                    command.DeliveryLatitude.Value,
+                    command.DeliveryLongitude.Value
+                ),
+                2
+            );
         }
+
+        bool isTakeoutOrder = command.DeliveryType == DeliveryType.Takeout;
+        bool isOrderHighDemand = currentSlotOrders > maxOrders;
+        string estimatedTime = DeliveryTimeEstimator.Estimate(orderDistanceKm, isOrderHighDemand, false, isTakeoutOrder);
+        string? demandNotice = isOrderHighDemand
+            ? (isTakeoutOrder
+                ? "Tiempo estimado de preparación extendido a 25-35 min por alta demanda en cocina."
+                : $"Tiempo estimado de entrega extendido a {estimatedTime} por alta demanda en cocina.")
+            : null;
 
         try
         {
