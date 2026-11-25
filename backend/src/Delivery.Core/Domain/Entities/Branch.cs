@@ -51,6 +51,12 @@ public class Branch : IMustHaveTenant
     public bool? AllowDirectCounterTakeoutDeliveryOverride { get; set; }
 
     /// <summary>
+    /// Override por sucursal para la tarifa base de envío a domicilio (USD).
+    /// null = heredar la tarifa configurada en la marca (TenantSetting.BaseDeliveryFee).
+    /// </summary>
+    public decimal? BaseDeliveryFeeOverride { get; set; }
+
+    /// <summary>
     /// Capacidad operativa máxima de pedidos admitidos por ventana de 20 minutos (throttling).
     /// </summary>
     public int MaxOrdersPerSlot { get; set; } = 15;

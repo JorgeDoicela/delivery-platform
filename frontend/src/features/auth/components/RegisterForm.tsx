@@ -146,9 +146,9 @@ export function RegisterForm({
         <div
           role="alert"
           aria-live="polite"
-          className="bg-red-50 dark:bg-red-950/40 border border-red-200 dark:border-red-800/60 text-red-700 dark:text-red-300 text-xs p-3.5 rounded-2xl flex items-start gap-2.5 animate-fadeIn"
+          className="bg-surface-canvas border border-surface-border text-text-strong text-xs p-3.5 rounded-2xl flex items-start gap-2.5 animate-fadeIn"
         >
-          <AlertCircle className="w-4 h-4 shrink-0 text-red-600 mt-0.5" />
+          <AlertCircle className="w-4 h-4 shrink-0 text-brand-primary mt-0.5" />
           <div className="leading-relaxed font-medium">{formError}</div>
         </div>
       )}
@@ -295,7 +295,7 @@ export function RegisterForm({
       </button>
 
       {/* Separador Visual de Métodos Rápidos */}
-      <div className="relative flex items-center justify-center my-1">
+      <div className="relative flex items-center justify-center">
         <div className="border-t border-surface-border w-full" />
         <span className="bg-surface-card px-3 text-[11px] font-bold text-text-subtle uppercase tracking-wider shrink-0">
           O regístrate con
@@ -303,9 +303,10 @@ export function RegisterForm({
         <div className="border-t border-surface-border w-full" />
       </div>
 
-      <WhatsAppSignInButton redirectUrl={redirectUrl} mode="register" />
-
-      <GoogleSignInButton redirectUrl={redirectUrl} />
+      <div className="space-y-2.5">
+        <WhatsAppSignInButton redirectUrl={redirectUrl} mode="register" />
+        <GoogleSignInButton redirectUrl={redirectUrl} />
+      </div>
 
       {/* Enlace alternativo para iniciar sesión */}
       <div className="pt-2 text-center">

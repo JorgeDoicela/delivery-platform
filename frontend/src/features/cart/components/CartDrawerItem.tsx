@@ -67,9 +67,14 @@ export function CartDrawerItem({ item }: CartDrawerItemProps) {
           <div className="flex items-center gap-1.5 bg-surface-card border border-surface-border rounded-full p-1 shadow-2xs">
             <button
               type="button"
-              onClick={() => updateQuantity(item.cartItemId, -1)}
+              disabled={item.quantity <= 1}
+              onClick={() => {
+                if (item.quantity > 1) {
+                  updateQuantity(item.cartItemId, -1);
+                }
+              }}
               aria-label={`Disminuir cantidad de ${item.name}`}
-              className="w-7 h-7 rounded-full hover:bg-surface-canvas flex items-center justify-center text-text-strong transition-all active:scale-90 cursor-pointer"
+              className="w-7 h-7 rounded-full hover:bg-surface-canvas flex items-center justify-center text-text-strong transition-all active:scale-90 cursor-pointer disabled:opacity-35 disabled:cursor-not-allowed disabled:hover:bg-transparent disabled:active:scale-100"
             >
               <Minus className="w-3.5 h-3.5 stroke-[2.5]" />
             </button>

@@ -110,6 +110,9 @@ export function AccountHeader({ profile, isLoading }: AccountHeaderProps) {
     : "CL";
 
   const resolvedAvatar = resolveAvatarUrl(profile.avatarUrl);
+  const isWhatsAppSyntheticEmail = Boolean(
+    profile.email?.toLowerCase().endsWith("@mesafy.local")
+  );
 
   return (
     <div className="bg-surface-card border border-surface-border rounded-3xl p-5 sm:p-6 md:p-8 shadow-xs space-y-4">
@@ -170,7 +173,14 @@ export function AccountHeader({ profile, isLoading }: AccountHeaderProps) {
             <h1 className="text-xl sm:text-2xl font-black text-text-strong font-display uppercase tracking-tight break-words">
               {profile.fullName || "Cliente de la Plataforma"}
             </h1>
-            {profile.isEmailVerified ? (
+            {isWhatsAppSyntheticEmail ? (
+              <span
+                title="Cuenta verificada mediante WhatsApp"
+                className="text-[11px] font-bold uppercase tracking-wider text-emerald-600 dark:text-emerald-400 shrink-0"
+              >
+                Verificado por WhatsApp
+              </span>
+            ) : profile.isEmailVerified ? (
               <span
                 title="Cuenta de correo verificada"
                 className="text-[11px] font-bold uppercase tracking-wider text-emerald-600 dark:text-emerald-400 shrink-0"
@@ -205,10 +215,12 @@ export function AccountHeader({ profile, isLoading }: AccountHeaderProps) {
             )}
           </div>
           <div className="flex flex-wrap items-center gap-x-3 gap-y-1 mt-1 text-xs text-text-muted break-all sm:break-normal">
-            <span className="flex items-center gap-1">
-              <Mail className="w-3.5 h-3.5 text-text-subtle shrink-0" />
-              <span>{profile.email}</span>
-            </span>
+            {!isWhatsAppSyntheticEmail && (
+              <span className="flex items-center gap-1">
+                <Mail className="w-3.5 h-3.5 text-text-subtle shrink-0" />
+                <span>{profile.email}</span>
+              </span>
+            )}
             {profile.phone && (
               <span className="flex items-center gap-1">
                 <Phone className="w-3.5 h-3.5 text-text-subtle shrink-0" />

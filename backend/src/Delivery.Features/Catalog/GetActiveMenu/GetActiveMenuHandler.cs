@@ -5,7 +5,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Delivery.Features.Catalog.GetActiveMenu;
 
-public sealed record GetActiveMenuQuery(bool IncludeInactive = false);
+public sealed record GetActiveMenuQuery(bool IncludeInactive = false, int? BranchId = null);
 
 public sealed record MenuModifierOptionDto(
     int Id,
@@ -70,28 +70,54 @@ public sealed class GetActiveMenuHandler : IHandler<GetActiveMenuQuery, Result<A
             .ThenByDescending(p => p.BasePrice)
             .ToListAsync(cancellationToken);
 
-        var productDtos = products.Select(p => new MenuProductDto(
-            p.Id,
-            p.Name,
-            p.Description,
-            p.BasePrice,
-            p.ImageUrl,
-            p.Category,
-            p.IsActive,
-            p.ProductModifierGroups.Select(pmg => new MenuModifierGroupDto(
-                pmg.ModifierGroup.Id,
-                pmg.ModifierGroup.Name,
-                pmg.ModifierGroup.MinSelectable,
-                pmg.ModifierGroup.MaxSelectable,
-                pmg.ModifierGroup.IsRequired,
-                pmg.ModifierGroup.Options.Select(o => new MenuModifierOptionDto(
-                    o.Id,
-                    o.Name,
-                    o.AdditionalPrice,
-                    o.IsAvailable
-                )).ToList()
-            )).ToList()
-        )).ToList();
+        // Aplicar overrides de disponibilidad y precio por sucursal si se solicitó una sucursal específica
+        var branchOverrides = new Dictionary<int, Delivery.Core.Domain.Entities.BranchProduct>();
+        if (query.BranchId.HasValue && query.BranchId.Value > 0)
+        {
+            var productIds = products.Select(p => p.Id).ToList();
+            branchOverrides = await _context.BranchProducts
+                .AsNoTracking()
+                .Where(bp => bp.BranchId == query.BranchId.Value && productIds.Contains(bp.ProductId))
+                .ToDictionaryAsync(bp => bp.ProductId, cancellationToken);
+        }
+
+        var productDtos = products
+            .Where(p =>
+                query.IncludeInactive ||
+                !branchOverrides.TryGetValue(p.Id, out var bp) ||
+                bp.IsAvailable)
+            .Select(p =>
+            {
+                var hasOverride = branchOverrides.TryGetValue(p.Id, out var bp);
+                var effectivePrice = hasOverride && bp!.CustomPrice.HasValue
+                    ? bp.CustomPrice.Value
+                    : p.BasePrice;
+                var effectiveActive = p.IsActive && (!hasOverride || bp!.IsAvailable);
+
+                return new MenuProductDto(
+                    p.Id,
+                    p.Name,
+                    p.Description,
+                    effectivePrice,
+                    p.ImageUrl,
+                    p.Category,
+                    effectiveActive,
+                    p.ProductModifierGroups.Select(pmg => new MenuModifierGroupDto(
+                        pmg.ModifierGroup.Id,
+                        pmg.ModifierGroup.Name,
+                        pmg.ModifierGroup.MinSelectable,
+                        pmg.ModifierGroup.MaxSelectable,
+                        pmg.ModifierGroup.IsRequired,
+                        pmg.ModifierGroup.Options.Select(o => new MenuModifierOptionDto(
+                            o.Id,
+                            o.Name,
+                            o.AdditionalPrice,
+                            o.IsAvailable
+                        )).ToList()
+                    )).ToList()
+                );
+            })
+            .ToList();
 
         var categories = productDtos
             .GroupBy(p => p.Category)

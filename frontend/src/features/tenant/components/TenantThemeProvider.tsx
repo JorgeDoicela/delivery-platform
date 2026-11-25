@@ -44,11 +44,17 @@ function TenantThemeEffect() {
     const effectiveTenant = tenant || (!isPlatform ? getFallbackTenantConfigByDomain(host) : null);
 
     if (effectiveTenant && (activeSlug || !isPlatform)) {
-      const firstBranch = effectiveTenant.branches?.[0];
+      const currentBranchId = useCartStore.getState().branchId;
+      const activeBranch =
+        effectiveTenant.branches?.find((b) => b.id === currentBranchId) ??
+        effectiveTenant.branches?.[0];
+      const resolvedDeliveryFee =
+        activeBranch?.effectiveDeliveryFee ?? effectiveTenant.baseDeliveryFee ?? 1.5;
+
       syncTenantContext(
         effectiveTenant.slug,
-        effectiveTenant.baseDeliveryFee ?? 1.5,
-        firstBranch ? { id: firstBranch.id, name: firstBranch.name } : undefined
+        resolvedDeliveryFee,
+        activeBranch ? { id: activeBranch.id, name: activeBranch.name } : undefined
       );
 
       if (effectiveTenant.brandPrimaryColor) {

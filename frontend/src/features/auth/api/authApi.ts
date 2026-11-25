@@ -24,6 +24,11 @@ import type {
   RequestWhatsAppOtpResponse,
   VerifyWhatsAppOtpRequest,
   VerifyWhatsAppOtpResponse,
+  CreateWhatsAppChallengeRequest,
+  CreateWhatsAppChallengeResponse,
+  PollWhatsAppChallengeResponse,
+  ExchangeWhatsAppMagicLinkRequest,
+  ExchangeWhatsAppMagicLinkResponse,
 } from "../types";
 import type { LoginFormData } from "../schemas/loginSchema";
 
@@ -207,6 +212,48 @@ export const authApi = {
       body: JSON.stringify({ ...data, ...(tenantSlug ? { tenantSlug } : {}) }),
     });
     return handleAuthResponse<VerifyWhatsAppOtpResponse>(res);
+  },
+
+  async createWhatsAppChallenge(
+    data: CreateWhatsAppChallengeRequest = {}
+  ): Promise<CreateWhatsAppChallengeResponse> {
+    const tenantSlug = data.tenantSlug || getApiClientTenantSlug() || undefined;
+    const res = await fetch(`${getApiBaseUrl()}/api/v1/auth/whatsapp/challenge`, {
+      method: "POST",
+      headers: buildAuthHeaders(undefined, tenantSlug),
+      credentials: "include",
+      body: JSON.stringify({ ...(tenantSlug ? { tenantSlug } : {}) }),
+    });
+    return handleAuthResponse<CreateWhatsAppChallengeResponse>(res);
+  },
+
+  async pollWhatsAppChallenge(
+    challengeId: string,
+    tenantSlug?: string
+  ): Promise<PollWhatsAppChallengeResponse> {
+    const slug = tenantSlug || getApiClientTenantSlug() || undefined;
+    const res = await fetch(
+      `${getApiBaseUrl()}/api/v1/auth/whatsapp/challenge/${encodeURIComponent(challengeId)}/status`,
+      {
+        method: "GET",
+        headers: buildAuthHeaders(undefined, slug),
+        credentials: "include",
+      }
+    );
+    return handleAuthResponse<PollWhatsAppChallengeResponse>(res);
+  },
+
+  async exchangeWhatsAppMagicLink(
+    data: ExchangeWhatsAppMagicLinkRequest
+  ): Promise<ExchangeWhatsAppMagicLinkResponse> {
+    const tenantSlug = data.tenantSlug || getApiClientTenantSlug() || undefined;
+    const res = await fetch(`${getApiBaseUrl()}/api/v1/auth/whatsapp/magic/exchange`, {
+      method: "POST",
+      headers: buildAuthHeaders(undefined, tenantSlug),
+      credentials: "include",
+      body: JSON.stringify({ ...data, ...(tenantSlug ? { tenantSlug } : {}) }),
+    });
+    return handleAuthResponse<ExchangeWhatsAppMagicLinkResponse>(res);
   },
 
   async logout(): Promise<void> {

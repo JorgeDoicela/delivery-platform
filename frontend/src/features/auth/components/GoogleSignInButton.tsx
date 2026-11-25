@@ -153,13 +153,15 @@ export function GoogleSignInButton({
         if (googleBtnRef.current) {
           try {
             googleBtnRef.current.innerHTML = "";
+            const containerWidth = googleBtnRef.current.parentElement?.clientWidth || 380;
+            const buttonWidth = Math.min(Math.max(Math.floor(containerWidth), 260), 400);
             window.google.accounts.id.renderButton(googleBtnRef.current, {
               type: "standard",
               theme: "outline",
               size: "large",
               text: "continue_with",
               shape: "pill",
-              width: 360,
+              width: buttonWidth,
             });
             setHasGsiButton(true);
           } catch {
@@ -223,7 +225,7 @@ export function GoogleSignInButton({
         {/* Contenedor del botón oficial de Google */}
         <div
           ref={googleBtnRef}
-          className={`w-full flex justify-center items-center ${hasGsiButton ? "block" : "hidden"}`}
+          className={hasGsiButton ? "w-full flex justify-center items-center" : "hidden"}
         />
 
         {/* Botón táctil nativo con diseño Mesafy como respaldo */}
@@ -233,17 +235,17 @@ export function GoogleSignInButton({
             onClick={handleButtonClick}
             disabled={isLoading}
             aria-label="Continuar con Google"
-            className="w-full min-h-[48px] px-4 py-2.5 bg-surface-card hover:bg-surface-card-hover active:scale-95 border border-surface-border hover:border-surface-border/80 rounded-full text-sm font-bold tracking-wide font-display text-text-strong shadow-xs transition-all flex items-center justify-center gap-2.5 disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
+            className="relative w-full max-w-[400px] mx-auto h-[40px] px-10 bg-surface-card hover:bg-surface-card-hover active:scale-95 border border-surface-border hover:border-surface-border/80 rounded-full text-sm font-medium font-sans text-text-strong shadow-xs transition-all flex items-center justify-center disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
           >
             {isLoading ? (
               <>
-                <Loader2 className="w-4 h-4 animate-spin text-text-muted" />
-                <span className="text-sm font-semibold">Conectando con Google...</span>
+                <Loader2 className="w-4 h-4 animate-spin text-text-muted shrink-0 absolute left-3.5" />
+                <span className="text-sm font-medium">Conectando con Google...</span>
               </>
             ) : (
               <>
                 <svg
-                  className="w-4 h-4 shrink-0"
+                  className="w-[18px] h-[18px] shrink-0 absolute left-3.5"
                   viewBox="0 0 24 24"
                   aria-hidden="true"
                 >

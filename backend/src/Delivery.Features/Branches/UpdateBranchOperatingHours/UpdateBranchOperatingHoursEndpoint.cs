@@ -14,7 +14,9 @@ public sealed record UpdateBranchOperatingHoursRequest(
     bool? IsCoverageStrict = null,
     bool? EnableKitchenWorkflowOverride = null,
     bool? AllowDirectCounterTakeoutDeliveryOverride = null,
-    bool ApplyWorkflowOverrides = false
+    bool ApplyWorkflowOverrides = false,
+    decimal? BaseDeliveryFeeOverride = null,
+    bool ApplyDeliveryFeeOverride = false
 );
 
 public sealed class UpdateBranchOperatingHoursEndpoint : IEndpoint
@@ -36,7 +38,9 @@ public sealed class UpdateBranchOperatingHoursEndpoint : IEndpoint
                 request.IsCoverageStrict,
                 request.EnableKitchenWorkflowOverride,
                 request.AllowDirectCounterTakeoutDeliveryOverride,
-                request.ApplyWorkflowOverrides
+                request.ApplyWorkflowOverrides,
+                request.BaseDeliveryFeeOverride,
+                request.ApplyDeliveryFeeOverride
             );
 
             var result = await handler.Handle(command, ct);

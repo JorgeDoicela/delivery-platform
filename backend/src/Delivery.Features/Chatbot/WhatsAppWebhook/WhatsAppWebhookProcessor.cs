@@ -1,5 +1,6 @@
 using System.Text.RegularExpressions;
 using Delivery.Features.Common.Privacy;
+using Delivery.Features.Common.Security;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 
@@ -13,6 +14,7 @@ public partial class WhatsAppWebhookProcessor : IWhatsAppWebhookProcessor
     private readonly IChatbotAiEngine _aiEngine;
     private readonly IWhatsAppClient _whatsAppClient;
     private readonly IWhatsAppOrderLocationProcessor? _locationProcessor;
+    private readonly IWhatsAppAuthChallengeStore? _authChallengeStore;
     private readonly WhatsAppChatbotOptions _options;
     private readonly ILogger<WhatsAppWebhookProcessor> _logger;
 
@@ -24,7 +26,8 @@ public partial class WhatsAppWebhookProcessor : IWhatsAppWebhookProcessor
         IWhatsAppClient whatsAppClient,
         IOptions<WhatsAppChatbotOptions> options,
         ILogger<WhatsAppWebhookProcessor> logger,
-        IWhatsAppOrderLocationProcessor? locationProcessor = null)
+        IWhatsAppOrderLocationProcessor? locationProcessor = null,
+        IWhatsAppAuthChallengeStore? authChallengeStore = null)
     {
         _knowledgeProvider = knowledgeProvider;
         _conversationStore = conversationStore;
@@ -34,6 +37,7 @@ public partial class WhatsAppWebhookProcessor : IWhatsAppWebhookProcessor
         _options = options.Value;
         _logger = logger;
         _locationProcessor = locationProcessor;
+        _authChallengeStore = authChallengeStore;
     }
 
     public async Task ProcessPayloadAsync(WhatsAppWebhookPayload payload, CancellationToken ct = default)
@@ -111,6 +115,12 @@ public partial class WhatsAppWebhookProcessor : IWhatsAppWebhookProcessor
         var userText = incoming.Text.Body.Trim();
         LogMessageReceived(_logger, senderPhone, contactName ?? "Anónimo", userText);
 
+        // 0. Intercepción de verificación de inicio de sesión Inbound ($0 Meta, sin bloqueo de ventana 24h)
+        if (_authChallengeStore != null && await TryHandleInboundLoginCodeAsync(userText, senderPhone, contactName, phoneId, ct))
+        {
+            return;
+        }
+
         try
         {
             var sessionTenantId = await _conversationStore.GetActiveTenantSessionAsync(senderPhone, ct);
@@ -173,11 +183,47 @@ public partial class WhatsAppWebhookProcessor : IWhatsAppWebhookProcessor
             // Mantener / refrescar la sesión activa del comensal para turnos posteriores
             await _conversationStore.SetActiveTenantSessionAsync(senderPhone, tenantId, ct);
 
+            // 3. Solicitud explícita de enlace directo a su cuenta o inicio de sesión desde el chat
+            if (_authChallengeStore != null && MagicLinkRequestRegex().IsMatch(userText))
+            {
+                var accountMagicToken = await _authChallengeStore.CreateMagicLinkAsync(
+                    senderPhone,
+                    contactName,
+                    tenant.Slug,
+                    "/cuenta",
+                    TimeSpan.FromMinutes(15),
+                    ct);
+
+                var directAccountUrl = $"https://{_options.PlatformDomain}/{tenant.Slug}/auth/wa?t={accountMagicToken}&next=%2Fcuenta";
+                var magicReply = $"Aquí tienes tu enlace seguro de acceso directo a '{tenant.Name}' (válido por 15 minutos, un solo uso):\n{directAccountUrl}\n\nAl abrirlo ingresarás automáticamente a tu cuenta sin contraseñas.";
+                await _whatsAppClient.SendTextMessageAsync(senderPhone, magicReply, phoneId, ct);
+                return;
+            }
+
             var orderInfo = await _knowledgeProvider.TryResolveOrderStatusAsync(tenantId, senderPhone, userText, ct);
             var history = await _conversationStore.GetHistoryAsync(tenantId, senderPhone, ct);
 
+            // 4. Enriquecer el System Prompt con un Magic Link autenticado al menú para que el cliente entre en 1 clic
+            var effectiveSystemPrompt = tenantContext.SystemPrompt;
+            if (_authChallengeStore != null)
+            {
+                var genericMenuUrl = $"https://{_options.PlatformDomain}/{tenant.Slug}/menu";
+                if (effectiveSystemPrompt.Contains(genericMenuUrl, StringComparison.OrdinalIgnoreCase))
+                {
+                    var menuMagicToken = await _authChallengeStore.CreateMagicLinkAsync(
+                        senderPhone,
+                        contactName,
+                        tenant.Slug,
+                        "/menu",
+                        TimeSpan.FromMinutes(30),
+                        ct);
+                    var authenticatedMenuUrl = $"https://{_options.PlatformDomain}/{tenant.Slug}/auth/wa?t={menuMagicToken}&next=%2Fmenu";
+                    effectiveSystemPrompt = effectiveSystemPrompt.Replace(genericMenuUrl, authenticatedMenuUrl, StringComparison.OrdinalIgnoreCase);
+                }
+            }
+
             var aiReply = await _aiEngine.GenerateReplyAsync(
-                tenantContext.SystemPrompt,
+                effectiveSystemPrompt,
                 history,
                 userText,
                 orderInfo,
@@ -220,10 +266,56 @@ public partial class WhatsAppWebhookProcessor : IWhatsAppWebhookProcessor
     [LoggerMessage(EventId = 3, Level = LogLevel.Error, Message = "Error procesando mensaje de WhatsApp de {Phone}")]
     private static partial void LogProcessMessageError(ILogger logger, Exception ex, string phone);
 
+    private async Task<bool> TryHandleInboundLoginCodeAsync(
+        string userText,
+        string senderPhone,
+        string? contactName,
+        string phoneId,
+        CancellationToken ct)
+    {
+        var match = InboundLoginCodeRegex().Match(userText);
+        if (!match.Success)
+        {
+            return false;
+        }
+
+        var code = match.Groups[1].Value.Trim().ToUpperInvariant();
+        var verified = await _authChallengeStore!.VerifyChallengeByCodeAsync(code, senderPhone, contactName, ct);
+
+        if (verified is null)
+        {
+            const string expiredMsg = "El código de acceso expiró o ya fue utilizado. Por favor genera un nuevo acceso desde la pantalla de inicio de sesión.";
+            await _whatsAppClient.SendTextMessageAsync(senderPhone, expiredMsg, phoneId, ct);
+            return true;
+        }
+
+        var magicToken = await _authChallengeStore.CreateMagicLinkAsync(
+            senderPhone,
+            contactName,
+            verified.TenantSlug,
+            null,
+            TimeSpan.FromMinutes(15),
+            ct);
+
+        var slugPrefix = string.IsNullOrWhiteSpace(verified.TenantSlug) ? "" : $"/{verified.TenantSlug}";
+        var magicUrl = $"https://{_options.PlatformDomain}{slugPrefix}/auth/wa?t={magicToken}";
+        var greeting = !string.IsNullOrWhiteSpace(contactName) ? $" {contactName}" : "";
+
+        var confirmMsg = $"Listo{greeting}, tu identidad fue verificada.\n\nVuelve a la pestaña del navegador (iniciará sesión automáticamente) o ingresa directo aquí:\n{magicUrl}";
+        await _whatsAppClient.SendTextMessageAsync(senderPhone, confirmMsg, phoneId, ct);
+        return true;
+    }
+
     [GeneratedRegex(@"^(?:acepto(?:\s+t[eé]rminos)?|aceptar|s[ií]|1|de\s+acuerdo|autorizo)$", RegexOptions.IgnoreCase)]
     private static partial Regex ConsentAcceptanceRegex();
 
     [GeneratedRegex(@"^(?:revocar(?:\s+consentimiento)?|eliminar\s+mis\s+datos|borrar\s+mis\s+datos|cancelar\s+consentimiento|no\s+autorizo)$", RegexOptions.IgnoreCase)]
     private static partial Regex ConsentRevocationRegex();
+
+    [GeneratedRegex(@"(?:c[oó]digo|iniciar\s+sesi[oó]n|acceso)\s*[:#-]?\s*([A-Z0-9]{6})\b", RegexOptions.IgnoreCase)]
+    private static partial Regex InboundLoginCodeRegex();
+
+    [GeneratedRegex(@"(?:^|\b)(?:mi\s+cuenta|iniciar\s+sesi[oó]n|entrar\s+a\s+la\s+web|ingresar\s+a\s+mi\s+cuenta|link\s+de\s+acceso|enlace\s+de\s+acceso)(?:\b|$)", RegexOptions.IgnoreCase)]
+    private static partial Regex MagicLinkRequestRegex();
 }
 

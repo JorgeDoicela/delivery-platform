@@ -13,6 +13,11 @@ public class WhatsAppChatbotOptions
     public string PhoneNumberId { get; set; } = string.Empty;
 
     /// <summary>
+    /// Número telefónico público internacional del bot de WhatsApp para enlaces wa.me (ej. 593991234567).
+    /// </summary>
+    public string BotPhoneNumber { get; set; } = string.Empty;
+
+    /// <summary>
     /// Identificador de la cuenta de WhatsApp Business (WABA ID).
     /// </summary>
     public string BusinessAccountId { get; set; } = string.Empty;

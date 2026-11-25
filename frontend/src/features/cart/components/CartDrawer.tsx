@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useEffect, useCallback } from "react";
-import { X, Trash2, Store, ShoppingBag } from "lucide-react";
+import { X, Store, ShoppingBag } from "lucide-react";
 import { useCartStore } from "../store/useCartStore";
 import { useCurrentTenantQuery } from "@/features/tenant";
 import { getBranchOperatingStatus } from "@/shared/lib/schedule";
@@ -16,7 +16,6 @@ export function CartDrawer() {
   const isCartOpen = useCartStore((s) => s.isCartOpen);
   const closeCart = useCartStore((s) => s.closeCart);
   const items = useCartStore((s) => s.items);
-  const clearCart = useCartStore((s) => s.clearCart);
   const branchName = useCartStore((s) => s.branchName);
   const tenantSlug = useCartStore((s) => s.tenantSlug);
 
@@ -169,20 +168,10 @@ export function CartDrawer() {
                   ))}
                 </div>
 
-                {/* Botón Vaciar Carrito */}
-                <div className="pt-3 pb-1 flex justify-end">
-                  <button
-                    type="button"
-                    onClick={clearCart}
-                    className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold text-text-muted hover:text-status-danger transition-colors cursor-pointer"
-                  >
-                    <Trash2 className="w-3.5 h-3.5" />
-                    <span>Vaciar carrito</span>
-                  </button>
-                </div>
-
                 {/* Sección de Utensilios y Cortesía */}
-                <CartDrawerUtensils />
+                <div className="pt-2">
+                  <CartDrawerUtensils />
+                </div>
               </ScrollArea>
 
               {/* 3. Resumen y Botón de Checkout Sticky */}

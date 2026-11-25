@@ -14,7 +14,6 @@ interface ModifierModalProps {
 
 export function ModifierModal({ product, onClose }: ModifierModalProps) {
     const addItem = useCartStore((s) => s.addItem);
-    const openCart = useCartStore((s) => s.openCart);
     const [quantity, setQuantity] = useState(1);
     const [showStickyBar, setShowStickyBar] = useState(false);
     const scrollContainerRef = useRef<HTMLDivElement>(null);
@@ -95,7 +94,6 @@ export function ModifierModal({ product, onClose }: ModifierModalProps) {
         });
 
         onClose();
-        openCart();
     };
 
     const handleScroll = (e: React.UIEvent<HTMLDivElement>) => {
@@ -115,7 +113,7 @@ export function ModifierModal({ product, onClose }: ModifierModalProps) {
             aria-modal="true"
             aria-labelledby="modifier-modal-title"
         >
-            <div className="relative w-full max-w-lg bg-surface-card rounded-t-3xl sm:rounded-3xl shadow-2xl flex flex-col h-[90vh] sm:h-auto sm:max-h-[85vh] overflow-hidden text-text-strong animate-in slide-in-from-bottom-8 sm:slide-in-from-bottom-0 sm:zoom-in-95 duration-250 ease-out">
+            <div className="relative w-full max-w-lg bg-surface-card rounded-none sm:rounded-3xl shadow-2xl flex flex-col h-dvh sm:h-auto sm:max-h-[85vh] overflow-hidden text-text-strong animate-in slide-in-from-bottom-8 sm:slide-in-from-bottom-0 sm:zoom-in-95 duration-250 ease-out">
                 {/* 1. Botón de Cierre Limpio sin envoltura */}
                 <button
                     type="button"

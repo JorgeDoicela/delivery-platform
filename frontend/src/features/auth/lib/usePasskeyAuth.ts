@@ -47,26 +47,26 @@ export function translateWebAuthnError(rawError: string | Error | unknown): stri
     lower.includes("cancelado") ||
     lower.includes("the operation either timed out or was not allowed")
   ) {
-    return "Activación cancelada en tu dispositivo o tiempo de espera agotado.";
+    return "Se canceló la verificación o no hay una huella guardada en este equipo.";
   }
 
   if (lower.includes("aborterror") || lower.includes("timed out") || lower.includes("timeout")) {
-    return "La solicitud expiró o fue interrumpida. Por favor, intenta de nuevo.";
+    return "Se agotó el tiempo de espera. Inténtalo de nuevo.";
   }
 
   if (lower.includes("notsupportederror") || lower.includes("not supported")) {
-    return "Tu dispositivo o navegador no soporta autenticación biométrica.";
+    return "Este navegador o dispositivo no permite entrar con huella o rostro.";
   }
 
   if (lower.includes("securityerror")) {
-    return "Operación no autorizada por las políticas de seguridad del navegador.";
+    return "El navegador no permitió usar la biometría en esta página.";
   }
 
   if (lower.includes("challenge") || lower.includes("expir")) {
-    return "El desafío de seguridad expiró. Por favor, intenta activar el dispositivo nuevamente.";
+    return "La verificación expiró. Inténtalo de nuevo.";
   }
 
-  return msg || "No se pudo activar el acceso en este equipo.";
+  return msg || "No se pudo completar la verificación. Inténtalo de nuevo.";
 }
 
 export function usePasskeyAuth(): UsePasskeyAuthReturn {
@@ -121,7 +121,7 @@ export function usePasskeyAuth(): UsePasskeyAuthReturn {
             const cause = err.cause as { name?: string };
             if (cause?.name === "NotAllowedError") {
               setError(
-                "No se encontró una huella o rostro registrada en este equipo o se canceló el intento. Si aún no tienes cuenta, crea una gratis; o ingresa con tu correo y contraseña para activarla."
+                "No tienes una huella o rostro guardado en este equipo. Entra con WhatsApp, Google o tu correo y actívalo en tu perfil."
               );
               return false;
             }
@@ -164,7 +164,7 @@ export function usePasskeyAuth(): UsePasskeyAuthReturn {
           if (err.code === "ERROR_PASSTHROUGH_SEE_CAUSE_PROPERTY") {
             const cause = err.cause as { name?: string };
             if (cause?.name === "NotAllowedError") {
-              setError("Activación cancelada en tu dispositivo.");
+              setError("Cancelaste el registro de tu huella o rostro.");
               return null;
             }
           }

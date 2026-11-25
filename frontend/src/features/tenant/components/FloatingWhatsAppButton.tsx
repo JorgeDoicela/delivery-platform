@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useMemo } from "react";
+import { usePathname } from "next/navigation";
 import { useCurrentTenantQuery } from "../hooks/useTenantQueries";
 import { WhatsAppIcon } from "@/shared/components/WhatsAppIcon";
 
@@ -25,7 +26,10 @@ interface FloatingWhatsAppButtonProps {
 }
 
 export function FloatingWhatsAppButton({ isEmbedded = false }: FloatingWhatsAppButtonProps = {}) {
+  const pathname = usePathname() || "";
   const { data: tenant } = useCurrentTenantQuery();
+
+  const isAuthRoute = /(?:^|\/)(login|registro|register|auth)(?:\/|$)/i.test(pathname);
 
   const phone = tenant?.contactPhone || tenant?.branches?.[0]?.phone;
   const brandName = tenant?.name || "el restaurante";
@@ -35,7 +39,7 @@ export function FloatingWhatsAppButton({ isEmbedded = false }: FloatingWhatsAppB
     [phone, brandName]
   );
 
-  if (!whatsappHref) return null;
+  if (!whatsappHref || isAuthRoute) return null;
 
   const buttonElement = (
     <a

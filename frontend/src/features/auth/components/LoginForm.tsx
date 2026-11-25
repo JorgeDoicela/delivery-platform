@@ -141,9 +141,9 @@ export function LoginForm({
         <div
           role="alert"
           aria-live="polite"
-          className="bg-red-50 dark:bg-red-950/40 border border-red-200 dark:border-red-800/60 text-red-700 dark:text-red-300 text-xs p-3.5 rounded-2xl flex items-start gap-2.5 animate-fadeIn"
+          className="bg-surface-canvas border border-surface-border text-text-strong text-xs p-3.5 rounded-2xl flex items-start gap-2.5 animate-fadeIn"
         >
-          <AlertCircle className="w-4 h-4 shrink-0 text-red-600 mt-0.5" />
+          <AlertCircle className="w-4 h-4 shrink-0 text-brand-primary mt-0.5" />
           <div className="leading-relaxed font-medium">{formError}</div>
         </div>
       )}
@@ -232,24 +232,24 @@ export function LoginForm({
         )}
       </div>
 
-      {/* Botón Canónico de Envío (Píldora Roja en Barlow Condensed, Cero SVG Decorativo) */}
+      {/* Botón Canónico de Envío */}
       <button
         type="submit"
         disabled={isSubmitting}
-        className="w-full min-h-[48px] px-4 py-2.5 bg-brand-primary hover:bg-brand-primary-hover active:scale-95 text-white font-bold text-sm tracking-wide font-display rounded-full shadow-md shadow-brand-primary/20 transition-all flex items-center justify-center gap-2.5 disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
+        className="w-full min-h-[48px] px-4 py-2.5 bg-brand-primary hover:bg-brand-primary-hover active:scale-95 text-white font-bold text-sm uppercase tracking-wider font-display rounded-full shadow-md shadow-brand-primary/20 transition-all flex items-center justify-center gap-2.5 disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
       >
         {isSubmitting ? (
           <>
             <Loader2 className="w-4 h-4 animate-spin text-white" />
-            <span>Validando Credenciales...</span>
+            <span>Validando credenciales...</span>
           </>
         ) : (
-          <span>Acceder al Sistema</span>
+          <span>Iniciar sesión</span>
         )}
       </button>
 
       {/* Separador Visual de Métodos Rápidos */}
-      <div className="relative flex items-center justify-center my-1">
+      <div className="relative flex items-center justify-center">
         <div className="border-t border-surface-border w-full" />
         <span className="bg-surface-card px-3 text-[11px] font-bold text-text-subtle uppercase tracking-wider shrink-0">
           O continúa con
@@ -257,11 +257,12 @@ export function LoginForm({
         <div className="border-t border-surface-border w-full" />
       </div>
 
-      <WhatsAppSignInButton redirectUrl={redirectUrl} mode="login" />
-
-      <GoogleSignInButton redirectUrl={redirectUrl} />
-
-      <PasskeySignInButton redirectUrl={redirectUrl} emailHint={watchedEmail} />
+      {/* Métodos Alternativos Agrupados con Espaciado Uniforme */}
+      <div className="space-y-2.5">
+        <WhatsAppSignInButton redirectUrl={redirectUrl} mode="login" />
+        <GoogleSignInButton redirectUrl={redirectUrl} />
+        <PasskeySignInButton redirectUrl={redirectUrl} emailHint={watchedEmail} />
+      </div>
 
       {/* Enlace alternativo para crear cuenta */}
       <div className="pt-2 text-center">

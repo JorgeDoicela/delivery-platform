@@ -25,7 +25,9 @@ public sealed record BranchDetailDto(
     bool? EnableKitchenWorkflowOverride = null,
     bool UseKitchenWorkflow = true,
     bool? AllowDirectCounterTakeoutDeliveryOverride = null,
-    bool AllowDirectCounterTakeoutDelivery = true
+    bool AllowDirectCounterTakeoutDelivery = true,
+    decimal? BaseDeliveryFeeOverride = null,
+    decimal EffectiveDeliveryFee = 1.50m
 );
 
 public sealed class GetBranchesHandler : IHandler<GetBranchesQuery, Result<List<BranchDetailDto>>>
@@ -61,7 +63,9 @@ public sealed class GetBranchesHandler : IHandler<GetBranchesQuery, Result<List<
                 b.EnableKitchenWorkflowOverride,
                 b.EnableKitchenWorkflowOverride ?? (b.Tenant.Settings != null ? b.Tenant.Settings.EnableKitchenWorkflow : true),
                 b.AllowDirectCounterTakeoutDeliveryOverride,
-                b.AllowDirectCounterTakeoutDeliveryOverride ?? (b.Tenant.Settings != null ? b.Tenant.Settings.AllowDirectCounterTakeoutDelivery : true)
+                b.AllowDirectCounterTakeoutDeliveryOverride ?? (b.Tenant.Settings != null ? b.Tenant.Settings.AllowDirectCounterTakeoutDelivery : true),
+                b.BaseDeliveryFeeOverride,
+                b.BaseDeliveryFeeOverride ?? (b.Tenant.Settings != null ? b.Tenant.Settings.BaseDeliveryFee : 1.50m)
             ))
             .ToListAsync(cancellationToken);
 

@@ -6,6 +6,31 @@ public sealed record RequestWhatsAppOtpResponse(bool Success, string Message);
 
 public sealed record VerifyWhatsAppOtpRequest(string Phone, string Code, string? TenantSlug = null);
 
+public sealed record CreateWhatsAppChallengeRequest(string? TenantSlug = null);
+
+public sealed record CreateWhatsAppChallengeResponse(
+    string ChallengeId,
+    string ShortCode,
+    string WhatsAppUrl,
+    string BotPhone,
+    int ExpiresInSeconds);
+
+public sealed record PollWhatsAppChallengeResponse(
+    string Status,
+    string? AccessToken = null,
+    string? RefreshToken = null,
+    DateTime? ExpiresAt = null,
+    WhatsAppUserAuthInfoDto? User = null);
+
+public sealed record ExchangeWhatsAppMagicLinkRequest(string Token, string? TenantSlug = null);
+
+public sealed record ExchangeWhatsAppMagicLinkResponse(
+    string AccessToken,
+    string RefreshToken,
+    DateTime ExpiresAt,
+    WhatsAppUserAuthInfoDto User,
+    string? RedirectPath = null);
+
 public sealed record WhatsAppUserAuthInfoDto(
     Guid Id,
     string Email,

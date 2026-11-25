@@ -9,7 +9,9 @@ public sealed record UpdateBranchOperatingHoursCommand(
     bool? IsCoverageStrict = null,
     bool? EnableKitchenWorkflowOverride = null,
     bool? AllowDirectCounterTakeoutDeliveryOverride = null,
-    bool ApplyWorkflowOverrides = false
+    bool ApplyWorkflowOverrides = false,
+    decimal? BaseDeliveryFeeOverride = null,
+    bool ApplyDeliveryFeeOverride = false
 );
 
 public sealed record UpdateBranchOperatingHoursResponse(
@@ -23,5 +25,7 @@ public sealed record UpdateBranchOperatingHoursResponse(
     bool? EnableKitchenWorkflowOverride = null,
     bool UseKitchenWorkflow = true,
     bool? AllowDirectCounterTakeoutDeliveryOverride = null,
-    bool AllowDirectCounterTakeoutDelivery = true
+    bool AllowDirectCounterTakeoutDelivery = true,
+    decimal? BaseDeliveryFeeOverride = null,
+    decimal EffectiveDeliveryFee = 1.50m
 );

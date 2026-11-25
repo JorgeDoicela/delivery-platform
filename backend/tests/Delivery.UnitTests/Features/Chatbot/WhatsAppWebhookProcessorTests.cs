@@ -1,6 +1,7 @@
 using Delivery.Core.Domain.Entities;
 using Delivery.Features.Chatbot.WhatsAppWebhook;
 using Delivery.Features.Common.Privacy;
+using Delivery.Features.Common.Security;
 using FluentAssertions;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
@@ -368,6 +369,86 @@ public class WhatsAppWebhookProcessorTests
         // Assert
         _consentMock.Verify(c => c.RevokeConsentAsync(tenant.Id, senderPhone, It.IsAny<CancellationToken>()), Times.Once);
         _senderMock.Verify(s => s.SendTextMessageAsync(senderPhone, It.Is<string>(t => t.Contains("ha sido revocado conforme a la LOPDP")), It.IsAny<string?>(), It.IsAny<CancellationToken>()), Times.Once);
+        _aiMock.Verify(a => a.GenerateReplyAsync(It.IsAny<string>(), It.IsAny<List<ChatMessageDto>>(), It.IsAny<string>(), It.IsAny<string?>(), It.IsAny<CancellationToken>()), Times.Never);
+    }
+
+    [Fact]
+    public async Task ProcessPayloadAsync_WithInboundLoginCode_VerifiesChallengeAndRepliesWithMagicLink()
+    {
+        // Arrange
+        var authStoreMock = new Mock<IWhatsAppAuthChallengeStore>();
+        var verified = new WhatsAppAuthChallenge("chg_1", "K7M9P2", "verified", "la-granjita", "593987654321", "Jorge Doicela", DateTime.UtcNow);
+
+        authStoreMock.Setup(s => s.VerifyChallengeByCodeAsync("K7M9P2", "593987654321", "Jorge Doicela", It.IsAny<CancellationToken>()))
+            .ReturnsAsync(verified);
+        authStoreMock.Setup(s => s.CreateMagicLinkAsync("593987654321", "Jorge Doicela", "la-granjita", null, It.IsAny<TimeSpan?>(), It.IsAny<CancellationToken>()))
+            .ReturnsAsync("magic_fallback_token");
+
+        _storeMock.Setup(s => s.IsMessageProcessedAsync("wamid.inbound_1", It.IsAny<CancellationToken>()))
+            .ReturnsAsync(false);
+
+        var processorWithAuth = new WhatsAppWebhookProcessor(
+            _knowledgeMock.Object,
+            _storeMock.Object,
+            _consentMock.Object,
+            _aiMock.Object,
+            _senderMock.Object,
+            Options.Create(_options),
+            _loggerMock.Object,
+            null,
+            authStoreMock.Object);
+
+        var payload = CreateSingleMessagePayload("wamid.inbound_1", "593987654321", "Hola La Granjita, quiero iniciar sesión. Código: K7M9P2");
+
+        // Act
+        await processorWithAuth.ProcessPayloadAsync(payload);
+
+        // Assert
+        authStoreMock.Verify(s => s.VerifyChallengeByCodeAsync("K7M9P2", "593987654321", "Jorge Doicela", It.IsAny<CancellationToken>()), Times.Once);
+        _senderMock.Verify(s => s.SendTextMessageAsync(
+            "593987654321",
+            It.Is<string>(msg => msg.Contains("identidad fue verificada") && msg.Contains("/la-granjita/auth/wa?t=magic_fallback_token")),
+            It.IsAny<string?>(),
+            It.IsAny<CancellationToken>()), Times.Once);
+        _aiMock.Verify(a => a.GenerateReplyAsync(It.IsAny<string>(), It.IsAny<List<ChatMessageDto>>(), It.IsAny<string>(), It.IsAny<string?>(), It.IsAny<CancellationToken>()), Times.Never);
+    }
+
+    [Fact]
+    public async Task ProcessPayloadAsync_WhenUserRequestsAccountAccess_SendsDirectMagicLink()
+    {
+        // Arrange
+        var authStoreMock = new Mock<IWhatsAppAuthChallengeStore>();
+        var tenant = new Tenant { Id = Guid.NewGuid(), Name = "La Granjita", Slug = "la-granjita" };
+
+        _storeMock.Setup(s => s.IsMessageProcessedAsync("wamid.magic_req", It.IsAny<CancellationToken>()))
+            .ReturnsAsync(false);
+        _knowledgeMock.Setup(k => k.ResolveContextAsync(It.IsAny<string>(), "Quiero entrar a mi cuenta", "593987654321", It.IsAny<Guid?>(), It.IsAny<CancellationToken>()))
+            .ReturnsAsync(new TenantChatContext { Tenant = tenant, SystemPrompt = "Prompt" });
+        authStoreMock.Setup(s => s.CreateMagicLinkAsync("593987654321", "Jorge Doicela", "la-granjita", "/cuenta", It.IsAny<TimeSpan?>(), It.IsAny<CancellationToken>()))
+            .ReturnsAsync("magic_account_xyz");
+
+        var processorWithAuth = new WhatsAppWebhookProcessor(
+            _knowledgeMock.Object,
+            _storeMock.Object,
+            _consentMock.Object,
+            _aiMock.Object,
+            _senderMock.Object,
+            Options.Create(_options),
+            _loggerMock.Object,
+            null,
+            authStoreMock.Object);
+
+        var payload = CreateSingleMessagePayload("wamid.magic_req", "593987654321", "Quiero entrar a mi cuenta");
+
+        // Act
+        await processorWithAuth.ProcessPayloadAsync(payload);
+
+        // Assert
+        _senderMock.Verify(s => s.SendTextMessageAsync(
+            "593987654321",
+            It.Is<string>(msg => msg.Contains("/la-granjita/auth/wa?t=magic_account_xyz")),
+            It.IsAny<string?>(),
+            It.IsAny<CancellationToken>()), Times.Once);
         _aiMock.Verify(a => a.GenerateReplyAsync(It.IsAny<string>(), It.IsAny<List<ChatMessageDto>>(), It.IsAny<string>(), It.IsAny<string?>(), It.IsAny<CancellationToken>()), Times.Never);
     }
 

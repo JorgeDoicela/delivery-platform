@@ -243,6 +243,7 @@ public partial class AppDbContext
             b.Property(x => x.SriEmissionPoint).HasMaxLength(3).IsRequired();
             b.Property(x => x.OpeningTime).HasMaxLength(10).IsRequired();
             b.Property(x => x.ClosingTime).HasMaxLength(10).IsRequired();
+            b.Property(x => x.BaseDeliveryFeeOverride).HasPrecision(18, 2);
 
             b.Property(x => x.LocationPoint)
                 .HasColumnType("geometry(Point, 4326)")

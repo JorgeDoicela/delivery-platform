@@ -93,10 +93,11 @@ public sealed class UpdateAccountProfileHandler : IHandler<UpdateAccountProfileC
         user.FullName = request.FullName.Trim();
         user.Phone = request.Phone.Trim();
         user.IdentificationType = string.IsNullOrWhiteSpace(request.IdentificationType)
-            ? "CONSUMIDOR_FINAL"
+            ? null
             : request.IdentificationType.Trim().ToUpperInvariant();
         user.IdentificationNumber = string.IsNullOrWhiteSpace(request.IdentificationNumber)
-            ? "9999999999999"
+            || request.IdentificationNumber.Trim() == "9999999999999"
+            ? null
             : request.IdentificationNumber.Trim();
 
         // Sincronizar directorio de clientes de caja si existe cliente con este email en el tenant activo
@@ -109,8 +110,11 @@ public sealed class UpdateAccountProfileHandler : IHandler<UpdateAccountProfileC
         {
             existingCustomer.FullName = user.FullName;
             existingCustomer.Phone = user.Phone;
-            existingCustomer.IdentificationType = user.IdentificationType;
-            existingCustomer.IdentificationNumber = user.IdentificationNumber;
+            if (!string.IsNullOrWhiteSpace(user.IdentificationType) && !string.IsNullOrWhiteSpace(user.IdentificationNumber))
+            {
+                existingCustomer.IdentificationType = user.IdentificationType;
+                existingCustomer.IdentificationNumber = user.IdentificationNumber;
+            }
         }
 
         await _context.SaveChangesAsync(cancellationToken);

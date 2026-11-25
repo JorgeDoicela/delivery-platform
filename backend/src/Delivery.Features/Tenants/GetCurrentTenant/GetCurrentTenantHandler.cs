@@ -35,7 +35,9 @@ public sealed record TenantBranchSummaryDto(
     bool? EnableKitchenWorkflowOverride = null,
     bool UseKitchenWorkflow = true,
     bool? AllowDirectCounterTakeoutDeliveryOverride = null,
-    bool AllowDirectCounterTakeoutDelivery = true
+    bool AllowDirectCounterTakeoutDelivery = true,
+    decimal? BaseDeliveryFeeOverride = null,
+    decimal EffectiveDeliveryFee = 1.50m
 );
 
 public sealed record TenantStorefrontConfigDto(
@@ -124,6 +126,7 @@ public sealed class GetCurrentTenantHandler : IHandler<GetCurrentTenantQuery, Re
 
         var tenantEnableKitchen = settings?.EnableKitchenWorkflow ?? true;
         var tenantAllowDirectTakeout = settings?.AllowDirectCounterTakeoutDelivery ?? true;
+        var tenantBaseDeliveryFee = settings?.BaseDeliveryFee ?? 1.50m;
 
         var branches = tenant.Branches
             .Where(b => b.IsActive)
@@ -144,7 +147,9 @@ public sealed class GetCurrentTenantHandler : IHandler<GetCurrentTenantQuery, Re
                 b.EnableKitchenWorkflowOverride,
                 KitchenWorkflowPolicy.ResolveKitchenWorkflow(tenantEnableKitchen, b.EnableKitchenWorkflowOverride),
                 b.AllowDirectCounterTakeoutDeliveryOverride,
-                KitchenWorkflowPolicy.ResolveDirectCounterTakeoutDelivery(tenantAllowDirectTakeout, b.AllowDirectCounterTakeoutDeliveryOverride)
+                KitchenWorkflowPolicy.ResolveDirectCounterTakeoutDelivery(tenantAllowDirectTakeout, b.AllowDirectCounterTakeoutDeliveryOverride),
+                b.BaseDeliveryFeeOverride,
+                b.BaseDeliveryFeeOverride ?? tenantBaseDeliveryFee
             ))
             .ToList();
 

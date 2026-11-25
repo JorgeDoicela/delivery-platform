@@ -118,6 +118,34 @@ export interface VerifyWhatsAppOtpRequest {
 
 export type VerifyWhatsAppOtpResponse = LoginResponse;
 
+export interface CreateWhatsAppChallengeRequest {
+  tenantSlug?: string;
+}
+
+export interface CreateWhatsAppChallengeResponse {
+  challengeId: string;
+  shortCode: string;
+  whatsAppUrl: string;
+  botPhone: string;
+  expiresInSeconds: number;
+}
+
+export interface PollWhatsAppChallengeResponse {
+  status: "pending" | "authenticated" | "expired";
+  accessToken?: string | null;
+  expiresAt?: string | null;
+  user?: AuthUser | null;
+}
+
+export interface ExchangeWhatsAppMagicLinkRequest {
+  token: string;
+  tenantSlug?: string;
+}
+
+export interface ExchangeWhatsAppMagicLinkResponse extends LoginResponse {
+  redirectPath?: string | null;
+}
+
 export interface ResendVerificationRequest {
   email: string;
   tenantSlug?: string;

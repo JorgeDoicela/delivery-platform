@@ -86,9 +86,9 @@ function LoginContent({ initialSlug }: LoginPageProps) {
     }, [isMounted, isAuthenticated, user, authMode, redirectUrl, routes, router]);
 
     return (
-        <div className="w-full max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-12 space-y-6 min-h-[100dvh] mb-16 sm:mb-24">
+        <div className="w-full max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 pt-14 sm:pt-20 lg:pt-24 pb-12 sm:pb-16 space-y-8 min-h-[100dvh] mb-16 sm:mb-24">
             {/* 1. Titular Principal en Barlow Condensed */}
-            <div className="text-center sm:text-left space-y-1">
+            <div className="text-center space-y-1">
                 <h1 className="text-3xl sm:text-4xl font-black text-text-strong uppercase tracking-tight font-display">
                     {isAuthenticated && user && authMode !== "verify-email"
                         ? "Accediendo a tu cuenta"
@@ -118,7 +118,7 @@ function LoginContent({ initialSlug }: LoginPageProps) {
                 ) : (
                     /* Formulario de Login / Registro / Recuperación */
                     <div className="w-full max-w-md mx-auto py-2">
-                        <div className="mb-6 pb-1">
+                        <div className="mb-6 pb-1 text-center">
                             <h2 className="text-2xl font-black uppercase tracking-tight text-text-strong font-display">
                                 {authMode === "login"
                                     ? "Iniciar Sesión"

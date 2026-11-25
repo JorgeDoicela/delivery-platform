@@ -125,5 +125,21 @@ public static class AuthErrors
     public static readonly Error InvalidPhoneNumber = new(
         "Auth.InvalidPhoneNumber",
         "El número de teléfono proporcionado no tiene un formato válido.");
+
+    public static readonly Error WhatsAppDeliveryFailed = new(
+        "Auth.WhatsAppDeliveryFailed",
+        "No fue posible enviar el mensaje por WhatsApp en este momento. Intenta iniciar sesión mediante el botón directo de WhatsApp.");
+
+    public static readonly Error WhatsAppBotNotConfigured = new(
+        "Auth.WhatsAppBotNotConfigured",
+        "El canal de WhatsApp no cuenta con un número configurado para este establecimiento.");
+
+    public static readonly Error InvalidOrExpiredMagicLink = new(
+        "Auth.InvalidOrExpiredMagicLink",
+        "El enlace de acceso de WhatsApp es inválido, ha expirado o ya fue utilizado.");
+
+    public static readonly Error StaffMustUsePasswordLogin = new(
+        "Auth.StaffMustUsePasswordLogin",
+        "Las cuentas operativas o administrativas deben iniciar sesión con su correo electrónico y contraseña.");
 }
 

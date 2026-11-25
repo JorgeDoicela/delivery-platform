@@ -85,6 +85,17 @@ public sealed class UpdateBranchOperatingHoursHandler : IHandler<UpdateBranchOpe
             }
         }
 
+        if (command.ApplyDeliveryFeeOverride)
+        {
+            branch.BaseDeliveryFeeOverride = command.BaseDeliveryFeeOverride.HasValue
+                ? Math.Round(command.BaseDeliveryFeeOverride.Value, 2, MidpointRounding.AwayFromZero)
+                : null;
+        }
+        else if (command.BaseDeliveryFeeOverride.HasValue)
+        {
+            branch.BaseDeliveryFeeOverride = Math.Round(command.BaseDeliveryFeeOverride.Value, 2, MidpointRounding.AwayFromZero);
+        }
+
         await _context.SaveChangesAsync(cancellationToken);
 
         var tenantWorkflow = branch.TenantId != Guid.Empty
@@ -92,7 +103,7 @@ public sealed class UpdateBranchOperatingHoursHandler : IHandler<UpdateBranchOpe
                 .IgnoreQueryFilters()
                 .AsNoTracking()
                 .Where(ts => ts.TenantId == branch.TenantId)
-                .Select(ts => new { ts.EnableKitchenWorkflow, ts.AllowDirectCounterTakeoutDelivery })
+                .Select(ts => new { ts.EnableKitchenWorkflow, ts.AllowDirectCounterTakeoutDelivery, ts.BaseDeliveryFee })
                 .FirstOrDefaultAsync(cancellationToken)
             : null;
 
@@ -104,6 +115,7 @@ public sealed class UpdateBranchOperatingHoursHandler : IHandler<UpdateBranchOpe
             tenantWorkflow?.AllowDirectCounterTakeoutDelivery ?? true,
             branch.AllowDirectCounterTakeoutDeliveryOverride
         );
+        var effectiveDeliveryFee = branch.BaseDeliveryFeeOverride ?? tenantWorkflow?.BaseDeliveryFee ?? 1.50m;
 
         return Result.Success(new UpdateBranchOperatingHoursResponse(
             branch.Id,
@@ -116,7 +128,9 @@ public sealed class UpdateBranchOperatingHoursHandler : IHandler<UpdateBranchOpe
             branch.EnableKitchenWorkflowOverride,
             useKitchenWorkflow,
             branch.AllowDirectCounterTakeoutDeliveryOverride,
-            allowDirectTakeout
+            allowDirectTakeout,
+            branch.BaseDeliveryFeeOverride,
+            effectiveDeliveryFee
         ));
     }
 }

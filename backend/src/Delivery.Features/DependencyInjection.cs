@@ -23,6 +23,7 @@ public static class DependencyInjection
         services.AddSingleton<ITokenProvider, JwtTokenProvider>();
         services.AddScoped<Delivery.Features.Auth.GoogleAuth.IGoogleTokenValidator, Delivery.Features.Auth.GoogleAuth.GoogleTokenValidator>();
         services.AddSingleton<IWebAuthnChallengeStore, RedisWebAuthnChallengeStore>();
+        services.AddSingleton<IWhatsAppAuthChallengeStore, RedisWhatsAppAuthChallengeStore>();
         services.AddScoped<IWebAuthnRelyingPartyResolver, WebAuthnRelyingPartyResolver>();
         services.AddScoped<IWebAuthnProvider, Fido2WebAuthnProvider>();
 
@@ -40,6 +41,9 @@ public static class DependencyInjection
             {
                 var envPhoneId = Environment.GetEnvironmentVariable("WHATSAPP_PHONE_NUMBER_ID");
                 if (!string.IsNullOrWhiteSpace(envPhoneId)) options.PhoneNumberId = envPhoneId;
+
+                var envBotPhone = Environment.GetEnvironmentVariable("WHATSAPP_BOT_PHONE");
+                if (!string.IsNullOrWhiteSpace(envBotPhone)) options.BotPhoneNumber = envBotPhone;
 
                 var envWabaId = Environment.GetEnvironmentVariable("WHATSAPP_BUSINESS_ACCOUNT_ID");
                 if (!string.IsNullOrWhiteSpace(envWabaId)) options.BusinessAccountId = envWabaId;

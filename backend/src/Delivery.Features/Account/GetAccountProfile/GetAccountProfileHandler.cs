@@ -74,13 +74,23 @@ public sealed class GetAccountProfileHandler : IHandler<GetAccountProfileQuery, 
             }
         }
 
+        var identificationNumber = string.IsNullOrWhiteSpace(user.IdentificationNumber)
+            || user.IdentificationNumber == "9999999999999"
+            ? null
+            : user.IdentificationNumber;
+
+        var identificationType = string.IsNullOrWhiteSpace(identificationNumber)
+            && user.IdentificationType == "CONSUMIDOR_FINAL"
+            ? null
+            : user.IdentificationType;
+
         var dto = new AccountProfileDto(
             user.Id,
             user.FullName,
             user.Email,
             user.Phone ?? string.Empty,
-            user.IdentificationType ?? "CONSUMIDOR_FINAL",
-            user.IdentificationNumber ?? "9999999999999",
+            identificationType,
+            identificationNumber,
             user.IsEmailVerified,
             user.CreatedAt,
             totalOrders,

@@ -22,6 +22,11 @@ import type {
   RequestWhatsAppOtpRequest,
   RequestWhatsAppOtpResponse,
   VerifyWhatsAppOtpRequest,
+  CreateWhatsAppChallengeRequest,
+  CreateWhatsAppChallengeResponse,
+  PollWhatsAppChallengeResponse,
+  ExchangeWhatsAppMagicLinkRequest,
+  ExchangeWhatsAppMagicLinkResponse,
 } from "../types";
 import type { LoginFormData } from "../schemas/loginSchema";
 
@@ -55,6 +60,35 @@ function normalizeAuthUser(user: AuthUser): AuthUser {
   };
 }
 
+function buildAuthenticatedSessionState(accessToken: string, user: AuthUser) {
+  const normalizedUser = normalizeAuthUser(user);
+  setApiClientAccessToken(accessToken);
+  if (typeof window !== "undefined") {
+    localStorage.setItem(SESSION_STORAGE_KEY, "1");
+  }
+  return {
+    user: normalizedUser,
+    accessToken,
+    isAuthenticated: true,
+    status: "success" as AuthStatus,
+    error: null,
+  };
+}
+
+function buildFailedAuthState(message: string) {
+  setApiClientAccessToken(null);
+  if (typeof window !== "undefined") {
+    localStorage.removeItem(SESSION_STORAGE_KEY);
+  }
+  return {
+    user: null,
+    accessToken: null,
+    isAuthenticated: false,
+    status: "error" as AuthStatus,
+    error: message,
+  };
+}
+
 interface AuthActions {
   login: (credentials: LoginFormData) => Promise<boolean>;
   register: (data: RegisterRequest) => Promise<boolean>;
@@ -65,6 +99,9 @@ interface AuthActions {
   resendVerification: (data: ResendVerificationRequest) => Promise<ResendVerificationResponse>;
   requestWhatsAppOtp: (data: RequestWhatsAppOtpRequest) => Promise<RequestWhatsAppOtpResponse>;
   verifyWhatsAppOtp: (data: VerifyWhatsAppOtpRequest) => Promise<boolean>;
+  createWhatsAppChallenge: (data?: CreateWhatsAppChallengeRequest) => Promise<CreateWhatsAppChallengeResponse>;
+  pollWhatsAppChallenge: (challengeId: string, tenantSlug?: string) => Promise<PollWhatsAppChallengeResponse>;
+  exchangeWhatsAppMagicLink: (data: ExchangeWhatsAppMagicLinkRequest) => Promise<ExchangeWhatsAppMagicLinkResponse | null>;
   logout: () => Promise<void>;
   checkAuth: () => Promise<boolean>;
   setAccessToken: (token: string | null) => void;
@@ -109,37 +146,11 @@ export const useAuthStore = create<AuthStore>()(
         set({ status: "loading", error: null });
         try {
           const response = await authApi.login(credentials);
-          const normalizedUser = normalizeAuthUser(response.user);
-          setApiClientAccessToken(response.accessToken);
-
-          if (typeof window !== "undefined") {
-            localStorage.setItem(SESSION_STORAGE_KEY, "1");
-          }
-
-          set({
-            user: normalizedUser,
-            accessToken: response.accessToken,
-            isAuthenticated: true,
-            status: "success",
-            error: null,
-          });
+          set(buildAuthenticatedSessionState(response.accessToken, response.user));
           return true;
         } catch (err: unknown) {
-          const message =
-            err instanceof Error ? err.message : "Error al iniciar sesión.";
-
-          setApiClientAccessToken(null);
-          if (typeof window !== "undefined") {
-            localStorage.removeItem(SESSION_STORAGE_KEY);
-          }
-
-          set({
-            user: null,
-            accessToken: null,
-            isAuthenticated: false,
-            status: "error",
-            error: message,
-          });
+          const message = err instanceof Error ? err.message : "Error al iniciar sesión.";
+          set(buildFailedAuthState(message));
           return false;
         }
       },
@@ -148,37 +159,11 @@ export const useAuthStore = create<AuthStore>()(
         set({ status: "loading", error: null });
         try {
           const response = await authApi.register(data);
-          const normalizedUser = normalizeAuthUser(response.user);
-          setApiClientAccessToken(response.accessToken);
-
-          if (typeof window !== "undefined") {
-            localStorage.setItem(SESSION_STORAGE_KEY, "1");
-          }
-
-          set({
-            user: normalizedUser,
-            accessToken: response.accessToken,
-            isAuthenticated: true,
-            status: "success",
-            error: null,
-          });
+          set(buildAuthenticatedSessionState(response.accessToken, response.user));
           return true;
         } catch (err: unknown) {
-          const message =
-            err instanceof Error ? err.message : "Error al registrar la cuenta.";
-
-          setApiClientAccessToken(null);
-          if (typeof window !== "undefined") {
-            localStorage.removeItem(SESSION_STORAGE_KEY);
-          }
-
-          set({
-            user: null,
-            accessToken: null,
-            isAuthenticated: false,
-            status: "error",
-            error: message,
-          });
+          const message = err instanceof Error ? err.message : "Error al registrar la cuenta.";
+          set(buildFailedAuthState(message));
           return false;
         }
       },
@@ -187,37 +172,11 @@ export const useAuthStore = create<AuthStore>()(
         set({ status: "loading", error: null });
         try {
           const response = await authApi.loginWithGoogle(data);
-          const normalizedUser = normalizeAuthUser(response.user);
-          setApiClientAccessToken(response.accessToken);
-
-          if (typeof window !== "undefined") {
-            localStorage.setItem(SESSION_STORAGE_KEY, "1");
-          }
-
-          set({
-            user: normalizedUser,
-            accessToken: response.accessToken,
-            isAuthenticated: true,
-            status: "success",
-            error: null,
-          });
+          set(buildAuthenticatedSessionState(response.accessToken, response.user));
           return true;
         } catch (err: unknown) {
-          const message =
-            err instanceof Error ? err.message : "Error al iniciar sesión con Google.";
-
-          setApiClientAccessToken(null);
-          if (typeof window !== "undefined") {
-            localStorage.removeItem(SESSION_STORAGE_KEY);
-          }
-
-          set({
-            user: null,
-            accessToken: null,
-            isAuthenticated: false,
-            status: "error",
-            error: message,
-          });
+          const message = err instanceof Error ? err.message : "Error al iniciar sesión con Google.";
+          set(buildFailedAuthState(message));
           return false;
         }
       },
@@ -306,27 +265,40 @@ export const useAuthStore = create<AuthStore>()(
         set({ status: "loading", error: null });
         try {
           const response = await authApi.verifyWhatsAppOtp(data);
-          const normalizedUser = normalizeAuthUser(response.user);
-          setApiClientAccessToken(response.accessToken);
-
-          if (typeof window !== "undefined") {
-            localStorage.setItem(SESSION_STORAGE_KEY, "1");
-          }
-
-          set({
-            user: normalizedUser,
-            accessToken: response.accessToken,
-            isAuthenticated: true,
-            status: "success",
-            error: null,
-          });
-
+          set(buildAuthenticatedSessionState(response.accessToken, response.user));
           return true;
         } catch (err: unknown) {
           const message =
             err instanceof Error ? err.message : "Código de verificación inválido o expirado.";
           set({ status: "error", error: message });
           return false;
+        }
+      },
+
+      createWhatsAppChallenge: async (data = {}) => {
+        set({ error: null });
+        return authApi.createWhatsAppChallenge(data);
+      },
+
+      pollWhatsAppChallenge: async (challengeId, tenantSlug) => {
+        const response = await authApi.pollWhatsAppChallenge(challengeId, tenantSlug);
+        if (response.status === "authenticated" && response.accessToken && response.user) {
+          set(buildAuthenticatedSessionState(response.accessToken, response.user));
+        }
+        return response;
+      },
+
+      exchangeWhatsAppMagicLink: async (data) => {
+        set({ status: "loading", error: null });
+        try {
+          const response = await authApi.exchangeWhatsAppMagicLink(data);
+          set(buildAuthenticatedSessionState(response.accessToken, response.user));
+          return response;
+        } catch (err: unknown) {
+          const message =
+            err instanceof Error ? err.message : "El enlace de acceso de WhatsApp es inválido o ha expirado.";
+          set({ status: "error", error: message });
+          return null;
         }
       },
 

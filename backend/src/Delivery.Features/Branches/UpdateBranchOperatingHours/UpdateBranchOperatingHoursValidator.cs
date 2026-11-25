@@ -33,5 +33,10 @@ public sealed class UpdateBranchOperatingHoursValidator : AbstractValidator<Upda
             .InclusiveBetween(0.5, 200.0)
             .When(x => x.DeliveryRadiusKm.HasValue)
             .WithMessage("El radio de cobertura debe estar comprendido entre 0.5 km y 200 km.");
+
+        RuleFor(x => x.BaseDeliveryFeeOverride)
+            .InclusiveBetween(0.00m, 100.00m)
+            .When(x => x.BaseDeliveryFeeOverride.HasValue)
+            .WithMessage("La tarifa de envío por sucursal debe estar entre $0.00 y $100.00 USD.");
     }
 }

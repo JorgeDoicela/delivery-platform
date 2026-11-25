@@ -57,15 +57,20 @@ export const PhoneNumberInput = React.forwardRef<HTMLInputElement, PhoneNumberIn
 
     const dropdownRef = useRef<HTMLDivElement>(null);
     const searchInputRef = useRef<HTMLInputElement>(null);
+    const lastEmittedRef = useRef<string>(value || "");
 
-    // Sincronizar estado si el valor externo cambia significativamente
+    // Sincronizar solo cuando el valor externo cambia desde fuera (ej. carga inicial o reset),
+    // evitando bucles de render con onChange y respetando el país elegido por el usuario.
     useEffect(() => {
-      const p = parsePhoneNumber(value);
-      if (p.country.code !== selectedCountry.code) {
-        setSelectedCountry(p.country);
+      const normalizedExternal = value || "";
+      if (normalizedExternal === lastEmittedRef.current) {
+        return;
       }
+      lastEmittedRef.current = normalizedExternal;
+      const p = parsePhoneNumber(normalizedExternal);
+      setSelectedCountry(p.country);
       setLocalNumber(p.localNumber);
-    }, [value, selectedCountry.code]);
+    }, [value]);
 
     // Cerrar dropdown al hacer click fuera
     useEffect(() => {
@@ -93,6 +98,7 @@ export const PhoneNumberInput = React.forwardRef<HTMLInputElement, PhoneNumberIn
       const trimmedLocal = localNumber.slice(0, country.maxLength);
       setLocalNumber(trimmedLocal);
       const full = formatToE164(country, trimmedLocal);
+      lastEmittedRef.current = full;
       onChange?.(full);
     };
 
@@ -108,6 +114,7 @@ export const PhoneNumberInput = React.forwardRef<HTMLInputElement, PhoneNumberIn
       const limited = digitsOnly.slice(0, selectedCountry.maxLength);
       setLocalNumber(limited);
       const full = formatToE164(selectedCountry, limited);
+      lastEmittedRef.current = full;
       onChange?.(full);
     };
 
@@ -159,6 +166,7 @@ export const PhoneNumberInput = React.forwardRef<HTMLInputElement, PhoneNumberIn
             id={inputId}
             name={name}
             type="tel"
+            autoComplete="tel-national"
             inputMode="numeric"
             maxLength={selectedCountry.maxLength}
             disabled={disabled}

@@ -49,6 +49,8 @@ export interface TenantBranchSummaryDto {
   useKitchenWorkflow?: boolean;
   allowDirectCounterTakeoutDeliveryOverride?: boolean | null;
   allowDirectCounterTakeoutDelivery?: boolean;
+  baseDeliveryFeeOverride?: number | null;
+  effectiveDeliveryFee?: number;
 }
 
 export interface BranchDetailDto {
@@ -70,6 +72,8 @@ export interface BranchDetailDto {
   useKitchenWorkflow?: boolean;
   allowDirectCounterTakeoutDeliveryOverride?: boolean | null;
   allowDirectCounterTakeoutDelivery?: boolean;
+  baseDeliveryFeeOverride?: number | null;
+  effectiveDeliveryFee?: number;
 }
 
 export interface UpdateBranchHoursRequest {
@@ -81,6 +85,8 @@ export interface UpdateBranchHoursRequest {
   enableKitchenWorkflowOverride?: boolean | null;
   allowDirectCounterTakeoutDeliveryOverride?: boolean | null;
   applyWorkflowOverrides?: boolean;
+  baseDeliveryFeeOverride?: number | null;
+  applyDeliveryFeeOverride?: boolean;
 }
 
 export interface UpdateBranchHoursResponse {

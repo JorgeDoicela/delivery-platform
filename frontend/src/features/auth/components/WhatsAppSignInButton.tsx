@@ -1,20 +1,27 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
+import { createPortal } from "react-dom";
 import { useRouter } from "next/navigation";
-import { Loader2, X, AlertCircle, ArrowLeft } from "lucide-react";
+import { Loader2, X, AlertCircle, RotateCw } from "lucide-react";
 import { WhatsAppIcon } from "@/shared/components/WhatsAppIcon";
-import { PhoneNumberInput } from "@/shared/components";
 import { useAuthStore } from "../store/useAuthStore";
 import { useCurrentTenantQuery, useTenantStore } from "@/features/tenant";
 import { resolveTenantRouting, useTenantRoutes } from "@/shared/lib/tenant-routing";
 import { resolvePostLoginRedirect } from "../lib/redirectByRole";
+import type { CreateWhatsAppChallengeResponse } from "../types";
 
 interface WhatsAppSignInButtonProps {
   redirectUrl?: string;
   onSuccess?: () => void;
   onError?: (error: string) => void;
   mode?: "login" | "register";
+}
+
+function formatSeconds(totalSeconds: number): string {
+  const mins = Math.floor(totalSeconds / 60);
+  const secs = totalSeconds % 60;
+  return `${mins}:${secs.toString().padStart(2, "0")}`;
 }
 
 export function WhatsAppSignInButton({
@@ -27,129 +34,153 @@ export function WhatsAppSignInButton({
   const { data: tenant } = useCurrentTenantQuery();
   const routes = useTenantRoutes(tenant?.slug);
 
-  const requestWhatsAppOtp = useAuthStore((s) => s.requestWhatsAppOtp);
-  const verifyWhatsAppOtp = useAuthStore((s) => s.verifyWhatsAppOtp);
+  const createWhatsAppChallenge = useAuthStore((s) => s.createWhatsAppChallenge);
+  const pollWhatsAppChallenge = useAuthStore((s) => s.pollWhatsAppChallenge);
 
   const [isOpen, setIsOpen] = useState(false);
-  const [step, setStep] = useState<"phone" | "code">("phone");
-  const [phone, setPhone] = useState("");
-  const [code, setCode] = useState("");
-  const [isLoading, setIsLoading] = useState(false);
+  const [challenge, setChallenge] = useState<CreateWhatsAppChallengeResponse | null>(null);
+  const [isCreating, setIsCreating] = useState(false);
+  const [isExpired, setIsExpired] = useState(false);
+  const [remainingSeconds, setRemainingSeconds] = useState(0);
   const [error, setError] = useState<string | null>(null);
-  const [countdown, setCountdown] = useState(0);
 
-  // Contador regresivo para reenvío de código
-  useEffect(() => {
-    if (countdown <= 0) return;
-    const timer = setTimeout(() => setCountdown((prev) => prev - 1), 1000);
-    return () => clearTimeout(timer);
-  }, [countdown]);
+  const isPollingRef = useRef(false);
+  const completedRef = useRef(false);
 
   const activeTenantSlug = routes.isPlatformRoot
     ? undefined
     : (tenant?.slug || useTenantStore.getState().tenantSlug || undefined);
 
-  const handleOpen = () => {
+  const handleAuthenticatedSuccess = useCallback(() => {
+    if (completedRef.current) return;
+    completedRef.current = true;
+    setIsOpen(false);
+    onSuccess?.();
+
+    const loggedUser = useAuthStore.getState().user;
+    if (loggedUser?.tenantSlug) {
+      useTenantStore.getState().setTenantSlug(loggedUser.tenantSlug);
+    }
+
+    const resolvedSlug = loggedUser?.tenantSlug || activeTenantSlug || undefined;
+
+    const routing = resolveTenantRouting({
+      explicitSlug: resolvedSlug,
+      pathname: typeof window !== "undefined" ? window.location.pathname : "/",
+      hostname: typeof window !== "undefined" ? window.location.hostname : undefined,
+    });
+
+    const destination = resolvePostLoginRedirect({
+      user: loggedUser,
+      redirectUrl,
+      routing,
+      useKitchenWorkflow: tenant?.enableKitchenWorkflow,
+    });
+
+    if (typeof window !== "undefined" && window.location.pathname === destination) {
+      router.replace(destination);
+    } else {
+      router.push(destination);
+    }
+    router.refresh();
+  }, [activeTenantSlug, onSuccess, redirectUrl, router, tenant?.enableKitchenWorkflow]);
+
+  const startChallenge = useCallback(async () => {
     setError(null);
-    setCode("");
-    setStep("phone");
+    setIsExpired(false);
+    setIsCreating(true);
+    completedRef.current = false;
+
+    try {
+      const created = await createWhatsAppChallenge({
+        tenantSlug: activeTenantSlug,
+      });
+      setChallenge(created);
+      setRemainingSeconds(created.expiresInSeconds);
+    } catch (err: unknown) {
+      const msg =
+        err instanceof Error
+          ? err.message
+          : "No se pudo iniciar el acceso con WhatsApp.";
+      setError(msg);
+      onError?.(msg);
+    } finally {
+      setIsCreating(false);
+    }
+  }, [activeTenantSlug, createWhatsAppChallenge, onError]);
+
+  const handleOpen = async () => {
     setIsOpen(true);
+    await startChallenge();
   };
 
   const handleClose = () => {
-    if (isLoading) return;
+    if (isCreating) return;
     setIsOpen(false);
+    setChallenge(null);
     setError(null);
+    setIsExpired(false);
   };
 
-  const handleRequestOtp = async (e?: React.FormEvent) => {
-    if (e) e.preventDefault();
-    setError(null);
-
-    const cleanPhone = phone.trim();
-    if (!cleanPhone || cleanPhone.length < 7) {
-      setError("Por favor ingresa un número de teléfono celular válido.");
-      return;
-    }
-
-    setIsLoading(true);
-    try {
-      await requestWhatsAppOtp({
-        phone: cleanPhone,
-        tenantSlug: activeTenantSlug,
-      });
-      setStep("code");
-      setCountdown(60);
-    } catch (err: unknown) {
-      const msg = err instanceof Error ? err.message : "Error al solicitar código por WhatsApp.";
-      setError(msg);
-      onError?.(msg);
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  const handleVerifyOtp = async (e?: React.FormEvent) => {
-    if (e) e.preventDefault();
-    setError(null);
-
-    const cleanCode = code.trim();
-    if (!cleanCode || cleanCode.length < 4) {
-      setError("Por favor ingresa el código numérico completo recibido en WhatsApp.");
-      return;
-    }
-
-    setIsLoading(true);
-    try {
-      const success = await verifyWhatsAppOtp({
-        phone: phone.trim(),
-        code: cleanCode,
-        tenantSlug: activeTenantSlug,
-      });
-
-      if (success) {
-        setIsOpen(false);
-        onSuccess?.();
-
-        const loggedUser = useAuthStore.getState().user;
-        if (loggedUser?.tenantSlug) {
-          useTenantStore.getState().setTenantSlug(loggedUser.tenantSlug);
+  // Temporizador regresivo de vigencia del código
+  useEffect(() => {
+    if (!isOpen || !challenge || isExpired || remainingSeconds <= 0) return;
+    const timer = setTimeout(() => {
+      setRemainingSeconds((prev) => {
+        if (prev <= 1) {
+          setIsExpired(true);
+          return 0;
         }
+        return prev - 1;
+      });
+    }, 1000);
+    return () => clearTimeout(timer);
+  }, [isOpen, challenge, isExpired, remainingSeconds]);
 
-        const resolvedSlug =
-          loggedUser?.tenantSlug || activeTenantSlug || undefined;
+  // Sondeo ligero del estado del challenge + chequeo inmediato al volver de WhatsApp
+  useEffect(() => {
+    if (!isOpen || !challenge || isExpired) return;
 
-        const routing = resolveTenantRouting({
-          explicitSlug: resolvedSlug,
-          pathname: typeof window !== "undefined" ? window.location.pathname : "/",
-          hostname: typeof window !== "undefined" ? window.location.hostname : undefined,
-        });
-
-        const destination = resolvePostLoginRedirect({
-          user: loggedUser,
-          redirectUrl,
-          routing,
-          useKitchenWorkflow: tenant?.enableKitchenWorkflow,
-        });
-
-        if (typeof window !== "undefined" && window.location.pathname === destination) {
-          router.replace(destination);
-        } else {
-          router.push(destination);
+    const checkStatus = async () => {
+      if (isPollingRef.current || completedRef.current) return;
+      isPollingRef.current = true;
+      try {
+        const res = await pollWhatsAppChallenge(challenge.challengeId, activeTenantSlug);
+        if (res.status === "authenticated") {
+          handleAuthenticatedSuccess();
+        } else if (res.status === "expired") {
+          setIsExpired(true);
         }
-        router.refresh();
-      } else {
-        const authError = useAuthStore.getState().error;
-        setError(authError || "El código ingresado es incorrecto o ha expirado.");
+      } catch (err: unknown) {
+        const msg = err instanceof Error ? err.message : null;
+        if (msg && msg.toLowerCase().includes("contraseña")) {
+          setError(msg);
+          setIsExpired(true);
+        }
+      } finally {
+        isPollingRef.current = false;
       }
-    } catch (err: unknown) {
-      const msg = err instanceof Error ? err.message : "Error al verificar código.";
-      setError(msg);
-      onError?.(msg);
-    } finally {
-      setIsLoading(false);
-    }
-  };
+    };
+
+    const interval = setInterval(() => {
+      void checkStatus();
+    }, 2500);
+
+    const handleVisibilityOrFocus = () => {
+      if (document.visibilityState === "visible") {
+        void checkStatus();
+      }
+    };
+
+    window.addEventListener("focus", handleVisibilityOrFocus);
+    document.addEventListener("visibilitychange", handleVisibilityOrFocus);
+
+    return () => {
+      clearInterval(interval);
+      window.removeEventListener("focus", handleVisibilityOrFocus);
+      document.removeEventListener("visibilitychange", handleVisibilityOrFocus);
+    };
+  }, [isOpen, challenge, isExpired, activeTenantSlug, pollWhatsAppChallenge, handleAuthenticatedSuccess]);
 
   return (
     <>
@@ -157,184 +188,120 @@ export function WhatsAppSignInButton({
       <button
         type="button"
         onClick={handleOpen}
-        className="w-full min-h-[46px] px-4 py-2.5 bg-[#25D366] hover:bg-[#20BD5A] active:scale-95 text-white font-bold text-sm tracking-wide font-display rounded-full shadow-md shadow-[#25D366]/20 transition-all flex items-center justify-center gap-2.5 cursor-pointer"
+        className="relative w-full max-w-[400px] mx-auto h-[40px] px-10 bg-[#25D366] hover:bg-[#20BD5A] active:scale-95 text-white font-medium text-sm font-sans rounded-full shadow-xs transition-all flex items-center justify-center cursor-pointer"
       >
-        <WhatsAppIcon className="w-5 h-5 fill-current shrink-0" />
-        <span>Continuar con WhatsApp</span>
+        <WhatsAppIcon className="w-[18px] h-[18px] fill-current shrink-0 absolute left-3.5" />
+        <span>
+          {mode === "register" ? "Continuar con WhatsApp" : "Continuar con WhatsApp"}
+        </span>
       </button>
 
-      {/* Modal Interactivo de Verificación OTP */}
-      {isOpen && (
-        <div
-          role="dialog"
-          aria-modal="true"
-          className="fixed inset-0 z-50 bg-black/60 backdrop-blur-xs flex items-center justify-center p-4 animate-fadeIn"
-        >
-          <div className="bg-surface-card border border-surface-border text-text-strong w-full max-w-sm rounded-3xl p-6 sm:p-7 shadow-2xl space-y-5 animate-scaleUp">
-            {/* Cabecera del Modal */}
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-2.5">
-                <div className="w-9 h-9 rounded-xl bg-[#25D366]/15 text-[#25D366] flex items-center justify-center shrink-0">
-                  <WhatsAppIcon className="w-5 h-5 fill-current" />
-                </div>
-                <div>
-                  <h3 className="font-display font-black text-lg uppercase tracking-tight text-text-strong leading-tight">
-                    {step === "phone"
-                      ? mode === "register"
-                        ? "Registro con WhatsApp"
-                        : "Acceso con WhatsApp"
-                      : "Verifica tu Código"}
+      {/* Modal de Verificación Directa por WhatsApp (renderizado en Portal para evitar márgenes/transformaciones heredadas) */}
+      {isOpen &&
+        typeof document !== "undefined" &&
+        createPortal(
+          <div
+            role="dialog"
+            aria-modal="true"
+            aria-label="Entrar con WhatsApp"
+            className="fixed inset-0 z-50 bg-black/60 backdrop-blur-xs flex items-center justify-center p-4 animate-fadeIn"
+          >
+            <div className="bg-surface-card border border-surface-border text-text-strong w-full max-w-sm rounded-3xl p-6 shadow-2xl space-y-5 max-h-[92vh] overflow-y-auto overscroll-contain">
+              {/* Cabecera del Modal */}
+              <div className="relative flex items-center justify-center px-8">
+                <div className="flex items-center gap-2">
+                  <WhatsAppIcon className="w-5 h-5 text-[#25D366] fill-current shrink-0" />
+                  <h3 className="font-display font-black text-lg uppercase tracking-tight text-text-strong leading-tight text-center">
+                    Entrar con WhatsApp
                   </h3>
-                  <span className="text-[11px] text-text-subtle font-mono">
-                    {step === "phone" ? "Entra o regístrate sin contraseña" : "Código de 6 dígitos"}
-                  </span>
                 </div>
+                <button
+                  type="button"
+                  onClick={handleClose}
+                  disabled={isCreating}
+                  aria-label="Cerrar ventana"
+                  className="absolute right-0 p-2 rounded-full hover:bg-surface-canvas text-text-subtle hover:text-text-strong transition-colors cursor-pointer"
+                >
+                  <X className="w-5 h-5" />
+                </button>
               </div>
-              <button
-                type="button"
-                onClick={handleClose}
-                disabled={isLoading}
-                aria-label="Cerrar ventana"
-                className="p-1.5 rounded-full hover:bg-surface-canvas text-text-subtle hover:text-text-strong transition-colors cursor-pointer"
-              >
-                <X className="w-5 h-5" />
-              </button>
+
+              {/* Alerta de Error */}
+              {error && (
+                <div className="border border-surface-border bg-surface-canvas text-text-strong text-xs p-3.5 rounded-2xl flex items-start gap-2.5">
+                  <AlertCircle className="w-4 h-4 shrink-0 text-brand-primary mt-0.5" />
+                  <span className="leading-relaxed">{error}</span>
+                </div>
+              )}
+
+              {/* Estado de Carga */}
+              {isCreating ? (
+                <div className="py-8 flex flex-col items-center justify-center gap-3 text-center">
+                  <Loader2 className="w-7 h-7 animate-spin text-[#25D366]" />
+                  <p className="text-xs text-text-muted">
+                    Preparando acceso...
+                  </p>
+                </div>
+              ) : challenge ? (
+                <div className="space-y-4 text-center">
+                  <p className="text-sm text-text-base leading-relaxed">
+                    Abre WhatsApp, envía el mensaje prellenado y vuelve aquí para entrar.
+                  </p>
+
+                  {isExpired ? (
+                    <div className="space-y-3 pt-1">
+                      <p className="text-xs text-text-muted">
+                        El enlace expiró. Genera uno nuevo para continuar.
+                      </p>
+                      <button
+                        type="button"
+                        onClick={() => void startChallenge()}
+                        className="w-full min-h-[46px] px-4 py-2.5 bg-brand-primary hover:bg-brand-primary-hover active:scale-95 text-white font-bold text-sm uppercase tracking-wider font-display rounded-full transition-all flex items-center justify-center gap-2 cursor-pointer"
+                      >
+                        <RotateCw className="w-4 h-4" />
+                        <span>Intentar de nuevo</span>
+                      </button>
+                    </div>
+                  ) : (
+                    <>
+                      <a
+                        href={challenge.whatsAppUrl}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="w-full min-h-[44px] px-5 py-2.5 bg-[#25D366] hover:bg-[#20BD5A] active:scale-95 text-white font-semibold text-sm font-sans rounded-full shadow-sm transition-all flex items-center justify-center gap-2.5 cursor-pointer"
+                      >
+                        <WhatsAppIcon className="w-5 h-5 fill-current shrink-0" />
+                        <span>Abrir WhatsApp</span>
+                      </a>
+
+                      <div className="flex flex-col items-center gap-1 text-xs text-text-muted pt-1">
+                        <span className="inline-flex items-center gap-2">
+                          <Loader2 className="w-3.5 h-3.5 animate-spin text-[#25D366]" />
+                          <span>Esperando confirmación</span>
+                        </span>
+                        <span className="font-mono tabular-nums text-[11px] text-text-subtle">
+                          {challenge.shortCode} · {formatSeconds(remainingSeconds)}
+                        </span>
+                      </div>
+                    </>
+                  )}
+                </div>
+              ) : (
+                <div className="pt-1">
+                  <button
+                    type="button"
+                    onClick={() => void startChallenge()}
+                    className="w-full min-h-[46px] px-4 py-2.5 bg-brand-primary hover:bg-brand-primary-hover active:scale-95 text-white font-bold text-sm uppercase tracking-wider font-display rounded-full transition-all flex items-center justify-center gap-2 cursor-pointer"
+                  >
+                    <RotateCw className="w-4 h-4" />
+                    <span>Reintentar</span>
+                  </button>
+                </div>
+              )}
             </div>
-
-            {/* Alerta de Error */}
-            {error && (
-              <div className="bg-red-50 dark:bg-red-950/40 border border-red-200 dark:border-red-800/60 text-red-700 dark:text-red-300 text-xs p-3 rounded-2xl flex items-start gap-2">
-                <AlertCircle className="w-4 h-4 shrink-0 text-red-600 mt-0.5" />
-                <span className="leading-relaxed">{error}</span>
-              </div>
-            )}
-
-            {/* Paso 1: Ingreso de Teléfono Celular */}
-            {step === "phone" ? (
-              <div
-                className="space-y-4"
-                onKeyDown={(e) => {
-                  if (e.key === "Enter" && !isLoading) {
-                    e.preventDefault();
-                    handleRequestOtp();
-                  }
-                }}
-              >
-                <div className="space-y-1.5">
-                  <PhoneNumberInput
-                    id="wa-phone"
-                    label="Número Celular de WhatsApp"
-                    required
-                    disabled={isLoading}
-                    value={phone}
-                    onChange={(val) => setPhone(val)}
-                  />
-                  <p className="text-[11px] text-text-muted leading-relaxed">
-                    Te enviaremos un mensaje de WhatsApp con un código de seguridad para ingresar a tu cuenta.
-                  </p>
-                </div>
-
-                <button
-                  type="button"
-                  onClick={handleRequestOtp}
-                  disabled={isLoading}
-                  className="w-full min-h-[46px] px-4 py-2.5 bg-[#25D366] hover:bg-[#20BD5A] active:scale-95 text-white font-bold text-sm tracking-wide font-display rounded-full shadow-md shadow-[#25D366]/20 transition-all flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50"
-                >
-                  {isLoading ? (
-                    <>
-                      <Loader2 className="w-4 h-4 animate-spin text-white" />
-                      <span>Enviando Código...</span>
-                    </>
-                  ) : (
-                    <span>Enviar Código por WhatsApp</span>
-                  )}
-                </button>
-              </div>
-            ) : (
-              /* Paso 2: Ingreso del Código OTP */
-              <div
-                className="space-y-4"
-                onKeyDown={(e) => {
-                  if (e.key === "Enter" && !isLoading && code.length >= 4) {
-                    e.preventDefault();
-                    handleVerifyOtp();
-                  }
-                }}
-              >
-                <div className="space-y-1.5">
-                  <div className="flex items-center justify-between">
-                    <label
-                      htmlFor="wa-code"
-                      className="block text-[11px] font-bold text-text-base uppercase tracking-wider"
-                    >
-                      Código de Seguridad
-                    </label>
-                    <button
-                      type="button"
-                      onClick={() => setStep("phone")}
-                      disabled={isLoading}
-                      className="text-[11px] text-brand-primary hover:underline font-bold inline-flex items-center gap-1 cursor-pointer"
-                    >
-                      <ArrowLeft className="w-3 h-3" />
-                      <span>Cambiar número</span>
-                    </button>
-                  </div>
-                  <input
-                    id="wa-code"
-                    type="text"
-                    inputMode="numeric"
-                    autoFocus
-                    required
-                    maxLength={6}
-                    disabled={isLoading}
-                    value={code}
-                    onChange={(e) => setCode(e.target.value.replace(/\D/g, ""))}
-                    placeholder="000000"
-                    className="w-full min-h-[50px] px-4 py-2 bg-surface-canvas border border-surface-border hover:border-surface-border/80 focus:bg-surface-card focus:border-[#25D366] focus:ring-1 focus:ring-[#25D366] rounded-xl text-center text-2xl font-black font-mono tracking-widest text-text-strong placeholder:text-text-subtle transition-all outline-none"
-                  />
-                  <p className="text-[11px] text-text-muted text-center leading-relaxed">
-                    Revisa tu WhatsApp en el número <strong className="text-text-strong">{phone}</strong>.
-                  </p>
-                </div>
-
-                <button
-                  type="button"
-                  onClick={handleVerifyOtp}
-                  disabled={isLoading || code.length < 4}
-                  className="w-full min-h-[46px] px-4 py-2.5 bg-[#25D366] hover:bg-[#20BD5A] active:scale-95 text-white font-bold text-sm tracking-wide font-display rounded-full shadow-md shadow-[#25D366]/20 transition-all flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50"
-                >
-                  {isLoading ? (
-                    <>
-                      <Loader2 className="w-4 h-4 animate-spin text-white" />
-                      <span>Verificando...</span>
-                    </>
-                  ) : (
-                    <span>Verificar y Entrar</span>
-                  )}
-                </button>
-
-                {/* Reenvío de código con contador */}
-                <div className="text-center pt-1">
-                  {countdown > 0 ? (
-                    <span className="text-xs text-text-subtle">
-                      ¿No lo recibiste? Reenviar en <strong className="font-mono">{countdown}s</strong>
-                    </span>
-                  ) : (
-                    <button
-                      type="button"
-                      onClick={() => handleRequestOtp()}
-                      disabled={isLoading}
-                      className="text-xs font-bold text-[#25D366] hover:underline cursor-pointer disabled:opacity-50"
-                    >
-                      Reenviar código a mi WhatsApp
-                    </button>
-                  )}
-                </div>
-              </div>
-            )}
-          </div>
-        </div>
-      )}
+          </div>,
+          document.body
+        )}
     </>
   );
 }
