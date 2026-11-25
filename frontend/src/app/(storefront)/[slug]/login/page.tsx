@@ -1,8 +1,8 @@
+import type { Metadata } from "next";
 import React, { Suspense } from "react";
 import LoginPage from "../../login/page";
 import { RESERVED_TENANT_SLUGS } from "@/shared/lib/tenant-context";
 import { notFound } from "next/navigation";
-import { connection } from "next/server";
 import { Loader2 } from "lucide-react";
 
 interface TenantLoginPageProps {
@@ -11,25 +11,10 @@ interface TenantLoginPageProps {
   }>;
 }
 
-export async function generateMetadata({ params }: TenantLoginPageProps) {
-  await connection();
-  const { slug } = await params;
-  if (RESERVED_TENANT_SLUGS.has(slug.toLowerCase())) {
-    return {
-      title: "No Encontrado | Mesafy",
-    };
-  }
-
-  const formatted = slug
-    .split("-")
-    .map((w) => w.charAt(0).toUpperCase() + w.slice(1))
-    .join(" ");
-
-  return {
-    title: `Iniciar Sesión • ${formatted}`,
-    description: `Acceso y registro de clientes y personal operativo para ${formatted}.`,
-  };
-}
+export const metadata: Metadata = {
+  title: "Iniciar Sesión",
+  description: "Acceso y registro de clientes y personal operativo.",
+};
 
 async function TenantLoginLoader({ params }: TenantLoginPageProps) {
   const { slug } = await params;

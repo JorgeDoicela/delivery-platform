@@ -1,6 +1,6 @@
+import type { Metadata } from "next";
 import React, { Suspense } from "react";
 import { notFound } from "next/navigation";
-import { connection } from "next/server";
 import { CatalogSection } from "@/features/catalog";
 import { RESERVED_TENANT_SLUGS } from "@/shared/lib/tenant-context";
 import { Loader2 } from "lucide-react";
@@ -11,22 +11,10 @@ interface TenantCatalogPageProps {
   }>;
 }
 
-export async function generateMetadata({ params }: TenantCatalogPageProps) {
-  await connection();
-  const { slug } = await params;
-  if (RESERVED_TENANT_SLUGS.has(slug.toLowerCase())) {
-    return { title: "No Encontrado | Mesafy" };
-  }
-  const formatted = slug
-    .split("-")
-    .map((w) => w.charAt(0).toUpperCase() + w.slice(1))
-    .join(" ");
-
-  return {
-    title: `Menú y Catálogo • ${formatted}`,
-    description: `Catálogo de especialidades y combos para ${formatted}.`,
-  };
-}
+export const metadata: Metadata = {
+  title: "Menú y Catálogo",
+  description: "Catálogo de especialidades y combos.",
+};
 
 async function TenantCatalogLoader({ params }: TenantCatalogPageProps) {
   const { slug } = await params;

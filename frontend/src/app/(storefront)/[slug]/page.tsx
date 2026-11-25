@@ -1,6 +1,6 @@
+import type { Metadata } from "next";
 import React, { Suspense } from "react";
 import { notFound } from "next/navigation";
-import { connection } from "next/server";
 import { RestaurantStorefrontView } from "@/features/tenant/components/RestaurantStorefrontView";
 import { RESERVED_TENANT_SLUGS } from "@/features/tenant/constants";
 
@@ -10,25 +10,11 @@ interface RestaurantPageProps {
   }>;
 }
 
-export async function generateMetadata({ params }: RestaurantPageProps) {
-  await connection();
-  const { slug } = await params;
-  if (RESERVED_TENANT_SLUGS.has(slug.toLowerCase())) {
-    return {
-      title: "No Encontrado | Mesafy",
-    };
-  }
-
-  const formatted = slug
-    .split("-")
-    .map((w) => w.charAt(0).toUpperCase() + w.slice(1))
-    .join(" ");
-
-  return {
-    title: `${formatted} | Pedidos y Delivery en Línea`,
-    description: `Menú en línea, especialidades recién preparadas y despacho a domicilio geolocalizado en ${formatted}.`,
-  };
-}
+export const metadata: Metadata = {
+  title: "Pedidos y Delivery en Línea",
+  description:
+    "Menú en línea, especialidades recién preparadas y despacho a domicilio geolocalizado.",
+};
 
 async function RestaurantStorefrontLoader({ params }: RestaurantPageProps) {
   const { slug } = await params;

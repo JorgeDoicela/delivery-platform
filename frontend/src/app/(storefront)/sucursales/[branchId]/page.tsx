@@ -1,1 +1,1 @@
-export { default, generateMetadata } from "../../sucursal/[branchId]/page";
+export { default, metadata } from "../../sucursal/[branchId]/page";

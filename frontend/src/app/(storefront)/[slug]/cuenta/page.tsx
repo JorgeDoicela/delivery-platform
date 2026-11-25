@@ -1,6 +1,6 @@
+import type { Metadata } from "next";
 import React, { Suspense } from "react";
 import { notFound } from "next/navigation";
-import { connection } from "next/server";
 import { RESERVED_TENANT_SLUGS } from "@/features/tenant/constants";
 import { AuthGuard } from "@/features/auth/components/AuthGuard";
 import { AccountDashboardView } from "@/features/account";
@@ -12,25 +12,11 @@ interface TenantAccountPageProps {
   }>;
 }
 
-export async function generateMetadata({ params }: TenantAccountPageProps) {
-  await connection();
-  const { slug } = await params;
-  if (RESERVED_TENANT_SLUGS.has(slug.toLowerCase())) {
-    return {
-      title: "No Encontrado | Mesafy",
-    };
-  }
-
-  const formatted = slug
-    .split("-")
-    .map((w) => w.charAt(0).toUpperCase() + w.slice(1))
-    .join(" ");
-
-  return {
-    title: `Mi Cuenta • ${formatted}`,
-    description: `Perfil de cliente, libreta de direcciones y seguimiento de pedidos para ${formatted}.`,
-  };
-}
+export const metadata: Metadata = {
+  title: "Mi Cuenta",
+  description:
+    "Perfil de cliente, libreta de direcciones y seguimiento de pedidos.",
+};
 
 async function TenantAccountLoader({ params }: TenantAccountPageProps) {
   const { slug } = await params;

@@ -1,5 +1,5 @@
+import type { Metadata } from "next";
 import React, { Suspense } from "react";
-import { connection } from "next/server";
 import { RestaurantStorefrontView } from "@/features/tenant/components/RestaurantStorefrontView";
 
 interface BranchPageProps {
@@ -8,14 +8,11 @@ interface BranchPageProps {
   }>;
 }
 
-export async function generateMetadata({ params }: BranchPageProps) {
-  await connection();
-  const { branchId } = await params;
-  return {
-    title: `Sucursal ${branchId} | Pedidos y Delivery en Línea`,
-    description: "Menú en línea, especialidades recién preparadas y despacho a domicilio.",
-  };
-}
+export const metadata: Metadata = {
+  title: "Sucursal | Pedidos y Delivery en Línea",
+  description:
+    "Menú en línea, especialidades recién preparadas y despacho a domicilio.",
+};
 
 async function BranchStorefrontLoader({ params }: BranchPageProps) {
   const { branchId } = await params;

@@ -56,7 +56,10 @@ export function DeliveryInfoSection({
   const { data: tenant } = useCurrentTenantQuery(tenantSlug);
   const branches = useMemo(() => tenant?.branches ?? [], [tenant?.branches]);
   const hasMultipleBranches = branches.length > 1;
-  const baseDeliveryFee = tenant?.baseDeliveryFee ?? 1.5;
+  const activeBranchForFee =
+    branches.find((b) => b.id === cartBranchId) ?? branches[0];
+  const baseDeliveryFee =
+    activeBranchForFee?.effectiveDeliveryFee ?? tenant?.baseDeliveryFee ?? 1.5;
 
   const currentDeliveryType = watch("deliveryType");
   const isDelivery = currentDeliveryType === 1;
@@ -177,19 +180,19 @@ export function DeliveryInfoSection({
         <label className="block text-xs font-bold text-text-muted uppercase tracking-wider mb-2 font-display">
           ¿Cómo deseas recibir tu pedido?
         </label>
-        <div className="grid grid-cols-2 p-1 bg-surface-canvas rounded-xl border border-surface-border">
+        <div className="grid grid-cols-2 rounded-xl overflow-hidden border border-surface-border bg-surface-card">
           <button
             type="button"
             onClick={() => handleModeChange("delivery")}
-            className={`py-2.5 px-3 sm:px-4 rounded-lg text-xs font-bold transition-all flex items-center justify-center gap-2 cursor-pointer font-display uppercase tracking-wide ${
+            className={`py-2.5 px-2 sm:px-4 text-[11px] sm:text-xs font-bold transition-colors flex items-center justify-center gap-1.5 sm:gap-2 cursor-pointer font-display uppercase tracking-wide border-r border-surface-border ${
               isDelivery
-                ? "bg-white text-text-strong shadow-xs border border-surface-border"
-                : "text-text-muted hover:text-text-strong"
+                ? "bg-brand-primary text-white"
+                : "bg-surface-card text-text-muted hover:text-text-strong hover:bg-surface-canvas"
             }`}
           >
-            <Truck className={`w-4 h-4 ${isDelivery ? "text-brand-primary" : "text-text-muted"}`} />
-            <span>A Domicilio</span>
-            <span className="text-[11px] font-mono text-brand-primary font-bold">
+            <Truck className={`w-3.5 h-3.5 sm:w-4 sm:h-4 shrink-0 ${isDelivery ? "text-white" : "text-text-muted"}`} />
+            <span className="truncate">A Domicilio</span>
+            <span className={`text-[10px] sm:text-[11px] font-mono font-bold shrink-0 ${isDelivery ? "text-white/90" : "text-brand-primary"}`}>
               ({formatCurrency(baseDeliveryFee)})
             </span>
           </button>
@@ -197,15 +200,15 @@ export function DeliveryInfoSection({
           <button
             type="button"
             onClick={() => handleModeChange("takeout")}
-            className={`py-2.5 px-3 sm:px-4 rounded-lg text-xs font-bold transition-all flex items-center justify-center gap-2 cursor-pointer font-display uppercase tracking-wide ${
+            className={`py-2.5 px-2 sm:px-4 text-[11px] sm:text-xs font-bold transition-colors flex items-center justify-center gap-1.5 sm:gap-2 cursor-pointer font-display uppercase tracking-wide ${
               !isDelivery
-                ? "bg-white text-text-strong shadow-xs border border-surface-border"
-                : "text-text-muted hover:text-text-strong"
+                ? "bg-brand-primary text-white"
+                : "bg-surface-card text-text-muted hover:text-text-strong hover:bg-surface-canvas"
             }`}
           >
-            <Store className={`w-4 h-4 ${!isDelivery ? "text-brand-primary" : "text-text-muted"}`} />
-            <span>Retiro en Local</span>
-            <span className="text-[11px] font-mono text-status-success font-bold">
+            <Store className={`w-3.5 h-3.5 sm:w-4 sm:h-4 shrink-0 ${!isDelivery ? "text-white" : "text-text-muted"}`} />
+            <span className="truncate">Retiro en Local</span>
+            <span className={`text-[10px] sm:text-[11px] font-mono font-bold shrink-0 ${!isDelivery ? "text-white/90" : "text-status-success"}`}>
               (Gratis)
             </span>
           </button>

@@ -1,6 +1,6 @@
+import type { Metadata } from "next";
 import React, { Suspense } from "react";
 import { notFound } from "next/navigation";
-import { connection } from "next/server";
 import { RestaurantStorefrontView } from "@/features/tenant/components/RestaurantStorefrontView";
 import { RESERVED_TENANT_SLUGS } from "@/shared/lib/tenant-context";
 
@@ -11,26 +11,11 @@ interface BranchPageProps {
   }>;
 }
 
-export async function generateMetadata({ params }: BranchPageProps) {
-  await connection();
-  const { slug, branchId } = await params;
-  if (RESERVED_TENANT_SLUGS.has(slug.toLowerCase())) {
-    return {
-      title: "No Encontrado | Mesafy",
-    };
-  }
-
-  const formatted = slug
-    .split("-")
-    .map((w) => w.charAt(0).toUpperCase() + w.slice(1))
-    .join(" ");
-
-  return {
-    title: `${formatted} • Sucursal ${branchId} | Pedidos y Delivery`,
-    description: `Menú en línea, especialidades recién preparadas y despacho a domicilio en ${formatted}.`,
-    manifest: `/manifest.json?slug=${encodeURIComponent(slug)}&branch=${encodeURIComponent(branchId)}`,
-  };
-}
+export const metadata: Metadata = {
+  title: "Sucursal | Pedidos y Delivery",
+  description:
+    "Menú en línea, especialidades recién preparadas y despacho a domicilio.",
+};
 
 async function BranchStorefrontLoader({ params }: BranchPageProps) {
   const { slug, branchId } = await params;

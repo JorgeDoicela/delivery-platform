@@ -108,8 +108,14 @@ export function OrderSummary() {
               <div className="flex items-center gap-2 bg-surface-canvas border border-surface-border rounded-lg p-0.5">
                 <button
                   type="button"
-                  onClick={() => updateQuantity(item.cartItemId, -1)}
-                  className="w-6 h-6 rounded flex items-center justify-center text-text-base hover:bg-surface-card-hover"
+                  disabled={item.quantity <= 1}
+                  onClick={() => {
+                    if (item.quantity > 1) {
+                      updateQuantity(item.cartItemId, -1);
+                    }
+                  }}
+                  aria-label={`Disminuir cantidad de ${item.name}`}
+                  className="w-6 h-6 rounded flex items-center justify-center text-text-base hover:bg-surface-card-hover cursor-pointer disabled:opacity-35 disabled:cursor-not-allowed disabled:hover:bg-transparent"
                 >
                   <Minus className="w-3 h-3" />
                 </button>
