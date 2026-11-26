@@ -37,6 +37,26 @@ public sealed class UpdateTenantStorefrontValidator : AbstractValidator<UpdateTe
             .GreaterThanOrEqualTo(0m)
             .WithMessage("La tarifa base de envío no puede ser negativa.");
 
+        RuleFor(x => x.BaseDeliveryDistanceKm)
+            .GreaterThanOrEqualTo(0.0)
+            .When(x => x.BaseDeliveryDistanceKm.HasValue)
+            .WithMessage("Los kilómetros incluidos en la tarifa base no pueden ser negativos.");
+
+        RuleFor(x => x.ExtraDeliveryFeePerKm)
+            .GreaterThanOrEqualTo(0m)
+            .When(x => x.ExtraDeliveryFeePerKm.HasValue)
+            .WithMessage("El costo adicional por kilómetro no puede ser negativo.");
+
+        RuleFor(x => x.MaxDeliveryFee)
+            .GreaterThanOrEqualTo(x => x.BaseDeliveryFee)
+            .When(x => x.MaxDeliveryFee.HasValue && x.MaxDeliveryFee.Value > 0m)
+            .WithMessage("El tope máximo de envío debe ser mayor o igual a la tarifa base.");
+
+        RuleFor(x => x.FreeDeliveryMinOrderAmount)
+            .GreaterThanOrEqualTo(0m)
+            .When(x => x.FreeDeliveryMinOrderAmount.HasValue)
+            .WithMessage("El monto mínimo para envío gratis no puede ser negativo.");
+
         RuleFor(x => x.CustomDomain)
             .Matches(@"^[a-z0-9]+([\-\.]{1}[a-z0-9]+)*\.[a-z]{2,5}(:[0-9]{1,5})?$")
             .When(x => !string.IsNullOrWhiteSpace(x.CustomDomain))

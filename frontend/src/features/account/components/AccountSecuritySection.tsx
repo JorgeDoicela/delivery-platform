@@ -11,7 +11,13 @@ import { useAccountStore } from "../store/useAccountStore";
 import { PasskeySettingsSection } from "./PasskeySettingsSection";
 import { AlertBanner } from "@/shared/components";
 
-export function AccountSecuritySection() {
+interface AccountSecuritySectionProps {
+  allowCustomBilling?: boolean;
+}
+
+export function AccountSecuritySection({
+  allowCustomBilling = true,
+}: AccountSecuritySectionProps) {
   const isSaving = useAccountStore((s) => s.isSaving);
   const profileError = useAccountStore((s) => s.profileError);
   const actionSuccessMessage = useAccountStore((s) => s.actionSuccessMessage);
@@ -44,13 +50,15 @@ export function AccountSecuritySection() {
   };
 
   return (
-    <div className="bg-surface-card border border-surface-border rounded-3xl p-6 md:p-8 space-y-6">
-      <div className="border-b border-surface-border pb-4">
+    <div className="space-y-6">
+      <div>
         <h2 className="text-lg font-black text-text-strong font-display uppercase tracking-tight">
           Seguridad y Acceso a la Cuenta
         </h2>
-        <p className="text-xs text-text-muted mt-0.5">
-          Actualiza tu clave periódicamente para proteger tu información de pedidos y facturación.
+        <p className="text-xs sm:text-[13px] text-text-muted mt-1">
+          {allowCustomBilling
+            ? "Actualiza tu clave periódicamente para proteger tu información de pedidos y facturación."
+            : "Actualiza tu clave periódicamente para proteger el acceso a tu cuenta y tus pedidos."}
         </p>
       </div>
 
@@ -68,14 +76,18 @@ export function AccountSecuritySection() {
 
       <form onSubmit={handleSubmit(onSubmit)} className="space-y-4 max-w-lg">
         <div className="space-y-1.5">
-          <label className="block text-xs font-bold text-text-base uppercase tracking-wider">
-            Contraseña Actual *
+          <label
+            htmlFor="security-current-password"
+            className="block text-[11px] font-bold text-text-base uppercase tracking-wider"
+          >
+            Contraseña Actual <span className="text-brand-primary">*</span>
           </label>
           <input
+            id="security-current-password"
             type="password"
             {...register("currentPassword")}
             placeholder="••••••••"
-            className="w-full px-4 py-3 rounded-2xl border border-surface-border bg-surface-canvas text-text-strong placeholder:text-text-subtle text-xs focus:outline-none focus:border-brand-primary"
+            className="w-full h-[46px] px-4 rounded-xl border border-surface-border bg-surface-canvas text-text-strong placeholder:text-text-subtle text-sm font-medium focus:outline-none focus:border-brand-primary focus:ring-1 focus:ring-brand-primary focus:bg-surface-card transition-all"
           />
           {errors.currentPassword && (
             <p className="text-xs text-brand-primary font-semibold">
@@ -85,14 +97,18 @@ export function AccountSecuritySection() {
         </div>
 
         <div className="space-y-1.5">
-          <label className="block text-xs font-bold text-text-base uppercase tracking-wider">
-            Nueva Contraseña *
+          <label
+            htmlFor="security-new-password"
+            className="block text-[11px] font-bold text-text-base uppercase tracking-wider"
+          >
+            Nueva Contraseña <span className="text-brand-primary">*</span>
           </label>
           <input
+            id="security-new-password"
             type="password"
             {...register("newPassword")}
             placeholder="Mínimo 8 caracteres, mayúscula y número"
-            className="w-full px-4 py-3 rounded-2xl border border-surface-border bg-surface-canvas text-text-strong placeholder:text-text-subtle text-xs focus:outline-none focus:border-brand-primary"
+            className="w-full h-[46px] px-4 rounded-xl border border-surface-border bg-surface-canvas text-text-strong placeholder:text-text-subtle text-sm font-medium focus:outline-none focus:border-brand-primary focus:ring-1 focus:ring-brand-primary focus:bg-surface-card transition-all"
           />
           {errors.newPassword && (
             <p className="text-xs text-brand-primary font-semibold">
@@ -102,14 +118,18 @@ export function AccountSecuritySection() {
         </div>
 
         <div className="space-y-1.5">
-          <label className="block text-xs font-bold text-text-base uppercase tracking-wider">
-            Confirmar Nueva Contraseña *
+          <label
+            htmlFor="security-confirm-password"
+            className="block text-[11px] font-bold text-text-base uppercase tracking-wider"
+          >
+            Confirmar Nueva Contraseña <span className="text-brand-primary">*</span>
           </label>
           <input
+            id="security-confirm-password"
             type="password"
             {...register("confirmPassword")}
             placeholder="Repite la nueva contraseña"
-            className="w-full px-4 py-3 rounded-2xl border border-surface-border bg-surface-canvas text-text-strong placeholder:text-text-subtle text-xs focus:outline-none focus:border-brand-primary"
+            className="w-full h-[46px] px-4 rounded-xl border border-surface-border bg-surface-canvas text-text-strong placeholder:text-text-subtle text-sm font-medium focus:outline-none focus:border-brand-primary focus:ring-1 focus:ring-brand-primary focus:bg-surface-card transition-all"
           />
           {errors.confirmPassword && (
             <p className="text-xs text-brand-primary font-semibold">

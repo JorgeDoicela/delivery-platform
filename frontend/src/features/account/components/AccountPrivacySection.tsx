@@ -26,12 +26,12 @@ export function AccountPrivacySection() {
   };
 
   return (
-    <div className="bg-surface-card border border-surface-border rounded-3xl p-6 md:p-8 space-y-6">
-      <div className="border-b border-surface-border pb-4">
+    <div className="space-y-8">
+      <div>
         <h2 className="text-lg font-black text-text-strong font-display uppercase tracking-tight">
           Privacidad y Protección de Datos Personales (LOPDP)
         </h2>
-        <p className="text-xs text-text-muted mt-0.5">
+        <p className="text-xs sm:text-[13px] text-text-muted mt-1">
           Gestiona el tratamiento de tus datos personales y los canales de comunicación automatizados con pleno derecho de revocatoria.
         </p>
       </div>
@@ -49,17 +49,15 @@ export function AccountPrivacySection() {
       )}
 
       {/* Control de WhatsApp */}
-      <div className="border border-surface-border rounded-3xl p-6 space-y-4 bg-surface-canvas/40">
+      <div className="space-y-4">
         <div className="flex items-start justify-between gap-4">
           <div className="flex items-start gap-3">
-            <div className="w-10 h-10 rounded-2xl bg-surface-canvas border border-surface-border flex items-center justify-center text-text-strong shrink-0 mt-0.5">
-              <MessageSquare className="w-5 h-5" />
-            </div>
+            <MessageSquare className="w-5 h-5 text-brand-primary shrink-0 mt-0.5" />
             <div className="space-y-1">
               <h3 className="text-sm font-black text-text-strong font-display uppercase tracking-tight">
                 Notificaciones y Asistente en WhatsApp
               </h3>
-              <p className="text-xs text-text-muted leading-relaxed max-w-xl">
+              <p className="text-xs sm:text-[13px] text-text-muted leading-relaxed max-w-2xl">
                 Autorizo expresamente a la plataforma y a sus establecimientos gastronómicos a tratar mi número telefónico para enviarme actualizaciones en tiempo real del estado de mis pedidos, confirmaciones de despacho y asistencia operativa mediante mensajería instantánea.
               </p>
             </div>
@@ -69,14 +67,15 @@ export function AccountPrivacySection() {
             type="button"
             role="switch"
             aria-checked={consentEnabled}
+            aria-label="Activar notificaciones y asistente en WhatsApp"
             disabled={isSaving || !profile?.phone}
             onClick={handleToggleConsent}
-            className={`relative inline-flex h-7 w-12 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none disabled:opacity-40 ${
-              consentEnabled ? "bg-brand-primary" : "bg-surface-canvas border border-surface-border"
+            className={`relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none disabled:opacity-50 disabled:cursor-not-allowed ${
+              consentEnabled ? "bg-brand-primary" : "bg-neutral-300 dark:bg-neutral-700"
             }`}
           >
             <span
-              className={`pointer-events-none inline-block h-6 w-6 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out ${
+              className={`pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow-sm ring-0 transition duration-200 ease-in-out ${
                 consentEnabled ? "translate-x-5" : "translate-x-0"
               }`}
             />
@@ -84,13 +83,13 @@ export function AccountPrivacySection() {
         </div>
 
         {!profile?.phone && (
-          <p className="text-xs text-brand-primary font-semibold">
+          <p className="text-xs text-brand-primary font-semibold pl-8">
             Debes registrar un número de teléfono en tu perfil para habilitar este canal.
           </p>
         )}
 
-        <div className="pt-2 border-t border-surface-border flex items-center gap-2 text-[11px] text-text-subtle">
-          <ShieldCheck className="w-3.5 h-3.5" />
+        <div className="flex items-center gap-2 text-xs text-text-muted pl-8">
+          <ShieldCheck className="w-4 h-4 text-text-subtle shrink-0" />
           <span>
             Estado de consentimiento:{" "}
             <strong className="text-text-strong">
@@ -101,11 +100,11 @@ export function AccountPrivacySection() {
       </div>
 
       {/* Términos y Marco Legal LOPDP */}
-      <div className="bg-surface-canvas border border-surface-border rounded-3xl p-6 space-y-2 text-xs text-text-muted leading-relaxed">
+      <div className="pt-6 border-t border-surface-border space-y-2 text-xs sm:text-[13px] text-text-muted leading-relaxed">
         <h4 className="font-bold text-text-strong uppercase tracking-wider text-[11px]">
           Marco Normativo y Ejercicio de Derechos ARCO
         </h4>
-        <p>
+        <p className="max-w-3xl">
           En estricto cumplimiento de la Ley Orgánica de Protección de Datos Personales del Ecuador y estándares internacionales, tus datos no serán cedidos a terceros con fines publicitarios no autorizados. Puedes revocar este consentimiento en cualquier instante desactivando la casilla superior o mediante solicitud formal de supresión de datos.
         </p>
       </div>

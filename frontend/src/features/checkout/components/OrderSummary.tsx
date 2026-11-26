@@ -46,14 +46,9 @@ export function OrderSummary() {
   return (
     <div className="bg-surface-card rounded-2xl sm:rounded-3xl border border-surface-border p-4 sm:p-6 space-y-5 shadow-sm">
       <div className="flex items-center justify-between pb-3 border-b border-surface-border-subtle">
-        <div>
-          <h3 className="text-xs sm:text-sm font-bold uppercase tracking-wider text-text-strong font-display">
-            Resumen del Pedido
-          </h3>
-          <span className="text-[11px] text-text-muted">
-            {items.reduce((acc, i) => acc + i.quantity, 0)} {items.reduce((acc, i) => acc + i.quantity, 0) === 1 ? "artículo" : "artículos"}
-          </span>
-        </div>
+        <h3 className="text-xs sm:text-sm font-bold uppercase tracking-wider text-text-strong font-display">
+          Resumen del Pedido
+        </h3>
         <span className="inline-flex items-center gap-1.5 text-xs text-text-strong font-bold uppercase tracking-wider font-display">
           {deliveryType === "delivery" ? (
             <>
@@ -97,9 +92,11 @@ export function OrderSummary() {
                 <p className="font-bold text-text-strong">
                   {formatCurrency(item.itemPrice * item.quantity)}
                 </p>
-                <p className="text-[10px] text-text-subtle">
-                  {formatCurrency(item.itemPrice)} c/u
-                </p>
+                {item.quantity > 1 && (
+                  <p className="text-[10px] text-text-subtle">
+                    {formatCurrency(item.itemPrice)} cada uno
+                  </p>
+                )}
               </div>
             </div>
 
@@ -153,7 +150,11 @@ export function OrderSummary() {
         <div className="flex justify-between text-text-base">
           <span>Tarifa de entrega:</span>
           <span className="font-semibold text-text-strong tabular-nums">
-            {deliveryFee > 0 ? formatCurrency(deliveryFee) : "Gratis (Retiro)"}
+            {deliveryFee > 0
+              ? formatCurrency(deliveryFee)
+              : deliveryType === "takeout"
+                ? "Gratis (Retiro)"
+                : "Gratis"}
           </span>
         </div>
 

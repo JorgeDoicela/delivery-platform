@@ -118,9 +118,7 @@ export function ForgotPasswordForm({
       {/* Pantalla de Éxito */}
       {successMessage ? (
         <div className="space-y-4 py-2 text-center animate-fadeIn">
-          <div className="w-12 h-12 bg-surface-canvas border border-surface-border rounded-full flex items-center justify-center mx-auto text-text-strong">
-            <CheckCircle2 className="w-6 h-6 stroke-[2.2] text-green-600" />
-          </div>
+          <CheckCircle2 className="w-8 h-8 stroke-[2.2] text-green-600 mx-auto" />
           <div className="space-y-1">
             <h3 className="text-lg font-black text-text-strong uppercase font-display tracking-tight">
               Revisa tu Correo

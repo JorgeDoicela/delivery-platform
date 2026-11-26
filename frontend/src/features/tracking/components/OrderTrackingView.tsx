@@ -1,7 +1,7 @@
 'use client';
 
 import { useRouter } from 'next/navigation';
-import { OrderStatus, PaymentMethod } from '@/shared/types/api';
+import { DeliveryType, OrderStatus, PaymentMethod } from '@/shared/types/api';
 import { ArrowLeft, Clock, Truck, AlertCircle, RefreshCw, Lock, LogIn, ShieldAlert } from 'lucide-react';
 import { StatusTimeline } from './StatusTimeline';
 import { OrderMap } from './OrderMap';
@@ -9,50 +9,43 @@ import { useOrderTracking } from '../hooks/useOrderTracking';
 import { useTenantRoutes } from '@/shared/lib/tenant-routing';
 
 const statusLabels: Record<OrderStatus, string> = {
-  [OrderStatus.Created]: 'Pedido Registrado',
-  [OrderStatus.PendingValidation]: 'Pendiente de Comprobante',
-  [OrderStatus.Confirmed]: 'Confirmado / En Cola',
-  [OrderStatus.InKitchen]: 'En Preparación (Horno)',
-  [OrderStatus.ReadyForDelivery]: 'Listo para Despacho',
-  [OrderStatus.OnTheWay]: 'En Camino',
+  [OrderStatus.Created]: 'Recibido',
+  [OrderStatus.PendingValidation]: 'Validando pago',
+  [OrderStatus.Confirmed]: 'Confirmado',
+  [OrderStatus.InKitchen]: 'En preparación',
+  [OrderStatus.ReadyForDelivery]: 'Listo',
+  [OrderStatus.OnTheWay]: 'En camino',
   [OrderStatus.Delivered]: 'Entregado',
   [OrderStatus.Cancelled]: 'Cancelado',
 };
 
-const statusDescriptions: Record<OrderStatus, { title: string; desc: string }> = {
-  [OrderStatus.Created]: {
-    title: 'Pedido Registrado en Cola',
-    desc: 'Tu comanda ha ingresado al sistema. En breve el equipo de cocina comenzará la preparación.',
-  },
-  [OrderStatus.PendingValidation]: {
-    title: 'Comprobante en Revisión',
-    desc: 'Validando la transferencia bancaria con el restaurante para enviar la comanda a cocina.',
-  },
-  [OrderStatus.Confirmed]: {
-    title: 'Confirmado por el Local',
-    desc: 'El restaurante confirmó tu orden. Pasa a asignación de cocina.',
-  },
-  [OrderStatus.InKitchen]: {
-    title: 'Preparando tus Platillos',
-    desc: 'Nuestros cocineros están horneando y preparando tus productos frescos en este momento.',
-  },
-  [OrderStatus.ReadyForDelivery]: {
-    title: 'Listo y Empacado para Despacho',
-    desc: 'Tu orden está empacada en el mostrador. El motorizado asignado está por retirarla.',
-  },
-  [OrderStatus.OnTheWay]: {
-    title: 'Motorizado en Ruta a tu Puerta',
-    desc: 'El repartidor retiró la comanda y se desplaza hacia tu dirección. Sigue su movimiento en el mapa en vivo.',
-  },
-  [OrderStatus.Delivered]: {
-    title: 'Pedido Entregado con Éxito',
-    desc: 'Tu pedido ha sido recibido en el domicilio indicado.',
-  },
-  [OrderStatus.Cancelled]: {
-    title: 'Orden Cancelada',
-    desc: 'Esta orden fue cancelada. Contacta al soporte si tienes dudas sobre tu pago.',
-  },
-};
+function getCustomerStatusMessage(status: OrderStatus, deliveryType?: DeliveryType): string {
+  const isTakeout = deliveryType === DeliveryType.Takeout;
+  switch (status) {
+    case OrderStatus.Created:
+      return 'Recibimos tu pedido y pronto comenzaremos a prepararlo.';
+    case OrderStatus.PendingValidation:
+      return 'Estamos verificando tu comprobante de transferencia.';
+    case OrderStatus.Confirmed:
+      return 'Recibimos tu pedido y ya lo estamos preparando.';
+    case OrderStatus.InKitchen:
+      return 'Estamos preparando tu pedido en este momento.';
+    case OrderStatus.ReadyForDelivery:
+      return isTakeout
+        ? 'Tu pedido está listo para retirar en el local.'
+        : 'Tu pedido está listo y esperando al repartidor.';
+    case OrderStatus.OnTheWay:
+      return 'Tu repartidor va en camino hacia tu ubicación.';
+    case OrderStatus.Delivered:
+      return isTakeout
+        ? 'Tu pedido fue entregado en el local.'
+        : 'Tu pedido fue entregado en tu ubicación.';
+    case OrderStatus.Cancelled:
+      return 'Este pedido fue cancelado.';
+    default:
+      return '';
+  }
+}
 
 interface OrderTrackingViewProps {
   orderId: string;
@@ -165,11 +158,11 @@ export function OrderTrackingView({ orderId }: OrderTrackingViewProps) {
       </button>
 
       {/* Grid de 2 Columnas para Ancho Completo */}
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-5 sm:gap-6 items-start">
         {/* Columna Izquierda: Estado del Pedido + Mapa Vectorial */}
-        <div className="lg:col-span-7 space-y-6">
-          <div className="bg-surface-card border border-surface-border rounded-3xl p-6 shadow-sm">
-            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 pb-4 border-b border-surface-border-subtle">
+        <div className="lg:col-span-7 space-y-5 sm:space-y-6">
+          <div className="sm:bg-surface-card sm:border sm:border-surface-border sm:rounded-3xl sm:p-6 sm:shadow-sm">
+            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-4 pb-4 border-b border-surface-border-subtle">
               <div>
                 <span className="text-xs font-bold uppercase tracking-wider text-brand-primary">
                   {order.branchName}
@@ -203,21 +196,11 @@ export function OrderTrackingView({ orderId }: OrderTrackingViewProps) {
               deliveryType={order.deliveryType}
             />
 
-            {/* Banner Descriptivo en Vivo según la Etapa del Despacho */}
-            {statusDescriptions[order.status as OrderStatus] && (
-              <div className="mt-5 p-4 rounded-2xl bg-surface-canvas border border-surface-border flex items-start gap-3 text-xs">
-                <div className="p-2 rounded-xl bg-brand-primary/10 text-brand-primary shrink-0 mt-0.5">
-                  <Truck className="h-4 w-4" />
-                </div>
-                <div className="min-w-0">
-                  <h3 className="font-bold uppercase tracking-wider font-display text-text-strong">
-                    {statusDescriptions[order.status as OrderStatus].title}
-                  </h3>
-                  <p className="text-text-muted mt-0.5 leading-relaxed">
-                    {statusDescriptions[order.status as OrderStatus].desc}
-                  </p>
-                </div>
-              </div>
+            {/* Mensaje breve y claro para el cliente */}
+            {getCustomerStatusMessage(order.status as OrderStatus, order.deliveryType) && (
+              <p className="mt-4 text-xs text-text-muted text-center">
+                {getCustomerStatusMessage(order.status as OrderStatus, order.deliveryType)}
+              </p>
             )}
           </div>
 
@@ -250,7 +233,7 @@ export function OrderTrackingView({ orderId }: OrderTrackingViewProps) {
         </div>
 
         {/* Columna Derecha: Detalle de Productos */}
-        <div className="lg:col-span-5 bg-surface-card border border-surface-border rounded-3xl p-6 shadow-sm">
+        <div className="lg:col-span-5 bg-surface-card border border-surface-border rounded-2xl sm:rounded-3xl p-4 sm:p-6 shadow-sm">
           <h2 className="text-sm font-bold text-text-strong uppercase tracking-wider font-display mb-4 flex items-center gap-2">
             <Clock className="h-4 w-4 text-text-muted" />
             Resumen de Artículos

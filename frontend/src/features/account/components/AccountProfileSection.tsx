@@ -20,7 +20,13 @@ const IDENTIFICATION_OPTIONS: SelectOption[] = [
     { value: "CONSUMIDOR_FINAL", label: "Consumidor Final" },
 ];
 
-export function AccountProfileSection() {
+interface AccountProfileSectionProps {
+    allowCustomBilling?: boolean;
+}
+
+export function AccountProfileSection({
+    allowCustomBilling = true,
+}: AccountProfileSectionProps) {
     const user = useAuthStore((s) => s.user);
     const isStaffOrAdmin =
         isUserInRole(user, UserRole.SuperAdmin) ||
@@ -29,6 +35,7 @@ export function AccountProfileSection() {
         isUserInRole(user, UserRole.KitchenStaff) ||
         isUserInRole(user, UserRole.Cashier) ||
         isUserInRole(user, UserRole.Driver);
+    const showBillingFields = !isStaffOrAdmin && allowCustomBilling;
 
     const profile = useAccountStore((s) => s.profile);
     const isSaving = useAccountStore((s) => s.isSaving);
@@ -56,14 +63,14 @@ export function AccountProfileSection() {
         defaultValues: {
             fullName: profile?.fullName || "",
             phone: profile?.phone || "",
-            identificationType: normalizedProfileIdType,
-            identificationNumber: normalizedProfileIdNumber,
+            identificationType: showBillingFields ? normalizedProfileIdType : null,
+            identificationNumber: showBillingFields ? normalizedProfileIdNumber : "",
         },
         values: {
             fullName: profile?.fullName || "",
             phone: profile?.phone || "",
-            identificationType: normalizedProfileIdType,
-            identificationNumber: normalizedProfileIdNumber,
+            identificationType: showBillingFields ? normalizedProfileIdType : null,
+            identificationNumber: showBillingFields ? normalizedProfileIdNumber : "",
         },
     });
 
@@ -76,21 +83,27 @@ export function AccountProfileSection() {
         await updateProfile({
             fullName: data.fullName,
             phone: data.phone,
-            identificationType: data.identificationType || null,
-            identificationNumber: data.identificationNumber || null,
+            identificationType: showBillingFields
+                ? data.identificationType || null
+                : profile?.identificationType || null,
+            identificationNumber: showBillingFields
+                ? data.identificationNumber || null
+                : profile?.identificationNumber || null,
         });
     };
 
     return (
-        <div className="bg-surface-card border border-surface-border rounded-3xl p-6 md:p-8 space-y-6">
-            <div className="border-b border-surface-border pb-4">
+        <div className="space-y-6">
+            <div>
                 <h2 className="text-lg font-black text-text-strong font-display uppercase tracking-tight">
-                    {isStaffOrAdmin ? "Datos Personales" : "Datos Personales y de Facturación"}
+                    {showBillingFields ? "Datos Personales y de Facturación" : "Datos Personales"}
                 </h2>
-                <p className="text-xs text-text-muted mt-0.5">
+                <p className="text-xs sm:text-[13px] text-text-muted mt-1">
                     {isStaffOrAdmin
                         ? "Actualiza tu nombre y teléfono de contacto asociados a tu cuenta operativa."
-                        : "Configura tus datos para agilizar el despacho y la emisión de comprobantes fiscales electrónicos (SRI)."}
+                        : showBillingFields
+                          ? "Configura tus datos para agilizar el despacho y la emisión de comprobantes fiscales electrónicos (SRI)."
+                          : "Actualiza tu nombre y teléfono de contacto asociados a tu cuenta para agilizar tus pedidos."}
                 </p>
             </div>
 
@@ -107,17 +120,21 @@ export function AccountProfileSection() {
             )}
 
             <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
                     {/* Nombre completo */}
                     <div className="space-y-1.5">
-                        <label className="block text-xs font-bold text-text-base uppercase tracking-wider">
-                            Nombre Completo *
+                        <label
+                            htmlFor="profile-full-name"
+                            className="block text-[11px] font-bold text-text-base uppercase tracking-wider"
+                        >
+                            Nombre Completo <span className="text-brand-primary">*</span>
                         </label>
                         <input
+                            id="profile-full-name"
                             type="text"
                             {...register("fullName")}
                             placeholder="Ej: Carlos Mendoza"
-                            className="w-full px-4 py-3 rounded-2xl border border-surface-border bg-surface-canvas text-text-strong placeholder:text-text-subtle focus:outline-none focus:border-brand-primary text-xs transition-colors"
+                            className="w-full h-[46px] px-4 rounded-xl border border-surface-border bg-surface-canvas text-text-strong placeholder:text-text-subtle focus:outline-none focus:border-brand-primary focus:ring-1 focus:ring-brand-primary focus:bg-surface-card text-sm font-medium transition-all"
                         />
                         {errors.fullName && (
                             <p className="text-xs text-brand-primary font-semibold">
@@ -142,7 +159,7 @@ export function AccountProfileSection() {
                         )}
                     />
 
-                    {!isStaffOrAdmin && (
+                    {showBillingFields && (
                         <>
                             {/* Tipo de Documento */}
                             <div>
@@ -162,14 +179,18 @@ export function AccountProfileSection() {
 
                             {/* Número de documento */}
                             <div className="space-y-1.5">
-                                <label className="block text-xs font-bold text-text-base uppercase tracking-wider">
+                                <label
+                                    htmlFor="profile-id-number"
+                                    className="block text-[11px] font-bold text-text-base uppercase tracking-wider"
+                                >
                                     Número de Identificación
                                 </label>
                                 <input
+                                    id="profile-id-number"
                                     type="text"
                                     {...register("identificationNumber")}
                                     placeholder="Ej: 1712345678"
-                                    className="w-full px-4 py-3 rounded-2xl border border-surface-border bg-surface-canvas text-text-strong placeholder:text-text-subtle focus:outline-none focus:border-brand-primary text-xs transition-colors"
+                                    className="w-full h-[46px] px-4 rounded-xl border border-surface-border bg-surface-canvas text-text-strong placeholder:text-text-subtle focus:outline-none focus:border-brand-primary focus:ring-1 focus:ring-brand-primary focus:bg-surface-card text-sm font-medium transition-all"
                                 />
                                 {errors.identificationNumber && (
                                     <p className="text-xs text-brand-primary font-semibold">
@@ -183,12 +204,16 @@ export function AccountProfileSection() {
 
                 {/* Correo (de solo lectura por motivos de auditoría y verificación) */}
                 <div className="space-y-1.5">
-                    <label className="block text-xs font-bold text-text-subtle uppercase tracking-wider">
+                    <label
+                        htmlFor="profile-email-readonly"
+                        className="block text-[11px] font-bold text-text-muted uppercase tracking-wider"
+                    >
                         {profile?.email?.toLowerCase().endsWith("@mesafy.local")
                             ? "Método de Acceso"
                             : "Correo Electrónico (Registrado)"}
                     </label>
                     <input
+                        id="profile-email-readonly"
                         type="text"
                         value={
                             profile?.email?.toLowerCase().endsWith("@mesafy.local")
@@ -196,20 +221,20 @@ export function AccountProfileSection() {
                                 : profile?.email || ""
                         }
                         disabled
-                        className="w-full px-4 py-3 rounded-2xl border border-surface-border bg-surface-canvas/60 text-text-subtle text-xs cursor-not-allowed"
+                        className="w-full h-[46px] px-4 rounded-xl border border-surface-border bg-surface-canvas/60 text-text-muted text-sm font-medium cursor-not-allowed"
                     />
-                    <p className="text-[11px] text-text-subtle">
-                        {profile?.email?.toLowerCase().endsWith("@mesafy.local")
-                            ? "Tu cuenta está vinculada directamente a tu número celular de WhatsApp."
-                            : "Para modificar tu correo electrónico principal, contacta con el soporte del sistema."}
-                    </p>
+                    {profile?.email?.toLowerCase().endsWith("@mesafy.local") && (
+                        <p className="text-[11px] text-text-subtle">
+                            Tu cuenta está vinculada directamente a tu número celular de WhatsApp.
+                        </p>
+                    )}
                 </div>
 
                 <div className="pt-2 flex justify-end">
                     <button
                         type="submit"
                         disabled={isSaving}
-                        className="w-full sm:w-auto bg-brand-primary hover:brightness-110 active:scale-95 disabled:opacity-50 text-white font-black text-xs uppercase tracking-wider font-display px-8 py-3.5 rounded-full shadow-sm transition-all flex items-center justify-center gap-2 min-h-[44px] cursor-pointer"
+                        className="w-full sm:w-auto bg-brand-primary hover:bg-brand-primary-hover active:scale-95 disabled:opacity-50 text-white font-black text-xs uppercase tracking-wider font-display px-8 py-3.5 rounded-full shadow-sm transition-all flex items-center justify-center gap-2 min-h-[44px] cursor-pointer"
                     >
                         {isSaving ? (
                             <>

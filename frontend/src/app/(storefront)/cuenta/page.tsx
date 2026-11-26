@@ -8,7 +8,7 @@ import { Loader2 } from "lucide-react";
 export default function PlatformAccountPage() {
   return (
     <AuthGuard>
-      <div className="min-h-screen bg-surface-canvas">
+      <div className="bg-surface-canvas">
         <Suspense
           fallback={
             <div className="flex flex-col items-center justify-center min-h-[50vh] text-neutral-500 gap-2">

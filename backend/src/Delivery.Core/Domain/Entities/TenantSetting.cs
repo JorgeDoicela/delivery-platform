@@ -16,6 +16,11 @@ public class TenantSetting : IMustHaveTenant
 
     // Configuración Operativa y Financiera del Storefront
     public decimal BaseDeliveryFee { get; set; } = 1.50m;
+    public bool EnableDynamicDistanceFee { get; set; }
+    public double BaseDeliveryDistanceKm { get; set; } = 2.0;
+    public decimal ExtraDeliveryFeePerKm { get; set; } = 0.50m;
+    public decimal? MaxDeliveryFee { get; set; }
+    public decimal? FreeDeliveryMinOrderAmount { get; set; }
     public bool EnableDelivery { get; set; } = true;
     public bool EnableTakeout { get; set; } = true;
     public bool EnableDineIn { get; set; }
@@ -53,6 +58,7 @@ public class TenantSetting : IMustHaveTenant
     public string? BankAccountNumber { get; set; }
     public string? BankAccountHolder { get; set; }
     public string? BankAccountTaxId { get; set; }
+    public string BankAccountsJson { get; set; } = "[]";
 
     // Personalización Dinámica de Landing Page (JSON y Plantillas)
     public string LandingLayoutTemplate { get; set; } = "asadero-clasico";

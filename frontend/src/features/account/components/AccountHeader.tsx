@@ -88,12 +88,12 @@ export function AccountHeader({ profile, isLoading }: AccountHeaderProps) {
 
   if (isLoading || !profile) {
     return (
-      <div className="bg-surface-card border border-surface-border rounded-3xl p-6 md:p-8 animate-pulse">
+      <div className="px-6 py-5 sm:px-8 sm:py-6 border-b border-surface-border animate-pulse">
         <div className="flex items-center gap-4">
-          <div className="w-16 h-16 rounded-2xl bg-surface-canvas" />
+          <div className="w-14 h-14 sm:w-16 sm:h-16 rounded-full bg-surface-canvas" />
           <div className="space-y-2 flex-1">
-            <div className="h-6 w-48 bg-surface-canvas rounded-lg" />
-            <div className="h-4 w-64 bg-surface-canvas/60 rounded-lg" />
+            <div className="h-5 w-44 bg-surface-canvas rounded-lg" />
+            <div className="h-3.5 w-56 bg-surface-canvas/70 rounded-lg" />
           </div>
         </div>
       </div>
@@ -115,14 +115,14 @@ export function AccountHeader({ profile, isLoading }: AccountHeaderProps) {
   );
 
   return (
-    <div className="bg-surface-card border border-surface-border rounded-3xl p-5 sm:p-6 md:p-8 shadow-xs space-y-4">
-      <div className="flex items-center gap-4 min-w-0">
-        {/* Contenedor de Avatar Interactivo con botón de cámara */}
+    <div className="px-6 py-5 sm:px-8 sm:py-6 border-b border-surface-border space-y-4">
+      <div className="flex items-center gap-4 sm:gap-5 min-w-0">
+        {/* Contenedor de Avatar Interactivo circular (coherente con el navbar) */}
         <div className="relative group shrink-0">
-          <div className="w-16 h-16 sm:w-20 sm:h-20 rounded-2xl bg-surface-canvas text-text-strong font-black text-xl sm:text-2xl flex items-center justify-center font-display tracking-wider overflow-hidden shadow-sm border border-surface-border">
+          <div className="w-14 h-14 sm:w-16 sm:h-16 rounded-full bg-surface-canvas text-text-strong font-black text-lg sm:text-xl flex items-center justify-center font-display tracking-wider overflow-hidden border border-surface-border">
             {isUploadingAvatar ? (
               <div className="w-full h-full flex flex-col items-center justify-center bg-surface-canvas/90 text-text-strong gap-1">
-                <Loader2 className="w-6 h-6 animate-spin text-brand-primary" />
+                <Loader2 className="w-5 h-5 animate-spin text-brand-primary" />
               </div>
             ) : resolvedAvatar ? (
               /* eslint-disable-next-line @next/next/no-img-element */
@@ -136,13 +136,14 @@ export function AccountHeader({ profile, isLoading }: AccountHeaderProps) {
             )}
           </div>
 
-          {/* Botón flotante para seleccionar foto */}
+          {/* Botón discreto para cambiar foto */}
           <button
             type="button"
             onClick={handleTriggerUpload}
             disabled={isUploadingAvatar}
             title="Cambiar foto de perfil"
-            className="absolute -bottom-1 -right-1 p-1.5 rounded-full bg-brand-primary hover:brightness-110 text-white shadow-md border-2 border-surface-card transition-all active:scale-95 cursor-pointer disabled:opacity-50"
+            aria-label="Cambiar foto de perfil"
+            className="absolute -bottom-0.5 -right-0.5 p-1.5 rounded-full bg-surface-card hover:border-brand-primary hover:text-brand-primary text-text-strong shadow-xs border border-surface-border transition-colors active:scale-95 cursor-pointer disabled:opacity-50"
           >
             <Camera className="w-3.5 h-3.5" />
           </button>

@@ -112,12 +112,12 @@ export function AccountAddressesSection() {
   return (
     <div className="space-y-6">
       {/* Cabecera y botón de nueva dirección */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-surface-card border border-surface-border rounded-3xl p-6 md:p-8">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
           <h2 className="text-lg font-black text-text-strong font-display uppercase tracking-tight">
             Libreta de Direcciones
           </h2>
-          <p className="text-xs text-text-muted mt-0.5">
+          <p className="text-xs sm:text-[13px] text-text-muted mt-1">
             Guarda tus ubicaciones frecuentes para pedir en un solo clic.
           </p>
         </div>
@@ -126,7 +126,7 @@ export function AccountAddressesSection() {
           <button
             type="button"
             onClick={handleOpenCreate}
-            className="inline-flex items-center justify-center gap-2 bg-brand-primary hover:brightness-110 text-white font-black text-xs uppercase tracking-wider font-display px-6 py-3 rounded-full shadow-sm min-h-[44px] cursor-pointer"
+            className="inline-flex items-center justify-center gap-2 bg-brand-primary hover:brightness-110 text-white font-black text-xs uppercase tracking-wider font-display px-6 py-3 rounded-full shadow-sm min-h-[44px] cursor-pointer shrink-0"
           >
             <Plus className="w-4 h-4" />
             <span>Agregar Dirección</span>
@@ -148,8 +148,8 @@ export function AccountAddressesSection() {
 
       {/* Formulario de Alta / Edición */}
       {isEditing && (
-        <div className="bg-surface-card border border-surface-border rounded-3xl p-6 md:p-8 space-y-5">
-          <div className="flex items-center justify-between border-b border-surface-border pb-4">
+        <div className="bg-surface-canvas/50 border border-surface-border rounded-2xl p-5 md:p-6 space-y-5">
+          <div className="flex items-center justify-between border-b border-surface-border pb-3">
             <h3 className="text-sm font-black text-text-strong font-display uppercase tracking-tight">
               {selectedAddress ? "Editar Ubicación" : "Nueva Ubicación de Entrega"}
             </h3>
@@ -165,14 +165,14 @@ export function AccountAddressesSection() {
           <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div className="space-y-1.5">
-                <label className="block text-xs font-bold text-text-base uppercase tracking-wider">
-                  Etiqueta (Ej: Casa, Oficina, Depto) *
+                <label className="block text-[11px] font-bold text-text-base uppercase tracking-wider">
+                  Etiqueta (Ej: Casa, Oficina, Depto) <span className="text-brand-primary">*</span>
                 </label>
                 <input
                   type="text"
                   {...register("label")}
                   placeholder="Mi Casa"
-                  className="w-full px-4 py-3 rounded-2xl border border-surface-border bg-surface-canvas text-text-strong placeholder:text-text-subtle text-xs focus:outline-none focus:border-brand-primary"
+                  className="w-full h-[46px] px-4 rounded-xl border border-surface-border bg-surface-card text-text-strong placeholder:text-text-subtle text-sm font-medium focus:outline-none focus:border-brand-primary focus:ring-1 focus:ring-brand-primary transition-all"
                 />
                 {errors.label && (
                   <p className="text-xs text-brand-primary">{errors.label.message}</p>
@@ -180,14 +180,14 @@ export function AccountAddressesSection() {
               </div>
 
               <div className="space-y-1.5">
-                <label className="block text-xs font-bold text-text-base uppercase tracking-wider">
-                  Calle Principal *
+                <label className="block text-[11px] font-bold text-text-base uppercase tracking-wider">
+                  Calle Principal <span className="text-brand-primary">*</span>
                 </label>
                 <input
                   type="text"
                   {...register("street")}
                   placeholder="Av. Amazonas"
-                  className="w-full px-4 py-3 rounded-2xl border border-surface-border bg-surface-canvas text-text-strong placeholder:text-text-subtle text-xs focus:outline-none focus:border-brand-primary"
+                  className="w-full h-[46px] px-4 rounded-xl border border-surface-border bg-surface-card text-text-strong placeholder:text-text-subtle text-sm font-medium focus:outline-none focus:border-brand-primary focus:ring-1 focus:ring-brand-primary transition-all"
                 />
                 {errors.street && (
                   <p className="text-xs text-brand-primary">{errors.street.message}</p>
@@ -195,39 +195,39 @@ export function AccountAddressesSection() {
               </div>
 
               <div className="space-y-1.5">
-                <label className="block text-xs font-bold text-text-base uppercase tracking-wider">
+                <label className="block text-[11px] font-bold text-text-base uppercase tracking-wider">
                   Calle Secundaria / Intersección
                 </label>
                 <input
                   type="text"
                   {...register("secondaryStreet")}
                   placeholder="y Naciones Unidas"
-                  className="w-full px-4 py-3 rounded-2xl border border-surface-border bg-surface-canvas text-text-strong placeholder:text-text-subtle text-xs focus:outline-none focus:border-brand-primary"
+                  className="w-full h-[46px] px-4 rounded-xl border border-surface-border bg-surface-card text-text-strong placeholder:text-text-subtle text-sm font-medium focus:outline-none focus:border-brand-primary focus:ring-1 focus:ring-brand-primary transition-all"
                 />
               </div>
 
               <div className="space-y-1.5">
-                <label className="block text-xs font-bold text-text-base uppercase tracking-wider">
+                <label className="block text-[11px] font-bold text-text-base uppercase tracking-wider">
                   Número de Edificio / Casa
                 </label>
                 <input
                   type="text"
                   {...register("buildingNumber")}
                   placeholder="N34-120"
-                  className="w-full px-4 py-3 rounded-2xl border border-surface-border bg-surface-canvas text-text-strong placeholder:text-text-subtle text-xs focus:outline-none focus:border-brand-primary"
+                  className="w-full h-[46px] px-4 rounded-xl border border-surface-border bg-surface-card text-text-strong placeholder:text-text-subtle text-sm font-medium focus:outline-none focus:border-brand-primary focus:ring-1 focus:ring-brand-primary transition-all"
                 />
               </div>
             </div>
 
             <div className="space-y-1.5">
-              <label className="block text-xs font-bold text-text-base uppercase tracking-wider">
+              <label className="block text-[11px] font-bold text-text-base uppercase tracking-wider">
                 Referencia de Entrega (Piso, Puerta, Color del inmueble)
               </label>
               <textarea
                 {...register("reference")}
                 rows={2}
                 placeholder="Torre B, Piso 4, Departamento 402. Tocar timbre 'Mendoza'."
-                className="w-full px-4 py-3 rounded-2xl border border-surface-border bg-surface-canvas text-text-strong placeholder:text-text-subtle text-xs focus:outline-none focus:border-brand-primary resize-none"
+                className="w-full px-4 py-3 rounded-xl border border-surface-border bg-surface-card text-text-strong placeholder:text-text-subtle text-sm font-medium focus:outline-none focus:border-brand-primary focus:ring-1 focus:ring-brand-primary resize-none transition-all"
               />
             </div>
 
@@ -275,14 +275,14 @@ export function AccountAddressesSection() {
 
       {/* Lista de Direcciones */}
       {isLoadingAddresses ? (
-        <div className="bg-surface-card border border-surface-border rounded-3xl p-8 text-center space-y-3 animate-pulse">
+        <div className="py-10 text-center space-y-3 animate-pulse">
           <Loader2 className="w-6 h-6 animate-spin mx-auto text-brand-primary" />
           <p className="text-xs text-text-muted font-bold uppercase">
             Cargando tus direcciones...
           </p>
         </div>
       ) : addresses.length === 0 ? (
-        <div className="bg-surface-card border border-surface-border rounded-3xl p-10 text-center space-y-3">
+        <div className="py-10 text-center space-y-3">
           <MapPin className="w-8 h-8 text-text-subtle mx-auto" />
           <h4 className="text-sm font-black text-text-strong font-display uppercase tracking-tight">
             No tienes direcciones guardadas
@@ -296,7 +296,7 @@ export function AccountAddressesSection() {
           {addresses.map((addr) => (
             <div
               key={addr.id}
-              className={`bg-surface-card border rounded-3xl p-6 space-y-4 transition-colors relative ${
+              className={`bg-surface-canvas/40 border rounded-2xl p-5 space-y-4 transition-colors relative ${
                 addr.isDefault
                   ? "border-brand-primary shadow-xs"
                   : "border-surface-border hover:border-text-subtle/40"

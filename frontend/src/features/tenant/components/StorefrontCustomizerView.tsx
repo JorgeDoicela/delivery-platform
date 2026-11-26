@@ -70,9 +70,20 @@ function StorefrontCustomizerForm({
     enableKitchenWorkflow: tenant.enableKitchenWorkflow ?? true,
     allowDirectCounterTakeoutDelivery: tenant.allowDirectCounterTakeoutDelivery ?? true,
     allowCustomBilling: tenant.allowCustomBilling ?? true,
+    enableDynamicDistanceFee: tenant.enableDynamicDistanceFee ?? false,
+    baseDeliveryDistanceKm: tenant.baseDeliveryDistanceKm ?? 2.0,
+    extraDeliveryFeePerKm: tenant.extraDeliveryFeePerKm ?? 0.5,
+    maxDeliveryFee: tenant.maxDeliveryFee ?? null,
+    freeDeliveryMinOrderAmount: tenant.freeDeliveryMinOrderAmount ?? null,
     landingLayoutTemplate: tenant.landingLayoutTemplate ?? "asadero-clasico",
     customDomain: tenant.customDomain ?? null,
     bankDetails: { ...tenant.bankDetails },
+    bankAccounts:
+      tenant.bankAccounts && tenant.bankAccounts.length > 0
+        ? tenant.bankAccounts.map((a) => ({ ...a }))
+        : tenant.bankDetails?.bankName || tenant.bankDetails?.accountNumber
+          ? [{ ...tenant.bankDetails }]
+          : [],
     heroSlides: [...tenant.heroSlides],
     promotionalBanners: [...tenant.promotionalBanners],
   }));

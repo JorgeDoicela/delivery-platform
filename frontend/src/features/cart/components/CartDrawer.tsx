@@ -67,7 +67,7 @@ export function CartDrawer() {
     ? branchName
     : `Sucursal ${cleanBranchName}`;
   const itemCount = items.reduce((acc, it) => acc + it.quantity, 0);
-  const hasSubheaderContent = hasMultipleBranches || !opStatus.isOpen || ENABLE_CART_COUPONS;
+  const hasSubheaderContent = hasMultipleBranches || ENABLE_CART_COUPONS;
 
   return (
     <div
@@ -144,15 +144,6 @@ export function CartDrawer() {
 
                   {/* Módulo de Cupón / Billetera (desactivado temporalmente) */}
                   {ENABLE_CART_COUPONS && <CartDrawerCoupon />}
-
-                  {/* Aviso exclusivo cuando la cocina esté cerrada fuera de horario de atención */}
-                  {!opStatus.isOpen && (
-                    <div className="p-3 rounded-2xl text-xs leading-relaxed flex items-center gap-2.5 shadow-2xs bg-brand-primary text-white">
-                      <span className="text-[11px] leading-relaxed">
-                        Arma tu pedido y sé el primero en ordenar cuando abramos. Nuestro horario es {openingTime} a {closingTime}.
-                      </span>
-                    </div>
-                  )}
                 </div>
               )}
 
@@ -163,6 +154,15 @@ export function CartDrawer() {
                 scrollShadows
               >
                 <div className={`space-y-3 ${hasSubheaderContent ? "pt-1" : "pt-4 sm:pt-6"}`}>
+                  {/* Aviso cuando la cocina está cerrada: se mantiene arriba dentro del scroll para no tapar la lista */}
+                  {!opStatus.isOpen && (
+                    <div className="p-3 rounded-2xl text-xs leading-relaxed flex items-center gap-2.5 shadow-2xs bg-brand-primary text-white">
+                      <span className="text-[11px] leading-relaxed">
+                        Arma tu pedido y sé el primero en ordenar cuando abramos. Nuestro horario es {openingTime} a {closingTime}.
+                      </span>
+                    </div>
+                  )}
+
                   {items.map((item) => (
                     <CartDrawerItem key={item.cartItemId} item={item} />
                   ))}

@@ -1,6 +1,7 @@
 using Delivery.Core.Common;
 using Delivery.Core.Common.Spatial;
 using Delivery.Core.Domain.Common;
+using Delivery.Core.Domain.Policies;
 using Delivery.Core.Infrastructure.Persistence;
 using Delivery.Features.Common.Handlers;
 using FluentValidation;
@@ -9,7 +10,7 @@ using NetTopologySuite.Geometries;
 
 namespace Delivery.Features.Branches.ResolveBranch;
 
-public sealed record ResolveBranchQuery(double Latitude, double Longitude);
+public sealed record ResolveBranchQuery(double Latitude, double Longitude, decimal? OrderSubtotal = null);
 
 public sealed record BranchCoverageDto(
     int BranchId,
@@ -19,7 +20,11 @@ public sealed record BranchCoverageDto(
     int MaxOrdersPerSlot,
     bool IsActive,
     double DistanceKm = 0,
-    bool IsDirectCoverage = true
+    bool IsDirectCoverage = true,
+    decimal CalculatedDeliveryFee = 1.50m,
+    double EstimatedRoadDistanceKm = 0,
+    bool IsDynamicFeeApplied = false,
+    bool IsFreeByMinimumOrder = false
 );
 
 public static class ResolveBranchErrors
@@ -129,6 +134,17 @@ public sealed class ResolveBranchHandler : IHandler<ResolveBranchQuery, Result<B
         if (directMatch != null)
         {
             var b = directMatch.Branch;
+            var feeResult = DeliveryFeePolicy.Calculate(
+                baseFee: b.BaseDeliveryFeeOverride ?? tenantSettings?.BaseDeliveryFee ?? 1.50m,
+                enableDynamicDistanceFee: tenantSettings?.EnableDynamicDistanceFee ?? false,
+                baseDistanceKm: tenantSettings?.BaseDeliveryDistanceKm ?? 2.0,
+                extraFeePerKm: tenantSettings?.ExtraDeliveryFeePerKm ?? 0.50m,
+                maxDeliveryFee: tenantSettings?.MaxDeliveryFee,
+                freeDeliveryMinOrderAmount: tenantSettings?.FreeDeliveryMinOrderAmount,
+                straightLineDistanceKm: directMatch.DistanceKm,
+                orderSubtotal: query.OrderSubtotal
+            );
+
             return Result.Success(new BranchCoverageDto(
                 b.Id,
                 b.Name,
@@ -137,7 +153,11 @@ public sealed class ResolveBranchHandler : IHandler<ResolveBranchQuery, Result<B
                 b.MaxOrdersPerSlot,
                 b.IsActive,
                 directMatch.DistanceKm,
-                IsDirectCoverage: true
+                IsDirectCoverage: true,
+                CalculatedDeliveryFee: feeResult.DeliveryFee,
+                EstimatedRoadDistanceKm: feeResult.EstimatedRoadDistanceKm,
+                IsDynamicFeeApplied: feeResult.IsDynamicByDistance,
+                IsFreeByMinimumOrder: feeResult.IsFreeByMinimumOrder
             ));
         }
 
@@ -150,6 +170,17 @@ public sealed class ResolveBranchHandler : IHandler<ResolveBranchQuery, Result<B
         if (flexibleBranch != null)
         {
             var b = flexibleBranch.Branch;
+            var feeResult = DeliveryFeePolicy.Calculate(
+                baseFee: b.BaseDeliveryFeeOverride ?? tenantSettings?.BaseDeliveryFee ?? 1.50m,
+                enableDynamicDistanceFee: tenantSettings?.EnableDynamicDistanceFee ?? false,
+                baseDistanceKm: tenantSettings?.BaseDeliveryDistanceKm ?? 2.0,
+                extraFeePerKm: tenantSettings?.ExtraDeliveryFeePerKm ?? 0.50m,
+                maxDeliveryFee: tenantSettings?.MaxDeliveryFee,
+                freeDeliveryMinOrderAmount: tenantSettings?.FreeDeliveryMinOrderAmount,
+                straightLineDistanceKm: flexibleBranch.DistanceKm,
+                orderSubtotal: query.OrderSubtotal
+            );
+
             return Result.Success(new BranchCoverageDto(
                 b.Id,
                 b.Name,
@@ -158,7 +189,11 @@ public sealed class ResolveBranchHandler : IHandler<ResolveBranchQuery, Result<B
                 b.MaxOrdersPerSlot,
                 b.IsActive,
                 flexibleBranch.DistanceKm,
-                IsDirectCoverage: false
+                IsDirectCoverage: false,
+                CalculatedDeliveryFee: feeResult.DeliveryFee,
+                EstimatedRoadDistanceKm: feeResult.EstimatedRoadDistanceKm,
+                IsDynamicFeeApplied: feeResult.IsDynamicByDistance,
+                IsFreeByMinimumOrder: feeResult.IsFreeByMinimumOrder
             ));
         }
 

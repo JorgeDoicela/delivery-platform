@@ -35,6 +35,7 @@ export const FALLBACK_TENANT_CONFIGS: Record<string, TenantStorefrontConfigDto> 
     acceptsCash: true,
     acceptsBankTransfer: true,
     acceptsCard: false,
+    allowCustomBilling: false,
     quickLinksEnabled: true,
     landingLayoutTemplate: "asadero-clasico",
     bankDetails: {

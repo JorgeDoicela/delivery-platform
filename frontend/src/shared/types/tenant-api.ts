@@ -152,6 +152,7 @@ export interface TenantStorefrontConfigDto {
   termsAndConditionsMarkdown?: string | null;
   privacyPolicyMarkdown?: string | null;
   bankDetails: TenantBankDetailsDto;
+  bankAccounts?: TenantBankDetailsDto[];
   heroSlides: TenantHeroSlide[];
   promotionalBanners: TenantPromoBanner[];
   branches: TenantBranchSummaryDto[];
@@ -159,6 +160,11 @@ export interface TenantStorefrontConfigDto {
   enableKitchenWorkflow?: boolean;
   allowDirectCounterTakeoutDelivery?: boolean;
   allowCustomBilling?: boolean;
+  enableDynamicDistanceFee?: boolean;
+  baseDeliveryDistanceKm?: number;
+  extraDeliveryFeePerKm?: number;
+  maxDeliveryFee?: number | null;
+  freeDeliveryMinOrderAmount?: number | null;
 }
 
 export interface UpdateTenantStorefrontCommand {
@@ -187,12 +193,18 @@ export interface UpdateTenantStorefrontCommand {
   termsAndConditionsMarkdown?: string | null;
   privacyPolicyMarkdown?: string | null;
   bankDetails: TenantBankDetailsDto;
+  bankAccounts?: TenantBankDetailsDto[];
   heroSlides: TenantHeroSlide[];
   promotionalBanners: TenantPromoBanner[];
   requireCoverageValidation?: boolean;
   enableKitchenWorkflow?: boolean;
   allowDirectCounterTakeoutDelivery?: boolean;
   allowCustomBilling?: boolean;
+  enableDynamicDistanceFee?: boolean;
+  baseDeliveryDistanceKm?: number;
+  extraDeliveryFeePerKm?: number;
+  maxDeliveryFee?: number | null;
+  freeDeliveryMinOrderAmount?: number | null;
 }
 
 export interface PlatformTenantItemDto {

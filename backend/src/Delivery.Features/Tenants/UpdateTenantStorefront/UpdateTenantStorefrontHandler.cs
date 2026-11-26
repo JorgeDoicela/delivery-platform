@@ -73,7 +73,13 @@ public sealed record UpdatedTenantStorefrontDto(
     bool RequireCoverageValidation = true,
     bool EnableKitchenWorkflow = true,
     bool AllowDirectCounterTakeoutDelivery = true,
-    bool AllowCustomBilling = true
+    bool AllowCustomBilling = true,
+    List<UpdateTenantBankDetailsDto>? BankAccounts = null,
+    bool EnableDynamicDistanceFee = false,
+    double BaseDeliveryDistanceKm = 2.0,
+    decimal ExtraDeliveryFeePerKm = 0.50m,
+    decimal? MaxDeliveryFee = null,
+    decimal? FreeDeliveryMinOrderAmount = null
 );
 
 public sealed record UpdateTenantStorefrontCommand(
@@ -107,7 +113,13 @@ public sealed record UpdateTenantStorefrontCommand(
     bool? RequireCoverageValidation = null,
     bool? EnableKitchenWorkflow = null,
     bool? AllowDirectCounterTakeoutDelivery = null,
-    bool? AllowCustomBilling = null
+    bool? AllowCustomBilling = null,
+    List<UpdateTenantBankDetailsDto>? BankAccounts = null,
+    bool? EnableDynamicDistanceFee = null,
+    double? BaseDeliveryDistanceKm = null,
+    decimal? ExtraDeliveryFeePerKm = null,
+    decimal? MaxDeliveryFee = null,
+    decimal? FreeDeliveryMinOrderAmount = null
 );
 
 public sealed class UpdateTenantStorefrontHandler : IHandler<UpdateTenantStorefrontCommand, Result<UpdatedTenantStorefrontDto>>
@@ -236,17 +248,71 @@ public sealed class UpdateTenantStorefrontHandler : IHandler<UpdateTenantStorefr
             settings.AllowCustomBilling = command.AllowCustomBilling.Value;
         }
 
+        if (command.EnableDynamicDistanceFee.HasValue)
+        {
+            settings.EnableDynamicDistanceFee = command.EnableDynamicDistanceFee.Value;
+        }
+
+        if (command.BaseDeliveryDistanceKm.HasValue)
+        {
+            settings.BaseDeliveryDistanceKm = Math.Round(Math.Max(0.0, command.BaseDeliveryDistanceKm.Value), 2, MidpointRounding.AwayFromZero);
+        }
+
+        if (command.ExtraDeliveryFeePerKm.HasValue)
+        {
+            settings.ExtraDeliveryFeePerKm = Math.Round(Math.Max(0m, command.ExtraDeliveryFeePerKm.Value), 2, MidpointRounding.AwayFromZero);
+        }
+
+        if (command.EnableDynamicDistanceFee.HasValue || command.MaxDeliveryFee.HasValue)
+        {
+            settings.MaxDeliveryFee = command.MaxDeliveryFee.HasValue && command.MaxDeliveryFee.Value > 0m
+                ? Math.Round(command.MaxDeliveryFee.Value, 2, MidpointRounding.AwayFromZero)
+                : null;
+        }
+
+        if (command.EnableDynamicDistanceFee.HasValue || command.FreeDeliveryMinOrderAmount.HasValue)
+        {
+            settings.FreeDeliveryMinOrderAmount = command.FreeDeliveryMinOrderAmount.HasValue && command.FreeDeliveryMinOrderAmount.Value > 0m
+                ? Math.Round(command.FreeDeliveryMinOrderAmount.Value, 2, MidpointRounding.AwayFromZero)
+                : null;
+        }
+
         if (!string.IsNullOrWhiteSpace(command.LandingLayoutTemplate))
         {
             settings.LandingLayoutTemplate = command.LandingLayoutTemplate.Trim();
         }
         settings.TermsAndConditionsMarkdown = command.TermsAndConditionsMarkdown;
         settings.PrivacyPolicyMarkdown = command.PrivacyPolicyMarkdown;
-        settings.BankName = command.BankDetails.BankName.Trim();
-        settings.BankAccountType = command.BankDetails.AccountType.Trim();
-        settings.BankAccountNumber = command.BankDetails.AccountNumber.Trim();
-        settings.BankAccountHolder = command.BankDetails.AccountHolder.Trim();
-        settings.BankAccountTaxId = command.BankDetails.TaxId.Trim();
+
+        var rawAccounts = command.BankAccounts is not null
+            ? command.BankAccounts
+            : new List<UpdateTenantBankDetailsDto> { command.BankDetails };
+
+        var normalizedBankAccounts = rawAccounts
+            .Where(a => a is not null && (!string.IsNullOrWhiteSpace(a.BankName) || !string.IsNullOrWhiteSpace(a.AccountNumber)))
+            .Select(a => new UpdateTenantBankDetailsDto(
+                a.BankName?.Trim() ?? string.Empty,
+                a.AccountType?.Trim() ?? string.Empty,
+                a.AccountNumber?.Trim() ?? string.Empty,
+                a.AccountHolder?.Trim() ?? string.Empty,
+                a.TaxId?.Trim() ?? string.Empty
+            ))
+            .ToList();
+
+        var primaryAccount = normalizedBankAccounts.FirstOrDefault() ?? new UpdateTenantBankDetailsDto(
+            string.Empty,
+            string.Empty,
+            string.Empty,
+            string.Empty,
+            string.Empty
+        );
+
+        settings.BankName = primaryAccount.BankName;
+        settings.BankAccountType = primaryAccount.AccountType;
+        settings.BankAccountNumber = primaryAccount.AccountNumber;
+        settings.BankAccountHolder = primaryAccount.AccountHolder;
+        settings.BankAccountTaxId = primaryAccount.TaxId;
+        settings.BankAccountsJson = JsonSerializer.Serialize(normalizedBankAccounts, JsonOptions);
 
         var heroSlides = command.HeroSlides ?? new List<TenantHeroSlide>();
         var promos = command.PromotionalBanners ?? new List<TenantPromoBanner>();
@@ -306,20 +372,20 @@ public sealed class UpdateTenantStorefrontHandler : IHandler<UpdateTenantStorefr
             settings.CustomDomain,
             settings.TermsAndConditionsMarkdown,
             settings.PrivacyPolicyMarkdown,
-            new UpdateTenantBankDetailsDto(
-                settings.BankName ?? "Banco Pichincha",
-                settings.BankAccountType ?? "Cuenta Corriente",
-                settings.BankAccountNumber ?? "2100456789",
-                settings.BankAccountHolder ?? tenant.BusinessName,
-                settings.BankAccountTaxId ?? tenant.TaxId
-            ),
+            primaryAccount,
             heroSlides.Where(s => s.IsActive).OrderBy(s => s.DisplayOrder).ToList(),
             promos.Where(p => p.IsActive).OrderBy(p => p.DisplayOrder).ToList(),
             branches,
             settings.RequireCoverageValidation,
             settings.EnableKitchenWorkflow,
             settings.AllowDirectCounterTakeoutDelivery,
-            settings.AllowCustomBilling
+            settings.AllowCustomBilling,
+            normalizedBankAccounts,
+            settings.EnableDynamicDistanceFee,
+            settings.BaseDeliveryDistanceKm,
+            settings.ExtraDeliveryFeePerKm,
+            settings.MaxDeliveryFee,
+            settings.FreeDeliveryMinOrderAmount
         );
 
         return Result.Success(dto);

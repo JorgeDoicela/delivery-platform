@@ -129,16 +129,16 @@ export function PasskeySettingsSection() {
   const activeError = passkeyError || errorMessage;
 
   return (
-    <div className="bg-surface-card border border-surface-border rounded-3xl p-6 md:p-8 space-y-6">
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 border-b border-surface-border pb-5">
+    <div className="pt-8 border-t border-surface-border space-y-5">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
           <div className="flex items-center gap-2">
-            <Fingerprint className="w-5 h-5 text-brand-primary" />
-            <h2 className="text-lg font-black text-text-strong font-display uppercase tracking-tight">
+            <Fingerprint className="w-5 h-5 text-brand-primary shrink-0" />
+            <h3 className="text-base sm:text-lg font-black text-text-strong font-display uppercase tracking-tight">
               Acceso Rápido con Huella o Rostro
-            </h2>
+            </h3>
           </div>
-          <p className="text-xs text-text-muted mt-1 max-w-xl">
+          <p className="text-xs sm:text-[13px] text-text-muted mt-1 max-w-xl">
             Entra a tu cuenta en un segundo usando la huella o el reconocimiento facial de tu celular o computadora, sin tener que escribir tu contraseña.
           </p>
         </div>
@@ -196,12 +196,12 @@ export function PasskeySettingsSection() {
           <Loader2 className="w-5 h-5 animate-spin text-brand-primary" />
         </div>
       ) : credentials.length === 0 ? (
-        <div className="text-center py-8 px-4 border border-dashed border-surface-border rounded-2xl bg-surface-canvas/50 space-y-2">
-          <KeyRound className="w-8 h-8 text-text-subtle mx-auto stroke-[1.5]" />
+        <div className="text-center py-6 px-4 space-y-2">
+          <KeyRound className="w-7 h-7 text-text-subtle mx-auto stroke-[1.5]" />
           <p className="text-xs font-bold text-text-strong font-display uppercase tracking-wide">
             No tienes dispositivos activados todavía
           </p>
-          <p className="text-[11px] text-text-muted max-w-sm mx-auto">
+          <p className="text-xs text-text-muted max-w-sm mx-auto">
             Activa tu teléfono o computadora actual para entrar a tu cuenta de forma más rápida y segura.
           </p>
         </div>
@@ -217,9 +217,7 @@ export function PasskeySettingsSection() {
                 className="py-3.5 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 first:pt-0 last:pb-0"
               >
                 <div className="flex items-center gap-3 min-w-0">
-                  <div className="w-9 h-9 rounded-xl bg-surface-canvas border border-surface-border flex items-center justify-center shrink-0 text-brand-primary">
-                    <Fingerprint className="w-4 h-4" />
-                  </div>
+                  <Fingerprint className="w-5 h-5 text-brand-primary shrink-0" />
 
                   <div className="min-w-0 flex-1">
                     {isEditing ? (

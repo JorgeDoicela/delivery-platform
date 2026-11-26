@@ -75,7 +75,13 @@ public sealed record TenantStorefrontConfigDto(
     bool RequireCoverageValidation = true,
     bool EnableKitchenWorkflow = true,
     bool AllowDirectCounterTakeoutDelivery = true,
-    bool AllowCustomBilling = true
+    bool AllowCustomBilling = true,
+    List<TenantBankDetailsDto>? BankAccounts = null,
+    bool EnableDynamicDistanceFee = false,
+    double BaseDeliveryDistanceKm = 2.0,
+    decimal ExtraDeliveryFeePerKm = 0.50m,
+    decimal? MaxDeliveryFee = null,
+    decimal? FreeDeliveryMinOrderAmount = null
 );
 
 public sealed class GetCurrentTenantHandler : IHandler<GetCurrentTenantQuery, Result<TenantStorefrontConfigDto>>
@@ -184,23 +190,81 @@ public sealed class GetCurrentTenantHandler : IHandler<GetCurrentTenantQuery, Re
             settings?.CustomDomain,
             settings?.TermsAndConditionsMarkdown,
             settings?.PrivacyPolicyMarkdown,
-            new TenantBankDetailsDto(
-                settings?.BankName ?? "Banco Pichincha",
-                settings?.BankAccountType ?? "Cuenta Corriente",
-                settings?.BankAccountNumber ?? "2100456789",
-                settings?.BankAccountHolder ?? tenant.BusinessName,
-                settings?.BankAccountTaxId ?? tenant.TaxId
-            ),
+            ResolvePrimaryBankDetails(settings, tenant.BusinessName, tenant.TaxId),
             heroSlides,
             promos,
             branches,
             settings?.RequireCoverageValidation ?? true,
             tenantEnableKitchen,
             tenantAllowDirectTakeout,
-            settings?.AllowCustomBilling ?? true
+            settings?.AllowCustomBilling ?? true,
+            ResolveBankAccounts(settings, tenant.BusinessName, tenant.TaxId),
+            settings?.EnableDynamicDistanceFee ?? false,
+            settings?.BaseDeliveryDistanceKm ?? 2.0,
+            settings?.ExtraDeliveryFeePerKm ?? 0.50m,
+            settings?.MaxDeliveryFee,
+            settings?.FreeDeliveryMinOrderAmount
         );
 
         return Result.Success(dto);
+    }
+
+    private static List<TenantBankDetailsDto> ResolveBankAccounts(
+        Delivery.Core.Domain.Entities.TenantSetting? settings,
+        string fallbackHolder,
+        string fallbackTaxId)
+    {
+        var parsed = DeserializeList<TenantBankDetailsDto>(settings?.BankAccountsJson)
+            .Where(a => !string.IsNullOrWhiteSpace(a.BankName) || !string.IsNullOrWhiteSpace(a.AccountNumber))
+            .Select(a => new TenantBankDetailsDto(
+                a.BankName?.Trim() ?? string.Empty,
+                a.AccountType?.Trim() ?? string.Empty,
+                a.AccountNumber?.Trim() ?? string.Empty,
+                string.IsNullOrWhiteSpace(a.AccountHolder) ? fallbackHolder : a.AccountHolder.Trim(),
+                string.IsNullOrWhiteSpace(a.TaxId) ? fallbackTaxId : a.TaxId.Trim()
+            ))
+            .ToList();
+
+        if (parsed.Count > 0)
+        {
+            return parsed;
+        }
+
+        if (!string.IsNullOrWhiteSpace(settings?.BankName) || !string.IsNullOrWhiteSpace(settings?.BankAccountNumber))
+        {
+            return
+            [
+                new TenantBankDetailsDto(
+                    settings?.BankName?.Trim() ?? string.Empty,
+                    settings?.BankAccountType?.Trim() ?? string.Empty,
+                    settings?.BankAccountNumber?.Trim() ?? string.Empty,
+                    string.IsNullOrWhiteSpace(settings?.BankAccountHolder) ? fallbackHolder : settings!.BankAccountHolder!.Trim(),
+                    string.IsNullOrWhiteSpace(settings?.BankAccountTaxId) ? fallbackTaxId : settings!.BankAccountTaxId!.Trim()
+                )
+            ];
+        }
+
+        return new List<TenantBankDetailsDto>();
+    }
+
+    private static TenantBankDetailsDto ResolvePrimaryBankDetails(
+        Delivery.Core.Domain.Entities.TenantSetting? settings,
+        string fallbackHolder,
+        string fallbackTaxId)
+    {
+        var accounts = ResolveBankAccounts(settings, fallbackHolder, fallbackTaxId);
+        if (accounts.Count > 0)
+        {
+            return accounts[0];
+        }
+
+        return new TenantBankDetailsDto(
+            string.Empty,
+            string.Empty,
+            string.Empty,
+            fallbackHolder,
+            fallbackTaxId
+        );
     }
 
     private static List<T> DeserializeList<T>(string? json)

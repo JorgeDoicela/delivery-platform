@@ -40,11 +40,17 @@ public partial class AppDbContext
             ts.Property(x => x.SriEnvironment).HasMaxLength(20).IsRequired();
             ts.Property(x => x.SriCertificatePath).HasMaxLength(500);
             ts.Property(x => x.BaseDeliveryFee).HasPrecision(18, 2);
+            ts.Property(x => x.EnableDynamicDistanceFee).HasDefaultValue(false);
+            ts.Property(x => x.BaseDeliveryDistanceKm).HasDefaultValue(2.0);
+            ts.Property(x => x.ExtraDeliveryFeePerKm).HasPrecision(18, 2).HasDefaultValue(0.50m);
+            ts.Property(x => x.MaxDeliveryFee).HasPrecision(18, 2);
+            ts.Property(x => x.FreeDeliveryMinOrderAmount).HasPrecision(18, 2);
             ts.Property(x => x.BankName).HasMaxLength(120);
             ts.Property(x => x.BankAccountType).HasMaxLength(50);
             ts.Property(x => x.BankAccountNumber).HasMaxLength(50);
             ts.Property(x => x.BankAccountHolder).HasMaxLength(150);
             ts.Property(x => x.BankAccountTaxId).HasMaxLength(30);
+            ts.Property(x => x.BankAccountsJson).HasColumnType("text").HasDefaultValue("[]");
             ts.Property(x => x.HeroSlidesJson).HasColumnType("text");
             ts.Property(x => x.PromotionalBannersJson).HasColumnType("text");
             ts.Property(x => x.CustomPrivacyPolicyUrl).HasMaxLength(500);

@@ -4,7 +4,7 @@ import { useEffect, useRef, useState } from 'react';
 import { Map, Marker, Popup, NavigationControl, LngLatBounds, setWorkerUrl, type StyleSpecification } from 'maplibre-gl';
 import 'maplibre-gl/dist/maplibre-gl.css';
 import { createDriverDomMarker, createDestinationDomMarker, createBranchDomMarker } from './DriverMarker';
-import { Navigation, Compass, Layers, Store } from 'lucide-react';
+import { Navigation } from 'lucide-react';
 
 interface OrderMapProps {
   origin?: {
@@ -85,8 +85,7 @@ export function OrderMap({ origin, destination, driverLocation, className = '' }
 
     map.addControl(
       new NavigationControl({
-        visualizePitch: true,
-        showCompass: true,
+        showCompass: false,
         showZoom: true,
       }),
       'bottom-right'
@@ -241,47 +240,26 @@ export function OrderMap({ origin, destination, driverLocation, className = '' }
       {/* Contenedor del lienzo MapLibre WebGL */}
       <div ref={mapContainerRef} className="w-full h-full" />
 
-      {/* Barra de control flotante */}
-      <div className="absolute top-3 left-3 z-10 flex items-center gap-1.5 sm:gap-2">
-        <span className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-surface-card/90 backdrop-blur-md border border-surface-border text-[9px] sm:text-[10px] font-bold uppercase tracking-wider text-text-strong shadow-md">
-          <Layers className="h-3 w-3 sm:h-3.5 sm:w-3.5 text-brand-primary" />
-          Rastreo Vectorial
-        </span>
-        {origin && (
-          <span className="hidden xs:flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-neutral-900 text-white border border-neutral-700 text-[9px] sm:text-[10px] font-bold uppercase tracking-wider shadow-md">
-            <Store className="h-3 w-3 text-brand-primary" />
-            <span>{origin.label || "Local"}</span>
+      {/* Indicador de transmisión GPS únicamente cuando el repartidor está en ruta */}
+      {driverLocation && (
+        <div className="absolute top-3 left-3 z-10">
+          <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-brand-primary text-white border border-brand-primary-hover text-[10px] font-bold uppercase tracking-wider shadow-md">
+            <span className="h-2 w-2 rounded-full bg-white animate-pulse" />
+            En vivo
           </span>
-        )}
-        {driverLocation && (
-          <span className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-brand-primary text-white border border-brand-primary-hover text-[9px] sm:text-[10px] font-bold uppercase tracking-wider animate-pulse shadow-md">
-            <span className="h-2 w-2 rounded-full bg-white" />
-            GPS Activo
-          </span>
-        )}
-      </div>
+        </div>
+      )}
 
       {/* Botón de Recentrado */}
       <button
         type="button"
         onClick={handleRecenter}
-        title="Centrar mapa en posición activa"
+        title="Centrar mapa"
+        aria-label="Centrar mapa"
         className="absolute top-3 right-3 z-10 p-2.5 rounded-full bg-surface-card/90 hover:bg-surface-card-hover backdrop-blur-md border border-surface-border text-text-strong shadow-lg transition-all active:scale-95 cursor-pointer min-h-[40px] min-w-[40px] flex items-center justify-center"
       >
         <Navigation className="h-4 w-4 text-brand-primary" />
       </button>
-
-      {/* Mensaje informativo si aún no hay repartidor transmitiendo */}
-      {!driverLocation && (
-        <div className="absolute bottom-3 left-3 right-16 z-10 p-2.5 sm:p-3 rounded-2xl bg-surface-card/90 backdrop-blur-md border border-surface-border text-[10px] sm:text-[11px] text-text-muted flex items-center gap-2">
-          <Compass className="h-3.5 w-3.5 text-brand-primary shrink-0" />
-          <span className="line-clamp-2">
-            {origin
-              ? `Preparando en ${origin.label || "la sucursal"}. Verás al repartidor salir en vivo al despachar.`
-              : "El mapa mostrará el movimiento en vivo en cuanto el repartidor retire la orden."}
-          </span>
-        </div>
-      )}
     </div>
   );
 }

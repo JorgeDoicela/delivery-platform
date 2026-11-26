@@ -45,6 +45,7 @@ interface CartState {
   branchName: string | null;
   deliveryType: "delivery" | "takeout";
   baseDeliveryFee: number;
+  calculatedDeliveryFee: number | null;
   cartsByTenant: Record<string, TenantCartSnapshot>;
 
   // Estado del Drawer Lateral
@@ -72,6 +73,7 @@ interface CartState {
   ) => void;
   setBranch: (branchId: number, branchName: string) => void;
   setDeliveryType: (type: "delivery" | "takeout") => void;
+  setCalculatedDeliveryFee: (fee: number | null) => void;
   addItem: (item: Omit<CartItem, "cartItemId" | "itemPrice">) => void;
   removeItem: (cartItemId: string) => void;
   updateQuantity: (cartItemId: string, delta: number) => void;
@@ -93,6 +95,7 @@ export const useCartStore = create<CartState>()(
       branchName: "Guamaní",
       deliveryType: "delivery",
       baseDeliveryFee: 1.5,
+      calculatedDeliveryFee: null,
       cartsByTenant: {},
 
       // Estado del Drawer Lateral
@@ -189,6 +192,7 @@ export const useCartStore = create<CartState>()(
             branchName: nextBranchName,
             deliveryType: existingForNext.deliveryType,
             baseDeliveryFee: nextFee,
+            calculatedDeliveryFee: null,
             cartsByTenant: updatedMap,
           });
         } else {
@@ -350,6 +354,7 @@ export const useCartStore = create<CartState>()(
       clearCart: () =>
         set((state) => ({
           items: [],
+          calculatedDeliveryFee: null,
           cartsByTenant: {
             ...state.cartsByTenant,
             [state.tenantSlug]: {
@@ -362,6 +367,8 @@ export const useCartStore = create<CartState>()(
           },
         })),
 
+      setCalculatedDeliveryFee: (fee) => set({ calculatedDeliveryFee: fee }),
+
       getSubtotal: () => {
         return get().items.reduce(
           (sum, item) => sum + item.itemPrice * item.quantity,
@@ -370,7 +377,9 @@ export const useCartStore = create<CartState>()(
       },
 
       getDeliveryFee: () => {
-        return get().deliveryType === "delivery" ? get().baseDeliveryFee : 0.0;
+        if (get().deliveryType !== "delivery") return 0.0;
+        const dynamicFee = get().calculatedDeliveryFee;
+        return dynamicFee !== null ? dynamicFee : get().baseDeliveryFee;
       },
 
       getTotal: () => {

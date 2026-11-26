@@ -51,75 +51,72 @@ export function AccountOrdersSection() {
     router.push(`/${order.tenantSlug}?branch=${order.branchId}`);
   };
 
-  if (isLoadingOrders) {
-    return (
-      <div className="bg-surface-card border border-surface-border rounded-3xl p-8 text-center space-y-4 animate-pulse">
-        <Loader2 className="w-8 h-8 animate-spin mx-auto text-brand-primary" />
-        <p className="text-xs text-text-muted font-bold uppercase tracking-wider">
-          Cargando historial de pedidos...
+  return (
+    <div className="space-y-6">
+      <div>
+        <h2 className="text-lg font-black text-text-strong font-display uppercase tracking-tight">
+          Historial de Pedidos
+        </h2>
+        <p className="text-xs sm:text-[13px] text-text-muted mt-1">
+          Consulta tus órdenes anteriores, revisa su estado y vuelve a pedir en un clic.
         </p>
       </div>
-    );
-  }
 
-  if (ordersError) {
-    return (
-      <div className="bg-surface-card border border-surface-border rounded-3xl p-8 text-center space-y-4">
-        <AlertCircle className="w-8 h-8 mx-auto text-brand-primary" />
-        <p className="text-xs text-text-base font-medium">{ordersError}</p>
-        <button
-          type="button"
-          onClick={() => fetchOrders()}
-          className="bg-brand-primary hover:brightness-110 text-white text-xs font-bold uppercase px-6 py-2.5 rounded-full min-h-[44px] cursor-pointer"
-        >
-          Reintentar
-        </button>
-      </div>
-    );
-  }
-
-  if (orders.length === 0) {
-    return (
-      <div className="bg-surface-card border border-surface-border rounded-3xl p-12 text-center space-y-4">
-        <div className="w-16 h-16 rounded-full bg-surface-canvas flex items-center justify-center mx-auto text-text-subtle">
-          <Package className="w-8 h-8" />
-        </div>
-        <div className="space-y-1">
-          <h3 className="text-lg font-black text-text-strong font-display uppercase tracking-tight">
-            Aún no tienes pedidos registrados
-          </h3>
-          <p className="text-xs text-text-muted max-w-sm mx-auto">
-            Explora las opciones de nuestra plataforma gastronómica y realiza tu primer pedido en minutos.
+      {isLoadingOrders ? (
+        <div className="py-10 text-center space-y-4 animate-pulse">
+          <Loader2 className="w-8 h-8 animate-spin mx-auto text-brand-primary" />
+          <p className="text-xs text-text-muted font-bold uppercase tracking-wider">
+            Cargando historial de pedidos...
           </p>
         </div>
-        <div className="pt-2">
-          <Link
-            href="/"
-            className="inline-flex items-center justify-center bg-brand-primary hover:brightness-110 text-white font-black text-xs uppercase tracking-wider font-display px-8 py-3.5 rounded-full shadow-sm min-h-[44px]"
+      ) : ordersError ? (
+        <div className="py-10 text-center space-y-4">
+          <AlertCircle className="w-8 h-8 mx-auto text-brand-primary" />
+          <p className="text-xs text-text-base font-medium">{ordersError}</p>
+          <button
+            type="button"
+            onClick={() => fetchOrders()}
+            className="bg-brand-primary hover:brightness-110 text-white text-xs font-bold uppercase px-6 py-2.5 rounded-full min-h-[44px] cursor-pointer"
           >
-            Explorar Restaurantes
-          </Link>
+            Reintentar
+          </button>
         </div>
-      </div>
-    );
-  }
+      ) : orders.length === 0 ? (
+        <div className="py-10 text-center space-y-4">
+          <Package className="w-8 h-8 text-text-subtle mx-auto" />
+          <div className="space-y-1">
+            <h3 className="text-sm font-black text-text-strong font-display uppercase tracking-tight">
+              Aún no tienes pedidos registrados
+            </h3>
+            <p className="text-xs text-text-muted max-w-sm mx-auto">
+              Explora las opciones de nuestra plataforma gastronómica y realiza tu primer pedido en minutos.
+            </p>
+          </div>
+          <div className="pt-2">
+            <Link
+              href="/"
+              className="inline-flex items-center justify-center bg-brand-primary hover:brightness-110 text-white font-black text-xs uppercase tracking-wider font-display px-8 py-3.5 rounded-full shadow-sm min-h-[44px]"
+            >
+              Explorar Restaurantes
+            </Link>
+          </div>
+        </div>
+      ) : (
+        <div className="space-y-4">
+          {orders.map((order) => {
+            const orderDate = new Date(order.createdAt).toLocaleDateString("es-EC", {
+              year: "numeric",
+              month: "short",
+              day: "numeric",
+              hour: "2-digit",
+              minute: "2-digit",
+            });
 
-  return (
-    <div className="space-y-4">
-      {orders.map((order) => {
-        const orderDate = new Date(order.createdAt).toLocaleDateString("es-EC", {
-          year: "numeric",
-          month: "short",
-          day: "numeric",
-          hour: "2-digit",
-          minute: "2-digit",
-        });
-
-        return (
-          <div
-            key={order.orderId}
-            className="bg-surface-card border border-surface-border rounded-3xl p-6 md:p-7 space-y-5 shadow-xs hover:border-text-subtle/40 transition-colors"
-          >
+            return (
+              <div
+                key={order.orderId}
+                className="bg-surface-canvas/40 border border-surface-border rounded-2xl p-5 md:p-6 space-y-5 hover:border-text-subtle/40 transition-colors"
+              >
             {/* Cabecera del pedido */}
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-surface-border pb-4">
               <div>
@@ -213,9 +210,11 @@ export function AccountOrdersSection() {
                 <span>Pedir Nuevamente</span>
               </button>
             </div>
-          </div>
-        );
-      })}
+            </div>
+          );
+        })}
+        </div>
+      )}
     </div>
   );
 }

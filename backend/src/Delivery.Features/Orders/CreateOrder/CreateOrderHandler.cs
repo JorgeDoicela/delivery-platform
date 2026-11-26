@@ -1,8 +1,10 @@
 using Delivery.Core.Common;
+using Delivery.Core.Common.Spatial;
 using Delivery.Core.Contracts;
 using Delivery.Core.Contracts.Realtime;
 using Delivery.Core.Domain.Entities;
 using Delivery.Core.Domain.Enums;
+using Delivery.Core.Domain.Policies;
 using Delivery.Core.Infrastructure.Persistence;
 using Delivery.Features.Common.Handlers;
 using FluentValidation;
@@ -240,7 +242,7 @@ public sealed class CreateOrderHandler : IHandler<CreateOrderCommand, Result<Cre
             CreatedAt = DateTime.UtcNow
         };
 
-        if (command.DeliveryLatitude.HasValue && command.DeliveryLongitude.HasValue)
+        if (command.DeliveryLatitude.HasValue && command.DeliveryLongitude.HasValue && branch.LocationPoint is not null)
         {
             order.DeliveryLocation = GeometryFactory.CreatePoint(
                 new Coordinate(command.DeliveryLongitude.Value, command.DeliveryLatitude.Value)
@@ -316,6 +318,36 @@ public sealed class CreateOrderHandler : IHandler<CreateOrderCommand, Result<Cre
         order.Subtotal = Math.Round(subtotal, 2, MidpointRounding.AwayFromZero);
         order.TaxAmount = Math.Round(taxTotal, 2, MidpointRounding.AwayFromZero);
         order.DiscountAmount = Math.Round(order.DiscountAmount, 2, MidpointRounding.AwayFromZero);
+
+        if (command.DeliveryType == DeliveryType.Delivery)
+        {
+            double? straightLineKm = command.DeliveryLatitude.HasValue
+                && command.DeliveryLongitude.HasValue
+                && branch.LocationPoint is not null
+                    ? HaversineCalculator.CalculateDistanceKm(
+                        branch.LocationPoint.Y,
+                        branch.LocationPoint.X,
+                        command.DeliveryLatitude.Value,
+                        command.DeliveryLongitude.Value)
+                    : null;
+
+            var deliveryFeeCalc = DeliveryFeePolicy.Calculate(
+                baseFee: configuredDeliveryFee,
+                enableDynamicDistanceFee: tenantSettings?.EnableDynamicDistanceFee ?? false,
+                baseDistanceKm: tenantSettings?.BaseDeliveryDistanceKm ?? 2.0,
+                extraFeePerKm: tenantSettings?.ExtraDeliveryFeePerKm ?? 0.50m,
+                maxDeliveryFee: tenantSettings?.MaxDeliveryFee,
+                freeDeliveryMinOrderAmount: tenantSettings?.FreeDeliveryMinOrderAmount,
+                straightLineDistanceKm: straightLineKm,
+                orderSubtotal: order.Subtotal
+            );
+            order.DeliveryFee = deliveryFeeCalc.DeliveryFee;
+        }
+        else
+        {
+            order.DeliveryFee = 0.00m;
+        }
+
         order.Total = Math.Round(Math.Max(0m, order.Subtotal - order.DiscountAmount + order.DeliveryFee), 2, MidpointRounding.AwayFromZero);
 
         // Validar pagos en efectivo y cálculo de vuelto
@@ -363,7 +395,7 @@ public sealed class CreateOrderHandler : IHandler<CreateOrderCommand, Result<Cre
         }
 
         double? orderDistanceKm = null;
-        if (command.DeliveryLatitude.HasValue && command.DeliveryLongitude.HasValue)
+        if (command.DeliveryLatitude.HasValue && command.DeliveryLongitude.HasValue && branch.LocationPoint is not null)
         {
             var branchLat = branch.LocationPoint.Y;
             var branchLon = branch.LocationPoint.X;

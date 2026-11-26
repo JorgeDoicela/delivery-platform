@@ -50,6 +50,9 @@ export function DeliveryInfoSection({
     const cartBranchId = useCartStore((s) => s.branchId);
     const setBranch = useCartStore((s) => s.setBranch);
     const setCartDeliveryType = useCartStore((s) => s.setDeliveryType);
+    const setCalculatedDeliveryFee = useCartStore((s) => s.setCalculatedDeliveryFee);
+    const calculatedDeliveryFee = useCartStore((s) => s.calculatedDeliveryFee);
+    const subtotal = useCartStore((s) => s.getSubtotal());
     const tenantSlug = useCartStore((s) => s.tenantSlug);
 
     const { data: tenant } = useCurrentTenantQuery(tenantSlug);
@@ -62,6 +65,8 @@ export function DeliveryInfoSection({
         branches.find((b) => b.id === cartBranchId) ?? branches[0];
     const baseDeliveryFee =
         activeBranchForFee?.effectiveDeliveryFee ?? tenant?.baseDeliveryFee ?? 1.5;
+    const displayedDeliveryFee =
+        calculatedDeliveryFee !== null ? calculatedDeliveryFee : baseDeliveryFee;
 
     const currentDeliveryType = watch("deliveryType");
     const isDelivery = currentDeliveryType === 1;
@@ -114,9 +119,12 @@ export function DeliveryInfoSection({
             setCoverageError(null);
 
             try {
-                const branch = await apiClient.resolveBranch(lat, lng);
+                const branch = await apiClient.resolveBranch(lat, lng, subtotal);
                 setResolvedBranch(branch);
                 setBranch(branch.branchId, branch.branchName);
+                if (typeof branch.calculatedDeliveryFee === "number") {
+                    setCalculatedDeliveryFee(branch.calculatedDeliveryFee);
+                }
                 onLocationResolved(lat, lng);
 
                 // Geocodificación inversa automática para que el cliente no deba escribir la calle
@@ -146,8 +154,23 @@ export function DeliveryInfoSection({
                 setIsValidatingLocation(false);
             }
         },
-        [setBranch, onLocationResolved, setValue, isDelivery]
+        [setBranch, setCalculatedDeliveryFee, onLocationResolved, setValue, isDelivery, subtotal]
     );
+
+    // Recalcular tarifa de envío si cambia el subtotal (ej. alcanza envío gratis por monto mínimo)
+    useEffect(() => {
+        if (!isDelivery || !coords || !resolvedBranch) return;
+        apiClient
+            .resolveBranch(coords.lat, coords.lng, subtotal)
+            .then((branch) => {
+                setResolvedBranch(branch);
+                if (typeof branch.calculatedDeliveryFee === "number") {
+                    setCalculatedDeliveryFee(branch.calculatedDeliveryFee);
+                }
+            })
+            .catch(() => {});
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [subtotal, isDelivery]);
 
     // Actualizar capacidad si cambia la modalidad (Delivery vs Takeout) sobre la sucursal ya resuelta
     useEffect(() => {
@@ -221,7 +244,7 @@ export function DeliveryInfoSection({
                             <Truck className={`w-3.5 h-3.5 sm:w-4 sm:h-4 shrink-0 ${isDelivery ? "text-white" : "text-text-muted"}`} />
                             <span className="truncate">A Domicilio</span>
                             <span className={`text-[10px] sm:text-[11px] font-mono font-bold shrink-0 ${isDelivery ? "text-white/90" : "text-brand-primary"}`}>
-                                ({formatCurrency(baseDeliveryFee)})
+                                ({displayedDeliveryFee === 0 ? "Gratis" : formatCurrency(displayedDeliveryFee)})
                             </span>
                         </button>
 
@@ -340,10 +363,24 @@ export function DeliveryInfoSection({
                                 {resolvedBranch.isDirectCoverage === false
                                     ? `Por cercanía • Sede ${resolvedBranch.branchName}`
                                     : `Despacha Sede ${resolvedBranch.branchName}`}
-                                {resolvedBranch.distanceKm ? (
-                                    <span className="font-normal text-text-muted"> ({resolvedBranch.distanceKm} km)</span>
+                                {(resolvedBranch.estimatedRoadDistanceKm || resolvedBranch.distanceKm) ? (
+                                    <span className="font-normal text-text-muted">
+                                        {" "}({resolvedBranch.estimatedRoadDistanceKm || resolvedBranch.distanceKm} km est.)
+                                    </span>
                                 ) : null}
                             </p>
+                            {resolvedBranch.isFreeByMinimumOrder ? (
+                                <p className="text-[11px] font-bold text-status-success mt-0.5">
+                                    Envío gratis aplicado por monto mínimo de pedido
+                                </p>
+                            ) : resolvedBranch.isDynamicFeeApplied && typeof resolvedBranch.calculatedDeliveryFee === "number" ? (
+                                <p className="text-[11px] font-medium text-text-muted mt-0.5">
+                                    Tarifa calculada por distancia:{" "}
+                                    <span className="font-bold font-mono text-text-strong">
+                                        {formatCurrency(resolvedBranch.calculatedDeliveryFee)}
+                                    </span>
+                                </p>
+                            ) : null}
                             {branchCapacity && (
                                 <p className="text-[11px] font-medium text-text-muted mt-0.5">
                                     Entrega estimada: <span className="font-bold text-text-strong">{branchCapacity.estimatedDeliveryTime}</span>

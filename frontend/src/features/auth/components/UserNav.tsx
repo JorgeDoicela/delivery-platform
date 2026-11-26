@@ -176,58 +176,54 @@ export function UserNav({ tenantSlug, showGuestLogin = true }: UserNavProps = {}
       {isOpen && (
         <div
           role="menu"
-          className="absolute right-0 mt-2 w-52 rounded-2xl bg-surface-card border border-surface-border shadow-xl py-1.5 z-50"
+          className="absolute right-0 mt-2 w-56 rounded-2xl bg-surface-card border border-surface-border shadow-xl p-1.5 z-50 space-y-0.5"
         >
-          <div className="px-3.5 py-2 border-b border-surface-border">
+          <div className="px-3 py-2">
             <p className="text-xs font-bold text-text-strong truncate">
               {user.fullName}
             </p>
             {user.email && (
-              <p className="text-[11px] text-text-muted truncate">
+              <p className="text-[11px] text-text-muted truncate mt-0.5">
                 {user.email}
               </p>
             )}
           </div>
 
-          <div className="py-1">
+          <Link
+            href={routes.getAccountHref()}
+            role="menuitem"
+            onClick={() => setIsOpen(false)}
+            className={`flex items-center gap-2.5 px-3 py-2 rounded-xl text-xs font-semibold transition-colors ${
+              isAccountActive
+                ? "text-brand-primary bg-surface-canvas font-bold"
+                : "text-text-strong hover:bg-surface-canvas hover:text-brand-primary"
+            }`}
+          >
+            <UserIcon className="w-3.5 h-3.5 text-brand-primary shrink-0" />
+            <span>Mi Perfil</span>
+          </Link>
+
+          {isCashierOrKitchen && (
             <Link
-              href={routes.getAccountHref()}
+              href={routes.getHomeHref()}
               role="menuitem"
               onClick={() => setIsOpen(false)}
-              className={`flex items-center gap-2.5 px-3.5 py-2 text-xs font-semibold transition-colors ${
-                isAccountActive
-                  ? "text-brand-primary bg-surface-canvas font-bold"
-                  : "text-text-strong hover:bg-surface-canvas hover:text-brand-primary"
-              }`}
+              className="flex items-center gap-2.5 px-3 py-2 rounded-xl text-xs font-semibold text-text-strong hover:bg-surface-canvas hover:text-brand-primary transition-colors"
             >
-              <UserIcon className="w-3.5 h-3.5 text-brand-primary shrink-0" />
-              <span>Mi Perfil</span>
+              <Store className="w-3.5 h-3.5 text-text-muted shrink-0" />
+              <span>Ver Tienda</span>
             </Link>
+          )}
 
-            {isCashierOrKitchen && (
-              <Link
-                href={routes.getHomeHref()}
-                role="menuitem"
-                onClick={() => setIsOpen(false)}
-                className="flex items-center gap-2.5 px-3.5 py-2 text-xs font-semibold text-text-strong hover:bg-surface-canvas hover:text-brand-primary transition-colors"
-              >
-                <Store className="w-3.5 h-3.5 text-text-muted shrink-0" />
-                <span>Ver Tienda</span>
-              </Link>
-            )}
-          </div>
-
-          <div className="pt-1 border-t border-surface-border">
-            <button
-              type="button"
-              role="menuitem"
-              onClick={handleLogout}
-              className="w-full flex items-center gap-2.5 px-3.5 py-2 text-xs font-semibold text-text-muted hover:text-red-500 hover:bg-surface-canvas transition-colors cursor-pointer"
-            >
-              <LogOut className="w-3.5 h-3.5 shrink-0" />
-              <span>Cerrar Sesión</span>
-            </button>
-          </div>
+          <button
+            type="button"
+            role="menuitem"
+            onClick={handleLogout}
+            className="w-full flex items-center gap-2.5 px-3 py-2 rounded-xl text-xs font-semibold text-text-muted hover:text-red-500 hover:bg-surface-canvas transition-colors cursor-pointer"
+          >
+            <LogOut className="w-3.5 h-3.5 shrink-0" />
+            <span>Cerrar Sesión</span>
+          </button>
         </div>
       )}
     </div>

@@ -118,7 +118,9 @@ export function FastCasualUrbanLandingLayout({
                       {brandName} • Pedido Directo
                     </p>
                     <p className="text-[11px] text-text-muted">
-                      Sin recargos de intermediarios • Factura electrónica SRI
+                      {tenant?.allowCustomBilling === false
+                        ? "Sin recargos de intermediarios • Pedido directo"
+                        : "Sin recargos de intermediarios • Factura electrónica SRI"}
                     </p>
                   </div>
                 </div>

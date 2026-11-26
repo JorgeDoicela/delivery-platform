@@ -221,12 +221,16 @@ export const apiClient = {
         return handleResponse<UpdateBranchHoursResponse>(res);
     },
 
-    // 1. Geofencing: Resolución espacial de cobertura
-    async resolveBranch(latitude: number, longitude: number): Promise<BranchCoverageDto> {
+    // 1. Geofencing: Resolución espacial de cobertura y tarifa dinámica por distancia
+    async resolveBranch(
+        latitude: number,
+        longitude: number,
+        orderSubtotal?: number
+    ): Promise<BranchCoverageDto> {
         const res = await fetch(`${getApiBaseUrl()}/api/geofencing/resolve`, {
             method: "POST",
             headers: buildHeaders(),
-            body: JSON.stringify({ latitude, longitude }),
+            body: JSON.stringify({ latitude, longitude, orderSubtotal }),
         });
         return handleResponse<BranchCoverageDto>(res);
     },

@@ -47,6 +47,10 @@ export interface BranchCoverageDto {
   isActive: boolean;
   distanceKm?: number;
   isDirectCoverage?: boolean;
+  calculatedDeliveryFee?: number;
+  estimatedRoadDistanceKm?: number;
+  isDynamicFeeApplied?: boolean;
+  isFreeByMinimumOrder?: boolean;
 }
 
 export interface CreateOrderItemRequest {
